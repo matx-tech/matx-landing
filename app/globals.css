@@ -101,6 +101,12 @@
     --color-action-danger-bg-active: var(--color-red-800);
     --color-feedback-warning: var(--color-amber-700);
     --color-feedback-info: var(--color-info-700);
+    --color-bg-info-subtle: var(--color-info-050);
+    --color-border-info: var(--color-info-400);
+    --color-text-info-strong: var(--color-info-700);
+    --color-bg-success-subtle: #E6F4ED;
+    --color-border-success: var(--color-green-400);
+    --color-text-success-strong: var(--color-green-700);
 
     /* --- Tier 3: Component Tokens --- */
     /* Primary Button */
@@ -176,6 +182,12 @@
     --color-action-danger-bg-active: var(--color-red-400);
     --color-feedback-warning: var(--color-amber-400);
     --color-feedback-info: var(--color-info-400);
+    --color-bg-info-subtle: var(--color-ink-800);
+    --color-border-info: var(--color-info-400);
+    --color-text-info-strong: var(--color-info-400);
+    --color-bg-success-subtle: var(--color-ink-800);
+    --color-border-success: var(--color-green-400);
+    --color-text-success-strong: var(--color-green-400);
 
     /* Tier 3 Dark Theme Adjustments */
     --button-primary-bg: var(--color-action-primary-bg);

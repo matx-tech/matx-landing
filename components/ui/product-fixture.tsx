@@ -64,15 +64,15 @@ export function ProductFixture({
   }, [animated, triggerId]);
 
   return (
-    <div
+    <section
       ref={containerRef}
       className={`space-y-4 ${className}`}
-      aria-label="Töövogu näide"
+      aria-labelledby="workflow-fixture-title"
     >
       {/* Label */}
-      <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+      <h2 id="workflow-fixture-title" className="text-xs font-medium text-text-secondary uppercase tracking-wider">
         {PRODUCT_FIXTURE.label}
-      </div>
+      </h2>
 
       {/* Student answer */}
       <div
@@ -94,18 +94,18 @@ export function ProductFixture({
       {/* Signal detection */}
       <div
         ref={signalRef}
-        className="p-4 bg-blue-50 rounded-lg border border-blue-200"
+        className="p-4 bg-info-surface rounded-lg border border-info-border"
         style={animated ? { opacity: 0 } : undefined}
       >
         <div className="flex items-center justify-between mb-2">
-          <span className="text-xs font-medium text-blue-800 uppercase tracking-wider">
+          <span className="text-xs font-medium text-info uppercase tracking-wider">
             {PRODUCT_FIXTURE.signal.label}
           </span>
-          <span className="text-xs text-blue-600">
+          <span className="text-xs text-info">
             {PRODUCT_FIXTURE.signal.confidence}
           </span>
         </div>
-        <div className="text-sm font-medium text-blue-900">
+        <div className="text-sm font-medium text-info-strong">
           {PRODUCT_FIXTURE.signal.pattern}
         </div>
       </div>
@@ -130,31 +130,32 @@ export function ProductFixture({
       {/* Teacher action */}
       <div
         ref={actionRef}
-        className="p-4 bg-green-50 rounded-lg border border-green-200"
+        className="p-4 bg-success-surface rounded-lg border border-success-border"
         style={animated ? { opacity: 0 } : undefined}
       >
-        <div className="text-xs font-medium text-green-800 uppercase tracking-wider mb-2">
+        <div className="text-xs font-medium text-success uppercase tracking-wider mb-2">
           Õpetaja otsustab
         </div>
-        <div className="text-sm font-medium text-green-900 mb-2">
+        <div className="text-sm font-medium text-success-strong mb-2">
           {PRODUCT_FIXTURE.teacherAction.recommendation}
         </div>
-        <div className="text-xs text-green-700 mb-3">
+        <div className="text-xs text-success mb-3">
           Põhjendus: {PRODUCT_FIXTURE.teacherAction.evidence}
         </div>
         <div className="flex gap-2 flex-wrap">
           {PRODUCT_FIXTURE.teacherAction.options.map((option) => (
             <button
               key={option.action}
-              className="px-3 py-1.5 text-xs font-medium rounded border border-green-300 bg-white text-green-800 hover:bg-green-100 transition-colors"
-              disabled
-              aria-label={option.label}
+              className="px-3 py-1.5 text-xs font-medium rounded border border-success-border bg-surface text-success-strong"
+              type="button"
+              aria-disabled="true"
+              title="Näidisandmed — tegevus ei ole selles vaates aktiivne"
             >
               {option.label}
             </button>
           ))}
         </div>
       </div>
-    </div>
+    </section>
   );
 }

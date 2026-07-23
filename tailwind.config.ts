@@ -7,6 +7,10 @@ const config: Config = {
     './components/**/*.{js,ts,jsx,tsx,mdx}',
     './app/**/*.{js,ts,jsx,tsx,mdx}',
   ],
+  // These classes are assembled from the heatmap level at runtime. Keep the
+  // authored component styles in the production CSS instead of letting the
+  // content scanner purge them as unused.
+  safelist: ['heatmap-cell-1', 'heatmap-cell-2', 'heatmap-cell-3', 'heatmap-cell-4', 'heatmap-cell-5'],
   theme: {
     extend: {
       fontFamily: {
@@ -34,6 +38,12 @@ const config: Config = {
         alert: 'var(--color-feedback-error)',
         warning: 'var(--color-feedback-warning)',
         info: 'var(--color-feedback-info)',
+        'info-surface': 'var(--color-bg-info-subtle)',
+        'info-border': 'var(--color-border-info)',
+        'info-strong': 'var(--color-text-info-strong)',
+        'success-surface': 'var(--color-bg-success-subtle)',
+        'success-border': 'var(--color-border-success)',
+        'success-strong': 'var(--color-text-success-strong)',
         danger: 'var(--color-action-danger-bg-hover)',
         focusRing: 'var(--color-focus-ring)',
         topics: {
