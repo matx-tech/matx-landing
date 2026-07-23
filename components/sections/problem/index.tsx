@@ -8,29 +8,26 @@ import { ScrollIndicator } from '@/components/sections/hero/scroll-indicator';
 const storyBeats = [
   {
     id: 1,
-    title: 'Iga neljas ebaõnnestub',
-    subtitle: '25% kukub läbi',
-    description: 'Eesti matemaatika lõpueksamil kukub läbi 25% õpilastest. See pole lihtsalt number — see on tuhanded lapsed, kes kaotavad usalduse oma võimetesse.',
-    stat: '1 in 4',
-    statLabel: 'õpilastest kukub läbi',
+    title: 'Õpilane eksib',
+    subtitle: 'Klassiruumis',
+    description: 'Õpilane teeb vea matemaatika ülesandes, kuid ei tea, mis järgmisena harjutada. Vastus on vale, aga põhjus jääb ebaselgeks.',
+    visual: 'answer',
     color: 'primary',
   },
   {
     id: 2,
-    title: '1.9× nõudlus-pakkumise lõhe',
-    subtitle: 'Eraõpetajate puudus',
-    description: 'Eratundideks on 308 taotlust, kuid ainult 166 saadaval olevat õpetajat. Keskmine hind €22/tund — paljudele kättesaamatu.',
-    stat: '€22/h',
-    statLabel: 'keskmine tunnihind',
+    title: 'Muster kordub',
+    subtitle: 'Veamuster',
+    description: 'Sama viga ilmneb erinevates ülesannetes, kuid jääb märkamata. Õpilane harjutab edasi, kuid ei paranda põhiprobleemi.',
+    visual: 'pattern',
     color: 'accent',
   },
   {
     id: 3,
-    title: 'Olemasolevad ei tööta',
-    subtitle: 'Vastused, mitte põhjused',
-    description: 'PhotoMath, Khan Academy, Opiq — nad näitavad vastust. MATx näitab, MIKS said valesti. Me mõistame veatüüpe.',
-    stat: '7',
-    statLabel: 'veatüüpi tuvastatud',
+    title: 'Õpetaja vajab järgmist sammu',
+    subtitle: 'Õpetaja otsustab',
+    description: 'Õpetaja näeb tulemusi, kuid ei tea, milline harjutus aitaks kõige paremini. Individuaalne toetus nõuab aega ja struktuuri.',
+    visual: 'teacher',
     color: 'secondary',
   },
 ];
@@ -43,6 +40,9 @@ export function ProblemSection() {
 
   useEffect(() => {
     if (!sectionRef.current) return;
+
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReducedMotion) return;
 
     const beats = beatRefs.current;
     const texts = textRefs.current;
@@ -122,28 +122,11 @@ export function ProblemSection() {
                   <p className="text-lg md:text-xl text-text-secondary leading-relaxed mb-8">
                     {beat.description}
                   </p>
-
-                  <div className={`inline-flex items-baseline gap-2 px-6 py-3 rounded-xl border ${
-                    beat.color === 'primary'
-                      ? 'bg-elevated border-primary/20'
-                      : beat.color === 'accent'
-                      ? 'bg-elevated border-accent/20'
-                      : 'bg-elevated border-secondary/20'
-                  }`}>
-                    <span className={`text-4xl md:text-5xl font-display font-bold ${
-                      beat.color === 'primary' ? 'text-primary' :
-                      beat.color === 'accent' ? 'text-accent' :
-                      'text-secondary'
-                    }`}>
-                      {beat.stat}
-                    </span>
-                    <span className="text-text-secondary text-sm">{beat.statLabel}</span>
-                  </div>
                 </div>
 
                 {/* Right: Visual */}
                 <div className="flex justify-center">
-                  <div className="relative w-full max-w-md min-h-64 md:min-h-80 rounded-xl bg-elevated border border-border overflow-hidden">
+                  <div className="relative w-full max-w-md min-h-64 md:min-h-80 rounded-xl bg-elevated border border-border overflow-hidden p-6">
                     <div className={`absolute top-0 left-0 w-32 h-32 rounded-full blur-3xl ${
                       beat.color === 'primary' ? 'bg-primary/15' :
                       beat.color === 'accent' ? 'bg-accent/15' :
@@ -155,19 +138,60 @@ export function ProblemSection() {
                       'bg-primary/10'
                     }`} />
 
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="text-center">
-                        <div className={`text-6xl md:text-7xl font-mono font-bold mb-2 ${
-                          beat.color === 'primary' ? 'text-primary/30' :
-                          beat.color === 'accent' ? 'text-accent/30' :
-                          'text-secondary/30'
-                        }`}>
-                          {beat.stat}
+                    <div className="relative z-10">
+                      {/* Visual content based on beat type */}
+                      {beat.visual === 'answer' && (
+                        <div className="space-y-4">
+                          <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Näidisandmed</div>
+                          <div className="p-4 bg-card rounded-lg border border-border">
+                            <div className="text-sm font-medium mb-2">3/4 + 1/2 = ?</div>
+                            <div className="text-sm text-muted-foreground">Õpilase vastus: <span className="font-mono text-destructive">4/6</span></div>
+                          </div>
+                          <div className="text-xs text-muted-foreground italic">
+                            Õpilane ei tea, mida järgmisena harjutada
+                          </div>
                         </div>
-                        <div className="text-text-secondary/40 text-sm uppercase tracking-wider">
-                          {beat.statLabel}
+                      )}
+
+                      {beat.visual === 'pattern' && (
+                        <div className="space-y-4">
+                          <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Näidisandmed</div>
+                          <div className="space-y-2">
+                            <div className="p-3 bg-card rounded border border-border text-xs">
+                              <span className="text-muted-foreground">3/4 + 1/2 = </span>
+                              <span className="font-mono text-destructive">4/6</span>
+                            </div>
+                            <div className="p-3 bg-card rounded border border-border text-xs">
+                              <span className="text-muted-foreground">1/3 + 1/6 = </span>
+                              <span className="font-mono text-destructive">2/9</span>
+                            </div>
+                            <div className="p-3 bg-card rounded border border-border text-xs">
+                              <span className="text-muted-foreground">2/5 + 1/10 = </span>
+                              <span className="font-mono text-destructive">3/15</span>
+                            </div>
+                          </div>
+                          <div className="text-xs text-amber-600 bg-amber-50 px-3 py-2 rounded border border-amber-200">
+                            Võimalik veamuster: liidab lugejad ja nimetajad eraldi
+                          </div>
                         </div>
-                      </div>
+                      )}
+
+                      {beat.visual === 'teacher' && (
+                        <div className="space-y-4">
+                          <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Õpetaja vaade</div>
+                          <div className="p-4 bg-card rounded-lg border border-border">
+                            <div className="text-sm font-medium mb-2">Mis järgmisena?</div>
+                            <div className="text-xs text-muted-foreground space-y-1">
+                              <div>• Kas harjutada ühist nimetajat?</div>
+                              <div>• Kas kinnistada lihtsamat näidet?</div>
+                              <div>• Kas võrrelda visuaalsete mudeliga?</div>
+                            </div>
+                          </div>
+                          <div className="text-xs text-muted-foreground italic">
+                            Vajab struktuuri ja aega individuaalseks toetuseks
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
