@@ -145,15 +145,27 @@ function BloomEffect() {
 
 export function ParticleCanvas() {
   const [isMobile, setIsMobile] = useState(false);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
 
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768);
     };
+    const checkReducedMotion = () => {
+      setPrefersReducedMotion(window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+    };
+
     checkMobile();
+    checkReducedMotion();
+
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
+
+  // Don't render particle field for mobile or reduced motion users
+  if (isMobile || prefersReducedMotion) {
+    return null;
+  }
 
   return (
     <div className="absolute inset-0 w-full h-full">
@@ -162,13 +174,9 @@ export function ParticleCanvas() {
         gl={{ antialias: true, alpha: true }}
         dpr={[1, 2]}
       >
-        {!isMobile && (
-          <>
-            <ambientLight intensity={0.5} />
-            <ParticleField />
-            <BloomEffect />
-          </>
-        )}
+        <ambientLight intensity={0.5} />
+        <ParticleField />
+        <BloomEffect />
       </Canvas>
     </div>
   );

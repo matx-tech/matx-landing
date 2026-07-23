@@ -22,6 +22,13 @@ export function AnimatedWordReveal({
   useEffect(() => {
     if (!containerRef.current) return;
 
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReducedMotion) {
+      // Show content immediately without animation
+      gsap.set(wordsRef.current, { y: 0, opacity: 1, rotateX: 0 });
+      return;
+    }
+
     const words = wordsRef.current;
 
     gsap.set(words, {
@@ -82,6 +89,13 @@ export function AnimatedCharacterReveal({ children, className = '', delay = 1.5 
   useEffect(() => {
     if (!containerRef.current) return;
 
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReducedMotion) {
+      // Show content immediately without animation
+      gsap.set(charsRef.current, { opacity: 1, y: 0 });
+      return;
+    }
+
     const chars = charsRef.current;
 
     gsap.set(chars, {
@@ -126,6 +140,13 @@ export function MATxLogoAnimation({ delay = 0 }: { delay?: number }) {
 
   useEffect(() => {
     if (!containerRef.current) return;
+
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReducedMotion) {
+      // Show content immediately without animation
+      gsap.set(lettersRef.current, { scale: 1, opacity: 1, rotation: 0 });
+      return;
+    }
 
     const letters = lettersRef.current;
 

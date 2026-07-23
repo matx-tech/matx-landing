@@ -10,6 +10,15 @@ export function ScrollIndicator() {
   useEffect(() => {
     if (!containerRef.current || !mouseRef.current) return;
 
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (prefersReducedMotion) {
+      // Show indicator without animation
+      gsap.set(containerRef.current, { opacity: 1, y: 0 });
+      gsap.set(mouseRef.current, { y: 0 });
+      return;
+    }
+
     gsap.set(containerRef.current, { opacity: 0, y: -20 });
     gsap.to(containerRef.current, {
       opacity: 1,
