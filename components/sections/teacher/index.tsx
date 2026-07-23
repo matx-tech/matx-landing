@@ -3,25 +3,31 @@
 import { useRef, useEffect, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { Clock, FileText, Scan, Users, AlertTriangle, TrendingUp } from 'lucide-react';
+import { AlertTriangle, TrendingUp, Clock } from 'lucide-react';
+import { TEACHER_STORY, SECTION_IDS } from '@/lib/content/landing-copy';
+import { PRODUCT_FIXTURE } from '@/lib/content/landing-evidence';
+import { CapabilityStatusBadge } from '@/components/ui/capability-status';
 
-// CVI-compliant alert types using semantic tokens
-const alertTypes = [
-  { icon: AlertTriangle, label: 'Raskused tuumteemaga', description: 'Tase <60% üle 5+ katse', tokenVar: 'var(--alert-error)' },
-  { icon: TrendingUp, label: 'Kiire pakkumine', description: '3+ vale <5s each', tokenVar: 'var(--alert-warning)' },
-  { icon: FileText, label: 'Arvutusviga', description: 'Korduv arvutusviga', tokenVar: 'var(--alert-info)' },
-  { icon: Clock, label: 'Kaasamatus', description: '7+ päeva passiivne', tokenVar: 'var(--alert-success)' },
-  { icon: Users, label: 'Platoo', description: '15+ katset, areng puudub', tokenVar: 'var(--alert-accent)' },
-  { icon: Scan, label: 'Veamuster', description: 'Sama viga 3+ korda', tokenVar: 'var(--alert-primary)' },
-];
-
-const teacherTools = [
-  'Loo eksam',
-  'Prindi tööleht',
-  'Skanni käsikirja',
-  'Genereeri vanema kiri',
-  'Ekspordi PDF',
-  'Loo raport',
+// Teacher-facing signals tied to the evidence fixture
+const teacherSignals = [
+  {
+    icon: AlertTriangle,
+    label: 'Veamuster tuvastatud',
+    description: 'Liidab lugejad ja nimetajad eraldi',
+    status: 'Saadaval' as const,
+  },
+  {
+    icon: TrendingUp,
+    label: 'Soovitus genereeritud',
+    description: 'Harjuta murdarvu liitmist sammu-sammult',
+    status: 'Saadaval' as const,
+  },
+  {
+    icon: Clock,
+    label: 'Reaalajas jälgimine',
+    description: 'Tunni ajal õpilaste edusammud',
+    status: 'Kavandatud' as const,
+  },
 ];
 
 // Heatmap level labels for accessibility
@@ -36,12 +42,15 @@ const heatmapLevelLabels = [
 export function TeacherSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const heatmapRef = useRef<HTMLDivElement>(null);
-  const alertCardsRef = useRef<HTMLDivElement[]>([]);
+  const signalCardsRef = useRef<HTMLDivElement[]>([]);
   const [hoveredCell, setHoveredCell] = useState<{ row: number; col: number } | null>(null);
   const [focusedCell, setFocusedCell] = useState<{ row: number; col: number } | null>(null);
 
   useEffect(() => {
     if (!sectionRef.current) return;
+
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReducedMotion) return;
 
     gsap.fromTo(
       sectionRef.current.querySelector('.section-title'),
@@ -58,7 +67,7 @@ export function TeacherSection() {
       }
     );
 
-    alertCardsRef.current.forEach((card, index) => {
+    signalCardsRef.current.forEach((card, index) => {
       if (!card) return;
 
       gsap.fromTo(
@@ -92,31 +101,20 @@ export function TeacherSection() {
   };
 
   return (
-    <section ref={sectionRef} id="opetajale" className="relative py-24 md:py-32 lg:py-40 bg-surface overflow-hidden">
+    <section ref={sectionRef} id={SECTION_IDS.teacher} className="relative py-24 md:py-32 lg:py-40 bg-surface overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-b from-canvas via-transparent to-canvas pointer-events-none" />
-
-      {/* Teacher Tools Marquee */}
-      <div className="relative w-full overflow-hidden py-6 border-y border-border">
-        <div className="flex items-center gap-8 animate-marquee">
-          {[...teacherTools, ...teacherTools].map((tool, i) => (
-            <span key={i} className="text-text-secondary/60 text-sm uppercase tracking-wider whitespace-nowrap font-mono">
-              {tool}
-            </span>
-          ))}
-        </div>
-      </div>
 
       <div className="relative z-10 container mx-auto px-4 md:px-8 lg:px-16">
         {/* Section Title */}
-        <div className="section-title text-center mb-16 mt-12">
+        <div className="section-title text-center mb-16">
           <span className="inline-block text-secondary text-sm uppercase tracking-widest mb-4 font-mono">
             Õpetajatele
           </span>
           <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-display font-bold text-text-primary mb-6">
-            MATx Õpetaja
+            {TEACHER_STORY.heading}
           </h2>
           <p className="text-lg md:text-xl text-text-secondary max-w-3xl mx-auto mb-4">
-            Säästa 10 tundi nädalas. MATx Õpetaja automatiseerib töölehtede koostamise: 60 sekundit → 4 sekundit.
+            {TEACHER_STORY.description}
           </p>
         </div>
 
@@ -124,10 +122,30 @@ export function TeacherSection() {
         <div ref={heatmapRef} className="mb-16">
           <div className="relative mx-auto max-w-4xl bg-elevated rounded-xl p-6 border border-border overflow-hidden">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-display font-semibold text-text-primary">
-                Klassi soorituskaart
-              </h3>
+              <div className="flex items-center gap-3">
+                <h3 className="text-lg font-display font-semibold text-text-primary">
+                  Klassi soorituskaart
+                </h3>
+                <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                  {TEACHER_STORY.heatmapLabel}
+                </span>
+              </div>
               <span className="text-text-secondary text-sm font-mono">22 õpilast · 9 oskust</span>
+            </div>
+
+            {/* Skill names row */}
+            <div className="mb-2 text-xs text-muted-foreground">
+              <div className="grid gap-1" style={{ gridTemplateColumns: `repeat(${skills}, minmax(0, 1fr))`, minWidth: '500px' }}>
+                <span>Liitm.</span>
+                <span>Lahut.</span>
+                <span>Korr.</span>
+                <span>Jag.</span>
+                <span>Murrud</span>
+                <span>Küm.m.</span>
+                <span>Prose.</span>
+                <span>Võrr.</span>
+                <span>Geom.</span>
+              </div>
             </div>
 
             {/* Heatmap Grid */}
@@ -170,7 +188,7 @@ export function TeacherSection() {
               </div>
             </div>
 
-            {/* Legend with text labels (not color alone) */}
+            {/* Legend with text labels */}
             <div className="flex items-center justify-center gap-4 mt-4">
               <span className="text-xs text-text-secondary">Madal</span>
               <div className="flex gap-1">
@@ -193,56 +211,72 @@ export function TeacherSection() {
           </div>
         </div>
 
-        {/* Alert Types */}
+        {/* Teacher Signals */}
         <div className="mb-16">
           <div className="text-center mb-8">
             <h3 className="text-xl font-display font-semibold text-text-primary">
-              6 automaatset hoiatustüüpi
+              Õpetaja signaalid
             </h3>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-            {alertTypes.map((alert, index) => (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+            {teacherSignals.map((signal, index) => (
               <div
-                key={alert.label}
+                key={signal.label}
                 ref={(el) => {
-                  if (el) alertCardsRef.current[index] = el;
+                  if (el) signalCardsRef.current[index] = el;
                 }}
-                className="bg-elevated rounded-xl p-4 text-center border border-border hover:border-primary/30 transition-colors group"
+                className="bg-elevated rounded-xl p-6 border border-border hover:border-primary/30 transition-colors"
               >
-                <div
-                  className="w-10 h-10 rounded-lg mx-auto mb-3 flex items-center justify-center group-hover:scale-110 transition-transform"
-                  style={{ backgroundColor: `color-mix(in srgb, ${alert.tokenVar} 12.5%, transparent)` }}
-                >
-                  <alert.icon className="w-5 h-5" style={{ color: alert.tokenVar }} />
+                <div className="flex items-start justify-between mb-3">
+                  <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                    <signal.icon className="w-5 h-5 text-primary" />
+                  </div>
+                  <CapabilityStatusBadge status={signal.status} />
                 </div>
-                <div className="text-sm font-medium text-text-primary mb-1">
-                  {alert.label}
+                <div className="text-sm font-medium text-text-primary mb-2">
+                  {signal.label}
                 </div>
-                <span className="text-xs text-text-secondary font-mono">{alert.description}</span>
+                <p className="text-xs text-text-secondary">
+                  {signal.description}
+                </p>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Teacher Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="card p-6 text-center">
-            <Clock className="w-8 h-8 text-primary mx-auto mb-3" />
-            <div className="text-4xl font-display font-bold text-text-primary mb-1">10h</div>
-            <div className="text-text-secondary text-sm">säästetud nädalas</div>
-          </div>
+        {/* Intervention Card */}
+        <div className="max-w-4xl mx-auto">
+          <div className="bg-green-50 rounded-xl p-6 border border-green-200">
+            <div className="flex items-start justify-between mb-4">
+              <h3 className="text-lg font-semibold text-green-900">Õpetaja sekkumine</h3>
+              <CapabilityStatusBadge status="Saadaval" />
+            </div>
 
-          <div className="card p-6 text-center">
-            <FileText className="w-8 h-8 text-secondary mx-auto mb-3" />
-            <div className="text-3xl font-display font-bold text-text-primary mb-1">60s → 4s</div>
-            <div className="text-text-secondary text-sm">töölehe loomine</div>
-          </div>
+            <div className="space-y-3 mb-4">
+              <div>
+                <div className="text-xs font-medium text-green-800 uppercase tracking-wider mb-1">Soovitus</div>
+                <div className="text-sm text-green-900">{PRODUCT_FIXTURE.teacherAction.recommendation}</div>
+              </div>
 
-          <div className="card p-6 text-center">
-            <Users className="w-8 h-8 text-secondary mx-auto mb-3" />
-            <div className="text-4xl font-display font-bold text-text-primary mb-1">22</div>
-            <div className="text-text-secondary text-sm">õpilast ühes vaates</div>
+              <div>
+                <div className="text-xs font-medium text-green-800 uppercase tracking-wider mb-1">Põhjendus</div>
+                <div className="text-sm text-green-700">{PRODUCT_FIXTURE.teacherAction.evidence}</div>
+              </div>
+            </div>
+
+            <div className="flex gap-3 flex-wrap pt-4 border-t border-green-200">
+              <div className="text-xs font-medium text-green-800 uppercase tracking-wider">Õpetaja valikud:</div>
+              {PRODUCT_FIXTURE.teacherAction.options.map((option) => (
+                <button
+                  key={option.action}
+                  className="px-3 py-1.5 text-xs font-medium rounded border border-green-300 bg-white text-green-800 hover:bg-green-100 transition-colors"
+                  disabled
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       </div>
