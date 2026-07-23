@@ -4,15 +4,9 @@ import { useRef, useEffect, useState, useCallback } from 'react';
 import gsap from 'gsap';
 import { Menu, X, Award } from 'lucide-react';
 import * as Dialog from '@radix-ui/react-dialog';
+import { LANDING_NAV_ITEMS } from '@/lib/content/landing-copy';
 
-const navItems = [
-  { label: 'Kuidas töötab', href: '#toovoog' },
-  { label: 'Õpilasele', href: '#opilasele' },
-  { label: 'Õpetajale', href: '#opetajale' },
-  { label: 'Teemad', href: '#teemad' },
-  { label: 'Usaldus', href: '#usaldus' },
-  { label: 'KKK', href: '#kkk' },
-];
+const navItems = LANDING_NAV_ITEMS;
 
 interface NavigationProps {
   onOpenRegistration?: () => void;
@@ -26,6 +20,12 @@ export function Navigation({ onOpenRegistration }: NavigationProps) {
   useEffect(() => {
     const nav = navRef.current;
     if (!nav) return;
+
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReducedMotion) {
+      gsap.set(nav, { y: 0, opacity: 1 });
+      return;
+    }
 
     gsap.set(nav, { y: -100, opacity: 0 });
     gsap.to(nav, {
@@ -117,7 +117,7 @@ export function Navigation({ onOpenRegistration }: NavigationProps) {
     <Dialog.Root open={isOpen} onOpenChange={handleOpenChange}>
       <nav
         ref={navRef}
-        className="fixed top-0 left-0 right-0 z-50 px-4 md:px-8 lg:px-16 py-4 bg-surface border-b border-border"
+        className="fixed top-0 left-0 right-0 z-50 px-4 md:px-8 lg:px-12 py-3 bg-surface border-b border-border"
       >
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           {/* Logo */}
@@ -133,7 +133,7 @@ export function Navigation({ onOpenRegistration }: NavigationProps) {
           </a>
 
           {/* Desktop Nav */}
-          <div className="hidden lg:flex items-center gap-8">
+          <div className="hidden xl:flex items-center gap-5 2xl:gap-8">
             {navItems.map((item) => (
               <a
                 key={item.label}
@@ -147,10 +147,10 @@ export function Navigation({ onOpenRegistration }: NavigationProps) {
           </div>
 
           {/* CTA Buttons */}
-          <div className="hidden md:flex items-center gap-4">
+          <div className="hidden md:flex items-center gap-2 xl:gap-4">
             <a
               href="#piloot"
-              className="px-4 py-2 rounded-lg text-sm font-medium text-text-secondary hover:text-text-primary transition-colors focus-ring-target min-h-[44px] flex items-center"
+              className="px-3 py-2 rounded-lg text-sm font-medium text-text-secondary hover:text-text-primary transition-colors focus-ring-target min-h-[44px] flex items-center whitespace-nowrap"
             >
               Liitu piloodiga
             </a>
@@ -158,7 +158,7 @@ export function Navigation({ onOpenRegistration }: NavigationProps) {
               href="https://calendly.com/matx-ee/15min"
               target="_blank"
               rel="noopener noreferrer"
-              className="btn-primary px-6 py-2 rounded-lg text-sm font-medium focus-ring-target min-h-[44px]"
+              className="btn-primary px-4 xl:px-6 py-2 rounded-lg text-sm font-medium focus-ring-target min-h-[44px] whitespace-nowrap"
             >
               Broneeri vestlus
             </a>

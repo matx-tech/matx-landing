@@ -218,5 +218,15 @@ export const SECTION_IDS = {
   context: 'kontekst',
   capabilities: 'võimekused',
   pilot: 'piloot',
+  trust: 'usaldus',
   faq: 'kkk',
 } as const;
+
+export const LANDING_NAV_ITEMS = [
+  { label: 'Kuidas töötab', href: `#${SECTION_IDS.workflow}` },
+  { label: 'Õpilasele', href: `#${SECTION_IDS.student}` },
+  { label: 'Õpetajale', href: `#${SECTION_IDS.teacher}` },
+  { label: 'Teemad', href: `#${SECTION_IDS.capabilities}` },
+  { label: 'Usaldus', href: `#${SECTION_IDS.trust}` },
+  { label: 'KKK', href: `#${SECTION_IDS.faq}` },
+] as const;

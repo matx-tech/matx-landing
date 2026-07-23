@@ -3,7 +3,7 @@
 import { AnimatedWordReveal, AnimatedCharacterReveal, MATxLogoAnimation } from './animated-headline';
 import { ScrollIndicator } from './scroll-indicator';
 import { ProductFixture } from '@/components/ui/product-fixture';
-import { HERO_COPY } from '@/lib/content/landing-copy';
+import { HERO_COPY, SECTION_IDS } from '@/lib/content/landing-copy';
 import { Award, GraduationCap } from 'lucide-react';
 
 interface HeroSectionProps {
@@ -12,7 +12,7 @@ interface HeroSectionProps {
 
 export function HeroSection({ onOpenRegistration }: HeroSectionProps) {
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-canvas">
+    <section id={SECTION_IDS.hero} className="relative min-h-screen flex items-center justify-center overflow-hidden bg-canvas">
       {/* CVI-compliant blueprint grid background */}
       <div className="absolute inset-0 hero-blueprint-bg" aria-hidden="true" />
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-canvas/40 to-canvas pointer-events-none" />
@@ -57,7 +57,7 @@ export function HeroSection({ onOpenRegistration }: HeroSectionProps) {
               </button>
 
               <a
-                href="#töövoog"
+                href={`#${SECTION_IDS.workflow}`}
                 className="btn-secondary min-w-[240px] sm:min-w-[280px] px-8 py-4 text-lg rounded-xl font-semibold group focus-ring-target min-h-[44px]"
               >
                 {HERO_COPY.secondaryCTA}
