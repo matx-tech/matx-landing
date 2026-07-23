@@ -5,10 +5,12 @@ import dynamic from 'next/dynamic';
 import { Navigation } from '@/components/ui/navigation';
 import { ScrollProgress } from '@/components/ui/scroll-progress';
 import { HeroSection } from '@/components/sections/hero';
+import { EvidenceLoopSection } from '@/components/sections/evidence-loop';
+import { StudentSection } from '@/components/sections/student';
 import { ProblemSection } from '@/components/sections/problem';
-import { DifferenceSection } from '@/components/sections/difference';
-import { JourneySection } from '@/components/sections/journey';
 import { TeacherSection } from '@/components/sections/teacher';
+import { ContextSection } from '@/components/sections/context';
+import { AdoptionSection } from '@/components/sections/adoption';
 import { TrustSection } from '@/components/sections/trust';
 import { CTASection } from '@/components/sections/cta';
 import { FAQSection } from '@/components/sections/faq';
@@ -45,12 +47,15 @@ export default function Home() {
       <ScrollProgress />
       <Navigation onOpenRegistration={handleOpenRegistration} />
       <main id="main" className="relative">
+        {/* New narrative order: hero → evidence loop → student → teacher → context → topics → adoption → trust → faq → cta */}
         <HeroSection onOpenRegistration={handleOpenRegistration} />
+        <EvidenceLoopSection />
+        <StudentSection />
         <ProblemSection />
-        <DifferenceSection />
-        <TopicsSection />
-        <JourneySection />
         <TeacherSection />
+        <ContextSection />
+        <TopicsSection />
+        <AdoptionSection onOpenRegistration={handleOpenRegistration} />
         <TrustSection />
         <FAQSection />
         <CTASection onOpenRegistration={handleOpenRegistration} />

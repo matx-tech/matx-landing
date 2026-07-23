@@ -27,23 +27,23 @@ const ibmPlexMono = IBM_Plex_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://matx.ee'),
-  title: 'MATx — Adaptiivne matemaatikaõpikeskkond Eesti põhikoolidele',
+  title: 'MATx — Õpilase harjutamine ja õpetaja otsus ühes töövoos',
   description:
-    'Adaptiivne matemaatikaõpikeskkond Eesti põhikoolidele. 150+ kureeritud ülesannet, Bayesian Knowledge Tracing mootor, EU AI Act nõuetele vastav.',
+    'MATx seob õpilase vastused, jälgitavad signaalid ja õpetaja tegevussoovituse üheks läbipaistvaks töövooks. Piloot Eesti põhikoolides.',
   keywords: [
     'matemaatika',
     'Eesti',
     'kool',
     'õppimine',
-    'BKT',
-    'ülesanded',
+    'harjutamine',
     'adaptiivne',
     'põhikool',
+    'õpetaja',
   ],
   authors: [{ name: 'MATx' }, { name: 'Andri Suga' }, { name: 'Tom Kristian Abel' }],
   openGraph: {
-    title: 'MATx — Adaptiivne matemaatikaõpikeskkond Eesti põhikoolidele',
-    description: '150+ kureeritud ülesannet, BKT mootor, EU AI Act nõuetele vastav.',
+    title: 'MATx — Õpilase harjutamine ja õpetaja otsus ühes töövoos',
+    description: 'Seob õpilase vastused, jälgitavad signaalid ja õpetaja tegevussoovituse üheks läbipaistvaks töövooks.',
     url: 'https://matx.ee',
     siteName: 'MATx',
     type: 'website',
@@ -51,8 +51,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'MATx — Adaptiivne matemaatikaõpikeskkond Eesti põhikoolidele',
-    description: '150+ kureeritud ülesannet, BKT mootor, EU AI Act nõuetele vastav.',
+    title: 'MATx — Õpilase harjutamine ja õpetaja otsus ühes töövoos',
+    description: 'Seob õpilase vastused, jälgitavad signaalid ja õpetaja tegevussoovituse üheks läbipaistvaks töövooks.',
   },
   robots: {
     index: true,
@@ -79,7 +79,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               '@context': 'https://schema.org',
               '@type': 'EducationalOrganization',
               name: 'MATx',
-              description: 'Adaptiivne matemaatikaõpikeskkond Eesti põhikoolidele',
+              description: 'Seob õpilase harjutamise, arusaadava tagasiside ja õpetaja tegevussoovituse üheks jälgitavaks töövooks',
               url: 'https://matx.ee',
               logo: 'https://matx.ee/logo.png',
               foundingDate: '2026',

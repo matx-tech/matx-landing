@@ -6,11 +6,11 @@ import { Menu, X, Award } from 'lucide-react';
 import * as Dialog from '@radix-ui/react-dialog';
 
 const navItems = [
-  { label: 'Probleem', href: '#probleem' },
-  { label: 'Erinevus', href: '#erinevus' },
-  { label: 'Teemad', href: '#teemad' },
-  { label: 'Õpitee', href: '#opitee' },
+  { label: 'Kuidas töötab', href: '#toovoog' },
+  { label: 'Õpilasele', href: '#opilasele' },
   { label: 'Õpetajale', href: '#opetajale' },
+  { label: 'Teemad', href: '#teemad' },
+  { label: 'Usaldus', href: '#usaldus' },
   { label: 'KKK', href: '#kkk' },
 ];
 
@@ -149,19 +149,19 @@ export function Navigation({ onOpenRegistration }: NavigationProps) {
           {/* CTA Buttons */}
           <div className="hidden md:flex items-center gap-4">
             <a
+              href="#piloot"
+              className="px-4 py-2 rounded-lg text-sm font-medium text-text-secondary hover:text-text-primary transition-colors focus-ring-target min-h-[44px] flex items-center"
+            >
+              Liitu piloodiga
+            </a>
+            <a
               href="https://calendly.com/matx-ee/15min"
               target="_blank"
               rel="noopener noreferrer"
-              className="px-4 py-2 rounded-lg text-sm font-medium text-text-secondary hover:text-text-primary transition-colors focus-ring-target min-h-[44px] flex items-center"
-            >
-              Infovestlus
-            </a>
-            <button
-              onClick={onOpenRegistration}
               className="btn-primary px-6 py-2 rounded-lg text-sm font-medium focus-ring-target min-h-[44px]"
             >
-              Registreeri kool
-            </button>
+              Broneeri vestlus
+            </a>
           </div>
 
           {/* Mobile Menu Button - Dialog Trigger */}
@@ -213,12 +213,13 @@ export function Navigation({ onOpenRegistration }: NavigationProps) {
             }}
             className="overflow-hidden mt-8 flex flex-col gap-4"
           >
-            <button
-              onClick={handleRegistrationClick}
-              className="px-6 py-3 rounded-lg bg-primary text-text-inverse font-semibold focus-ring-target min-h-[44px]"
+            <a
+              href="#piloot"
+              onClick={() => setIsOpen(false)}
+              className="px-6 py-3 rounded-lg bg-primary text-text-inverse font-semibold focus-ring-target min-h-[44px] text-center"
             >
-              Registreeri kool
-            </button>
+              Liitu piloodiga
+            </a>
             <a
               href="https://calendly.com/matx-ee/15min"
               target="_blank"
@@ -226,7 +227,7 @@ export function Navigation({ onOpenRegistration }: NavigationProps) {
               onClick={() => setIsOpen(false)}
               className="px-6 py-3 rounded-lg border border-border text-text-primary font-semibold hover:bg-surface transition-colors text-center focus-ring-target min-h-[44px]"
             >
-              Broneeri infovestlus
+              Broneeri vestlus
             </a>
           </div>
 
