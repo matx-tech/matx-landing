@@ -3,34 +3,7 @@
 import { useRef, useEffect, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-
-const faqItems = [
-  {
-    question: 'Kui palju maksab MATx koolile?',
-    answer: 'Pilootkatsetuse perioodil: 100% tasuta, kogu rahastus Targa Tuleviku Fondi poolt. Ei mingit kaasrahastamist ega varjatud kulusid. Pärast pilootkatsetust jätkub MATx põhikoolidele mõistliku hinnaga SaaS-litsentsi mudelil.',
-    category: 'hind',
-  },
-  {
-    question: 'Kuidas mõjub see õpetaja tööajale?',
-    answer: 'Netoajakulu väheneb, mitte suureneb. Automatiseeritud: parandamine ja analüüsimine (eemaldab pühapäevaõhtused), diferentseeritud töölehtede koostamine (60 sekund → 4 sekund), klassi ülevaated automaatselt uuenev. Prognoositud netosääst: 2 tundi nädalas.',
-    category: 'tööaeg',
-  },
-  {
-    question: 'Kuidas on garanteeritud andmeturve ja GDPR?',
-    answer: 'Isikuku päringuid ei koguta. Õpilased saavad anonüümsed identifikaatorid. Krüpteering: RSA-4096 + ML-DSA-65 hübriid-allkirjastamine, RFC 3161 ajatemplid, 18-aastane säilitus. EU AI Act: MATx on täielikult kooskõlas.',
-    category: 'turvalisus',
-  },
-  {
-    question: 'Kas see sobib ebaühtlaste tasemetega klassi?',
-    answer: 'Jah, just see on meie tuumväärtus. Tugevamad õpilased: Olympiad-stiilis ülesanded. Keskmine tase: ZPD sihtimine (70% tuttav, 30% uus). Väiksema ettevalmistusega: ilma surveeta lünkade täitmine. Klassis 28 õpilast käsitletakse 28 individuaalset õpiteed.',
-    category: 'diferentseerimine',
-  },
-  {
-    question: 'Millised on konkreetsed liitumise sammud?',
-    answer: '1. Täida vorm (1 minut) → 2. Võta vastu 15-minutiline infovestlus → 3. Allkirjasta digitaalne toetuskiri Targa Tuleviku Fondi taotluseks → 4. Sügisene pilootkatsetus algab: August 2026. Meie tiim toetab samm-sammult.',
-    category: 'liitumine',
-  },
-];
+import { FAQ_ENTRIES, SECTION_IDS } from '@/lib/content/landing-copy';
 
 export function FAQSection() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -39,6 +12,9 @@ export function FAQSection() {
 
   useEffect(() => {
     if (!sectionRef.current) return;
+
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReducedMotion) return;
 
     itemsRef.current.forEach((item, index) => {
       if (!item) return;
@@ -71,7 +47,7 @@ export function FAQSection() {
   };
 
   return (
-    <section ref={sectionRef} id="kkk" className="relative py-24 md:py-32 bg-surface overflow-hidden">
+    <section ref={sectionRef} id={SECTION_IDS.faq} className="relative py-24 md:py-32 bg-surface overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-b from-canvas via-transparent to-canvas pointer-events-none" />
 
       <div className="relative z-10 container mx-auto px-4 md:px-8 lg:px-16 max-w-4xl">
@@ -87,7 +63,7 @@ export function FAQSection() {
 
         {/* FAQ Items */}
         <div className="space-y-4">
-          {faqItems.map((item, index) => {
+          {FAQ_ENTRIES.map((item, index) => {
             const isOpen = openIndex === index;
 
             return (
