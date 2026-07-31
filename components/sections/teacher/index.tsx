@@ -162,7 +162,7 @@ export function TeacherSection() {
 
   return (
     <section ref={sectionRef} id={SECTION_IDS.teacher} className="relative py-24 md:py-32 lg:py-40 bg-surface overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-b from-canvas via-transparent to-canvas pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-b from-canvas via-transparent to-transparent pointer-events-none" />
 
       <div className="relative z-10 container mx-auto px-4 md:px-8 lg:px-16">
         {/* Section Title */}
