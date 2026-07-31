@@ -133,7 +133,7 @@ export function AdoptionSection({ onOpenRegistration }: AdoptionRoutesProps) {
                 <button
                   type="button"
                   onClick={() => handleCTAClick(route.ctaAction)}
-                  className="w-full px-4 py-2.5 text-sm font-medium rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                  className="w-full px-4 py-2.5 text-sm font-medium rounded-lg bg-primary text-text-inverse hover:bg-primary/90 transition-colors focus-ring-target min-h-[44px]"
                   aria-label={`${route.cta} - ${route.audience}`}
                 >
                   {route.cta}
