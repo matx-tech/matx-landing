@@ -15,8 +15,7 @@ export function Fraction({
 }) {
   return (
     <span
-      className={`inline-flex flex-col items-center leading-none mx-px align-middle ${className}`}
-      style={{ verticalAlign: '-0.35em' }}
+      className={`inline-flex flex-col items-center leading-none ${className}`}
       aria-label={`${num}/${den}`}
       role="img"
     >
@@ -30,7 +29,8 @@ export function Fraction({
  * Renders a simple inline math expression with fractions.
  * Supports operators + − × ÷ between fractions or integers.
  * Recognises patterns like "3/4", "1/2" and renders them as vertical fractions.
- * Everything else passes through as-is.
+ * Operators are vertically centred on the fraction bar (vinculum), not
+ * baseline-aligned with the numerator.
  */
 export function InlineFractionalExpression({
   expression,
@@ -50,10 +50,18 @@ export function InlineFractionalExpression({
     }
     // Preserve whitespace as spaces
     if (/^\s+$/.test(token)) {
-      return ' ';
+      return <span key={i}> </span>;
     }
-    return <span key={i}>{token}</span>;
+    return (
+      <span key={i} className="self-center">
+        {token}
+      </span>
+    );
   });
 
-  return <span className={className}>{rendered}</span>;
+  return (
+    <span className={`inline-flex items-center gap-px align-middle ${className}`}>
+      {rendered}
+    </span>
+  );
 }
