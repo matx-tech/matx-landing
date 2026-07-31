@@ -98,7 +98,7 @@ export function ProblemSection() {
             }}
             className="relative min-h-screen flex items-center justify-center py-20"
           >
-            <div className="absolute inset-0 bg-gradient-to-b from-canvas via-surface to-transparent opacity-50" />
+            <div className="absolute inset-0 bg-gradient-to-b from-canvas via-surface to-transparent opacity-10" />
 
             <div
               ref={(el) => {
