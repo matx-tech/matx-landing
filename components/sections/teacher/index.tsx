@@ -119,10 +119,10 @@ export function TeacherSection() {
 
         {/* Interactive Heatmap */}
         <div ref={heatmapRef} className="mb-16">
-          <div className="relative mx-auto max-w-4xl bg-elevated rounded-xl p-6 border border-border overflow-hidden">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-3">
-                <h3 className="text-lg font-display font-semibold text-text-primary">
+          <div className="relative mx-auto max-w-4xl bg-elevated rounded-xl p-3 sm:p-6 border border-border overflow-hidden">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+              <div className="flex flex-wrap items-center gap-2">
+                <h3 className="text-lg font-display font-semibold text-text-primary whitespace-nowrap">
                   Klassi soorituskaart
                 </h3>
                 <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
@@ -132,65 +132,67 @@ export function TeacherSection() {
               <span className="text-text-secondary text-sm font-mono">22 õpilast · 9 oskust</span>
             </div>
 
-            {/* Skill names row */}
-            <div className="mb-2 text-xs text-muted-foreground">
-              <div className="grid gap-1" style={{ gridTemplateColumns: `repeat(${skills}, minmax(0, 1fr))`, minWidth: '620px' }}>
-                <span>Liitmine</span>
-                <span>Lahutamine</span>
-                <span>Korrutamine</span>
-                <span>Jagamine</span>
-                <span>Murrud</span>
-                <span>Kümnendmurrud</span>
-                <span>Protsendid</span>
-                <span>Võrrandid</span>
-                <span>Geomeetria</span>
-              </div>
-            </div>
-
-            {/* Heatmap Grid */}
-            <div className="relative overflow-x-auto">
-              <div
-                className="flex flex-col gap-1"
-                style={{ minWidth: '620px' }}
-                role="grid"
-                aria-label="Klassi soorituskaart: 22 õpilast, 9 oskust"
-                onMouseMove={(e) => {
-                  if (!gradientOverlayRef.current) return;
-                  const rect = e.currentTarget.getBoundingClientRect();
-                  const x = ((e.clientX - rect.left) / rect.width) * 100;
-                  const y = ((e.clientY - rect.top) / rect.height) * 100;
-                  gradientOverlayRef.current.style.setProperty('--heatmap-x', `${x}%`);
-                  gradientOverlayRef.current.style.setProperty('--heatmap-y', `${y}%`);
-                  gradientOverlayRef.current.style.opacity = '1';
-                }}
-                onMouseLeave={() => {
-                  if (gradientOverlayRef.current) {
-                    gradientOverlayRef.current.style.opacity = '0';
-                  }
-                }}
-              >
-                {Array.from({ length: students }).map((_, row) => (
-                  <div key={`row-${row}`} role="row" className="grid gap-1" style={{ gridTemplateColumns: `repeat(${skills}, minmax(0, 1fr))` }}>
-                    {Array.from({ length: skills }).map((_, col) => {
-                      const level = getCellLevel(row, col) + 1;
-
-                      return (
-                        <button
-                          key={`${row}-${col}`}
-                          type="button"
-                          className={`aspect-square rounded-sm transition-[opacity,transform] duration-150 focus:outline-none heatmap-cell-${level} opacity-60 hover:opacity-100 hover:[transform:scale(1.3)] focus-visible:opacity-100 focus-visible:[transform:scale(1.3)]`}
-                          aria-label={`Õpilane ${row + 1}, Oskus ${col + 1}: ${heatmapLevelLabels[level - 1]}`}
-                          role="gridcell"
-                        />
-                      );
-                    })}
+            {/* Unified scroll container for headers + grid */}
+            <div className="overflow-x-auto">
+              <div style={{ minWidth: '620px' }}>
+                {/* Skill names row */}
+                <div className="mb-2 text-xs text-muted-foreground">
+                  <div className="grid gap-1" style={{ gridTemplateColumns: `repeat(${skills}, minmax(0, 1fr))` }}>
+                    <span>Liitmine</span>
+                    <span>Lahutamine</span>
+                    <span>Korrutamine</span>
+                    <span>Jagamine</span>
+                    <span>Murrud</span>
+                    <span>Kümnendmurrud</span>
+                    <span>Protsendid</span>
+                    <span>Võrrandid</span>
+                    <span>Geomeetria</span>
                   </div>
-                ))}
+                </div>
+
+                {/* Heatmap Grid */}
+                <div
+                  className="flex flex-col gap-1"
+                  role="grid"
+                  aria-label="Klassi soorituskaart: 22 õpilast, 9 oskust"
+                  onMouseMove={(e) => {
+                    if (!gradientOverlayRef.current) return;
+                    const rect = e.currentTarget.getBoundingClientRect();
+                    const x = ((e.clientX - rect.left) / rect.width) * 100;
+                    const y = ((e.clientY - rect.top) / rect.height) * 100;
+                    gradientOverlayRef.current.style.setProperty('--heatmap-x', `${x}%`);
+                    gradientOverlayRef.current.style.setProperty('--heatmap-y', `${y}%`);
+                    gradientOverlayRef.current.style.opacity = '1';
+                  }}
+                  onMouseLeave={() => {
+                    if (gradientOverlayRef.current) {
+                      gradientOverlayRef.current.style.opacity = '0';
+                    }
+                  }}
+                >
+                  {Array.from({ length: students }).map((_, row) => (
+                    <div key={`row-${row}`} role="row" className="grid gap-1" style={{ gridTemplateColumns: `repeat(${skills}, minmax(0, 1fr))` }}>
+                      {Array.from({ length: skills }).map((_, col) => {
+                        const level = getCellLevel(row, col) + 1;
+
+                        return (
+                          <button
+                            key={`${row}-${col}`}
+                            type="button"
+                            className={`aspect-square rounded-sm transition-[opacity,transform] duration-150 focus:outline-none heatmap-cell-${level} opacity-60 hover:opacity-100 hover:[transform:scale(1.3)] focus-visible:opacity-100 focus-visible:[transform:scale(1.3)]`}
+                            aria-label={`Õpilane ${row + 1}, Oskus ${col + 1}: ${heatmapLevelLabels[level - 1]}`}
+                            role="gridcell"
+                          />
+                        );
+                      })}
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
 
             {/* Legend with text labels */}
-            <div className="flex items-center justify-center gap-4 mt-4">
+            <div className="flex items-center justify-center gap-4 mt-3 pt-3">
               <span className="text-xs text-text-secondary">Madal</span>
               <div className="flex gap-1">
                 {[1, 2, 3, 4, 5].map((level) => (
