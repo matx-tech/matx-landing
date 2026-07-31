@@ -4,6 +4,7 @@ import { useRef, useMemo, useEffect, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import gsap from 'gsap';
+import { usePrefersReducedMotion } from '@/lib/hooks/use-prefers-reduced-motion';
 
 function ParticleField() {
   const meshRef = useRef<THREE.Points>(null);
@@ -127,25 +128,24 @@ function ParticleField() {
 }
 
 export function ParticleCanvas() {
-  // Initialize from window on first client render so we never mount Canvas for mobile / reduced-motion users
+  const prefersReducedMotion = usePrefersReducedMotion();
+
+  // Initialize from window on first client render so we never mount Canvas for mobile users
   const [state] = useState(() => {
-    if (typeof window === 'undefined') return { ready: false, isMobile: false, prefersReducedMotion: false };
+    if (typeof window === 'undefined') return { ready: false, isMobile: false };
     return {
       ready: true,
       isMobile: window.innerWidth < 768,
-      prefersReducedMotion: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
     };
   });
 
   const [isMobile, setIsMobile] = useState(state.isMobile);
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(state.prefersReducedMotion);
   const [ready, setReady] = useState(state.ready);
 
   useEffect(() => {
     // If window was undefined during SSR, initialize now
     if (!ready) {
       setIsMobile(window.innerWidth < 768);
-      setPrefersReducedMotion(window.matchMedia('(prefers-reduced-motion: reduce)').matches);
       setReady(true);
       return;
     }

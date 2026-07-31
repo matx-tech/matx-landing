@@ -3,6 +3,7 @@
 import { useRef, useEffect } from 'react';
 import gsap from 'gsap';
 import { SCROLL_INDICATOR_LABEL } from '@/lib/content/landing-copy';
+import { usePrefersReducedMotion } from '@/lib/hooks/use-prefers-reduced-motion';
 
 interface ScrollIndicatorProps {
   /** Hides the text label for compact contexts (between-beat indicators). */
@@ -12,11 +13,10 @@ interface ScrollIndicatorProps {
 export function ScrollIndicator({ hideLabel = false }: ScrollIndicatorProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mouseRef = useRef<HTMLDivElement>(null);
+  const prefersReducedMotion = usePrefersReducedMotion();
 
   useEffect(() => {
     if (!containerRef.current || !mouseRef.current) return;
-
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     if (prefersReducedMotion) {
       // Show indicator without animation
@@ -46,12 +46,13 @@ export function ScrollIndicator({ hideLabel = false }: ScrollIndicatorProps) {
       gsap.killTweensOf(containerRef.current);
       gsap.killTweensOf(mouseRef.current);
     };
-  }, []);
+  }, [prefersReducedMotion]);
 
   return (
     <div
       ref={containerRef}
       className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
+      role="img"
       aria-label={SCROLL_INDICATOR_LABEL}
     >
       {!hideLabel && (
