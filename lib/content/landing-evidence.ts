@@ -52,6 +52,13 @@ export const PRODUCT_FIXTURE = {
       { label: 'Ignoreeri', action: 'ignore' },
     ],
   },
+
+  // Recurring error-pattern examples for the problem-section pattern visual
+  patternExamples: [
+    { expression: '3/4 + 1/2', wrongAnswer: '4/6' },
+    { expression: '1/3 + 1/6', wrongAnswer: '2/9' },
+    { expression: '2/5 + 1/10', wrongAnswer: '3/15' },
+  ],
 } as const;
 
 // Capability records with status, source, and boundaries
