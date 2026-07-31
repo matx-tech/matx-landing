@@ -4,7 +4,7 @@ import { Award, GraduationCap, Twitter, Linkedin, Github, Mail } from 'lucide-re
 
 export function FooterSection() {
   return (
-    <footer className="relative bg-canvas border-t border-border">
+    <footer className="relative bg-canvas border-t border-border section-fade-from-surface">
       <div className="container mx-auto px-4 md:px-8 lg:px-16 py-16">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
           {/* Logo & Description */}

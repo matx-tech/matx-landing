@@ -536,6 +536,41 @@
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }
+
+  /* ── Section background transition fades ──
+     Sections alternate between bg-canvas (#F8FAFC) and bg-surface (#FFFFFF).
+     Hard edges at section boundaries are smoothed with a 6rem top-edge
+     ::before gradient that fades from the previous section's background.
+     The inner content sits at z-10, so the overlay at z-1 stays behind it. */
+  .section-fade-from-canvas {
+    position: relative;
+  }
+  .section-fade-from-canvas::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 6rem;
+    background: linear-gradient(to bottom, var(--color-bg-canvas), transparent);
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .section-fade-from-surface {
+    position: relative;
+  }
+  .section-fade-from-surface::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 6rem;
+    background: linear-gradient(to bottom, var(--color-bg-surface), transparent);
+    pointer-events: none;
+    z-index: 1;
+  }
 }
 
 /* Topic color utilities — CVI-compliant palette */

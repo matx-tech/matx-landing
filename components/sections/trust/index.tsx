@@ -42,7 +42,7 @@ export function TrustSection() {
   }, []);
 
   return (
-    <section ref={sectionRef} id="usaldus" className="relative py-24 md:py-32 lg:py-40 bg-canvas overflow-hidden">
+    <section ref={sectionRef} id="usaldus" className="relative py-24 md:py-32 lg:py-40 bg-canvas overflow-hidden section-fade-from-surface">
       <div className="absolute inset-0">
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
         <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-secondary/5 rounded-full blur-3xl" />
