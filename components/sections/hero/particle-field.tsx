@@ -130,26 +130,14 @@ function ParticleField() {
 export function ParticleCanvas() {
   const prefersReducedMotion = usePrefersReducedMotion();
 
-  // Initialize from window on first client render so we never mount Canvas for mobile users
-  const [state] = useState(() => {
-    if (typeof window === 'undefined') return { ready: false, isMobile: false };
-    return {
-      ready: true,
-      isMobile: window.innerWidth < 768,
-    };
-  });
-
-  const [isMobile, setIsMobile] = useState(state.isMobile);
-  const [ready, setReady] = useState(state.ready);
+  // Start with server-safe defaults; initialize from window in useEffect
+  const [isMobile, setIsMobile] = useState(false);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    // If window was undefined during SSR, initialize now
-    if (!ready) {
-      setIsMobile(window.innerWidth < 768);
-      setReady(true);
-      return;
-    }
-  }, [ready]);
+    setIsMobile(window.innerWidth < 768);
+    setReady(true);
+  }, []);
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
