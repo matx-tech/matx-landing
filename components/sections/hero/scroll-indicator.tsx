@@ -16,17 +16,19 @@ export function ScrollIndicator({ hideLabel = false }: ScrollIndicatorProps) {
   const prefersReducedMotion = usePrefersReducedMotion();
 
   useEffect(() => {
-    if (!containerRef.current || !mouseRef.current) return;
+    const container = containerRef.current;
+    const mouse = mouseRef.current;
+    if (!container || !mouse) return;
 
     if (prefersReducedMotion) {
       // Show indicator without animation
-      gsap.set(containerRef.current, { opacity: 1, y: 0 });
-      gsap.set(mouseRef.current, { y: 0 });
+      gsap.set(container, { opacity: 1, y: 0 });
+      gsap.set(mouse, { y: 0 });
       return;
     }
 
-    gsap.set(containerRef.current, { opacity: 0, y: -20 });
-    gsap.to(containerRef.current, {
+    gsap.set(container, { opacity: 0, y: -20 });
+    gsap.to(container, {
       opacity: 1,
       y: 0,
       duration: 0.3,
@@ -34,7 +36,7 @@ export function ScrollIndicator({ hideLabel = false }: ScrollIndicatorProps) {
       ease: 'cubic-bezier(0.2, 0, 0, 1)',
     });
 
-    gsap.to(mouseRef.current, {
+    gsap.to(mouse, {
       y: 8,
       duration: 1.2,
       repeat: -1,
@@ -43,8 +45,8 @@ export function ScrollIndicator({ hideLabel = false }: ScrollIndicatorProps) {
     });
 
     return () => {
-      gsap.killTweensOf(containerRef.current);
-      gsap.killTweensOf(mouseRef.current);
+      gsap.killTweensOf(container);
+      gsap.killTweensOf(mouse);
     };
   }, [prefersReducedMotion]);
 
