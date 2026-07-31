@@ -18,11 +18,7 @@ export function ScrollProgress() {
       end: 'bottom bottom',
       onUpdate: (self) => {
         if (progressRef.current) {
-          gsap.to(progressRef.current, {
-            scaleX: self.progress,
-            duration: 0.1,
-            ease: 'none',
-          });
+          gsap.set(progressRef.current, { scaleX: self.progress });
         }
       },
     });
