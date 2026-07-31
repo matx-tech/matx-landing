@@ -209,7 +209,7 @@ export function JourneySection() {
         .milestone-card {
           opacity: 0.4;
           transform: scale(0.9);
-          transition: all 0.5s ease;
+          transition: opacity 0.5s ease, transform 0.3s ease;
         }
 
         .milestone.active .milestone-card {
@@ -220,7 +220,7 @@ export function JourneySection() {
         }
 
         .milestone-line {
-          transition: all 0.5s ease;
+          transition: opacity 0.5s ease;
         }
 
         .milestone.active .milestone-line {

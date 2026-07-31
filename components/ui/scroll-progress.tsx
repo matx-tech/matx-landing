@@ -1,12 +1,11 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 export function ScrollProgress() {
   const progressRef = useRef<HTMLDivElement>(null);
-  const [progress, setProgress] = useState(0);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -18,9 +17,6 @@ export function ScrollProgress() {
       start: 'top top',
       end: 'bottom bottom',
       onUpdate: (self) => {
-        const prog = self.progress * 100;
-        setProgress(prog);
-
         if (progressRef.current) {
           gsap.to(progressRef.current, {
             scaleX: self.progress,
@@ -41,7 +37,7 @@ export function ScrollProgress() {
       <div
         ref={progressRef}
         className="h-full bg-gradient-brand origin-left"
-        style={{ width: `${progress}%`, maxWidth: '100%' }}
+        style={{ transform: 'scaleX(0)' }}
       />
     </div>
   );

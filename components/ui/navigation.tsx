@@ -2,6 +2,7 @@
 
 import { useRef, useEffect, useState, useCallback } from 'react';
 import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Menu, X, Award } from 'lucide-react';
 import * as Dialog from '@radix-ui/react-dialog';
 import { LANDING_NAV_ITEMS, SECTION_IDS, CALENDLY_URL } from '@/lib/content/landing-copy';
@@ -29,6 +30,9 @@ export function Navigation({ onOpenRegistration }: NavigationProps) {
       return;
     }
 
+    gsap.registerPlugin(ScrollTrigger);
+
+    // Initial entrance
     gsap.set(nav, { y: -100, opacity: 0 });
     gsap.to(nav, {
       y: 0,
@@ -38,40 +42,31 @@ export function Navigation({ onOpenRegistration }: NavigationProps) {
       ease: 'cubic-bezier(0.2, 0, 0, 1)',
     });
 
-    let lastScrollY = window.scrollY;
-    let ticking = false;
-
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-
-      if (!ticking) {
-        window.requestAnimationFrame(() => {
-          if (currentScrollY > lastScrollY && currentScrollY > 100) {
-            gsap.to(nav, {
-              y: -100,
-              opacity: 0.5,
-              duration: 0.25,
-              ease: 'cubic-bezier(0.4, 0, 1, 1)',
-            });
-          } else {
-            gsap.to(nav, {
-              y: 0,
-              opacity: 1,
-              duration: 0.25,
-              ease: 'cubic-bezier(0, 0, 0.2, 1)',
-            });
-          }
-          lastScrollY = currentScrollY;
-          ticking = false;
-        });
-        ticking = true;
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
+    // Scroll-driven hide/show via ScrollTrigger (replaces scroll event + rAF)
+    ScrollTrigger.create({
+      trigger: document.body,
+      start: 'top top',
+      onUpdate: (self) => {
+        if (self.scroll() > 100 && self.direction === 1) {
+          gsap.to(nav, {
+            y: -100,
+            opacity: 0.5,
+            duration: 0.25,
+            ease: 'cubic-bezier(0.4, 0, 1, 1)',
+          });
+        } else {
+          gsap.to(nav, {
+            y: 0,
+            opacity: 1,
+            duration: 0.25,
+            ease: 'cubic-bezier(0, 0, 0.2, 1)',
+          });
+        }
+      },
+    });
 
     return () => {
-      window.removeEventListener('scroll', handleScroll);
+      ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
       gsap.killTweensOf(nav);
     };
   }, []);

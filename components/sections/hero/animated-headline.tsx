@@ -64,7 +64,7 @@ export function AnimatedWordReveal({
             ref={(el) => {
               if (el) wordsRef.current[index] = el;
             }}
-            className="inline-block will-change-transform"
+            className="inline-block"
             style={{ display: 'inline-block', transformStyle: 'preserve-3d' }}
           >
             {word}
@@ -125,7 +125,7 @@ export function AnimatedCharacterReveal({ children, className = '', delay = 1.5 
           ref={(el) => {
             if (el) charsRef.current[index] = el;
           }}
-          className="inline-block will-change-transform"
+          className="inline-block"
         >
           {char === ' ' ? '\u00A0' : char}
         </span>
@@ -181,7 +181,7 @@ export function MATxLogoAnimation({ delay = 0 }: { delay?: number }) {
           ref={(el) => {
             if (el) lettersRef.current[index] = el;
           }}
-          className={`inline-block will-change-transform ${
+          className={`inline-block ${
             char === 'x' ? 'text-secondary' : 'text-primary'
           }`}
           style={{ display: 'inline-block' }}
