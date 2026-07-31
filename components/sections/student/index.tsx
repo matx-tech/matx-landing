@@ -11,6 +11,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { STUDENT_STORY, SECTION_IDS } from '@/lib/content/landing-copy';
 import { PRODUCT_FIXTURE } from '@/lib/content/landing-evidence';
 import { usePrefersReducedMotion } from '@/lib/hooks/use-prefers-reduced-motion';
+import { InlineFractionalExpression } from '@/components/ui/fraction';
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
@@ -100,7 +101,7 @@ export function StudentSection() {
               <div className="text-sm font-semibold text-foreground mb-2">Ülesanne</div>
               <div className="p-4 bg-surface rounded-lg border border-border">
                 <div className="text-base font-medium text-foreground">
-                  {PRODUCT_FIXTURE.task.question}
+                  <InlineFractionalExpression expression={PRODUCT_FIXTURE.task.question} />
                 </div>
               </div>
             </div>
@@ -110,7 +111,7 @@ export function StudentSection() {
               <div className="text-sm font-semibold text-foreground mb-2">Õpilase vastus</div>
               <div className="p-4 bg-red-50 rounded-lg border border-red-200">
                 <div className="text-base font-mono text-red-700">
-                  {PRODUCT_FIXTURE.answer.submitted}
+                  <InlineFractionalExpression expression={PRODUCT_FIXTURE.answer.submitted} />
                 </div>
               </div>
             </div>
@@ -130,7 +131,7 @@ export function StudentSection() {
               <div className="text-sm font-semibold text-foreground mb-2">Järgmine harjutus</div>
               <div className="p-4 bg-green-50 rounded-lg border border-green-200">
                 <div className="text-base font-medium text-green-900">
-                  {PRODUCT_FIXTURE.retry.question}
+                  <InlineFractionalExpression expression={PRODUCT_FIXTURE.retry.question} />
                 </div>
                 <div className="text-xs text-green-700 mt-2">
                   {PRODUCT_FIXTURE.retry.hint}

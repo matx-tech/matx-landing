@@ -135,16 +135,16 @@ export function TeacherSection() {
 
             {/* Skill names row */}
             <div className="mb-2 text-xs text-muted-foreground">
-              <div className="grid gap-1" style={{ gridTemplateColumns: `repeat(${skills}, minmax(0, 1fr))`, minWidth: '500px' }}>
-                <span>Liitm.</span>
-                <span>Lahut.</span>
-                <span>Korr.</span>
-                <span>Jag.</span>
+              <div className="grid gap-1" style={{ gridTemplateColumns: `repeat(${skills}, minmax(0, 1fr))`, minWidth: '620px' }}>
+                <span>Liitmine</span>
+                <span>Lahutamine</span>
+                <span>Korrutamine</span>
+                <span>Jagamine</span>
                 <span>Murrud</span>
-                <span>Küm.m.</span>
-                <span>Prose.</span>
-                <span>Võrr.</span>
-                <span>Geom.</span>
+                <span>Kümnendmurrud</span>
+                <span>Protsendid</span>
+                <span>Võrrandid</span>
+                <span>Geomeetria</span>
               </div>
             </div>
 
@@ -154,7 +154,7 @@ export function TeacherSection() {
                 className="grid gap-1"
                 style={{
                   gridTemplateColumns: `repeat(${skills}, minmax(0, 1fr))`,
-                  minWidth: '500px',
+                  minWidth: '620px',
                 }}
                 role="grid"
                 aria-label="Klassi soorituskaart: 22 õpilast, 9 oskust"

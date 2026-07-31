@@ -5,6 +5,7 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ScrollIndicator } from '@/components/sections/hero/scroll-indicator';
 import { PRODUCT_FIXTURE } from '@/lib/content/landing-evidence';
+import { Fraction, InlineFractionalExpression } from '@/components/ui/fraction';
 
 const storyBeats = [
   {
@@ -105,9 +106,9 @@ export function ProblemSection() {
               }}
               className="relative z-10 container mx-auto px-4 md:px-8 lg:px-16 max-w-5xl"
             >
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 items-center">
                 {/* Left: Text */}
-                <div className="text-center lg:text-left">
+                <div className="text-center lg:text-left max-w-prose">
                   <span className={`inline-block text-sm uppercase tracking-widest mb-4 font-mono ${
                     beat.color === 'primary' ? 'text-primary' :
                     beat.color === 'accent' ? 'text-accent' :
@@ -127,7 +128,7 @@ export function ProblemSection() {
 
                 {/* Right: Visual */}
                 <div className="flex justify-center">
-                  <div className="relative w-full max-w-md min-h-64 md:min-h-80 rounded-xl bg-elevated border border-border overflow-hidden p-6">
+                  <div className="relative w-full max-w-md min-h-0 rounded-xl bg-elevated border border-border p-4 md:p-6">
                     <div className={`absolute top-0 left-0 w-32 h-32 rounded-full blur-3xl ${
                       beat.color === 'primary' ? 'bg-primary/15' :
                       beat.color === 'accent' ? 'bg-accent/15' :
@@ -145,8 +146,8 @@ export function ProblemSection() {
                         <div className="space-y-4">
                           <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{PRODUCT_FIXTURE.label}</div>
                           <div className="p-4 bg-card rounded-lg border border-border">
-                            <div className="text-sm font-medium mb-2">{PRODUCT_FIXTURE.task.question}</div>
-                            <div className="text-sm text-muted-foreground">Õpilase vastus: <span className="font-mono text-destructive">{PRODUCT_FIXTURE.answer.submitted}</span></div>
+                            <div className="text-sm font-medium mb-2"><InlineFractionalExpression expression={PRODUCT_FIXTURE.task.question} /></div>
+                            <div className="text-sm text-muted-foreground">Õpilase vastus:{' '}<span className="font-mono text-destructive"><InlineFractionalExpression expression={PRODUCT_FIXTURE.answer.submitted} /></span></div>
                           </div>
                           <div className="text-xs text-muted-foreground italic">
                             Õpilane ei tea, mida järgmisena harjutada
@@ -159,16 +160,16 @@ export function ProblemSection() {
                           <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{PRODUCT_FIXTURE.label}</div>
                           <div className="space-y-2">
                             <div className="p-3 bg-card rounded border border-border text-xs">
-                              <span className="text-muted-foreground">3/4 + 1/2 = </span>
-                              <span className="font-mono text-destructive">4/6</span>
+                              <span className="text-muted-foreground"><InlineFractionalExpression expression="3/4 + 1/2" /> = </span>
+                              <span className="font-mono text-destructive"><InlineFractionalExpression expression="4/6" /></span>
                             </div>
                             <div className="p-3 bg-card rounded border border-border text-xs">
-                              <span className="text-muted-foreground">1/3 + 1/6 = </span>
-                              <span className="font-mono text-destructive">2/9</span>
+                              <span className="text-muted-foreground"><InlineFractionalExpression expression="1/3 + 1/6" /> = </span>
+                              <span className="font-mono text-destructive"><InlineFractionalExpression expression="2/9" /></span>
                             </div>
                             <div className="p-3 bg-card rounded border border-border text-xs">
-                              <span className="text-muted-foreground">2/5 + 1/10 = </span>
-                              <span className="font-mono text-destructive">3/15</span>
+                              <span className="text-muted-foreground"><InlineFractionalExpression expression="2/5 + 1/10" /> = </span>
+                              <span className="font-mono text-destructive"><InlineFractionalExpression expression="3/15" /></span>
                             </div>
                           </div>
                           <div className="text-xs text-amber-600 bg-amber-50 px-3 py-2 rounded border border-amber-200">

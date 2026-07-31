@@ -10,6 +10,7 @@ import { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { PRODUCT_FIXTURE } from '@/lib/content/landing-evidence';
+import { InlineFractionalExpression } from '@/components/ui/fraction';
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
@@ -81,10 +82,10 @@ export function ProductFixture({
         style={animated ? { opacity: 0 } : undefined}
       >
         <div className="text-sm font-medium text-foreground mb-2">
-          {PRODUCT_FIXTURE.task.question}
+          <InlineFractionalExpression expression={PRODUCT_FIXTURE.task.question} />
         </div>
         <div className="text-sm text-muted-foreground mb-1">
-          Õpilase vastus: <span className="font-mono text-destructive">{PRODUCT_FIXTURE.answer.submitted}</span>
+          Õpilase vastus:{' '}<span className="font-mono text-destructive"><InlineFractionalExpression expression={PRODUCT_FIXTURE.answer.submitted} /></span>
         </div>
         <div className="text-xs text-muted-foreground">
           Oskus: {PRODUCT_FIXTURE.task.skill}
@@ -120,7 +121,7 @@ export function ProductFixture({
           Järgmine harjutus
         </div>
         <div className="text-sm font-medium text-foreground mb-2">
-          {PRODUCT_FIXTURE.retry.question}
+          <InlineFractionalExpression expression={PRODUCT_FIXTURE.retry.question} />
         </div>
         <div className="text-xs text-muted-foreground">
           {PRODUCT_FIXTURE.retry.rationale}

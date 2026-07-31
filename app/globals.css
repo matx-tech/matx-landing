@@ -238,6 +238,11 @@
     font-size: 1.0625rem;
     line-height: 1.6;
     overflow-x: hidden;
+    /* Estonian hyphenation — lang="et" on <html> tells the browser to use et patterns */
+    hyphens: auto;
+    hyphenate-limit-chars: 7 3 3;
+    /* Prevent orphaned words due to leading-space at line-start */
+    overflow-wrap: break-word;
   }
 
   ::selection {
@@ -302,6 +307,16 @@
       linear-gradient(90deg, var(--color-blue-700) 1px, transparent 1px);
     background-size: 48px 48px;
     opacity: 0.06;
+  }
+
+  /* Estonian prose: prevent justified-text spacing artifacts and give
+     the browser the best chance at native et hyphenation */
+  .prose-et {
+    text-align: left;
+    hyphens: auto;
+    hyphenate-limit-chars: 8 3 3;
+    overflow-wrap: break-word;
+    word-break: normal;
   }
 }
 
