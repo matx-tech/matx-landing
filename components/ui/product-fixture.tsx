@@ -11,6 +11,7 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { PRODUCT_FIXTURE } from '@/lib/content/landing-evidence';
 import { InlineFractionalExpression } from '@/components/ui/fraction';
+import { usePrefersReducedMotion } from '@/lib/hooks/use-prefers-reduced-motion';
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
@@ -32,14 +33,18 @@ export function ProductFixture({
   const signalRef = useRef<HTMLDivElement>(null);
   const retryRef = useRef<HTMLDivElement>(null);
   const actionRef = useRef<HTMLDivElement>(null);
+  const prefersReducedMotion = usePrefersReducedMotion();
 
   useEffect(() => {
     if (!animated || !containerRef.current) return;
 
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (prefersReducedMotion) return;
-
     const elements = [answerRef.current, signalRef.current, retryRef.current, actionRef.current];
+
+    if (prefersReducedMotion) {
+      // Set all panels to their final visible state
+      gsap.set(elements, { opacity: 1, y: 0 });
+      return;
+    }
 
     // Set initial state
     gsap.set(elements, { opacity: 0, y: 20 });
@@ -62,7 +67,7 @@ export function ProductFixture({
     return () => {
       timeline.kill();
     };
-  }, [animated, triggerId]);
+  }, [animated, triggerId, prefersReducedMotion]);
 
   return (
     <section
