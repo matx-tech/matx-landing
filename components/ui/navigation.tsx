@@ -43,7 +43,7 @@ export function Navigation({ onOpenRegistration }: NavigationProps) {
     });
 
     // Scroll-driven hide/show via ScrollTrigger (replaces scroll event + rAF)
-    ScrollTrigger.create({
+    const st = ScrollTrigger.create({
       trigger: document.body,
       start: 'top top',
       onUpdate: (self) => {
@@ -66,7 +66,7 @@ export function Navigation({ onOpenRegistration }: NavigationProps) {
     });
 
     return () => {
-      ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
+      st.kill();
       gsap.killTweensOf(nav);
     };
   }, []);
