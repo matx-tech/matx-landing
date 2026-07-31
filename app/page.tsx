@@ -13,29 +13,24 @@ import { FooterSection } from '@/components/sections/footer';
 import { RegistrationForm } from '@/components/ui/registration-form';
 
 const EvidenceLoopSection = dynamic(
-  () => import('@/components/sections/evidence-loop').then((mod) => mod.EvidenceLoopSection),
-  { ssr: false }
+  () => import('@/components/sections/evidence-loop').then((mod) => mod.EvidenceLoopSection)
 );
 
 const StudentSection = dynamic(
-  () => import('@/components/sections/student').then((mod) => mod.StudentSection),
-  { ssr: false }
+  () => import('@/components/sections/student').then((mod) => mod.StudentSection)
 );
 
 const TeacherSection = dynamic(
-  () => import('@/components/sections/teacher').then((mod) => mod.TeacherSection),
-  { ssr: false }
+  () => import('@/components/sections/teacher').then((mod) => mod.TeacherSection)
 );
 
 const ContextSection = dynamic(
-  () => import('@/components/sections/context').then((mod) => mod.ContextSection),
-  { ssr: false }
+  () => import('@/components/sections/context').then((mod) => mod.ContextSection)
 );
 
 const TopicsSection = dynamic(
   () => import('@/components/sections/topics').then((mod) => mod.TopicsSection),
   {
-    ssr: false,
     loading: () => (
       <section className="py-24 md:py-32 lg:py-40 bg-surface">
         <div className="container mx-auto px-4 md:px-8 lg:px-16 text-center">
@@ -47,8 +42,7 @@ const TopicsSection = dynamic(
 );
 
 const AdoptionSection = dynamic(
-  () => import('@/components/sections/adoption').then((mod) => mod.AdoptionSection),
-  { ssr: false }
+  () => import('@/components/sections/adoption').then((mod) => mod.AdoptionSection)
 );
 
 export default function Home() {
