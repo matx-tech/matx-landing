@@ -3,7 +3,6 @@ import type { Metadata } from 'next';
 import { Public_Sans, Inter, IBM_Plex_Mono } from 'next/font/google';
 import { LenisProvider } from '@/components/providers/lenis-provider';
 import { SITE_META } from '@/lib/content/landing-copy';
-import 'katex/dist/katex.min.css';
 
 const publicSans = Public_Sans({
   subsets: ['latin'],
@@ -70,8 +69,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="et" className={`${publicSans.variable} ${inter.variable} ${ibmPlexMono.variable}`}>
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{

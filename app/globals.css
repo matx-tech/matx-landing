@@ -538,16 +538,6 @@
   }
 }
 
-/* KaTeX styling */
-.katex {
-  font-family: 'IBM Plex Mono', 'KaTeX_Main', serif !important;
-  font-size: 1.1em;
-}
-
-.katex .katex-html {
-  color: var(--color-text-primary);
-}
-
 /* Topic color utilities — CVI-compliant palette */
 .topic-protsendid { color: var(--color-teal-700); }
 .topic-vorrandid { color: var(--color-blue-700); }

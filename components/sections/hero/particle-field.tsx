@@ -68,9 +68,9 @@ function ParticleField() {
 
       const distX = (mouseRef.current.x * viewport.width) / 2 - x;
       const distY = (mouseRef.current.y * viewport.height) / 2 - y;
-      const dist = Math.sqrt(distX * distX + distY * distY);
+      const distSq = distX * distX + distY * distY;
 
-      if (dist < 2) {
+      if (distSq < 4) { // radius² = 2²
         positions[i3] += distX * 0.02;
         positions[i3 + 1] += distY * 0.02;
       }
@@ -126,23 +126,6 @@ function ParticleField() {
   );
 }
 
-function BloomEffect() {
-  const { gl, scene, camera } = useThree();
-  const renderTargetRef = useRef<THREE.WebGLRenderTarget>();
-
-  useFrame(() => {
-    if (!renderTargetRef.current) {
-      renderTargetRef.current = new THREE.WebGLRenderTarget(512, 512, {
-        minFilter: THREE.LinearFilter,
-        magFilter: THREE.LinearFilter,
-        format: THREE.RGBAFormat,
-      });
-    }
-  });
-
-  return null;
-}
-
 export function ParticleCanvas() {
   // Initialize from window on first client render so we never mount Canvas for mobile / reduced-motion users
   const [state] = useState(() => {
@@ -191,7 +174,6 @@ export function ParticleCanvas() {
       >
         <ambientLight intensity={0.5} />
         <ParticleField />
-        <BloomEffect />
       </Canvas>
     </div>
   );
