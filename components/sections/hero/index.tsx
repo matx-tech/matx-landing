@@ -50,6 +50,7 @@ export function HeroSection({ onOpenRegistration }: HeroSectionProps) {
             {/* Dual CTA Buttons */}
             <div className="flex flex-col sm:flex-row items-center lg:items-start lg:justify-start justify-center gap-4 mb-8">
               <button
+                type="button"
                 onClick={onOpenRegistration}
                 className="btn-primary min-w-[240px] sm:min-w-[280px] px-8 py-4 text-lg rounded-xl font-semibold focus-ring-target min-h-[44px]"
               >

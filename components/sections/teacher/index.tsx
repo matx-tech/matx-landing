@@ -271,7 +271,9 @@ export function TeacherSection() {
                 <button
                   key={option.action}
                   className="px-3 py-1.5 text-xs font-medium rounded border border-green-300 bg-white text-green-800 hover:bg-green-100 transition-colors"
-                  disabled
+                  type="button"
+                  aria-disabled="true"
+                  title="Näidisandmed — tegevus ei ole selles vaates aktiivne"
                 >
                   {option.label}
                 </button>

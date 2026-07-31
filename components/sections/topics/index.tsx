@@ -180,6 +180,7 @@ export function TopicsSection() {
             {TOPIC_AREAS.map((_, index) => (
               <button
                 key={index}
+                type="button"
                 onClick={() => {
                   setActiveIndex(index);
                   if (trackRef.current) {

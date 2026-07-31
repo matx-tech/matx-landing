@@ -66,7 +66,8 @@ export function AdoptionSection({ onOpenRegistration }: AdoptionRoutesProps) {
     if (action === 'registration' && onOpenRegistration) {
       onOpenRegistration();
     } else if (action === 'calendly') {
-      window.open('https://calendly.com/matx-demo', '_blank');
+      const newWin = window.open('https://calendly.com/matx-demo', '_blank', 'noopener,noreferrer');
+      if (newWin) newWin.opener = null;
     }
     // Other actions would need implementation
   };

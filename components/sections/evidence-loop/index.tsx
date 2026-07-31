@@ -112,7 +112,7 @@ export function EvidenceLoopSection() {
                   {/* Stage number */}
                   <div
                     className="flex-shrink-0 w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-green-500 flex items-center justify-center text-white font-bold text-xl shadow-lg relative z-10"
-                    aria-label={`Samm ${stage.number}`}
+                    aria-hidden="true"
                   >
                     {stage.number}
                   </div>
