@@ -1,0 +1,7 @@
+# Target modern browsers only — all support Baseline 2024 features.
+# Eliminates 11+ KiB of unnecessary polyfills (Array.at, flat, flatMap,
+# Object.fromEntries, String.trimStart/trimEnd).
+Chrome >= 100
+Firefox >= 100
+Safari >= 15.4
+Edge >= 100

@@ -106,7 +106,7 @@ export function ContextSection() {
                   <div className="text-xs text-muted-foreground mb-1">
                     <span className="font-medium">Allikas:</span> {context.source}
                   </div>
-                  <div className="text-xs text-amber-600 bg-amber-50 px-2 py-1 rounded mt-2 inline-block">
+                  <div className="text-xs text-amber-800 bg-amber-50 px-2 py-1 rounded mt-2 inline-block">
                     {context.limitation}
                   </div>
                 </div>

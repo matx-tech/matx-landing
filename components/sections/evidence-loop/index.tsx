@@ -72,7 +72,7 @@ export function EvidenceLoopSection() {
 
   const caveatStyles: Record<string, string> = {
     info: 'text-blue-600 bg-blue-50 border-blue-200',
-    success: 'text-green-600 bg-green-50 border-green-200',
+    success: 'text-green-800 bg-green-50 border-green-200',
   };
 
   return (
