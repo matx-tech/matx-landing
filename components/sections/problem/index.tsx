@@ -49,42 +49,42 @@ export function ProblemSection() {
     const beats = beatRefs.current;
     const texts = textRefs.current;
 
-    beats.forEach((beat, index) => {
-      if (!beat) return;
+    const ctx = gsap.context(() => {
+      beats.forEach((beat, index) => {
+        if (!beat) return;
 
-      const text = texts[index];
-      if (!text) return;
+        const text = texts[index];
+        if (!text) return;
 
-      gsap.set(text.children, { y: 50, opacity: 0 });
+        gsap.set(text.children, { y: 50, opacity: 0 });
 
-      ScrollTrigger.create({
-        trigger: beat,
-        start: 'top center',
-        end: 'bottom center',
-        onEnter: () => {
-          gsap.to(text.children, {
-            y: 0,
-            opacity: 1,
-            duration: 0.3,
-            stagger: 0.08,
-            ease: 'cubic-bezier(0.2, 0, 0, 1)',
-          });
-        },
-        onLeaveBack: () => {
-          gsap.to(text.children, {
-            y: 50,
-            opacity: 0,
-            duration: 0.25,
-            stagger: 0.05,
-            ease: 'cubic-bezier(0.4, 0, 1, 1)',
-          });
-        },
+        ScrollTrigger.create({
+          trigger: beat,
+          start: 'top center',
+          end: 'bottom center',
+          onEnter: () => {
+            gsap.to(text.children, {
+              y: 0,
+              opacity: 1,
+              duration: 0.3,
+              stagger: 0.08,
+              ease: 'cubic-bezier(0.2, 0, 0, 1)',
+            });
+          },
+          onLeaveBack: () => {
+            gsap.to(text.children, {
+              y: 50,
+              opacity: 0,
+              duration: 0.25,
+              stagger: 0.05,
+              ease: 'cubic-bezier(0.4, 0, 1, 1)',
+            });
+          },
+        });
       });
-    });
+    }, sectionRef);
 
-    return () => {
-      ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
-    };
+    return () => ctx.revert();
   }, []);
 
   return (
@@ -172,7 +172,7 @@ export function ProblemSection() {
                               <span className="font-mono text-destructive"><InlineFractionalExpression expression="3/15" /></span>
                             </div>
                           </div>
-                          <div className="text-xs text-amber-600 bg-amber-50 px-3 py-2 rounded border border-amber-200">
+                          <div className="text-xs text-amber-800 bg-amber-50 px-3 py-2 rounded border border-amber-200">
                             Võimalik veamuster: liidab lugejad ja nimetajad eraldi
                           </div>
                         </div>

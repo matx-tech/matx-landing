@@ -16,27 +16,27 @@ export function CTASection({ onOpenRegistration }: CTASectionProps) {
   useEffect(() => {
     if (!sectionRef.current || !titleRef.current) return;
 
-    const lines = titleRef.current.querySelectorAll('.cta-line');
+    const ctx = gsap.context(() => {
+      const lines = titleRef.current!.querySelectorAll('.cta-line');
 
-    gsap.set(lines, { y: 60, opacity: 0 });
+      gsap.set(lines, { y: 60, opacity: 0 });
 
-    ScrollTrigger.create({
-      trigger: sectionRef.current,
-      start: 'top 60%',
-      onEnter: () => {
-        gsap.to(lines, {
-          y: 0,
-          opacity: 1,
-          duration: 0.3,
-          stagger: 0.12,
-          ease: 'cubic-bezier(0.2, 0, 0, 1)',
-        });
-      },
-    });
+      ScrollTrigger.create({
+        trigger: sectionRef.current,
+        start: 'top 60%',
+        onEnter: () => {
+          gsap.to(lines, {
+            y: 0,
+            opacity: 1,
+            duration: 0.3,
+            stagger: 0.12,
+            ease: 'cubic-bezier(0.2, 0, 0, 1)',
+          });
+        },
+      });
+    }, sectionRef);
 
-    return () => {
-      ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
-    };
+    return () => ctx.revert();
   }, []);
 
   return (

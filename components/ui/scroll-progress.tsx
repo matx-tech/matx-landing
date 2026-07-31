@@ -12,7 +12,7 @@ export function ScrollProgress() {
 
     gsap.registerPlugin(ScrollTrigger);
 
-    ScrollTrigger.create({
+    const st = ScrollTrigger.create({
       trigger: document.body,
       start: 'top top',
       end: 'bottom bottom',
@@ -28,7 +28,7 @@ export function ScrollProgress() {
     });
 
     return () => {
-      ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
+      st.kill();
     };
   }, []);
 

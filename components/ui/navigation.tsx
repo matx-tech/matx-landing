@@ -76,13 +76,11 @@ export function Navigation({ onOpenRegistration }: NavigationProps) {
 
     if (isOpen) {
       gsap.set(items, {
-        clipPath: 'inset(0 100% 0 0)',
         opacity: 0,
         x: -30,
       });
 
       gsap.to(items, {
-        clipPath: 'inset(0 0% 0 0)',
         opacity: 1,
         x: 0,
         duration: 0.3,
@@ -91,7 +89,6 @@ export function Navigation({ onOpenRegistration }: NavigationProps) {
       });
     } else {
       gsap.to(items, {
-        clipPath: 'inset(0 100% 0 0)',
         opacity: 0,
         x: -30,
         duration: 0.25,

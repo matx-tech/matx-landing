@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { AlertTriangle, TrendingUp, Clock } from 'lucide-react';
@@ -43,8 +43,7 @@ export function TeacherSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const heatmapRef = useRef<HTMLDivElement>(null);
   const signalCardsRef = useRef<HTMLDivElement[]>([]);
-  const [hoveredCell, setHoveredCell] = useState<{ row: number; col: number } | null>(null);
-  const [focusedCell, setFocusedCell] = useState<{ row: number; col: number } | null>(null);
+  const gradientOverlayRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!sectionRef.current) return;
@@ -52,45 +51,45 @@ export function TeacherSection() {
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (prefersReducedMotion) return;
 
-    gsap.fromTo(
-      sectionRef.current.querySelector('.section-title'),
-      { y: 60, opacity: 0 },
-      {
-        y: 0,
-        opacity: 1,
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: 'top 70%',
-          end: 'top 30%',
-          scrub: 1,
-        },
-      }
-    );
-
-    signalCardsRef.current.forEach((card, index) => {
-      if (!card) return;
-
+    const ctx = gsap.context(() => {
       gsap.fromTo(
-        card,
-        { y: 30, opacity: 0 },
+        sectionRef.current!.querySelector('.section-title'),
+        { y: 60, opacity: 0 },
         {
           y: 0,
           opacity: 1,
-          duration: 0.3,
-          ease: 'cubic-bezier(0, 0, 0.2, 1)',
           scrollTrigger: {
-            trigger: card,
-            start: 'top 90%',
-            toggleActions: 'play none none reverse',
+            trigger: sectionRef.current,
+            start: 'top 70%',
+            end: 'top 30%',
+            scrub: 1,
           },
-          delay: index * 0.08,
         }
       );
-    });
 
-    return () => {
-      ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
-    };
+      signalCardsRef.current.forEach((card, index) => {
+        if (!card) return;
+
+        gsap.fromTo(
+          card,
+          { y: 30, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.3,
+            ease: 'cubic-bezier(0, 0, 0.2, 1)',
+            scrollTrigger: {
+              trigger: card,
+              start: 'top 90%',
+              toggleActions: 'play none none reverse',
+            },
+            delay: index * 0.08,
+          }
+        );
+      });
+    }, sectionRef);
+
+    return () => ctx.revert();
   }, []);
 
   const students = 22;
@@ -151,40 +150,42 @@ export function TeacherSection() {
             {/* Heatmap Grid */}
             <div className="relative overflow-x-auto">
               <div
-                className="grid gap-1"
-                style={{
-                  gridTemplateColumns: `repeat(${skills}, minmax(0, 1fr))`,
-                  minWidth: '620px',
-                }}
+                className="flex flex-col gap-1"
+                style={{ minWidth: '620px' }}
                 role="grid"
                 aria-label="Klassi soorituskaart: 22 õpilast, 9 oskust"
+                onMouseMove={(e) => {
+                  if (!gradientOverlayRef.current) return;
+                  const rect = e.currentTarget.getBoundingClientRect();
+                  const x = ((e.clientX - rect.left) / rect.width) * 100;
+                  const y = ((e.clientY - rect.top) / rect.height) * 100;
+                  gradientOverlayRef.current.style.setProperty('--heatmap-x', `${x}%`);
+                  gradientOverlayRef.current.style.setProperty('--heatmap-y', `${y}%`);
+                  gradientOverlayRef.current.style.opacity = '1';
+                }}
+                onMouseLeave={() => {
+                  if (gradientOverlayRef.current) {
+                    gradientOverlayRef.current.style.opacity = '0';
+                  }
+                }}
               >
-                {Array.from({ length: students }).map((_, row) =>
-                  Array.from({ length: skills }).map((_, col) => {
-                    const level = getCellLevel(row, col) + 1;
-                    const isHovered = hoveredCell?.row === row && hoveredCell?.col === col;
-                    const isFocused = focusedCell?.row === row && focusedCell?.col === col;
-                    const isActive = isHovered || isFocused;
+                {Array.from({ length: students }).map((_, row) => (
+                  <div key={`row-${row}`} role="row" className="grid gap-1" style={{ gridTemplateColumns: `repeat(${skills}, minmax(0, 1fr))` }}>
+                    {Array.from({ length: skills }).map((_, col) => {
+                      const level = getCellLevel(row, col) + 1;
 
-                    return (
-                      <button
-                        key={`${row}-${col}`}
-                        type="button"
-                        className={`aspect-square rounded-sm transition-transform focus:outline-none heatmap-cell-${level}`}
-                        style={{
-                          opacity: isActive ? 1 : 0.6,
-                          transform: isActive ? 'scale(1.3)' : 'scale(1)',
-                        }}
-                        onMouseEnter={() => setHoveredCell({ row, col })}
-                        onMouseLeave={() => setHoveredCell(null)}
-                        onFocus={() => setFocusedCell({ row, col })}
-                        onBlur={() => setFocusedCell(null)}
-                        aria-label={`Õpilane ${row + 1}, Oskus ${col + 1}: ${heatmapLevelLabels[level - 1]}`}
-                        role="gridcell"
-                      />
-                    );
-                  })
-                )}
+                      return (
+                        <button
+                          key={`${row}-${col}`}
+                          type="button"
+                          className={`aspect-square rounded-sm transition-[opacity,transform] duration-150 focus:outline-none heatmap-cell-${level} opacity-60 hover:opacity-100 hover:[transform:scale(1.3)] focus-visible:opacity-100 focus-visible:[transform:scale(1.3)]`}
+                          aria-label={`Õpilane ${row + 1}, Oskus ${col + 1}: ${heatmapLevelLabels[level - 1]}`}
+                          role="gridcell"
+                        />
+                      );
+                    })}
+                  </div>
+                ))}
               </div>
             </div>
 
@@ -199,15 +200,14 @@ export function TeacherSection() {
               <span className="text-xs text-text-secondary">Kõrge</span>
             </div>
 
-            {/* Hover/Focus tooltip */}
-            {(hoveredCell || focusedCell) && (
-              <div
-                className="absolute inset-0 pointer-events-none"
-                style={{
-                  background: `radial-gradient(circle at ${(((hoveredCell?.col ?? focusedCell?.col ?? 0) + 0.5) / skills) * 100}% ${(((hoveredCell?.row ?? focusedCell?.row ?? 0) + 0.5) / students) * 100}%, rgba(30, 90, 138, 0.1), transparent 30%)`,
-                }}
-              />
-            )}
+            {/* Hover gradient overlay — positioned via CSS custom property set on mouse move */}
+            <div
+              ref={gradientOverlayRef}
+              className="absolute inset-0 pointer-events-none opacity-0 transition-opacity duration-150"
+              style={{
+                background: 'radial-gradient(circle at var(--heatmap-x, 50%) var(--heatmap-y, 50%), rgba(30, 90, 138, 0.1), transparent 30%)',
+              }}
+            />
           </div>
         </div>
 
