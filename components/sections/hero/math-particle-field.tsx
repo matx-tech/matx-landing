@@ -64,9 +64,9 @@ function MathParticleField() {
 
       const distX = (mouseRef.current.x * viewport.width) / 2 - x;
       const distY = (mouseRef.current.y * viewport.height) / 2 - y;
-      const dist = Math.sqrt(distX * distX + distY * distY);
+      const distSq = distX * distX + distY * distY;
 
-      if (dist < 3) {
+      if (distSq < 9) { // radius² = 3²
         positions[i3] += distX * 0.015;
         positions[i3 + 1] += distY * 0.015;
       }

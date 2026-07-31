@@ -69,12 +69,19 @@ export function LenisProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
+    let resizeTimer: ReturnType<typeof setTimeout>;
     const handleResize = () => {
-      ScrollTrigger.refresh();
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        ScrollTrigger.refresh();
+      }, 150);
     };
 
     window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      clearTimeout(resizeTimer);
+    };
   }, []);
 
   const scrollTo = useCallback((target: string | number | HTMLElement, options?: { focusHeading?: boolean }) => {
@@ -114,15 +121,15 @@ export function LenisProvider({ children }: { children: React.ReactNode }) {
   // Handle anchor link clicks for focus management
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
-      const anchor = target.closest('a[href^="#"]');
+      // Early exit: only intercept clicks on anchor elements with hash hrefs
+      if (!(e.target instanceof HTMLElement)) return;
+      const anchor = e.target.closest('a[href^="#"]');
+      if (!(anchor instanceof HTMLAnchorElement)) return;
 
-      if (anchor && anchor instanceof HTMLAnchorElement) {
-        const href = anchor.getAttribute('href');
-        if (href && href.length > 1) {
-          e.preventDefault();
-          scrollTo(href, { focusHeading: true });
-        }
+      const href = anchor.getAttribute('href');
+      if (href && href.length > 1) {
+        e.preventDefault();
+        scrollTo(href, { focusHeading: true });
       }
     };
 
