@@ -5,17 +5,32 @@ import dynamic from 'next/dynamic';
 import { Navigation } from '@/components/ui/navigation';
 import { ScrollProgress } from '@/components/ui/scroll-progress';
 import { HeroSection } from '@/components/sections/hero';
-import { EvidenceLoopSection } from '@/components/sections/evidence-loop';
-import { StudentSection } from '@/components/sections/student';
 import { ProblemSection } from '@/components/sections/problem';
-import { TeacherSection } from '@/components/sections/teacher';
-import { ContextSection } from '@/components/sections/context';
-import { AdoptionSection } from '@/components/sections/adoption';
 import { TrustSection } from '@/components/sections/trust';
-import { CTASection } from '@/components/sections/cta';
 import { FAQSection } from '@/components/sections/faq';
+import { CTASection } from '@/components/sections/cta';
 import { FooterSection } from '@/components/sections/footer';
 import { RegistrationForm } from '@/components/ui/registration-form';
+
+const EvidenceLoopSection = dynamic(
+  () => import('@/components/sections/evidence-loop').then((mod) => mod.EvidenceLoopSection),
+  { ssr: false }
+);
+
+const StudentSection = dynamic(
+  () => import('@/components/sections/student').then((mod) => mod.StudentSection),
+  { ssr: false }
+);
+
+const TeacherSection = dynamic(
+  () => import('@/components/sections/teacher').then((mod) => mod.TeacherSection),
+  { ssr: false }
+);
+
+const ContextSection = dynamic(
+  () => import('@/components/sections/context').then((mod) => mod.ContextSection),
+  { ssr: false }
+);
 
 const TopicsSection = dynamic(
   () => import('@/components/sections/topics').then((mod) => mod.TopicsSection),
@@ -29,6 +44,11 @@ const TopicsSection = dynamic(
       </section>
     ),
   }
+);
+
+const AdoptionSection = dynamic(
+  () => import('@/components/sections/adoption').then((mod) => mod.AdoptionSection),
+  { ssr: false }
 );
 
 export default function Home() {
@@ -47,7 +67,7 @@ export default function Home() {
       <ScrollProgress />
       <Navigation onOpenRegistration={handleOpenRegistration} />
       <main id="main" className="relative">
-        {/* New narrative order: hero → evidence loop → student → teacher → context → topics → adoption → trust → faq → cta */}
+        {/* New narrative order: hero → evidence loop → student → problem → teacher → context → topics → adoption → trust → faq → cta */}
         <HeroSection onOpenRegistration={handleOpenRegistration} />
         <EvidenceLoopSection />
         <StudentSection />
