@@ -1,12 +1,18 @@
 'use client';
 
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState, useCallback } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { AlertTriangle, TrendingUp, Clock } from 'lucide-react';
 import { TEACHER_STORY, SECTION_IDS } from '@/lib/content/landing-copy';
 import { PRODUCT_FIXTURE } from '@/lib/content/landing-evidence';
 import { CapabilityStatusBadge } from '@/components/ui/capability-status';
+
+// Skill names matching the heatmap columns
+const SKILL_NAMES = [
+  'Liitmine', 'Lahutamine', 'Korrutamine', 'Jagamine',
+  'Murrud', 'Kümnendmurrud', 'Protsendid', 'Võrrandid', 'Geomeetria',
+] as const;
 
 // Teacher-facing signals tied to the evidence fixture
 const teacherSignals = [
@@ -44,6 +50,67 @@ export function TeacherSection() {
   const heatmapRef = useRef<HTMLDivElement>(null);
   const signalCardsRef = useRef<HTMLDivElement[]>([]);
   const gradientOverlayRef = useRef<HTMLDivElement>(null);
+  const cellRefs = useRef<(HTMLButtonElement | null)[][]>([]);
+
+  // Roving focus state for the heatmap grid
+  const [activeRow, setActiveRow] = useState(0);
+  const [activeCol, setActiveCol] = useState(0);
+
+  const students = 22;
+  const skills = SKILL_NAMES.length;
+
+  const getCellLevel = (row: number, col: number) => {
+    return (row * 13 + col * 7) % 5;
+  };
+
+  // Ensure refs matrix is populated before we need it
+  const getCellRefs = useCallback(() => {
+    if (cellRefs.current.length === 0) {
+      cellRefs.current = Array.from({ length: students }, () => []);
+    }
+    return cellRefs.current;
+  }, []);
+
+  const setCellRef = useCallback((row: number, col: number, el: HTMLButtonElement | null) => {
+    const refs = getCellRefs();
+    refs[row][col] = el;
+  }, [getCellRefs]);
+
+  const focusCell = useCallback((row: number, col: number) => {
+    const refs = getCellRefs();
+    const cell = refs[row]?.[col];
+    if (cell) cell.focus();
+  }, [getCellRefs]);
+
+  const handleHeatmapKeyDown = useCallback((e: React.KeyboardEvent) => {
+    let nextRow = activeRow;
+    let nextCol = activeCol;
+
+    switch (e.key) {
+      case 'ArrowRight':
+        nextCol = Math.min(activeCol + 1, skills - 1);
+        break;
+      case 'ArrowLeft':
+        nextCol = Math.max(activeCol - 1, 0);
+        break;
+      case 'ArrowDown':
+        nextRow = Math.min(activeRow + 1, students - 1);
+        break;
+      case 'ArrowUp':
+        nextRow = Math.max(activeRow - 1, 0);
+        break;
+      default:
+        return;
+    }
+
+    e.preventDefault();
+    if (nextRow !== activeRow || nextCol !== activeCol) {
+      setActiveRow(nextRow);
+      setActiveCol(nextCol);
+      // Focus the new cell after state update
+      setTimeout(() => focusCell(nextRow, nextCol), 0);
+    }
+  }, [activeRow, activeCol, students, skills, focusCell]);
 
   useEffect(() => {
     if (!sectionRef.current) return;
@@ -92,12 +159,6 @@ export function TeacherSection() {
     return () => ctx.revert();
   }, []);
 
-  const students = 22;
-  const skills = 9;
-
-  const getCellLevel = (row: number, col: number) => {
-    return (row * 13 + col * 7) % 5;
-  };
 
   return (
     <section ref={sectionRef} id={SECTION_IDS.teacher} className="relative py-24 md:py-32 lg:py-40 bg-surface overflow-hidden">
@@ -129,7 +190,7 @@ export function TeacherSection() {
                   {TEACHER_STORY.heatmapLabel}
                 </span>
               </div>
-              <span className="text-text-secondary text-sm font-mono">22 õpilast · 9 oskust</span>
+              <span className="text-text-secondary text-sm font-mono">{students} õpilast · {skills} oskust</span>
             </div>
 
             {/* Unified scroll container for headers + grid */}
@@ -138,15 +199,9 @@ export function TeacherSection() {
                 {/* Skill names row */}
                 <div className="mb-2 text-xs text-muted-foreground">
                   <div className="grid gap-1" style={{ gridTemplateColumns: `repeat(${skills}, minmax(0, 1fr))` }}>
-                    <span>Liitmine</span>
-                    <span>Lahutamine</span>
-                    <span>Korrutamine</span>
-                    <span>Jagamine</span>
-                    <span>Murrud</span>
-                    <span>Kümnendmurrud</span>
-                    <span>Protsendid</span>
-                    <span>Võrrandid</span>
-                    <span>Geomeetria</span>
+                    {SKILL_NAMES.map((name) => (
+                      <span key={name}>{name}</span>
+                    ))}
                   </div>
                 </div>
 
@@ -154,7 +209,8 @@ export function TeacherSection() {
                 <div
                   className="flex flex-col gap-1"
                   role="grid"
-                  aria-label="Klassi soorituskaart: 22 õpilast, 9 oskust"
+                  aria-label={`Klassi soorituskaart: ${students} õpilast, ${skills} oskust`}
+                  onKeyDown={handleHeatmapKeyDown}
                   onMouseMove={(e) => {
                     if (!gradientOverlayRef.current) return;
                     const rect = e.currentTarget.getBoundingClientRect();
@@ -174,13 +230,16 @@ export function TeacherSection() {
                     <div key={`row-${row}`} role="row" className="grid gap-1" style={{ gridTemplateColumns: `repeat(${skills}, minmax(0, 1fr))` }}>
                       {Array.from({ length: skills }).map((_, col) => {
                         const level = getCellLevel(row, col) + 1;
+                        const isActive = row === activeRow && col === activeCol;
 
                         return (
                           <button
                             key={`${row}-${col}`}
+                            ref={(el) => setCellRef(row, col, el)}
                             type="button"
+                            tabIndex={isActive ? 0 : -1}
                             className={`aspect-square rounded-sm transition-[opacity,transform] duration-150 focus:outline-none heatmap-cell-${level} opacity-60 hover:opacity-100 hover:[transform:scale(1.3)] focus-visible:opacity-100 focus-visible:[transform:scale(1.3)]`}
-                            aria-label={`Õpilane ${row + 1}, Oskus ${col + 1}: ${heatmapLevelLabels[level - 1]}`}
+                            aria-label={`Õpilane ${row + 1}, ${SKILL_NAMES[col]}: ${heatmapLevelLabels[level - 1]}`}
                             role="gridcell"
                           />
                         );
