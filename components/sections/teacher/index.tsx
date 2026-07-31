@@ -107,10 +107,13 @@ export function TeacherSection() {
     if (nextRow !== activeRow || nextCol !== activeCol) {
       setActiveRow(nextRow);
       setActiveCol(nextCol);
-      // Focus the new cell after state update
-      setTimeout(() => focusCell(nextRow, nextCol), 0);
     }
-  }, [activeRow, activeCol, students, skills, focusCell]);
+  }, [activeRow, activeCol, students, skills]);
+
+  // Focus the active cell after React commits the state update
+  useEffect(() => {
+    focusCell(activeRow, activeCol);
+  }, [activeRow, activeCol, focusCell]);
 
   useEffect(() => {
     if (!sectionRef.current) return;
