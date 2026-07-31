@@ -6,6 +6,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ScrollIndicator } from '@/components/sections/hero/scroll-indicator';
 import { PRODUCT_FIXTURE } from '@/lib/content/landing-evidence';
 import { Fraction, InlineFractionalExpression } from '@/components/ui/fraction';
+import { usePrefersReducedMotion } from '@/lib/hooks/use-prefers-reduced-motion';
 
 const storyBeats = [
   {
@@ -39,12 +40,18 @@ export function ProblemSection() {
   const containerRef = useRef<HTMLDivElement>(null);
   const beatRefs = useRef<HTMLDivElement[]>([]);
   const textRefs = useRef<HTMLDivElement[]>([]);
+  const prefersReducedMotion = usePrefersReducedMotion();
 
   useEffect(() => {
     if (!sectionRef.current) return;
 
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (prefersReducedMotion) return;
+    if (prefersReducedMotion) {
+      // Show text at final visible state when reduced motion is enabled
+      textRefs.current.forEach((text) => {
+        if (text?.children) gsap.set(text.children, { y: 0, opacity: 1 });
+      });
+      return;
+    }
 
     const beats = beatRefs.current;
     const texts = textRefs.current;
@@ -85,7 +92,7 @@ export function ProblemSection() {
     }, sectionRef);
 
     return () => ctx.revert();
-  }, []);
+  }, [prefersReducedMotion]);
 
   return (
     <section ref={sectionRef} id="probleem" className="relative bg-surface">

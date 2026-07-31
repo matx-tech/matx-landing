@@ -4,16 +4,17 @@ import { useRef, useEffect, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { FAQ_ENTRIES, SECTION_IDS } from '@/lib/content/landing-copy';
+import { usePrefersReducedMotion } from '@/lib/hooks/use-prefers-reduced-motion';
 
 export function FAQSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const itemsRef = useRef<HTMLDivElement[]>([]);
   const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const prefersReducedMotion = usePrefersReducedMotion();
 
   useEffect(() => {
     if (!sectionRef.current) return;
 
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (prefersReducedMotion) return;
 
     itemsRef.current.forEach((item, index) => {
@@ -40,7 +41,7 @@ export function FAQSection() {
     return () => {
       ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
     };
-  }, []);
+  }, [prefersReducedMotion]);
 
   const handleToggle = (index: number) => {
     setOpenIndex(openIndex === index ? null : index);

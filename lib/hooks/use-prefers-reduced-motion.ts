@@ -7,7 +7,12 @@ import { useEffect, useState } from 'react';
  * Use in GSAP/SVG animation effects so triggers rebuild when the OS preference toggles.
  */
 export function usePrefersReducedMotion(): boolean {
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    }
+    return false;
+  });
 
   useEffect(() => {
     const mql = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -16,7 +21,8 @@ export function usePrefersReducedMotion(): boolean {
       setPrefersReducedMotion(e.matches);
     };
 
-    handler(mql); // initial value
+    // Sync in case the lazy initializer was a stale server value
+    handler(mql);
 
     mql.addEventListener('change', handler);
     return () => mql.removeEventListener('change', handler);

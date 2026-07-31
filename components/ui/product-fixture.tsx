@@ -65,6 +65,7 @@ export function ProductFixture({
       .to(actionRef.current, { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out' }, '+=0.3');
 
     return () => {
+      timeline.scrollTrigger?.kill();
       timeline.kill();
     };
   }, [animated, triggerId, prefersReducedMotion]);

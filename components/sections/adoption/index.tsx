@@ -85,7 +85,7 @@ export function AdoptionSection({ onOpenRegistration }: AdoptionRoutesProps) {
       id={SECTION_IDS.pilot}
       className="py-24 md:py-32 lg:py-40 bg-canvas section-fade-from-surface"
     >
-      <div className="container mx-auto px-4 md:px-8 lg:px-16">
+      <div className="relative z-10 container mx-auto px-4 md:px-8 lg:px-16">
         {/* Section header */}
         <div className="max-w-3xl mx-auto text-center mb-16">
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-4">

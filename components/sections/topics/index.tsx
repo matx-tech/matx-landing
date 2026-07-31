@@ -8,6 +8,7 @@ import { ChevronLeft, ChevronRight, Plus, Minus, X, Divide } from 'lucide-react'
 import { TOPICS_SECTION, SECTION_IDS } from '@/lib/content/landing-copy';
 import { TOPIC_AREAS } from '@/lib/content/landing-evidence';
 import { CapabilityStatusBadge } from '@/components/ui/capability-status';
+import { usePrefersReducedMotion } from '@/lib/hooks/use-prefers-reduced-motion';
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger, Draggable);
@@ -19,11 +20,11 @@ export function TopicsSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
+  const prefersReducedMotion = usePrefersReducedMotion();
 
   useEffect(() => {
     if (!sectionRef.current) return;
 
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (prefersReducedMotion) return;
 
     gsap.fromTo(
@@ -40,7 +41,7 @@ export function TopicsSection() {
         },
       }
     );
-  }, []);
+  }, [prefersReducedMotion]);
 
   useEffect(() => {
     if (!trackRef.current) return;

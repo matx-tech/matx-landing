@@ -57,7 +57,7 @@ export function StudentSection() {
       id={SECTION_IDS.student}
       className="py-24 md:py-32 lg:py-40 bg-surface section-fade-from-canvas"
     >
-      <div className="container mx-auto px-4 md:px-8 lg:px-16">
+      <div className="relative z-10 container mx-auto px-4 md:px-8 lg:px-16">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Left: Content */}
           <div>

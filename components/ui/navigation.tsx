@@ -6,6 +6,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Menu, X, Award } from 'lucide-react';
 import * as Dialog from '@radix-ui/react-dialog';
 import { LANDING_NAV_ITEMS, SECTION_IDS, CALENDLY_URL } from '@/lib/content/landing-copy';
+import { usePrefersReducedMotion } from '@/lib/hooks/use-prefers-reduced-motion';
 
 const navItems = LANDING_NAV_ITEMS;
 
@@ -19,12 +20,12 @@ export function Navigation({ onOpenRegistration }: NavigationProps) {
   const [isOpen, setIsOpen] = useState(false);
   const navRef = useRef<HTMLElement>(null);
   const menuItemsRef = useRef<HTMLDivElement[]>([]);
+  const prefersReducedMotion = usePrefersReducedMotion();
 
   useEffect(() => {
     const nav = navRef.current;
     if (!nav) return;
 
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (prefersReducedMotion) {
       gsap.set(nav, { y: 0, opacity: 1 });
       return;
@@ -43,16 +44,22 @@ export function Navigation({ onOpenRegistration }: NavigationProps) {
     });
 
     // Scroll-driven hide/show via ScrollTrigger (replaces scroll event + rAF)
+    let wasHidden = false;
     const st = ScrollTrigger.create({
       trigger: document.body,
       start: 'top top',
       onUpdate: (self) => {
-        if (self.scroll() > 100 && self.direction === 1) {
+        const isHidden = self.scroll() > 100 && self.direction === 1;
+        if (isHidden === wasHidden) return;
+        wasHidden = isHidden;
+
+        if (isHidden) {
           gsap.to(nav, {
             y: -100,
             opacity: 0.5,
             duration: 0.25,
             ease: 'cubic-bezier(0.4, 0, 1, 1)',
+            overwrite: 'auto',
           });
         } else {
           gsap.to(nav, {
@@ -60,6 +67,7 @@ export function Navigation({ onOpenRegistration }: NavigationProps) {
             opacity: 1,
             duration: 0.25,
             ease: 'cubic-bezier(0, 0, 0.2, 1)',
+            overwrite: 'auto',
           });
         }
       },
@@ -69,12 +77,16 @@ export function Navigation({ onOpenRegistration }: NavigationProps) {
       st.kill();
       gsap.killTweensOf(nav);
     };
-  }, []);
+  }, [prefersReducedMotion]);
 
   useEffect(() => {
     const items = menuItemsRef.current.filter(Boolean);
 
     if (isOpen) {
+      if (prefersReducedMotion) {
+        gsap.set(items, { opacity: 1, x: 0 });
+        return;
+      }
       gsap.set(items, {
         opacity: 0,
         x: -30,
@@ -96,7 +108,7 @@ export function Navigation({ onOpenRegistration }: NavigationProps) {
         ease: 'cubic-bezier(0.4, 0, 1, 1)',
       });
     }
-  }, [isOpen]);
+  }, [isOpen, prefersReducedMotion]);
 
   const handleRegistrationClick = useCallback(() => {
     setIsOpen(false);

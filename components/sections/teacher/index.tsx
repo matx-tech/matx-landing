@@ -7,6 +7,7 @@ import { AlertTriangle, TrendingUp, Clock } from 'lucide-react';
 import { TEACHER_STORY, SECTION_IDS } from '@/lib/content/landing-copy';
 import { PRODUCT_FIXTURE } from '@/lib/content/landing-evidence';
 import { CapabilityStatusBadge } from '@/components/ui/capability-status';
+import { usePrefersReducedMotion } from '@/lib/hooks/use-prefers-reduced-motion';
 
 // Skill names matching the heatmap columns
 const SKILL_NAMES = [
@@ -55,6 +56,8 @@ export function TeacherSection() {
   // Roving focus state for the heatmap grid
   const [activeRow, setActiveRow] = useState(0);
   const [activeCol, setActiveCol] = useState(0);
+  const pendingFocusRef = useRef(false);
+  const prefersReducedMotion = usePrefersReducedMotion();
 
   const students = 22;
   const skills = SKILL_NAMES.length;
@@ -105,20 +108,23 @@ export function TeacherSection() {
 
     e.preventDefault();
     if (nextRow !== activeRow || nextCol !== activeCol) {
+      pendingFocusRef.current = true;
       setActiveRow(nextRow);
       setActiveCol(nextCol);
     }
   }, [activeRow, activeCol, students, skills]);
 
-  // Focus the active cell after React commits the state update
+  // Focus the active cell only after keyboard navigation, not on initial mount
   useEffect(() => {
-    focusCell(activeRow, activeCol);
+    if (pendingFocusRef.current) {
+      pendingFocusRef.current = false;
+      focusCell(activeRow, activeCol);
+    }
   }, [activeRow, activeCol, focusCell]);
 
   useEffect(() => {
     if (!sectionRef.current) return;
 
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (prefersReducedMotion) return;
 
     const ctx = gsap.context(() => {
@@ -160,7 +166,7 @@ export function TeacherSection() {
     }, sectionRef);
 
     return () => ctx.revert();
-  }, []);
+  }, [prefersReducedMotion]);
 
 
   return (
@@ -241,6 +247,7 @@ export function TeacherSection() {
                             ref={(el) => setCellRef(row, col, el)}
                             type="button"
                             tabIndex={isActive ? 0 : -1}
+                            onFocus={() => { setActiveRow(row); setActiveCol(col); }}
                             className={`aspect-square rounded-sm transition-[opacity,transform] duration-150 focus:outline-none heatmap-cell-${level} opacity-60 hover:opacity-100 hover:[transform:scale(1.3)] focus-visible:opacity-100 focus-visible:[transform:scale(1.3)]`}
                             aria-label={`Õpilane ${row + 1}, ${SKILL_NAMES[col]}: ${heatmapLevelLabels[level - 1]}`}
                             role="gridcell"
