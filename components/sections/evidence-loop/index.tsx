@@ -8,8 +8,8 @@
 import { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { EVIDENCE_STAGES } from '@/lib/content/landing-copy';
-import { SECTION_IDS } from '@/lib/content/landing-copy';
+import { EVIDENCE_STAGES, SECTION_IDS } from '@/lib/content/landing-copy';
+import { usePrefersReducedMotion } from '@/lib/hooks/use-prefers-reduced-motion';
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
@@ -19,16 +19,15 @@ export function EvidenceLoopSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const stagesRef = useRef<(HTMLLIElement | null)[]>([]);
   const connectorRef = useRef<HTMLDivElement>(null);
+  const prefersReducedMotion = usePrefersReducedMotion();
 
   useEffect(() => {
     if (!sectionRef.current) return;
-
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (prefersReducedMotion) return;
 
     const ctx = gsap.context(() => {
       // Animate stages sequentially
-      stagesRef.current.forEach((stage, index) => {
+      stagesRef.current.forEach((stage) => {
         if (!stage) return;
 
         gsap.fromTo(
@@ -69,7 +68,12 @@ export function EvidenceLoopSection() {
     }, sectionRef);
 
     return () => ctx.revert();
-  }, []);
+  }, [prefersReducedMotion]);
+
+  const caveatStyles: Record<string, string> = {
+    info: 'text-blue-600 bg-blue-50 border-blue-200',
+    success: 'text-green-600 bg-green-50 border-green-200',
+  };
 
   return (
     <section
@@ -126,31 +130,14 @@ export function EvidenceLoopSection() {
                       {stage.description}
                     </p>
 
-                    {/* Special notes for specific stages */}
-                    {stage.number === 2 && (
-                      <div className="mt-3 text-sm text-blue-600 bg-blue-50 px-3 py-2 rounded border border-blue-200">
-                        Signaal on võimalik veamuster, mitte lõplik diagnoos
-                      </div>
-                    )}
-                    {stage.number === 4 && (
-                      <div className="mt-3 text-sm text-green-600 bg-green-50 px-3 py-2 rounded border border-green-200">
-                        Õpetaja võib soovituse vastu võtta, muuta või eirata
+                    {/* Caveat (from centralized data) */}
+                    {'caveat' in stage && (
+                      <div className={`mt-3 text-sm px-3 py-2 rounded border ${caveatStyles[stage.tone] ?? caveatStyles.info}`}>
+                        {stage.caveat}
                       </div>
                     )}
                   </div>
                 </div>
-              </li>
-            ))}
-          </ol>
-        </div>
-
-        {/* Accessibility: Text-only version for screen readers */}
-        <div className="sr-only">
-          <h3>Töövogu sammud:</h3>
-          <ol>
-            {EVIDENCE_STAGES.map((stage) => (
-              <li key={stage.number}>
-                <strong>{stage.title}:</strong> {stage.description}
               </li>
             ))}
           </ol>

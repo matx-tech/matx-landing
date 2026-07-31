@@ -86,7 +86,7 @@ export function HeroSection({ onOpenRegistration }: HeroSectionProps) {
 
           {/* Right: Product fixture */}
           <div className="lg:pl-8">
-            <ProductFixture animated={true} triggerId="hero" />
+            <ProductFixture animated={true} triggerId={SECTION_IDS.hero} />
           </div>
         </div>
       </div>

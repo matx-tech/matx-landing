@@ -8,19 +8,20 @@
 import { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { ADOPTION_ROUTES, SECTION_IDS } from '@/lib/content/landing-copy';
+import { ADOPTION_ROUTES, SECTION_IDS, CALENDLY_URL, type AudienceId } from '@/lib/content/landing-copy';
 import { BookOpen, School, FileText, Server } from 'lucide-react';
+import { usePrefersReducedMotion } from '@/lib/hooks/use-prefers-reduced-motion';
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
 }
 
-const AUDIENCE_ICONS = {
-  'Õpetajale': BookOpen,
-  'Koolijuhile': School,
-  'Hankele': FileText,
-  'IT-le': Server,
-} as const;
+const AUDIENCE_ICONS: Record<AudienceId, typeof BookOpen | typeof School | typeof FileText | typeof Server> = {
+  teacher: BookOpen,
+  principal: School,
+  procurement: FileText,
+  it: Server,
+};
 
 interface AdoptionRoutesProps {
   onOpenRegistration?: () => void;
@@ -29,11 +30,10 @@ interface AdoptionRoutesProps {
 export function AdoptionSection({ onOpenRegistration }: AdoptionRoutesProps) {
   const sectionRef = useRef<HTMLElement>(null);
   const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
+  const prefersReducedMotion = usePrefersReducedMotion();
 
   useEffect(() => {
     if (!sectionRef.current) return;
-
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (prefersReducedMotion) return;
 
     const ctx = gsap.context(() => {
@@ -60,16 +60,23 @@ export function AdoptionSection({ onOpenRegistration }: AdoptionRoutesProps) {
     }, sectionRef);
 
     return () => ctx.revert();
-  }, []);
+  }, [prefersReducedMotion]);
 
   const handleCTAClick = (action: string) => {
     if (action === 'registration' && onOpenRegistration) {
       onOpenRegistration();
     } else if (action === 'calendly') {
-      const newWin = window.open('https://calendly.com/matx-demo', '_blank', 'noopener,noreferrer');
+      const newWin = window.open(CALENDLY_URL, '_blank', 'noopener,noreferrer');
       if (newWin) newWin.opener = null;
+    } else if (action === 'procurement') {
+      // Route to adoption section (anchor: pilot) — procurement info lives there
+      const el = document.getElementById(SECTION_IDS.pilot);
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    } else if (action === 'technical') {
+      // Route to adoption section (anchor: pilot) — technical overview lives there
+      const el = document.getElementById(SECTION_IDS.pilot);
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
     }
-    // Other actions would need implementation
   };
 
   return (
@@ -92,7 +99,7 @@ export function AdoptionSection({ onOpenRegistration }: AdoptionRoutesProps) {
         {/* Adoption route cards */}
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
           {ADOPTION_ROUTES.map((route, index) => {
-            const Icon = AUDIENCE_ICONS[route.audience as keyof typeof AUDIENCE_ICONS];
+            const Icon = AUDIENCE_ICONS[route.audienceId];
 
             return (
               <div
@@ -124,6 +131,7 @@ export function AdoptionSection({ onOpenRegistration }: AdoptionRoutesProps) {
 
                 {/* CTA */}
                 <button
+                  type="button"
                   onClick={() => handleCTAClick(route.ctaAction)}
                   className="w-full px-4 py-2.5 text-sm font-medium rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
                   aria-label={`${route.cta} - ${route.audience}`}

@@ -104,7 +104,19 @@ export function FAQSection() {
                 >
                   <div className="overflow-hidden">
                     <div className="px-6 pb-5 text-text-secondary leading-relaxed">
-                      {item.answer}
+                      {'answerLink' in item ? (
+                        <>
+                          {item.answer}{' '}
+                          <a
+                            href={item.answerLink.href}
+                            className="text-primary hover:text-secondary underline transition-colors"
+                          >
+                            {item.answerLink.label}
+                          </a>
+                        </>
+                      ) : (
+                        item.answer
+                      )}
                     </div>
                   </div>
                 </div>

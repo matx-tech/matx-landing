@@ -1,10 +1,16 @@
 'use client';
 
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Shield, Eye, FileText } from 'lucide-react';
-import { TRUST_PILLARS } from '@/lib/content/landing-copy';
+import { TRUST_PILLARS, SECTION_IDS } from '@/lib/content/landing-copy';
+
+const TRUST_ICONS: Record<string, typeof Shield | typeof Eye | typeof FileText> = {
+  shield: Shield,
+  eye: Eye,
+  'file-text': FileText,
+};
 
 export function TrustSection() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -35,8 +41,6 @@ export function TrustSection() {
     };
   }, []);
 
-  const pillarIcons = [Shield, Eye, FileText];
-
   return (
     <section ref={sectionRef} id="usaldus" className="relative py-24 md:py-32 lg:py-40 bg-canvas overflow-hidden">
       <div className="absolute inset-0">
@@ -60,13 +64,13 @@ export function TrustSection() {
 
         {/* Trust Pillars */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16 max-w-5xl mx-auto">
-          {TRUST_PILLARS.map((pillar, index) => {
-            const Icon = pillarIcons[index];
+          {TRUST_PILLARS.map((pillar) => {
+            const Icon = TRUST_ICONS[pillar.icon];
 
             return (
               <div key={pillar.title} className="card p-8 text-center group">
                 <div className="w-16 h-16 rounded-xl mx-auto mb-6 flex items-center justify-center bg-primary/10 group-hover:scale-110 transition-transform">
-                  <Icon className="w-8 h-8 text-primary" />
+                  {Icon && <Icon className="w-8 h-8 text-primary" />}
                 </div>
                 <h3 className="text-xl font-display font-semibold text-text-primary mb-3">
                   {pillar.title}
@@ -99,7 +103,7 @@ export function TrustSection() {
                   Tuvastatud signaal
                 </div>
                 <div className="text-sm text-text-primary">
-                  Võimalik veamuster: "Liidab lugejad ja nimetajad eraldi" (kontrollitav signaal)
+                  Võimalik veamuster: „Liidab lugejad ja nimetajad eraldi\u201c (kontrollitav signaal)
                 </div>
               </div>
 
@@ -126,16 +130,16 @@ export function TrustSection() {
           </div>
         </div>
 
-        {/* Link to IT/procurement details */}
+        {/* Link to adoption section with procurement/IT info */}
         <div className="text-center mt-12">
           <p className="text-text-secondary mb-4">
-            IT-juhile ja hankeametnikule: tehniline ülevaade ja turvadetailid
+            IT-juhile ja hankeametnikule: Kuidas alustada ja tehnilised detailid
           </p>
           <a
-            href="#piloot"
+            href={`#${SECTION_IDS.pilot}`}
             className="inline-flex items-center gap-2 text-primary hover:text-secondary transition-colors focus-ring-target rounded-md min-h-[44px] px-4"
           >
-            <span>Vaata IT-dokumentatsiooni</span>
+            <span>Vaata alustamise marsruute</span>
             <span aria-hidden="true">→</span>
           </a>
         </div>

@@ -4,9 +4,11 @@ import { useRef, useEffect, useState, useCallback } from 'react';
 import gsap from 'gsap';
 import { Menu, X, Award } from 'lucide-react';
 import * as Dialog from '@radix-ui/react-dialog';
-import { LANDING_NAV_ITEMS } from '@/lib/content/landing-copy';
+import { LANDING_NAV_ITEMS, SECTION_IDS, CALENDLY_URL } from '@/lib/content/landing-copy';
 
 const navItems = LANDING_NAV_ITEMS;
+
+const PILOT_HREF = `#${SECTION_IDS.pilot}`;
 
 interface NavigationProps {
   onOpenRegistration?: () => void;
@@ -149,13 +151,13 @@ export function Navigation({ onOpenRegistration }: NavigationProps) {
           {/* CTA Buttons */}
           <div className="hidden md:flex items-center gap-2 xl:gap-4">
             <a
-              href="#piloot"
+              href={PILOT_HREF}
               className="px-3 py-2 rounded-lg text-sm font-medium text-text-secondary hover:text-text-primary transition-colors focus-ring-target min-h-[44px] flex items-center whitespace-nowrap"
             >
               Liitu piloodiga
             </a>
             <a
-              href="https://calendly.com/matx-ee/15min"
+              href={CALENDLY_URL}
               target="_blank"
               rel="noopener noreferrer"
               className="btn-primary px-4 xl:px-6 py-2 rounded-lg text-sm font-medium focus-ring-target min-h-[44px] whitespace-nowrap"
@@ -167,7 +169,7 @@ export function Navigation({ onOpenRegistration }: NavigationProps) {
           {/* Mobile Menu Button - Dialog Trigger */}
           <Dialog.Trigger asChild>
             <button
-              className="lg:hidden w-11 h-11 rounded-lg bg-elevated flex items-center justify-center focus-ring-target"
+              className="xl:hidden w-11 h-11 rounded-lg bg-elevated flex items-center justify-center focus-ring-target"
               aria-label="Ava menüü"
             >
               {isOpen ? (
@@ -214,14 +216,14 @@ export function Navigation({ onOpenRegistration }: NavigationProps) {
             className="overflow-hidden mt-8 flex flex-col gap-4"
           >
             <a
-              href="#piloot"
+              href={PILOT_HREF}
               onClick={() => setIsOpen(false)}
               className="px-6 py-3 rounded-lg bg-primary text-text-inverse font-semibold focus-ring-target min-h-[44px] text-center"
             >
               Liitu piloodiga
             </a>
             <a
-              href="https://calendly.com/matx-ee/15min"
+              href={CALENDLY_URL}
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => setIsOpen(false)}

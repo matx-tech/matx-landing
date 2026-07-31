@@ -144,23 +144,38 @@ function BloomEffect() {
 }
 
 export function ParticleCanvas() {
-  const [isMobile, setIsMobile] = useState(false);
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  // Initialize from window on first client render so we never mount Canvas for mobile / reduced-motion users
+  const [state] = useState(() => {
+    if (typeof window === 'undefined') return { ready: false, isMobile: false, prefersReducedMotion: false };
+    return {
+      ready: true,
+      isMobile: window.innerWidth < 768,
+      prefersReducedMotion: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+    };
+  });
+
+  const [isMobile, setIsMobile] = useState(state.isMobile);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(state.prefersReducedMotion);
+  const [ready, setReady] = useState(state.ready);
 
   useEffect(() => {
-    const checkMobile = () => {
+    // If window was undefined during SSR, initialize now
+    if (!ready) {
       setIsMobile(window.innerWidth < 768);
-    };
-    const checkReducedMotion = () => {
       setPrefersReducedMotion(window.matchMedia('(prefers-reduced-motion: reduce)').matches);
-    };
+      setReady(true);
+      return;
+    }
+  }, [ready]);
 
-    checkMobile();
-    checkReducedMotion();
-
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  // Gate: don't render anything until preferences are known
+  if (!ready) return null;
 
   // Don't render particle field for mobile or reduced motion users
   if (isMobile || prefersReducedMotion) {

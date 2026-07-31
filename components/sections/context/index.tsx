@@ -10,25 +10,29 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { NATIONAL_CONTEXT, SECTION_IDS } from '@/lib/content/landing-copy';
 import { TrendingDown, Clock, Minus } from 'lucide-react';
+import { usePrefersReducedMotion } from '@/lib/hooks/use-prefers-reduced-motion';
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
 }
 
-const CONTEXT_ICONS = [TrendingDown, Clock, Minus];
+const CONTEXT_ICONS: Record<string, typeof TrendingDown | typeof Clock | typeof Minus> = {
+  'trending-down': TrendingDown,
+  'clock': Clock,
+  'minus': Minus,
+};
 
 export function ContextSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
+  const prefersReducedMotion = usePrefersReducedMotion();
 
   useEffect(() => {
     if (!sectionRef.current) return;
-
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (prefersReducedMotion) return;
 
     const ctx = gsap.context(() => {
-      cardsRef.current.forEach((card, index) => {
+      cardsRef.current.forEach((card) => {
         if (!card) return;
 
         gsap.fromTo(
@@ -38,7 +42,6 @@ export function ContextSection() {
             opacity: 1,
             y: 0,
             duration: 0.5,
-            delay: index * 0.15,
             ease: 'power2.out',
             scrollTrigger: {
               trigger: card,
@@ -51,7 +54,7 @@ export function ContextSection() {
     }, sectionRef);
 
     return () => ctx.revert();
-  }, []);
+  }, [prefersReducedMotion]);
 
   return (
     <section
@@ -73,7 +76,7 @@ export function ContextSection() {
         {/* Context cards */}
         <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
           {NATIONAL_CONTEXT.map((context, index) => {
-            const Icon = CONTEXT_ICONS[index];
+            const Icon = CONTEXT_ICONS[context.icon];
 
             return (
               <div
@@ -85,7 +88,7 @@ export function ContextSection() {
               >
                 {/* Icon */}
                 <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center mb-4">
-                  <Icon className="w-5 h-5 text-muted-foreground" />
+                  {Icon && <Icon className="w-5 h-5 text-muted-foreground" />}
                 </div>
 
                 {/* Title */}

@@ -4,6 +4,7 @@ import { useRef, useEffect } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ScrollIndicator } from '@/components/sections/hero/scroll-indicator';
+import { PRODUCT_FIXTURE } from '@/lib/content/landing-evidence';
 
 const storyBeats = [
   {
@@ -142,10 +143,10 @@ export function ProblemSection() {
                       {/* Visual content based on beat type */}
                       {beat.visual === 'answer' && (
                         <div className="space-y-4">
-                          <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Näidisandmed</div>
+                          <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{PRODUCT_FIXTURE.label}</div>
                           <div className="p-4 bg-card rounded-lg border border-border">
-                            <div className="text-sm font-medium mb-2">3/4 + 1/2 = ?</div>
-                            <div className="text-sm text-muted-foreground">Õpilase vastus: <span className="font-mono text-destructive">4/6</span></div>
+                            <div className="text-sm font-medium mb-2">{PRODUCT_FIXTURE.task.question}</div>
+                            <div className="text-sm text-muted-foreground">Õpilase vastus: <span className="font-mono text-destructive">{PRODUCT_FIXTURE.answer.submitted}</span></div>
                           </div>
                           <div className="text-xs text-muted-foreground italic">
                             Õpilane ei tea, mida järgmisena harjutada
@@ -155,7 +156,7 @@ export function ProblemSection() {
 
                       {beat.visual === 'pattern' && (
                         <div className="space-y-4">
-                          <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Näidisandmed</div>
+                          <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{PRODUCT_FIXTURE.label}</div>
                           <div className="space-y-2">
                             <div className="p-3 bg-card rounded border border-border text-xs">
                               <span className="text-muted-foreground">3/4 + 1/2 = </span>
