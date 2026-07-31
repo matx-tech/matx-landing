@@ -2,6 +2,7 @@
 
 import { useRef, useEffect } from 'react';
 import gsap from 'gsap';
+import { usePrefersReducedMotion } from '@/lib/hooks/use-prefers-reduced-motion';
 
 interface AnimatedHeadlineProps {
   children: string;
@@ -18,11 +19,11 @@ export function AnimatedWordReveal({
 }: AnimatedHeadlineProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const wordsRef = useRef<HTMLSpanElement[]>([]);
+  const prefersReducedMotion = usePrefersReducedMotion();
 
   useEffect(() => {
     if (!containerRef.current) return;
 
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (prefersReducedMotion) {
       // Show content immediately without animation
       gsap.set(wordsRef.current, { y: 0, opacity: 1, rotateX: 0 });
@@ -51,7 +52,7 @@ export function AnimatedWordReveal({
     return () => {
       gsap.killTweensOf(words);
     };
-  }, [stagger, delay]);
+  }, [stagger, delay, prefersReducedMotion]);
 
   const words = children.trim().split(/\s+/);
 
@@ -85,11 +86,11 @@ interface AnimatedSublineProps {
 export function AnimatedCharacterReveal({ children, className = '', delay = 1.5 }: AnimatedSublineProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const charsRef = useRef<HTMLSpanElement[]>([]);
+  const prefersReducedMotion = usePrefersReducedMotion();
 
   useEffect(() => {
     if (!containerRef.current) return;
 
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (prefersReducedMotion) {
       // Show content immediately without animation
       gsap.set(charsRef.current, { opacity: 1, y: 0 });
@@ -115,7 +116,7 @@ export function AnimatedCharacterReveal({ children, className = '', delay = 1.5 
     return () => {
       gsap.killTweensOf(chars);
     };
-  }, [delay]);
+  }, [delay, prefersReducedMotion]);
 
   return (
     <div ref={containerRef} className={className}>
@@ -137,11 +138,11 @@ export function AnimatedCharacterReveal({ children, className = '', delay = 1.5 
 export function MATxLogoAnimation({ delay = 0 }: { delay?: number }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const lettersRef = useRef<HTMLSpanElement[]>([]);
+  const prefersReducedMotion = usePrefersReducedMotion();
 
   useEffect(() => {
     if (!containerRef.current) return;
 
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (prefersReducedMotion) {
       // Show content immediately without animation
       gsap.set(lettersRef.current, { scale: 1, opacity: 1, rotation: 0 });
@@ -170,7 +171,7 @@ export function MATxLogoAnimation({ delay = 0 }: { delay?: number }) {
     return () => {
       gsap.killTweensOf(letters);
     };
-  }, [delay]);
+  }, [delay, prefersReducedMotion]);
 
   // CVI colors: Public Service Blue for "MAT", Learning Teal for "x"
   return (
