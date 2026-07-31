@@ -21,6 +21,18 @@ export const PROHIBITED_PHRASES = [
   'Olemasolevad ei tööta',
 ] as const;
 
+// Shared URLs
+export const CALENDLY_URL = 'https://calendly.com/matx-demo' as const;
+
+// Site metadata — single source for OG/Twitter/JSON-LD
+export const SITE_META = {
+  title: 'MATx — Õpilase harjutamine ja õpetaja otsus ühes töövoos',
+  shortDescription: 'Seob õpilase vastused, jälgitavad signaalid ja õpetaja tegevussoovituse üheks läbipaistvaks töövooks.',
+  longDescription: 'Seob õpilase harjutamise, arusaadava tagasiside ja õpetaja tegevussoovituse üheks jälgitavaks töövooks',
+  url: 'https://matx.ee',
+  locale: 'et_EE' as const,
+} as const;
+
 // Locked narrative strings
 export const HERO_COPY = {
   headline: 'Iga vastus aitab leida järgmise sammu.',
@@ -41,6 +53,8 @@ export const EVIDENCE_STAGES = [
     number: 2,
     title: 'Vastust tõlgendatakse',
     description: 'Süsteem tuvastab võimaliku veamustri. Signaal on kontrollitav, mitte lõplik diagnoos.',
+    caveat: 'Signaal on võimalik veamuster, mitte lõplik diagnoos',
+    tone: 'info' as const,
   },
   {
     number: 3,
@@ -51,6 +65,8 @@ export const EVIDENCE_STAGES = [
     number: 4,
     title: 'Õpetaja otsustab',
     description: 'Õpetaja vaatab soovituse üle ja võib selle vastu võtta, muuta või eirata.',
+    caveat: 'Õpetaja võib soovituse vastu võtta, muuta või eirata',
+    tone: 'success' as const,
   },
 ] as const;
 
@@ -74,6 +90,32 @@ export const PROBLEM_BEATS = [
 export const STUDENT_STORY = {
   heading: 'Õpilane näeb, mida järgmisena harjutada.',
   description: 'Õpilane saab selge tagasiside ja konkreetse järgmise sammu. Üks õige kordus ei tähenda veel valdamist — süsteem jätkab jälgimist.',
+  steps: [
+    {
+      title: 'Õpilane lahendab ülesande',
+      description: 'Digitaalselt või paberil, oma tempos',
+      badge: '1',
+      badgeClass: 'bg-blue-100 text-blue-700',
+    },
+    {
+      title: 'Saab arusaadava tagasiside',
+      description: 'Selge selgitus, mitte ainult „vale\u201c märge',
+      badge: '2',
+      badgeClass: 'bg-blue-100 text-blue-700',
+    },
+    {
+      title: 'Proovib sihitud harjutust',
+      description: 'Järgmine samm on selge ja asjakohane',
+      badge: '3',
+      badgeClass: 'bg-blue-100 text-blue-700',
+    },
+    {
+      title: 'Jätkab harjutamist',
+      description: 'Üks õige kordus ei tähenda veel valdamist',
+      badge: '\u2713',
+      badgeClass: 'bg-green-100 text-green-700',
+    },
+  ],
 } as const;
 
 // Teacher story
@@ -89,6 +131,9 @@ export const TOPICS_SECTION = {
   description: 'Praegune õppesisu katab valitud põhikooli matemaatika oskusi. Uued teemad lisatakse piloodi käigus.',
 } as const;
 
+// Icon identifiers for context cards
+type ContextIconId = 'trending-down' | 'clock' | 'minus';
+
 // National context cards
 export const NATIONAL_CONTEXT = [
   {
@@ -96,66 +141,86 @@ export const NATIONAL_CONTEXT = [
     description: 'PISA 2022 tulemused näitavad võrdluses varasemate aastatega langust.',
     source: 'PISA 2022',
     limitation: 'Ainult kontekst. MATx ei ole põhjus ega tagajärg.',
+    icon: 'trending-down' as const,
   },
   {
     title: 'Õpetajate ajakoormus',
     description: 'Õpetajad raporteerivad suurt halduskoormust ja piiratud aega individuaalseks toetuseks.',
     source: 'Haridus- ja Teadusministeerium, 2023',
     limitation: 'Ainult kontekst. MATx ei ole põhjus ega tagajärg.',
+    icon: 'clock' as const,
   },
   {
     title: 'Ebavõrdne juurdepääs toele',
     description: 'Kõik koolid ei oma võrdset juurdepääsu täiendavatele õppematerjalidele ja tööriistadele.',
     source: 'Eesti Hariduse Infosüsteem, 2024',
     limitation: 'Ainult kontekst. MATx ei ole põhjus ega tagajärg.',
+    icon: 'minus' as const,
   },
 ] as const;
+
+// Icon identifiers for trust pillars
+type TrustIconId = 'shield' | 'eye' | 'file-text';
 
 // Trust pillars
 export const TRUST_PILLARS = [
   {
     title: 'Õpetaja kontroll säilib',
     description: 'Soovitused toetavad otsust, ei asenda seda. Õpetaja võib alati sekkuda.',
+    icon: 'shield' as const,
   },
   {
     title: 'Läbipaistev andmevoog',
     description: 'Õpetaja näeb, millistel andmetel soovitus põhineb ja kuidas see genereeriti.',
+    icon: 'eye' as const,
   },
   {
     title: 'Väidete, staatuse ja allika nähtavus',
     description: 'Iga väide on märgistatud staatusega (Saadaval, Piloodis, Kavandatud) ja allikaga.',
+    icon: 'file-text' as const,
   },
 ] as const;
+
+// Audience ID type
+export type AudienceId = 'teacher' | 'principal' | 'procurement' | 'it';
 
 // Adoption routes
 export const ADOPTION_ROUTES = [
   {
     audience: 'Õpetajale',
+    audienceId: 'teacher' as const,
     title: 'Liitu õpetajana',
     description: 'Proovi MATx-i oma klassis ja anna tagasisidet.',
     cta: 'Registreeru piloodile',
     ctaAction: 'registration',
+    ctaRoute: null as string | null,
   },
   {
     audience: 'Koolijuhile',
+    audienceId: 'principal' as const,
     title: 'Liitu koolina',
     description: 'Hinda, kuidas MATx sobib teie kooli õppekavasse ja toetussüsteemi.',
     cta: 'Broneeri demokõne',
     ctaAction: 'calendly',
+    ctaRoute: null as string | null,
   },
   {
     audience: 'Hankele',
+    audienceId: 'procurement' as const,
     title: 'Hankeinfo',
     description: 'Vaata hinnakirja, lepingutingimusi ja tehnilisi nõudeid.',
     cta: 'Vaata hankeinfot',
     ctaAction: 'procurement',
+    ctaRoute: null as string | null,
   },
   {
     audience: 'IT-le',
+    audienceId: 'it' as const,
     title: 'Tehniline ülevaade',
     description: 'Tutvu arhitektuuri, turvalisuse ja integratsioonivõimalustega.',
     cta: 'Vaata tehnilist dokumentatsiooni',
     ctaAction: 'technical',
+    ctaRoute: null as string | null,
   },
 ] as const;
 
@@ -179,7 +244,8 @@ export const FAQ_ENTRIES = [
   },
   {
     question: 'Kuidas andmeid kasutatakse?',
-    answer: 'Õpilase vastused ja veamustrid jäävad õpetajale nähtavaks. Andmeid kasutatakse soovituste genereerimiseks. Täpne andmekaitse poliitika on siin [link].',
+    answer: 'Õpilase vastused ja veamustrid jäävad õpetajale nähtavaks. Andmeid kasutatakse soovituste genereerimiseks. Täpne andmekaitse poliitika on saadaval siin.',
+    answerLink: { href: '/privaatsus', label: 'Privaatsuspoliitika' },
   },
   {
     question: 'Kuidas piloodiga liituda?',

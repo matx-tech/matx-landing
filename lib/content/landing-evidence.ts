@@ -21,6 +21,11 @@ export const PRODUCT_FIXTURE = {
     isCorrect: false,
   },
 
+  // Feedback shown to the student
+  feedback: {
+    text: 'Oled proovinud liita lugejaid ja nimetajaid eraldi. Murdude liitmisel tuleb esmalt leida ühine nimetaja.',
+  },
+
   // Signal detection
   signal: {
     pattern: 'Liidab lugejad ja nimetajad eraldi',
@@ -33,6 +38,7 @@ export const PRODUCT_FIXTURE = {
   retry: {
     question: '1/3 + 1/6 = ?',
     rationale: 'Lihtsam ülesanne sama mustri kontrollimiseks',
+    hint: 'Proovi sama meetodit lihtsamal ülesandel',
     expectedPattern: 'Kas õpilane liidab jälle lugejad ja nimetajad eraldi?',
   },
 
