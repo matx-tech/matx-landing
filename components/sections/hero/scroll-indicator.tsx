@@ -2,8 +2,14 @@
 
 import { useRef, useEffect } from 'react';
 import gsap from 'gsap';
+import { SCROLL_INDICATOR_LABEL } from '@/lib/content/landing-copy';
 
-export function ScrollIndicator() {
+interface ScrollIndicatorProps {
+  /** Hides the text label for compact contexts (between-beat indicators). */
+  hideLabel?: boolean;
+}
+
+export function ScrollIndicator({ hideLabel = false }: ScrollIndicatorProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mouseRef = useRef<HTMLDivElement>(null);
 
@@ -46,8 +52,13 @@ export function ScrollIndicator() {
     <div
       ref={containerRef}
       className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
+      aria-label={SCROLL_INDICATOR_LABEL}
     >
-      <span className="text-text-secondary text-sm tracking-wider uppercase">Scroll</span>
+      {!hideLabel && (
+        <span className="text-text-secondary text-sm tracking-wider uppercase">
+          {SCROLL_INDICATOR_LABEL}
+        </span>
+      )}
       <div className="w-6 h-10 rounded-full border-2 border-text-secondary/50 flex items-start justify-center p-1">
         <div
           ref={mouseRef}

@@ -21,6 +21,9 @@ export const PROHIBITED_PHRASES = [
   'Olemasolevad ei tööta',
 ] as const;
 
+// Shared UI labels
+export const SCROLL_INDICATOR_LABEL = 'Keri alla' as const;
+
 // Shared URLs
 export const CALENDLY_URL = 'https://calendly.com/matx-demo' as const;
 
