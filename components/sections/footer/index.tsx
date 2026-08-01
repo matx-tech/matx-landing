@@ -6,6 +6,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Award, GraduationCap, Mail, MessageCircle, Building2, GitBranch } from 'lucide-react';
 import { usePrefersReducedMotion } from '@/lib/hooks/use-prefers-reduced-motion';
 import { motionTokens, gsapEase, staggers } from '@/lib/motion-tokens';
+import { SECTION_IDS } from '@/lib/content/landing-copy';
 
 export function FooterSection() {
   const footerRef = useRef<HTMLElement>(null);
@@ -132,27 +133,27 @@ export function FooterSection() {
                 </a>
               </li>
               <li>
-                <a href="#töövoog" className="text-text-secondary hover:text-primary transition-colors text-sm focus-ring-target rounded-md" style={{ textDecoration: 'underline' }}>
+                <a href={`#${SECTION_IDS.workflow}`} className="text-text-secondary hover:text-primary transition-colors text-sm focus-ring-target rounded-md" style={{ textDecoration: 'underline' }}>
                   Töövoog
                 </a>
               </li>
               <li>
-                <a href="#võimekused" className="text-text-secondary hover:text-primary transition-colors text-sm focus-ring-target rounded-md" style={{ textDecoration: 'underline' }}>
+                <a href={`#${SECTION_IDS.capabilities}`} className="text-text-secondary hover:text-primary transition-colors text-sm focus-ring-target rounded-md" style={{ textDecoration: 'underline' }}>
                   Teemad
                 </a>
               </li>
               <li>
-                <a href="#õpilasele" className="text-text-secondary hover:text-primary transition-colors text-sm focus-ring-target rounded-md" style={{ textDecoration: 'underline' }}>
+                <a href={`#${SECTION_IDS.student}`} className="text-text-secondary hover:text-primary transition-colors text-sm focus-ring-target rounded-md" style={{ textDecoration: 'underline' }}>
                   Õpitee
                 </a>
               </li>
               <li>
-                <a href="#õpetajale" className="text-text-secondary hover:text-primary transition-colors text-sm focus-ring-target rounded-md" style={{ textDecoration: 'underline' }}>
+                <a href={`#${SECTION_IDS.teacher}`} className="text-text-secondary hover:text-primary transition-colors text-sm focus-ring-target rounded-md" style={{ textDecoration: 'underline' }}>
                   Õpetajale
                 </a>
               </li>
               <li>
-                <a href="#kkk" className="text-text-secondary hover:text-primary transition-colors text-sm focus-ring-target rounded-md" style={{ textDecoration: 'underline' }}>
+                <a href={`#${SECTION_IDS.faq}`} className="text-text-secondary hover:text-primary transition-colors text-sm focus-ring-target rounded-md" style={{ textDecoration: 'underline' }}>
                   KKK
                 </a>
               </li>

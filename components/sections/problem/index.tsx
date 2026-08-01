@@ -99,7 +99,7 @@ export function ProblemSection() {
           end: 'bottom center',
           onEnter: () => enterTween.play(),
           onLeave: () => enterTween.reverse(),
-          onEnterBack: () => leaveBackTween.reverse(),
+          onEnterBack: () => leaveBackTween.reverse(1),
           onLeaveBack: () => leaveBackTween.play(),
         });
       });
