@@ -4,6 +4,7 @@ import { useRef, useMemo, useEffect, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import gsap from 'gsap';
+import { usePrefersReducedMotion } from '@/lib/hooks/use-prefers-reduced-motion';
 
 function ParticleField() {
   const meshRef = useRef<THREE.Points>(null);
@@ -68,9 +69,9 @@ function ParticleField() {
 
       const distX = (mouseRef.current.x * viewport.width) / 2 - x;
       const distY = (mouseRef.current.y * viewport.height) / 2 - y;
-      const dist = Math.sqrt(distX * distX + distY * distY);
+      const distSq = distX * distX + distY * distY;
 
-      if (dist < 2) {
+      if (distSq < 4) { // radius² = 2²
         positions[i3] += distX * 0.02;
         positions[i3 + 1] += distY * 0.02;
       }
@@ -126,34 +127,31 @@ function ParticleField() {
   );
 }
 
-function BloomEffect() {
-  const { gl, scene, camera } = useThree();
-  const renderTargetRef = useRef<THREE.WebGLRenderTarget>();
-
-  useFrame(() => {
-    if (!renderTargetRef.current) {
-      renderTargetRef.current = new THREE.WebGLRenderTarget(512, 512, {
-        minFilter: THREE.LinearFilter,
-        magFilter: THREE.LinearFilter,
-        format: THREE.RGBAFormat,
-      });
-    }
-  });
-
-  return null;
-}
-
 export function ParticleCanvas() {
+  const prefersReducedMotion = usePrefersReducedMotion();
+
+  // Start with server-safe defaults; initialize from window in useEffect
   const [isMobile, setIsMobile] = useState(false);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
+    setIsMobile(window.innerWidth < 768);
+    setReady(true);
   }, []);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Gate: don't render anything until preferences are known
+  if (!ready) return null;
+
+  // Don't render particle field for mobile or reduced motion users
+  if (isMobile || prefersReducedMotion) {
+    return null;
+  }
 
   return (
     <div className="absolute inset-0 w-full h-full">
@@ -162,13 +160,8 @@ export function ParticleCanvas() {
         gl={{ antialias: true, alpha: true }}
         dpr={[1, 2]}
       >
-        {!isMobile && (
-          <>
-            <ambientLight intensity={0.5} />
-            <ParticleField />
-            <BloomEffect />
-          </>
-        )}
+        <ambientLight intensity={0.5} />
+        <ParticleField />
       </Canvas>
     </div>
   );

@@ -101,6 +101,12 @@
     --color-action-danger-bg-active: var(--color-red-800);
     --color-feedback-warning: var(--color-amber-700);
     --color-feedback-info: var(--color-info-700);
+    --color-bg-info-subtle: var(--color-info-050);
+    --color-border-info: var(--color-info-400);
+    --color-text-info-strong: var(--color-info-700);
+    --color-bg-success-subtle: #E6F4ED;
+    --color-border-success: var(--color-green-400);
+    --color-text-success-strong: var(--color-green-700);
 
     /* --- Tier 3: Component Tokens --- */
     /* Primary Button */
@@ -176,6 +182,12 @@
     --color-action-danger-bg-active: var(--color-red-400);
     --color-feedback-warning: var(--color-amber-400);
     --color-feedback-info: var(--color-info-400);
+    --color-bg-info-subtle: var(--color-ink-800);
+    --color-border-info: var(--color-info-400);
+    --color-text-info-strong: var(--color-info-400);
+    --color-bg-success-subtle: var(--color-ink-800);
+    --color-border-success: var(--color-green-400);
+    --color-text-success-strong: var(--color-green-400);
 
     /* Tier 3 Dark Theme Adjustments */
     --button-primary-bg: var(--color-action-primary-bg);
@@ -195,6 +207,11 @@
   html {
     font-size: 100%;
     scroll-behavior: auto;
+    /* Override Tailwind preflight: standard property clears the deprecated
+       -webkit-text-size-adjust: 100% warning in Chrome DevTools while
+       preserving the intended text-inflation prevention on mobile. */
+    -webkit-text-size-adjust: none;
+    text-size-adjust: none;
   }
 
   html.lenis,
@@ -226,6 +243,11 @@
     font-size: 1.0625rem;
     line-height: 1.6;
     overflow-x: hidden;
+    /* Estonian hyphenation — lang="et" on <html> tells the browser to use et patterns */
+    hyphens: auto;
+    hyphenate-limit-chars: 7 3 3;
+    /* Prevent orphaned words due to leading-space at line-start */
+    overflow-wrap: break-word;
   }
 
   ::selection {
@@ -290,6 +312,16 @@
       linear-gradient(90deg, var(--color-blue-700) 1px, transparent 1px);
     background-size: 48px 48px;
     opacity: 0.06;
+  }
+
+  /* Estonian prose: prevent justified-text spacing artifacts and give
+     the browser the best chance at native et hyphenation */
+  .prose-et {
+    text-align: left;
+    hyphens: auto;
+    hyphenate-limit-chars: 8 3 3;
+    overflow-wrap: break-word;
+    word-break: normal;
   }
 }
 
@@ -487,24 +519,8 @@
     backface-visibility: hidden;
   }
 
-  @keyframes shimmer {
-    0% { background-position: -200% 0; }
-    100% { background-position: 200% 0; }
-  }
-
   @keyframes ripple {
     to { transform: scale(4); opacity: 0; }
-  }
-
-  .animate-shimmer {
-    background: linear-gradient(
-      90deg,
-      rgba(0, 0, 0, 0) 0%,
-      rgba(0, 0, 0, 0.06) 50%,
-      rgba(0, 0, 0, 0) 100%
-    );
-    background-size: 200% 100%;
-    animation: shimmer 2s linear infinite;
   }
 
   .animate-ripple {
@@ -512,9 +528,6 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .animate-marquee,
-    .animate-float,
-    .animate-shimmer,
     .animate-ripple {
       animation: none;
     }
@@ -528,16 +541,41 @@
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }
-}
 
-/* KaTeX styling */
-.katex {
-  font-family: 'IBM Plex Mono', 'KaTeX_Main', serif !important;
-  font-size: 1.1em;
-}
+  /* ── Section background transition fades ──
+     Sections alternate between bg-canvas (#F8FAFC) and bg-surface (#FFFFFF).
+     Hard edges at section boundaries are smoothed with a 6rem top-edge
+     ::before gradient that fades from the previous section's background.
+     The inner content sits at z-10, so the overlay at z-1 stays behind it. */
+  .section-fade-from-canvas {
+    position: relative;
+  }
+  .section-fade-from-canvas::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 6rem;
+    background: linear-gradient(to bottom, var(--color-bg-canvas), transparent);
+    pointer-events: none;
+    z-index: 1;
+  }
 
-.katex .katex-html {
-  color: var(--color-text-primary);
+  .section-fade-from-surface {
+    position: relative;
+  }
+  .section-fade-from-surface::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 6rem;
+    background: linear-gradient(to bottom, var(--color-bg-surface), transparent);
+    pointer-events: none;
+    z-index: 1;
+  }
 }
 
 /* Topic color utilities — CVI-compliant palette */

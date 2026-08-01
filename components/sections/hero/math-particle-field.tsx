@@ -3,6 +3,7 @@
 import { useRef, useMemo, useEffect, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
+import { usePrefersReducedMotion } from '@/lib/hooks/use-prefers-reduced-motion';
 
 const mathCharacters = [
   '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
@@ -64,9 +65,9 @@ function MathParticleField() {
 
       const distX = (mouseRef.current.x * viewport.width) / 2 - x;
       const distY = (mouseRef.current.y * viewport.height) / 2 - y;
-      const dist = Math.sqrt(distX * distX + distY * distY);
+      const distSq = distX * distX + distY * distY;
 
-      if (dist < 3) {
+      if (distSq < 9) { // radius² = 3²
         positions[i3] += distX * 0.015;
         positions[i3 + 1] += distY * 0.015;
       }
@@ -134,6 +135,7 @@ function MathParticleField() {
 
 export function MathParticleCanvas() {
   const [isMobile, setIsMobile] = useState(false);
+  const prefersReducedMotion = usePrefersReducedMotion();
 
   useEffect(() => {
     const checkMobile = () => {
@@ -144,6 +146,11 @@ export function MathParticleCanvas() {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
+  // Don't render particle field for mobile or reduced-motion users
+  if (isMobile || prefersReducedMotion) {
+    return null;
+  }
+
   return (
     <div className="absolute inset-0 w-full h-full">
       <Canvas
@@ -151,7 +158,7 @@ export function MathParticleCanvas() {
         gl={{ antialias: true, alpha: true }}
         dpr={[1, 2]}
       >
-        {!isMobile && <MathParticleField />}
+        <MathParticleField />
       </Canvas>
     </div>
   );

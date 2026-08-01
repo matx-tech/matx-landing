@@ -1,108 +1,131 @@
 'use client';
 
+import { useRef } from 'react';
+import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
 import { AnimatedWordReveal, AnimatedCharacterReveal, MATxLogoAnimation } from './animated-headline';
 import { ScrollIndicator } from './scroll-indicator';
-import { Award, GraduationCap, BookOpen, Users } from 'lucide-react';
+import { ProductFixture } from '@/components/ui/product-fixture';
+import { HERO_COPY, SECTION_IDS } from '@/lib/content/landing-copy';
+import { Award, GraduationCap } from 'lucide-react';
+import { motionTokens, gsapEase, staggers } from '@/lib/motion-tokens';
 
 interface HeroSectionProps {
   onOpenRegistration: () => void;
 }
 
 export function HeroSection({ onOpenRegistration }: HeroSectionProps) {
+  const ctasRef = useRef<HTMLDivElement>(null);
+  const trustRef = useRef<HTMLParagraphElement>(null);
+  const badgesRef = useRef<HTMLDivElement>(null);
+
+  useGSAP(() => {
+    const mm = gsap.matchMedia();
+
+    // Reduced motion: instant visibility for CTAs, trust line, badges
+    mm.add('(prefers-reduced-motion: reduce)', () => {
+      const elements = [
+        ...Array.from(ctasRef.current?.children ?? []),
+        trustRef.current,
+        ...Array.from(badgesRef.current?.children ?? []),
+      ].filter(Boolean);
+      gsap.set(elements, { opacity: 1, y: 0 });
+    });
+
+    // Full animation: staggered reveal after headline completes
+    mm.add('(prefers-reduced-motion: no-preference)', () => {
+      const elements = [
+        ...Array.from(ctasRef.current?.children ?? []),
+        trustRef.current,
+        ...Array.from(badgesRef.current?.children ?? []),
+      ].filter(Boolean) as (Element | HTMLDivElement)[];
+
+      gsap.set(elements, { opacity: 0, y: motionTokens.distance.md });
+
+      gsap.to(elements, {
+        opacity: 1,
+        y: 0,
+        duration: motionTokens.duration.normal,
+        delay: 2.2,
+        stagger: staggers.card,
+        ease: gsapEase(motionTokens.easing.emphasized),
+      });
+    });
+
+    return () => mm.revert();
+  }, { scope: ctasRef });
+
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-canvas">
-      {/* CVI-compliant blueprint grid background (replaces 3D particles) */}
+    <section id={SECTION_IDS.hero} className="relative min-h-screen flex items-center justify-center overflow-hidden bg-canvas">
       <div className="absolute inset-0 hero-blueprint-bg" aria-hidden="true" />
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-canvas/40 to-canvas pointer-events-none" />
 
-      <div className="relative z-10 container mx-auto px-4 md:px-8 py-24 md:py-32 lg:py-40 text-center">
-        <div className="max-w-5xl mx-auto">
-          {/* Achievement Badges */}
-          <div className="flex flex-wrap justify-center gap-4 mb-8">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-surface border border-border">
-              <Award className="w-4 h-4 text-warning" />
-              <span className="text-sm font-medium text-text-primary">FELLIN HÄKK 2026 — I koht</span>
-            </div>
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-surface border border-border">
-              <GraduationCap className="w-4 h-4 text-secondary" />
-              <span className="text-sm font-medium text-text-primary">Presidendi Häkaton 2026</span>
-            </div>
-          </div>
-
-          {/* Logo */}
-          <div className="mb-6">
-            <div className="text-6xl md:text-7xl lg:text-8xl font-display font-bold tracking-tight">
-              <MATxLogoAnimation delay={0.3} />
-            </div>
-          </div>
-
-          {/* Main Headline */}
-          <AnimatedWordReveal
-            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-display font-semibold text-text-primary tracking-tight mb-6"
-            stagger={0.08}
-            delay={0.6}
-          >
-            Matemaatika selgeks — teaduslikel alustel
-          </AnimatedWordReveal>
-
-          {/* Sub-headline */}
-          <div className="mb-10">
-            <AnimatedCharacterReveal
-              className="text-lg md:text-xl text-text-secondary max-w-3xl mx-auto leading-relaxed"
-              delay={1.8}
-            >
-              Andmepõhine õpitee iga õpilase jaoks. Valmistatud Eesti õpetajate poolt, Eesti õppekavaks.
-            </AnimatedCharacterReveal>
-          </div>
-
-          {/* Dual CTA Buttons */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
-            <button
-              onClick={onOpenRegistration}
-              className="btn-primary min-w-[240px] sm:min-w-[280px] px-8 py-4 text-lg rounded-xl font-semibold focus-ring-target min-h-[44px]"
-            >
-              Registreeri kool pilootkatsetuseks
-            </button>
-
-            <a
-              href="https://calendly.com/matx-ee/15min"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-secondary min-w-[240px] sm:min-w-[280px] px-8 py-4 text-lg rounded-xl font-semibold group focus-ring-target min-h-[44px]"
-            >
-              Broneeri 15-min infovestlus
-              <span className="ml-2 inline-block transition-transform group-hover:translate-x-1">→</span>
-            </a>
-          </div>
-
-          {/* Trust Stats */}
-          <div className="flex flex-wrap justify-center gap-6 md:gap-8">
-            <div className="flex items-center gap-2">
-              <BookOpen className="w-5 h-5 text-primary" />
-              <span className="text-text-secondary text-sm md:text-base">150+ ülesannet</span>
-            </div>
-            <div className="w-px h-6 bg-border hidden sm:block" />
-            <div className="flex items-center gap-2">
-              <div className="w-5 h-5 rounded-full bg-secondary/20 flex items-center justify-center">
-                <span className="text-xs font-bold text-secondary">7</span>
+      <div className="relative z-10 container mx-auto px-4 md:px-8 py-24 md:py-32 lg:py-40">
+        <div className="grid lg:grid-cols-2 gap-12 items-center max-w-7xl mx-auto">
+          <div className="text-center lg:text-left">
+            <div className="mb-6 lg:mb-8">
+              <div className="text-5xl md:text-6xl lg:text-7xl font-display font-bold tracking-tight">
+                <MATxLogoAnimation delay={0.3} />
               </div>
-              <span className="text-text-secondary text-sm md:text-base">veatüüpi tuvastamist</span>
             </div>
-            <div className="w-px h-6 bg-border hidden sm:block" />
-            <div className="flex items-center gap-2">
-              <Users className="w-5 h-5 text-primary" />
-              <span className="text-text-secondary text-sm md:text-base">EU AI Act auditeeritav</span>
+
+            <AnimatedWordReveal
+              className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-display font-semibold text-text-primary tracking-tight mb-6"
+              stagger={0.08}
+              delay={0.6}
+            >
+              {HERO_COPY.headline}
+            </AnimatedWordReveal>
+
+            <div className="mb-10">
+              <AnimatedCharacterReveal
+                className="text-lg md:text-xl text-text-secondary leading-relaxed"
+                delay={1.8}
+              >
+                {HERO_COPY.support}
+              </AnimatedCharacterReveal>
+            </div>
+
+            <div ref={ctasRef} className="flex flex-col sm:flex-row items-center lg:items-start lg:justify-start justify-center gap-4 mb-8">
+              <button
+                type="button"
+                onClick={onOpenRegistration}
+                className="btn-primary min-w-[240px] sm:min-w-[280px] px-8 py-4 text-lg rounded-xl font-semibold focus-ring-target min-h-[44px]"
+              >
+                {HERO_COPY.primaryCTA}
+              </button>
+
+              <a
+                href={`#${SECTION_IDS.workflow}`}
+                className="btn-secondary min-w-[240px] sm:min-w-[280px] px-8 py-4 text-lg rounded-xl font-semibold group focus-ring-target min-h-[44px]"
+              >
+                {HERO_COPY.secondaryCTA}
+                <span className="ml-2 inline-block transition-transform group-hover:translate-y-1">↓</span>
+              </a>
+            </div>
+
+            <p ref={trustRef} className="text-sm text-text-secondary/80 italic mb-8">
+              {HERO_COPY.trustLine}
+            </p>
+
+            <div ref={badgesRef} className="flex flex-wrap justify-center lg:justify-start gap-3">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface border border-border text-xs">
+                <Award className="w-3.5 h-3.5 text-warning" />
+                <span className="font-medium text-text-primary">FELLIN HÄKK 2026 — I koht</span>
+              </div>
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface border border-border text-xs">
+                <GraduationCap className="w-3.5 h-3.5 text-secondary" />
+                <span className="font-medium text-text-primary">Presidendi Häkaton 2026</span>
+              </div>
             </div>
           </div>
 
-          {/* Clarification text */}
-          <p className="mt-8 text-text-secondary/70 text-sm max-w-2xl mx-auto">
-            MATx on AI-toega adaptiivne matemaatikaõpikeskkond Eesti põhikoolidele. Me ei asenda õpetajat — me anname teile andmepõhise tööriista, mis näitab täpselt millised teemad vajavad kordamist.
-          </p>
+          <div className="lg:pl-8">
+            <ProductFixture animated={true} triggerId={SECTION_IDS.hero} delay={2.5} />
+          </div>
         </div>
       </div>
 
-      {/* Scroll Indicator */}
       <ScrollIndicator />
     </section>
   );

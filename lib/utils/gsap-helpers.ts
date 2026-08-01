@@ -7,6 +7,12 @@ if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
 }
 
+/**
+ * ⚠ DEPRECATED — use `useRippleEffect` from @/lib/hooks/use-ripple-effect instead.
+ *
+ * This creates a DOM ripple + GSAP tween without reduced-motion awareness.
+ * Kept for backward compatibility with any code that may import it directly.
+ */
 export const createRippleEffect = (element: HTMLElement) => {
   const createRipple = (event: MouseEvent) => {
     const button = element;
