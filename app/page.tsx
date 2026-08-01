@@ -59,7 +59,7 @@ export default function Home() {
   return (
     <>
       <ScrollProgress />
-      <Navigation onOpenRegistration={handleOpenRegistration} />
+      <Navigation />
       <main id="main" className="relative pt-16">
         {/* New narrative order: hero → evidence loop → student → problem → teacher → context → topics → adoption → trust → faq → cta */}
         <HeroSection onOpenRegistration={handleOpenRegistration} />

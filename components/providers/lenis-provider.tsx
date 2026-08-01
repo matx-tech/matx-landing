@@ -34,6 +34,7 @@ export const useLenis = () => useContext(LenisContext);
 export function LenisProvider({ children }: { children: React.ReactNode }) {
   const lenisRef = useRef<Lenis | null>(null);
   const reducedMotionRef = useRef(false);
+  const tickerCbRef = useRef<((time: number) => void) | null>(null);
 
   useEffect(() => {
     const reducedMotion =
@@ -42,19 +43,32 @@ export function LenisProvider({ children }: { children: React.ReactNode }) {
 
     reducedMotionRef.current = reducedMotion;
 
+    // Share one rAF cycle between Lenis and GSAP — eliminates duplicate
+    // animation loops and reduces jank.
+    gsap.ticker.lagSmoothing(false);
+
     function createLenis(rm: boolean) {
       return new Lenis({
         lerp: rm ? 0 : 0.1,
         duration: rm ? 0 : 1.2,
         smoothWheel: !rm,
         touchMultiplier: rm ? 1 : 2,
-        autoRaf: true,
+        autoRaf: false,
       });
+    }
+
+    function registerRaf(instance: Lenis) {
+      // Remove previous callback first so we never double-register
+      if (tickerCbRef.current) gsap.ticker.remove(tickerCbRef.current);
+      const cb = (time: number) => instance.raf(time * 1000);
+      tickerCbRef.current = cb;
+      gsap.ticker.add(cb);
     }
 
     let lenis = createLenis(reducedMotion);
     lenisRef.current = lenis;
 
+    registerRaf(lenis);
     lenis.on('scroll', ScrollTrigger.update);
 
     // Subscribe to live reduced-motion changes
@@ -63,10 +77,10 @@ export function LenisProvider({ children }: { children: React.ReactNode }) {
       const rm = e.matches;
       reducedMotionRef.current = rm;
 
-      // Destroy current instance and recreate with updated options
       lenis.destroy();
       lenis = createLenis(rm);
       lenisRef.current = lenis;
+      registerRaf(lenis);
       lenis.on('scroll', ScrollTrigger.update);
       ScrollTrigger.refresh();
     };
@@ -74,6 +88,7 @@ export function LenisProvider({ children }: { children: React.ReactNode }) {
 
     return () => {
       mql.removeEventListener('change', handleChange);
+      if (tickerCbRef.current) gsap.ticker.remove(tickerCbRef.current);
       lenis.destroy();
     };
   }, []);

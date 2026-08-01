@@ -17,11 +17,9 @@ const navItems = LANDING_NAV_ITEMS;
 
 const PILOT_HREF = `#${SECTION_IDS.pilot}`;
 
-interface NavigationProps {
-  onOpenRegistration?: () => void;
-}
+interface NavigationProps {}
 
-export function Navigation({ onOpenRegistration }: NavigationProps) {
+export function Navigation(_props: NavigationProps) {
   const [isOpen, setIsOpen] = useState(false);
   const navRef = useRef<HTMLElement>(null);
   const menuItemsRef = useRef<HTMLDivElement[]>([]);
@@ -114,11 +112,6 @@ export function Navigation({ onOpenRegistration }: NavigationProps) {
     }
   }, [isOpen, prefersReducedMotion]);
 
-  const handleRegistrationClick = useCallback(() => {
-    setIsOpen(false);
-    onOpenRegistration?.();
-  }, [onOpenRegistration]);
-
   const handleOpenChange = useCallback((open: boolean) => {
     setIsOpen(open);
   }, []);
@@ -193,7 +186,10 @@ export function Navigation({ onOpenRegistration }: NavigationProps) {
       {/* Mobile Menu - Radix Dialog */}
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 bg-canvas/95 z-40 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
-        <Dialog.Content className="fixed inset-0 z-50 flex flex-col items-start justify-center h-full px-8 md:px-16 focus:outline-none">
+        <Dialog.Content
+          className="fixed inset-0 z-50 flex flex-col items-start justify-center h-full px-8 md:px-16 focus:outline-none data-[state=closed]:animate-out data-[state=closed]:fade-out-0"
+          style={{ animationDuration: '0.5s' }}
+        >
           <Dialog.Title className="sr-only">Navigatsioonimenüü</Dialog.Title>
           <Dialog.Description className="sr-only">
             Valige menüüst soovitud osa või sulgege menüü

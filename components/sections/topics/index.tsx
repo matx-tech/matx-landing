@@ -111,9 +111,14 @@ export function TopicsSection() {
 
   // Stable ref so Observer callbacks don't need scrollTo / moveToIndex in deps
   const moveToIndexRef = useRef(moveToIndex);
-  moveToIndexRef.current = moveToIndex;
   const activeIndexRef = useRef(activeIndex);
-  activeIndexRef.current = activeIndex;
+
+  // Keep both refs current after every committed render so Observer
+  // callbacks always see the latest values without depending on them.
+  useEffect(() => {
+    moveToIndexRef.current = moveToIndex;
+    activeIndexRef.current = activeIndex;
+  });
 
   // Observer: horizontal wheel/swipe on carousel viewport → prev/next navigation
   useEffect(() => {
@@ -129,7 +134,6 @@ export function TopicsSection() {
         onRight: () => moveToIndexRef.current(Math.min(activeIndexRef.current + 1, TOPIC_AREAS.length - 1)),
         onLeft: () => moveToIndexRef.current(Math.max(activeIndexRef.current - 1, 0)),
         tolerance: 20,
-        preventDefault: true,
       });
     }, viewport);
 
