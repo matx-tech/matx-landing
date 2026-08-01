@@ -121,7 +121,7 @@ export function HeroSection({ onOpenRegistration }: HeroSectionProps) {
           </div>
 
           <div className="lg:pl-8">
-            <ProductFixture animated={true} triggerId={SECTION_IDS.hero} />
+            <ProductFixture animated={true} triggerId={SECTION_IDS.hero} delay={2.5} />
           </div>
         </div>
       </div>

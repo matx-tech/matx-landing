@@ -22,12 +22,16 @@ if (typeof window !== 'undefined') {
 interface ProductFixtureProps {
   animated?: boolean;
   triggerId?: string;
+  /** Seconds to wait before the panel stagger begins — use to sequence
+   *  the fixture after left-side headline / text animations complete. */
+  delay?: number;
   className?: string;
 }
 
 export function ProductFixture({
   animated = true,
   triggerId,
+  delay = 0,
   className = ''
 }: ProductFixtureProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -85,12 +89,12 @@ export function ProductFixture({
       };
 
       timeline
-        .to(targets.answer, { opacity: 1, y: 0 })
+        .to(targets.answer, { opacity: 1, y: 0 }, delay > 0 ? `+=${delay}` : undefined)
         .to(targets.signal, { opacity: 1, y: 0 }, '+=0.3')
         .to(targets.retry, { opacity: 1, y: 0 }, '+=0.3')
         .to(targets.action, { opacity: 1, y: 0 }, '+=0.3');
     },
-    { scope: containerRef, dependencies: [animated, triggerId, prefersReducedMotion], revertOnUpdate: true },
+    { scope: containerRef, dependencies: [animated, triggerId, delay, prefersReducedMotion], revertOnUpdate: true },
   );
 
   return (
