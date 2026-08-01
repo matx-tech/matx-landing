@@ -1,14 +1,30 @@
 'use client';
 
 import { useRef } from 'react';
+import dynamic from 'next/dynamic';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 import { AnimatedWordReveal, AnimatedCharacterReveal, MATxLogoAnimation } from './animated-headline';
 import { ScrollIndicator } from './scroll-indicator';
-import { ProductFixture } from '@/components/ui/product-fixture';
 import { HERO_COPY, SECTION_IDS } from '@/lib/content/landing-copy';
 import { Award, GraduationCap } from 'lucide-react';
 import { motionTokens, gsapEase, staggers } from '@/lib/motion-tokens';
+
+// Lazy-load the product fixture (right column visual) — it's below the fold
+// on mobile and to the right of the hero text on desktop.  Deferring it
+// removes GSAP ScrollTrigger + layout work from the critical path.
+const ProductFixture = dynamic(
+  () => import('@/components/ui/product-fixture').then((mod) => mod.ProductFixture),
+  {
+    ssr: false,
+    loading: () => (
+      <div
+        className="hidden lg:block w-full aspect-[4/3] rounded-2xl bg-surface/50 animate-pulse"
+        aria-hidden="true"
+      />
+    ),
+  }
+) as React.ComponentType<{ animated?: boolean; triggerId?: string; delay?: number; className?: string }>;
 
 interface HeroSectionProps {
   onOpenRegistration: () => void;

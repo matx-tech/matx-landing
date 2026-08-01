@@ -121,6 +121,7 @@ export function Navigation(_props: NavigationProps) {
       <nav
         ref={navRef}
         className="fixed top-0 left-0 right-0 z-50 px-4 md:px-8 lg:px-12 py-3 bg-surface border-b border-border"
+        style={prefersReducedMotion ? undefined : { opacity: 0 }}
       >
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           {/* Logo */}

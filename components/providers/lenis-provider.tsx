@@ -6,17 +6,14 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
 import { SplitText } from 'gsap/SplitText';
-import { ScrambleTextPlugin } from 'gsap/ScrambleTextPlugin';
-import { Flip } from 'gsap/Flip';
-import { ScrollToPlugin } from 'gsap/ScrollToPlugin';
 import { CustomEase } from 'gsap/CustomEase';
-import { Observer } from 'gsap/Observer';
-import { MotionPathPlugin } from 'gsap/MotionPathPlugin';
-import { Draggable } from 'gsap/Draggable';
-import { InertiaPlugin } from 'gsap/InertiaPlugin';
 
+// Only register plugins that are needed across the entire site.
+// Per-section plugins (Draggable, Observer, Flip, MotionPathPlugin)
+// are registered locally in their respective components to keep the
+// initial JS bundle lean.
 if (typeof window !== 'undefined') {
-  gsap.registerPlugin(ScrollTrigger, useGSAP, SplitText, ScrambleTextPlugin, Flip, ScrollToPlugin, CustomEase, Observer, MotionPathPlugin, Draggable, InertiaPlugin);
+  gsap.registerPlugin(ScrollTrigger, useGSAP, SplitText, CustomEase);
 }
 
 interface LenisContextValue {

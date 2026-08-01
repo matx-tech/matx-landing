@@ -13,6 +13,31 @@ interface AnimatedHeadlineProps {
   delay?: number;
 }
 
+/**
+ * Schedules a callback using requestIdleCallback (with rAF fallback) so
+ * expensive layout operations don't block the first paint or contribute
+ * to Total Blocking Time (TBT).
+ *
+ * The 108ms forced-reflow Lighthouse audit traces to SplitText.create()
+ * which synchronously reads layout properties then mutates the DOM.  By
+ * deferring it past the initial render we let the browser paint text
+ * immediately (backed by the `.gsap-animate-on-mount` CSS fallback) and
+ * then apply the reveal animation on idle time.
+ */
+function scheduleIdle(cb: () => void): () => void {
+  let cancelled = false;
+  if (typeof requestIdleCallback !== 'undefined') {
+    const id = requestIdleCallback(() => { if (!cancelled) cb(); });
+    return () => { cancelled = true; cancelIdleCallback(id); };
+  }
+  // requestIdleCallback is not available in Safari < 15.4,
+  // so fall back to a rAF + microtask which still defers past paint.
+  const raf = requestAnimationFrame(() => {
+    if (!cancelled) setTimeout(cb, 0);
+  });
+  return () => { cancelled = true; cancelAnimationFrame(raf); };
+}
+
 export function AnimatedWordReveal({
   children,
   className = '',
@@ -27,37 +52,43 @@ export function AnimatedWordReveal({
 
       const mm = gsap.matchMedia();
 
-      // Reduced motion: instant visibility, no animation
+      // Reduced motion: text is already visible via CSS fallback.
       mm.add('(prefers-reduced-motion: reduce)', () => {
-        gsap.set(containerRef.current, { opacity: 1 });
+        containerRef.current?.classList.remove('gsap-animate-on-mount');
       });
 
-      // Full animation: word-by-word 3D reveal
+      // Full animation: defer SplitText past first paint to avoid forced reflow.
       mm.add('(prefers-reduced-motion: no-preference)', () => {
-        const split = SplitText.create(containerRef.current!, {
-          type: 'words',
-          wordsClass: 'inline-block overflow-hidden',
+        const el = containerRef.current!;
+        let split: ReturnType<typeof SplitText.create> | null = null;
+        const cancelIdle = scheduleIdle(() => {
+          split = SplitText.create(el, {
+            type: 'words',
+            wordsClass: 'inline-block overflow-hidden',
+          });
+
+          gsap.set(split.words, {
+            y: motionTokens.distance.xxl,
+            opacity: 0,
+            rotateX: -90,
+            transformOrigin: 'center bottom',
+          });
+
+          gsap.to(split.words, {
+            y: 0,
+            opacity: 1,
+            rotateX: 0,
+            duration: motionTokens.duration.normal,
+            stagger,
+            ease: gsapEase(motionTokens.easing.emphasized),
+            delay,
+          });
+
+          // Remove CSS fallback right before GSAP hides text for animation.
+          el.classList.remove('gsap-animate-on-mount');
         });
 
-        gsap.set(split.words, {
-          y: motionTokens.distance.xxl,
-          opacity: 0,
-          rotateX: -90,
-          transformOrigin: 'center bottom',
-        });
-
-        gsap.to(split.words, {
-          y: 0,
-          opacity: 1,
-          rotateX: 0,
-          duration: motionTokens.duration.normal,
-          stagger,
-          ease: gsapEase(motionTokens.easing.emphasized),
-          delay,
-        });
-
-        // Cleanup: revert SplitText when this query stops matching
-        return () => split.revert();
+        return () => { cancelIdle(); split?.revert(); };
       });
 
       return () => mm.revert();
@@ -69,7 +100,7 @@ export function AnimatedWordReveal({
     <div className={`overflow-hidden ${className}`}>
       <h1
         ref={containerRef}
-        className="relative leading-none"
+        className="gsap-animate-on-mount relative leading-none"
         style={{ perspective: '400px' }}
       >
         {children}
@@ -94,30 +125,36 @@ export function AnimatedCharacterReveal({ children, className = '', delay = 1.5 
       const mm = gsap.matchMedia();
 
       mm.add('(prefers-reduced-motion: reduce)', () => {
-        gsap.set(containerRef.current, { opacity: 1 });
+        containerRef.current?.classList.remove('gsap-animate-on-mount');
       });
 
       mm.add('(prefers-reduced-motion: no-preference)', () => {
-        const split = SplitText.create(containerRef.current!, {
-          type: 'chars',
-          charsClass: 'inline-block',
+        const el = containerRef.current!;
+        let split: ReturnType<typeof SplitText.create> | null = null;
+        const cancelIdle = scheduleIdle(() => {
+          split = SplitText.create(el, {
+            type: 'chars',
+            charsClass: 'inline-block',
+          });
+
+          gsap.set(split.chars, {
+            opacity: 0,
+            y: motionTokens.distance.md,
+          });
+
+          gsap.to(split.chars, {
+            opacity: 1,
+            y: 0,
+            duration: motionTokens.duration.fast,
+            stagger: staggers.character,
+            ease: gsapEase(motionTokens.easing.emphasized),
+            delay,
+          });
+
+          el.classList.remove('gsap-animate-on-mount');
         });
 
-        gsap.set(split.chars, {
-          opacity: 0,
-          y: motionTokens.distance.md,
-        });
-
-        gsap.to(split.chars, {
-          opacity: 1,
-          y: 0,
-          duration: motionTokens.duration.fast,
-          stagger: staggers.character,
-          ease: gsapEase(motionTokens.easing.emphasized),
-          delay,
-        });
-
-        return () => split.revert();
+        return () => { cancelIdle(); split?.revert(); };
       });
 
       return () => mm.revert();
@@ -126,7 +163,7 @@ export function AnimatedCharacterReveal({ children, className = '', delay = 1.5 
   );
 
   return (
-    <p ref={containerRef} className={className}>
+    <p ref={containerRef} className={`gsap-animate-on-mount ${className}`}>
       {children}
     </p>
   );
@@ -180,7 +217,7 @@ export function MATxLogoAnimation({ delay = 0 }: { delay?: number }) {
           ref={(el) => {
             if (el) lettersRef.current[index] = el;
           }}
-          className={`inline-block ${
+          className={`gsap-animate-on-mount inline-block ${
             char === 'x' ? 'text-secondary' : 'text-primary'
           }`}
           style={{ display: 'inline-block' }}

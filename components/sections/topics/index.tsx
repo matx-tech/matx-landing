@@ -6,6 +6,10 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Draggable } from 'gsap/Draggable';
 import { Observer } from 'gsap/Observer';
 import { ChevronLeft, ChevronRight, Plus, Minus, X, Divide } from 'lucide-react';
+
+if (typeof window !== 'undefined') {
+  gsap.registerPlugin(ScrollTrigger, Draggable, Observer);
+}
 import { TOPICS_SECTION, SECTION_IDS } from '@/lib/content/landing-copy';
 import { TOPIC_AREAS } from '@/lib/content/landing-evidence';
 import { CapabilityStatusBadge } from '@/components/ui/capability-status';

@@ -304,6 +304,15 @@
     }
   }
 
+  /* --- GSAP reveal fallback: content visible before JS executes ---
+     GSAP SplitText animations set opacity: 0 → 1, which hides content
+     until the JS bundle loads and parses.  This class keeps text visible
+     during the critical rendering path; GSAP removes it when it's ready
+     to take over the animation. */
+  .gsap-animate-on-mount {
+    opacity: 1 !important;
+  }
+
   /* --- CVI-Compliant Hero Blueprint Background --- */
   .hero-blueprint-bg {
     background-color: var(--color-bg-canvas);
