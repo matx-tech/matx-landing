@@ -1,0 +1,146 @@
+version: 2
+updates:
+  # ── npm / pnpm ──────────────────────────────────────────────────────────
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: Europe/Tallinn
+    versioning-strategy: increase
+    open-pull-requests-limit: 5
+    target-branch: main
+    labels:
+      - dependencies
+      - javascript
+    reviewers:
+      - tomkabel
+    assignees:
+      - tomkabel
+    commit-message:
+      prefix: deps
+      prefix-development: "deps(dev)"
+      include: scope
+    rebase-strategy: auto
+    insecure-external-code-execution: allow
+
+    # ── Groups ────────────────────────────────────────────────────────────
+
+    groups:
+      # Radix UI primitives — released in lockstep; single PR avoids skew.
+      radix:
+        patterns:
+          - "@radix-ui/*"
+
+      # React + DOM + their @types — keep runtime and type stubs in sync.
+      react:
+        patterns:
+          - "react"
+          - "react-dom"
+          - "@types/react"
+          - "@types/react-dom"
+
+      # GSAP core + React hook — hook pins a peer range on gsap.
+      gsap:
+        patterns:
+          - "gsap"
+          - "@gsap/*"
+
+      # React Three Fiber ecosystem — drei pins peer range on fiber + three.
+      r3f:
+        patterns:
+          - "three"
+          - "@types/three"
+          - "@react-three/*"
+
+      # Tailwind CSS + PostCSS pipeline — config / plugin compatibility.
+      tailwind:
+        patterns:
+          - "tailwindcss"
+          - "postcss"
+          - "autoprefixer"
+          - "tailwind-merge"
+          - "tailwindcss-animate"
+
+      # ESLint + Next.js ESLint config — parser / plugin compatibility.
+      eslint:
+        patterns:
+          - "eslint"
+          - "eslint-config-next"
+          - "@typescript-eslint/*"
+
+      # Next.js — framework upgrades; eslint-config-next is in the eslint group.
+      nextjs:
+        patterns:
+          - "next"
+
+      # Sharp is a native module; review carefully because prebuilt
+      # binaries must match the deployment platform (Linux x64).
+      sharp:
+        patterns:
+          - "sharp"
+
+      # ThumbHash — tiny pure-JS lib; safe to auto-merge on green CI.
+      thumbhash:
+        patterns:
+          - "thumbhash"
+
+      # Dev tooling that rarely breaks but groups well in one PR.
+      dev-tools:
+        patterns:
+          - "typescript"
+          - "npm-check-updates"
+          - "critters"
+          - "@types/node"
+
+      # Production catch-all for uncategorised runtime deps (lucide,
+      # framer-motion, lenis, canvas-confetti, clsx, cva, zip).
+      production:
+        dependency-type: production
+        patterns:
+          - "*"
+        exclude-patterns:
+          - "next"
+          - "react"
+          - "react-dom"
+          - "gsap"
+          - "@gsap/*"
+          - "@radix-ui/*"
+          - "@react-three/*"
+          - "three"
+          - "tailwindcss"
+          - "postcss"
+          - "autoprefixer"
+          - "tailwind-merge"
+          - "tailwindcss-animate"
+          - "thumbhash"
+          - "sharp"
+          - "eslint"
+          - "eslint-config-next"
+          - "@typescript-eslint/*"
+
+    ignore:
+      # lucide-react is pinned to a specific major for icon stability.
+      # Bump manually when we audit icon names against the changelog.
+      - dependency-name: lucide-react
+        update-types: ["version-update:semver-major"]
+
+  # ── GitHub Actions ──────────────────────────────────────────────────────
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: Europe/Tallinn
+    target-branch: main
+    labels:
+      - dependencies
+      - ci
+    reviewers:
+      - tomkabel
+    commit-message:
+      prefix: "ci(deps)"
+      include: scope
+    rebase-strategy: auto
