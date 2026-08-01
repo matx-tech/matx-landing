@@ -11,6 +11,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { STUDENT_STORY, SECTION_IDS } from '@/lib/content/landing-copy';
 import { PRODUCT_FIXTURE } from '@/lib/content/landing-evidence';
 import { usePrefersReducedMotion } from '@/lib/hooks/use-prefers-reduced-motion';
+import { motionTokens, gsapEase } from '@/lib/motion-tokens';
 import { InlineFractionalExpression } from '@/components/ui/fraction';
 
 if (typeof window !== 'undefined') {
@@ -24,7 +25,13 @@ export function StudentSection() {
 
   useEffect(() => {
     if (!sectionRef.current) return;
-    if (prefersReducedMotion) return;
+    if (prefersReducedMotion) {
+      // Ensure all animated elements are visible when motion is disabled
+      stepsRef.current.forEach((step) => {
+        if (step) gsap.set(step, { opacity: 1, x: 0 });
+      });
+      return;
+    }
 
     const ctx = gsap.context(() => {
       stepsRef.current.forEach((step) => {
@@ -32,12 +39,12 @@ export function StudentSection() {
 
         gsap.fromTo(
           step,
-          { opacity: 0, x: -20 },
+          { opacity: 0, x: -motionTokens.distance.md },
           {
             opacity: 1,
             x: 0,
-            duration: 0.5,
-            ease: 'power2.out',
+            duration: motionTokens.duration.slow,
+            ease: gsapEase(motionTokens.easing.smooth),
             scrollTrigger: {
               trigger: step,
               start: 'top 80%',

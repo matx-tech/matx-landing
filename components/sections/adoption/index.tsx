@@ -10,7 +10,9 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ADOPTION_ROUTES, SECTION_IDS, CALENDLY_URL, type AudienceId } from '@/lib/content/landing-copy';
 import { BookOpen, School, FileText, Server } from 'lucide-react';
+import { useLenis } from '@/components/providers/lenis-provider';
 import { usePrefersReducedMotion } from '@/lib/hooks/use-prefers-reduced-motion';
+import { motionTokens, gsapEase, staggers } from '@/lib/motion-tokens';
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
@@ -29,33 +31,46 @@ interface AdoptionRoutesProps {
 
 export function AdoptionSection({ onOpenRegistration }: AdoptionRoutesProps) {
   const sectionRef = useRef<HTMLElement>(null);
-  const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
+  const { scrollTo } = useLenis();
   const prefersReducedMotion = usePrefersReducedMotion();
 
   useEffect(() => {
     if (!sectionRef.current) return;
-    if (prefersReducedMotion) return;
+    if (prefersReducedMotion) {
+      // Ensure all animated elements are visible when motion is disabled
+      const cards = sectionRef.current.querySelectorAll('.adoption-card');
+      gsap.set(cards, { opacity: 1, y: 0 });
+      return;
+    }
 
     const ctx = gsap.context(() => {
-      cardsRef.current.forEach((card, index) => {
-        if (!card) return;
+      // Adoption route cards — batched ScrollTrigger
+      const cards = gsap.utils.toArray<HTMLDivElement>('.adoption-card', sectionRef.current);
 
-        gsap.fromTo(
-          card,
-          { opacity: 0, y: 30 },
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.5,
-            delay: index * 0.1,
-            ease: 'power2.out',
-            scrollTrigger: {
-              trigger: card,
-              start: 'top 85%',
-              toggleActions: 'play none none reverse',
-            },
-          }
-        );
+      ScrollTrigger.batch(cards, {
+        onEnter: (elements) => {
+          gsap.fromTo(
+            elements,
+            { opacity: 0, y: motionTokens.distance.lg },
+            {
+              opacity: 1,
+              y: 0,
+              duration: motionTokens.duration.slow,
+              stagger: staggers.card,
+              ease: gsapEase(motionTokens.easing.smooth),
+            }
+          );
+        },
+        onLeaveBack: (elements) => {
+          gsap.to(elements, {
+            opacity: 0,
+            y: motionTokens.distance.lg,
+            duration: motionTokens.duration.fast,
+            stagger: staggers.card,
+            ease: gsapEase(motionTokens.easing.accelerate),
+          });
+        },
+        start: 'top 85%',
       });
     }, sectionRef);
 
@@ -69,13 +84,11 @@ export function AdoptionSection({ onOpenRegistration }: AdoptionRoutesProps) {
       const newWin = window.open(CALENDLY_URL, '_blank', 'noopener,noreferrer');
       if (newWin) newWin.opener = null;
     } else if (action === 'procurement') {
-      // Route to adoption section (anchor: pilot) — procurement info lives there
       const el = document.getElementById(SECTION_IDS.pilot);
-      if (el) el.scrollIntoView({ behavior: 'smooth' });
+      if (el) scrollTo(el);
     } else if (action === 'technical') {
-      // Route to adoption section (anchor: pilot) — technical overview lives there
       const el = document.getElementById(SECTION_IDS.pilot);
-      if (el) el.scrollIntoView({ behavior: 'smooth' });
+      if (el) scrollTo(el);
     }
   };
 
@@ -104,10 +117,7 @@ export function AdoptionSection({ onOpenRegistration }: AdoptionRoutesProps) {
             return (
               <div
                 key={route.audience}
-                ref={(el) => {
-                  cardsRef.current[index] = el;
-                }}
-                className="bg-card rounded-xl p-6 shadow-sm border border-border hover:shadow-md transition-shadow"
+                className="adoption-card bg-card rounded-xl p-6 shadow-sm border border-border hover:shadow-md transition-shadow"
               >
                 {/* Icon */}
                 <div className="w-12 h-12 rounded-lg bg-primary/10 text-primary flex items-center justify-center mb-4">

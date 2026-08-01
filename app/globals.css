@@ -207,6 +207,11 @@
   html {
     font-size: 100%;
     scroll-behavior: auto;
+    /* Override Tailwind preflight: standard property clears the deprecated
+       -webkit-text-size-adjust: 100% warning in Chrome DevTools while
+       preserving the intended text-inflation prevention on mobile. */
+    -webkit-text-size-adjust: none;
+    text-size-adjust: none;
   }
 
   html.lenis,

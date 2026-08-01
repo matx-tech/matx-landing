@@ -1,54 +1,52 @@
 'use client';
 
-import { useRef, useEffect } from 'react';
+import { useRef } from 'react';
 import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
 import { SCROLL_INDICATOR_LABEL } from '@/lib/content/landing-copy';
-import { usePrefersReducedMotion } from '@/lib/hooks/use-prefers-reduced-motion';
+import { motionTokens, gsapEase, customEases } from '@/lib/motion-tokens';
 
 interface ScrollIndicatorProps {
-  /** Hides the text label for compact contexts (between-beat indicators). */
   hideLabel?: boolean;
 }
 
 export function ScrollIndicator({ hideLabel = false }: ScrollIndicatorProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mouseRef = useRef<HTMLDivElement>(null);
-  const prefersReducedMotion = usePrefersReducedMotion();
 
-  useEffect(() => {
+  useGSAP(() => {
     const container = containerRef.current;
     const mouse = mouseRef.current;
     if (!container || !mouse) return;
 
-    if (prefersReducedMotion) {
-      // Show indicator without animation
+    const mm = gsap.matchMedia();
+
+    mm.add('(prefers-reduced-motion: reduce)', () => {
       gsap.set(container, { opacity: 1, y: 0 });
       gsap.set(mouse, { y: 0 });
-      return;
-    }
-
-    gsap.set(container, { opacity: 0, y: -20 });
-    gsap.to(container, {
-      opacity: 1,
-      y: 0,
-      duration: 0.3,
-      delay: 3.2,
-      ease: 'cubic-bezier(0.2, 0, 0, 1)',
     });
 
-    gsap.to(mouse, {
-      y: 8,
-      duration: 1.2,
-      repeat: -1,
-      yoyo: true,
-      ease: 'cubic-bezier(0.4, 0, 0.2, 1)',
+    mm.add('(prefers-reduced-motion: no-preference)', () => {
+      gsap.set(container, { opacity: 0, y: -motionTokens.distance.md });
+      gsap.to(container, {
+        opacity: 1,
+        y: 0,
+        duration: motionTokens.duration.normal,
+        delay: 3.2,
+        ease: gsapEase(motionTokens.easing.emphasized),
+      });
+
+      gsap.to(mouse, {
+        y: motionTokens.distance.sm,
+        duration: motionTokens.duration.crawl,
+        repeat: -1,
+        yoyo: true,
+        ease: customEases.bounce,
+      });
     });
 
-    return () => {
-      gsap.killTweensOf(container);
-      gsap.killTweensOf(mouse);
-    };
-  }, [prefersReducedMotion]);
+    return () => mm.revert();
+  }, { scope: containerRef });
 
   return (
     <div

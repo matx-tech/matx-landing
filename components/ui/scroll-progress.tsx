@@ -3,22 +3,29 @@
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { usePrefersReducedMotion } from '@/lib/hooks/use-prefers-reduced-motion';
+
+if (typeof window !== 'undefined') {
+  gsap.registerPlugin(ScrollTrigger);
+}
 
 export function ScrollProgress() {
   const progressRef = useRef<HTMLDivElement>(null);
+  const prefersReducedMotion = usePrefersReducedMotion();
 
   useEffect(() => {
-    if (typeof window === 'undefined') return;
-
-    gsap.registerPlugin(ScrollTrigger);
-
     const st = ScrollTrigger.create({
       trigger: document.body,
       start: 'top top',
       end: 'bottom bottom',
       onUpdate: (self) => {
         if (progressRef.current) {
-          gsap.set(progressRef.current, { scaleX: self.progress });
+          // Instant set — avoid GSAP tween when reduced motion is preferred
+          if (prefersReducedMotion) {
+            progressRef.current.style.transform = `scaleX(${self.progress})`;
+          } else {
+            gsap.set(progressRef.current, { scaleX: self.progress });
+          }
         }
       },
     });
@@ -26,7 +33,7 @@ export function ScrollProgress() {
     return () => {
       st.kill();
     };
-  }, []);
+  }, [prefersReducedMotion]);
 
   return (
     <div className="fixed top-0 left-0 right-0 h-0.5 bg-border z-50">

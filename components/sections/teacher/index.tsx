@@ -8,6 +8,11 @@ import { TEACHER_STORY, SECTION_IDS } from '@/lib/content/landing-copy';
 import { PRODUCT_FIXTURE } from '@/lib/content/landing-evidence';
 import { CapabilityStatusBadge } from '@/components/ui/capability-status';
 import { usePrefersReducedMotion } from '@/lib/hooks/use-prefers-reduced-motion';
+import { motionTokens, gsapEase, staggers } from '@/lib/motion-tokens';
+
+if (typeof window !== 'undefined') {
+  gsap.registerPlugin(ScrollTrigger);
+}
 
 // Skill names matching the heatmap columns
 const SKILL_NAMES = [
@@ -124,45 +129,67 @@ export function TeacherSection() {
 
   useEffect(() => {
     if (!sectionRef.current) return;
-
-    if (prefersReducedMotion) return;
+    if (prefersReducedMotion) {
+      // Ensure all animated elements are visible when motion is disabled
+      const title = sectionRef.current.querySelector('.section-title');
+      if (title) gsap.set(title, { opacity: 1, y: 0 });
+      signalCardsRef.current.forEach((card) => {
+        if (card) gsap.set(card, { opacity: 1, y: 0 });
+      });
+      return;
+    }
 
     const ctx = gsap.context(() => {
-      gsap.fromTo(
-        sectionRef.current!.querySelector('.section-title'),
-        { y: 60, opacity: 0 },
-        {
-          y: 0,
-          opacity: 1,
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: 'top 70%',
-            end: 'top 30%',
-            scrub: 1,
-          },
-        }
-      );
+      const sectionTitle = sectionRef.current!.querySelector('.section-title');
+      if (sectionTitle) {
+        gsap.fromTo(
+          sectionTitle,
+          { y: motionTokens.distance.xl, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            scrollTrigger: {
+              trigger: sectionRef.current,
+              start: 'top 70%',
+              end: 'top 30%',
+              scrub: 1,
+            },
+          }
+        );
+      }
 
       signalCardsRef.current.forEach((card, index) => {
         if (!card) return;
 
         gsap.fromTo(
           card,
-          { y: 30, opacity: 0 },
+          { y: motionTokens.distance.lg, opacity: 0 },
           {
             y: 0,
             opacity: 1,
-            duration: 0.3,
-            ease: 'cubic-bezier(0, 0, 0.2, 1)',
+            duration: motionTokens.duration.normal,
+            delay: index * staggers.card,
+            ease: gsapEase(motionTokens.easing.standard),
             scrollTrigger: {
               trigger: card,
               start: 'top 90%',
               toggleActions: 'play none none reverse',
             },
-            delay: index * 0.08,
           }
         );
       });
+
+      // Pin the heatmap while signal cards scroll into view underneath
+      if (heatmapRef.current) {
+        ScrollTrigger.create({
+          trigger: heatmapRef.current,
+          start: 'top 80%',
+          end: '+=800',
+          pin: true,
+          pinSpacing: true,
+          markers: false,
+        });
+      }
     }, sectionRef);
 
     return () => ctx.revert();

@@ -4,6 +4,12 @@ import { useRef, useEffect } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { GraduationCap, Users } from 'lucide-react';
+import { usePrefersReducedMotion } from '@/lib/hooks/use-prefers-reduced-motion';
+import { motionTokens, gsapEase, staggers } from '@/lib/motion-tokens';
+
+if (typeof window !== 'undefined') {
+  gsap.registerPlugin(ScrollTrigger);
+}
 
 interface CTASectionProps {
   onOpenRegistration: () => void;
@@ -12,32 +18,161 @@ interface CTASectionProps {
 export function CTASection({ onOpenRegistration }: CTASectionProps) {
   const sectionRef = useRef<HTMLElement>(null);
   const titleRef = useRef<HTMLDivElement>(null);
+  const statsRef = useRef<(HTMLDivElement | null)[]>([]);
+  const ctaCardsRef = useRef<(HTMLDivElement | null)[]>([]);
+  const marqueeRef = useRef<HTMLDivElement>(null);
+  const motionDotRef = useRef<SVGCircleElement>(null);
+  const prefersReducedMotion = usePrefersReducedMotion();
 
   useEffect(() => {
     if (!sectionRef.current || !titleRef.current) return;
 
-    const ctx = gsap.context(() => {
-      const lines = titleRef.current!.querySelectorAll('.cta-line');
+    const lines = titleRef.current.querySelectorAll('.cta-line');
 
-      gsap.set(lines, { y: 60, opacity: 0 });
+    if (prefersReducedMotion) {
+      gsap.set(lines, { y: 0, opacity: 1 });
+      const statTargets = statsRef.current.filter(Boolean);
+      if (statTargets.length > 0) {
+        gsap.set(statTargets, { opacity: 1 });
+      }
+      return;
+    }
+
+    const ctx = gsap.context(() => {
+      gsap.set(lines, { y: motionTokens.distance.xxl, opacity: 0 });
+
+      // Pre-create title line tweens so they're tracked and reverted on unmount
+      const titleTween = gsap.to(lines, {
+        y: 0,
+        opacity: 1,
+        duration: motionTokens.duration.normal,
+        stagger: staggers.card,
+        ease: gsapEase(motionTokens.easing.emphasized),
+        paused: true,
+      });
 
       ScrollTrigger.create({
         trigger: sectionRef.current,
         start: 'top 60%',
-        onEnter: () => {
-          gsap.to(lines, {
-            y: 0,
-            opacity: 1,
-            duration: 0.3,
-            stagger: 0.12,
-            ease: 'cubic-bezier(0.2, 0, 0, 1)',
-          });
-        },
+        onEnter: () => titleTween.play(),
       });
+
+      // Stat number scramble — triggers once when stats container enters viewport
+      const statTargets = statsRef.current.filter(Boolean);
+      const statEnterTween = statTargets.length > 0
+        ? gsap.fromTo(
+            statTargets,
+            { opacity: 0, y: motionTokens.distance.md },
+            {
+              opacity: 1,
+              y: 0,
+              duration: motionTokens.duration.slow,
+              ease: gsapEase(motionTokens.easing.smooth),
+              paused: true,
+            },
+          )
+        : null;
+
+      if (statEnterTween) {
+        ScrollTrigger.create({
+          trigger: statsRef.current[0]?.parentElement,
+          start: 'top 85%',
+          onEnter: () => statEnterTween.play(),
+        });
+      }
+
+      // Timing: when the stats section enters viewport, scramble each number
+      const statValues: { element: HTMLDivElement | null; target: string; chars: string }[] = [
+        { element: statsRef.current[0], target: '150+', chars: '0123456789+' },
+        { element: statsRef.current[1], target: '85%', chars: '0123456789%' },
+        { element: statsRef.current[2], target: '2.3×', chars: '0123456789.×' },
+      ];
+
+      statValues.forEach(({ element, target, chars }) => {
+        if (!element) return;
+
+        const scrabbleTween = gsap.to(element, {
+          scrambleText: { text: target, chars, revealDelay: 0.3, speed: 0.6 },
+          duration: motionTokens.duration.slow,
+          paused: true,
+        });
+
+        ScrollTrigger.create({
+          trigger: element,
+          start: 'top 85%',
+          onEnter: () => scrabbleTween.play(),
+        });
+      });
+
+      // CTA cards — staggered scroll-triggered entrance
+      const cardTargets = ctaCardsRef.current.filter(Boolean);
+      const ctaCardTween = cardTargets.length > 0
+        ? gsap.fromTo(
+            cardTargets,
+            { y: motionTokens.distance.lg, opacity: 0, scale: 0.97 },
+            {
+              y: 0,
+              opacity: 1,
+              scale: 1,
+              duration: motionTokens.duration.slow,
+              stagger: staggers.card,
+              ease: gsapEase(motionTokens.easing.smooth),
+              paused: true,
+            },
+          )
+        : null;
+
+      if (ctaCardTween && ctaCardsRef.current[0]) {
+        ScrollTrigger.create({
+          trigger: ctaCardsRef.current[0],
+          start: 'top 85%',
+          onEnter: () => ctaCardTween.play(),
+        });
+      }
+
+      // Marquee SVG — fade in on scroll
+      if (marqueeRef.current) {
+        const marqueeTween = gsap.fromTo(
+          marqueeRef.current,
+          { opacity: 0, y: motionTokens.distance.md },
+          {
+            opacity: 1,
+            y: 0,
+            duration: motionTokens.duration.slow,
+            ease: gsapEase(motionTokens.easing.smooth),
+            paused: true,
+          },
+        );
+
+        ScrollTrigger.create({
+          trigger: marqueeRef.current,
+          start: 'top 90%',
+          onEnter: () => marqueeTween.play(),
+        });
+      }
+
+      // MotionPath: decorative dot follows the SVG text curve on scroll
+      if (motionDotRef.current && document.querySelector('#ctaPath')) {
+        gsap.to(motionDotRef.current, {
+          motionPath: {
+            path: '#ctaPath',
+            align: '#ctaPath',
+            alignOrigin: [0.5, 0.5],
+          },
+          duration: motionTokens.duration.crawl,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: marqueeRef.current,
+            start: 'top 80%',
+            end: 'bottom 20%',
+            scrub: 1,
+          },
+        });
+      }
     }, sectionRef);
 
     return () => ctx.revert();
-  }, []);
+  }, [prefersReducedMotion]);
 
   return (
     <section ref={sectionRef} className="relative py-24 md:py-32 lg:py-40 bg-surface overflow-hidden">
@@ -65,7 +200,10 @@ export function CTASection({ onOpenRegistration }: CTASectionProps) {
         {/* Dual CTAs */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-3xl mx-auto mb-16">
           {/* Student CTA */}
-          <div className="card p-8 text-center hover:border-primary/30 transition-colors">
+          <div
+            ref={(el) => { ctaCardsRef.current[0] = el; }}
+            className="card p-8 text-center hover:border-primary/30 transition-colors"
+          >
             <GraduationCap className="w-10 h-10 text-primary mx-auto mb-4" />
             <h3 className="text-xl font-display font-semibold text-text-primary mb-2">
               Koolide registreerimine
@@ -87,7 +225,10 @@ export function CTASection({ onOpenRegistration }: CTASectionProps) {
           </div>
 
           {/* Teacher CTA */}
-          <div className="card p-8 text-center hover:border-secondary/30 transition-colors">
+          <div
+            ref={(el) => { ctaCardsRef.current[1] = el; }}
+            className="card p-8 text-center hover:border-secondary/30 transition-colors"
+          >
             <Users className="w-10 h-10 text-secondary mx-auto mb-4" />
             <h3 className="text-xl font-display font-semibold text-text-primary mb-2">
               Õpetajatele
@@ -112,7 +253,7 @@ export function CTASection({ onOpenRegistration }: CTASectionProps) {
         </div>
 
         {/* Marquee */}
-        <div className="relative w-full overflow-hidden py-8">
+        <div ref={marqueeRef} className="relative w-full overflow-hidden py-8">
           <svg
             viewBox="0 0 600 30"
             className="w-full max-w-2xl mx-auto opacity-50"
@@ -130,21 +271,36 @@ export function CTASection({ onOpenRegistration }: CTASectionProps) {
                 Alusta tasuta · Õpi mõistvalt · Säästa aega · 150+ ülesannet · BKT mootor · EU AI Act ·
               </textPath>
             </text>
+            <circle
+              ref={motionDotRef}
+              cx="0" cy="0" r="3"
+              fill="var(--color-primary)"
+              opacity="0.8"
+            />
           </svg>
         </div>
 
         {/* Stats */}
         <div className="flex flex-wrap justify-center gap-8 mt-12">
           <div className="text-center">
-            <div className="text-3xl md:text-4xl font-display font-bold text-primary">150+</div>
+            <div
+              ref={(el) => { statsRef.current[0] = el; }}
+              className="text-3xl md:text-4xl font-display font-bold text-primary"
+            >150+</div>
             <div className="text-text-secondary text-sm">ülesannet</div>
           </div>
           <div className="text-center">
-            <div className="text-3xl md:text-4xl font-display font-bold text-secondary">85%</div>
+            <div
+              ref={(el) => { statsRef.current[1] = el; }}
+              className="text-3xl md:text-4xl font-display font-bold text-secondary"
+            >85%</div>
             <div className="text-text-secondary text-sm">mastery rate</div>
           </div>
           <div className="text-center">
-            <div className="text-3xl md:text-4xl font-display font-bold text-accent">2.3×</div>
+            <div
+              ref={(el) => { statsRef.current[2] = el; }}
+              className="text-3xl md:text-4xl font-display font-bold text-accent"
+            >2.3×</div>
             <div className="text-text-secondary text-sm">kiirem progress</div>
           </div>
         </div>

@@ -7,6 +7,11 @@ import { ScrollIndicator } from '@/components/sections/hero/scroll-indicator';
 import { PRODUCT_FIXTURE } from '@/lib/content/landing-evidence';
 import { Fraction, InlineFractionalExpression } from '@/components/ui/fraction';
 import { usePrefersReducedMotion } from '@/lib/hooks/use-prefers-reduced-motion';
+import { motionTokens, gsapEase, staggers } from '@/lib/motion-tokens';
+
+if (typeof window !== 'undefined') {
+  gsap.registerPlugin(ScrollTrigger);
+}
 
 const storyBeats = [
   {
@@ -46,7 +51,6 @@ export function ProblemSection() {
     if (!sectionRef.current) return;
 
     if (prefersReducedMotion) {
-      // Show text at final visible state when reduced motion is enabled
       textRefs.current.forEach((text) => {
         if (text?.children) gsap.set(text.children, { y: 0, opacity: 1 });
       });
@@ -63,30 +67,39 @@ export function ProblemSection() {
         const text = texts[index];
         if (!text) return;
 
-        gsap.set(text.children, { y: 50, opacity: 0 });
+        gsap.set(text.children, { y: motionTokens.distance.xl, opacity: 0 });
+
+        // Pre-create enter + leave tweens inside the context so they're tracked and
+        // reverted on unmount (no orphaned tweens from ScrollTrigger callbacks).
+        const enterTween = gsap.to(text.children, {
+          y: 0,
+          opacity: 1,
+          duration: motionTokens.duration.normal,
+          stagger: staggers.word,
+          ease: gsapEase(motionTokens.easing.emphasized),
+          paused: true,
+        });
+
+        const leaveBackTween = gsap.fromTo(text.children,
+          { y: 0, opacity: 1 },
+          {
+            y: motionTokens.distance.xl,
+            opacity: 0,
+            duration: motionTokens.duration.fast,
+            stagger: staggers.character * 2,
+            ease: gsapEase(motionTokens.easing.accelerate),
+            paused: true,
+          }
+        );
 
         ScrollTrigger.create({
           trigger: beat,
           start: 'top center',
           end: 'bottom center',
-          onEnter: () => {
-            gsap.to(text.children, {
-              y: 0,
-              opacity: 1,
-              duration: 0.3,
-              stagger: 0.08,
-              ease: 'cubic-bezier(0.2, 0, 0, 1)',
-            });
-          },
-          onLeaveBack: () => {
-            gsap.to(text.children, {
-              y: 50,
-              opacity: 0,
-              duration: 0.25,
-              stagger: 0.05,
-              ease: 'cubic-bezier(0.4, 0, 1, 1)',
-            });
-          },
+          onEnter: () => enterTween.play(),
+          onLeave: () => enterTween.reverse(),
+          onEnterBack: () => leaveBackTween.reverse(),
+          onLeaveBack: () => leaveBackTween.play(),
         });
       });
     }, sectionRef);

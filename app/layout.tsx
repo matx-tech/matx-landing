@@ -78,7 +78,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               name: 'MATx',
               description: SITE_META.longDescription,
               url: SITE_META.url,
-              logo: `${SITE_META.url}/logo.png`,
               foundingDate: '2026',
               founders: [
                 { '@type': 'Person', name: 'Andri Suga' },

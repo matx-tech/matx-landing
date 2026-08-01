@@ -1,49 +1,88 @@
 'use client';
 
-import { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect, useState, useLayoutEffect } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { Flip } from 'gsap/Flip';
 import { FAQ_ENTRIES, SECTION_IDS } from '@/lib/content/landing-copy';
 import { usePrefersReducedMotion } from '@/lib/hooks/use-prefers-reduced-motion';
+import { motionTokens, gsapEase, staggers } from '@/lib/motion-tokens';
 
 export function FAQSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const itemsRef = useRef<HTMLDivElement[]>([]);
   const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const flipStateRef = useRef<Flip.FlipState | null>(null);
+  const flippingRef = useRef(false);
   const prefersReducedMotion = usePrefersReducedMotion();
 
   useEffect(() => {
     if (!sectionRef.current) return;
+    if (prefersReducedMotion) {
+      // Ensure all animated elements are visible when motion is disabled
+      itemsRef.current.forEach((item) => {
+        if (item) gsap.set(item, { opacity: 1, y: 0 });
+      });
+      return;
+    }
 
-    if (prefersReducedMotion) return;
+    const ctx = gsap.context(() => {
+      itemsRef.current.forEach((item, index) => {
+        if (!item) return;
 
-    itemsRef.current.forEach((item, index) => {
-      if (!item) return;
+        gsap.fromTo(
+          item,
+          { y: motionTokens.distance.lg, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: motionTokens.duration.normal,
+            delay: index * staggers.card,
+            ease: gsapEase(motionTokens.easing.emphasized),
+            scrollTrigger: {
+              trigger: item,
+              start: 'top 90%',
+              toggleActions: 'play none none reverse',
+            },
+          }
+        );
+      });
+    }, sectionRef);
 
-      gsap.fromTo(
-        item,
-        { y: 40, opacity: 0 },
-        {
-          y: 0,
-          opacity: 1,
-          duration: 0.3,
-          ease: 'cubic-bezier(0.2, 0, 0, 1)',
-          scrollTrigger: {
-            trigger: item,
-            start: 'top 90%',
-            toggleActions: 'play none none reverse',
-          },
-          delay: index * 0.1,
-        }
-      );
-    });
-
-    return () => {
-      ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
-    };
+    return () => ctx.revert();
   }, [prefersReducedMotion]);
 
+  // Flip animation on accordion toggle
+  useLayoutEffect(() => {
+    if (!flipStateRef.current || prefersReducedMotion) return;
+
+    Flip.from(flipStateRef.current, {
+      duration: motionTokens.duration.normal,
+      ease: gsapEase(motionTokens.easing.smooth),
+      absolute: true,
+      onComplete: () => {
+        flippingRef.current = false;
+      },
+    });
+
+    flipStateRef.current = null;
+  }, [openIndex, prefersReducedMotion]);
+
   const handleToggle = (index: number) => {
+    if (prefersReducedMotion) {
+      setOpenIndex(openIndex === index ? null : index);
+      return;
+    }
+
+    const panel = document.getElementById(`faq-panel-${index}`);
+    if (!panel) {
+      setOpenIndex(openIndex === index ? null : index);
+      return;
+    }
+
+    // Capture current layout state before toggling
+    flipStateRef.current = Flip.getState(panel);
+    flippingRef.current = true;
     setOpenIndex(openIndex === index ? null : index);
   };
 
@@ -98,7 +137,7 @@ export function FAQSection() {
                 <div
                   id={`faq-panel-${index}`}
                   role="region"
-                  className="grid transition-all duration-200 ease-out"
+                  className="grid"
                   style={{
                     gridTemplateRows: isOpen ? '1fr' : '0fr',
                   }}

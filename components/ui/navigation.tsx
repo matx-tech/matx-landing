@@ -7,6 +7,11 @@ import { Menu, X, Award } from 'lucide-react';
 import * as Dialog from '@radix-ui/react-dialog';
 import { LANDING_NAV_ITEMS, SECTION_IDS, CALENDLY_URL } from '@/lib/content/landing-copy';
 import { usePrefersReducedMotion } from '@/lib/hooks/use-prefers-reduced-motion';
+import { motionTokens, gsapEase, staggers } from '@/lib/motion-tokens';
+
+if (typeof window !== 'undefined') {
+  gsap.registerPlugin(ScrollTrigger);
+}
 
 const navItems = LANDING_NAV_ITEMS;
 
@@ -31,19 +36,20 @@ export function Navigation({ onOpenRegistration }: NavigationProps) {
       return;
     }
 
-    gsap.registerPlugin(ScrollTrigger);
-
     // Initial entrance
-    gsap.set(nav, { y: -100, opacity: 0 });
+    gsap.set(nav, { y: -motionTokens.distance.xxl, opacity: 0 });
     gsap.to(nav, {
       y: 0,
       opacity: 1,
-      duration: 0.3,
+      duration: motionTokens.duration.normal,
       delay: 0.5,
-      ease: 'cubic-bezier(0.2, 0, 0, 1)',
+      ease: gsapEase(motionTokens.easing.emphasized),
     });
 
-    // Scroll-driven hide/show via ScrollTrigger (replaces scroll event + rAF)
+    // Scroll-driven hide/show via ScrollTrigger — uses quickTo for performance
+    const yTo = gsap.quickTo(nav, 'y', { duration: motionTokens.duration.fast, ease: gsapEase(motionTokens.easing.standard) });
+    const opacityTo = gsap.quickTo(nav, 'opacity', { duration: motionTokens.duration.fast, ease: gsapEase(motionTokens.easing.standard) });
+
     let wasHidden = false;
     const st = ScrollTrigger.create({
       trigger: document.body,
@@ -54,21 +60,11 @@ export function Navigation({ onOpenRegistration }: NavigationProps) {
         wasHidden = isHidden;
 
         if (isHidden) {
-          gsap.to(nav, {
-            y: -100,
-            opacity: 0.5,
-            duration: 0.25,
-            ease: 'cubic-bezier(0.4, 0, 1, 1)',
-            overwrite: 'auto',
-          });
+          yTo(-motionTokens.distance.xxl);
+          opacityTo(0.5);
         } else {
-          gsap.to(nav, {
-            y: 0,
-            opacity: 1,
-            duration: 0.25,
-            ease: 'cubic-bezier(0, 0, 0.2, 1)',
-            overwrite: 'auto',
-          });
+          yTo(0);
+          opacityTo(1);
         }
       },
     });
@@ -82,6 +78,10 @@ export function Navigation({ onOpenRegistration }: NavigationProps) {
   useEffect(() => {
     const items = menuItemsRef.current.filter(Boolean);
 
+    // Guard: on initial load the mobile menu is closed and Radix's Portal
+    // doesn't mount the content, so ref callbacks haven't fired yet.
+    if (items.length === 0) return;
+
     if (isOpen) {
       if (prefersReducedMotion) {
         gsap.set(items, { opacity: 1, x: 0 });
@@ -89,23 +89,23 @@ export function Navigation({ onOpenRegistration }: NavigationProps) {
       }
       gsap.set(items, {
         opacity: 0,
-        x: -30,
+        x: -motionTokens.distance.lg,
       });
 
       gsap.to(items, {
         opacity: 1,
         x: 0,
-        duration: 0.3,
-        stagger: 0.06,
-        ease: 'cubic-bezier(0.2, 0, 0, 1)',
+        duration: motionTokens.duration.normal,
+        stagger: staggers.menuItem,
+        ease: gsapEase(motionTokens.easing.emphasized),
       });
     } else {
       gsap.to(items, {
         opacity: 0,
-        x: -30,
-        duration: 0.25,
-        stagger: 0.04,
-        ease: 'cubic-bezier(0.4, 0, 1, 1)',
+        x: -motionTokens.distance.lg,
+        duration: motionTokens.duration.fast,
+        stagger: staggers.menuItemExit,
+        ease: gsapEase(motionTokens.easing.accelerate),
       });
     }
   }, [isOpen, prefersReducedMotion]);

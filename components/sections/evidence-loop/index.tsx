@@ -10,6 +10,7 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { EVIDENCE_STAGES, SECTION_IDS } from '@/lib/content/landing-copy';
 import { usePrefersReducedMotion } from '@/lib/hooks/use-prefers-reduced-motion';
+import { motionTokens, gsapEase } from '@/lib/motion-tokens';
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
@@ -23,7 +24,14 @@ export function EvidenceLoopSection() {
 
   useEffect(() => {
     if (!sectionRef.current) return;
-    if (prefersReducedMotion) return;
+    if (prefersReducedMotion) {
+      // Ensure all animated elements are visible when motion is disabled
+      stagesRef.current.forEach((stage) => {
+        if (stage) gsap.set(stage, { opacity: 1, y: 0 });
+      });
+      if (connectorRef.current) gsap.set(connectorRef.current, { scaleY: 1 });
+      return;
+    }
 
     const ctx = gsap.context(() => {
       // Animate stages sequentially
@@ -32,12 +40,12 @@ export function EvidenceLoopSection() {
 
         gsap.fromTo(
           stage,
-          { opacity: 0, y: 30 },
+          { opacity: 0, y: motionTokens.distance.lg },
           {
             opacity: 1,
             y: 0,
-            duration: 0.5,
-            ease: 'power2.out',
+            duration: motionTokens.duration.slow,
+            ease: gsapEase(motionTokens.easing.smooth),
             scrollTrigger: {
               trigger: stage,
               start: 'top 80%',
@@ -54,8 +62,8 @@ export function EvidenceLoopSection() {
           { scaleY: 0 },
           {
             scaleY: 1,
-            duration: 1.2,
-            ease: 'power2.inOut',
+            duration: motionTokens.duration.crawl,
+            ease: gsapEase(motionTokens.easing.smooth),
             scrollTrigger: {
               trigger: sectionRef.current,
               start: 'top 60%',
