@@ -89,6 +89,7 @@ export function ProblemSection() {
             stagger: staggers.character * 2,
             ease: gsapEase(motionTokens.easing.accelerate),
             paused: true,
+            immediateRender: false,
           }
         );
 
@@ -103,6 +104,10 @@ export function ProblemSection() {
         });
       });
     }, sectionRef);
+
+    // Force recalculation so beats already in the viewport receive their
+    // enter state immediately (e.g. after reduced-motion is toggled off).
+    ScrollTrigger.refresh();
 
     return () => ctx.revert();
   }, [prefersReducedMotion]);

@@ -74,14 +74,15 @@ export function FAQSection() {
       return;
     }
 
-    const panel = document.getElementById(`faq-panel-${index}`);
-    if (!panel) {
+    // Capture current layout state for ALL accordion panels before toggling,
+    // so both the previously-open panel and the newly-opened panel animate.
+    const allPanels = gsap.utils.toArray<HTMLElement>('[id^="faq-panel-"]');
+    if (allPanels.length === 0) {
       setOpenIndex(openIndex === index ? null : index);
       return;
     }
 
-    // Capture current layout state before toggling
-    flipStateRef.current = Flip.getState(panel);
+    flipStateRef.current = Flip.getState(allPanels);
     flippingRef.current = true;
     setOpenIndex(openIndex === index ? null : index);
   };

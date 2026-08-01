@@ -15,6 +15,10 @@ import { InlineFractionalExpression } from '@/components/ui/fraction';
 import { usePrefersReducedMotion } from '@/lib/hooks/use-prefers-reduced-motion';
 import { motionTokens, gsapEase } from '@/lib/motion-tokens';
 
+if (typeof window !== 'undefined') {
+  gsap.registerPlugin(ScrollTrigger);
+}
+
 interface ProductFixtureProps {
   animated?: boolean;
   triggerId?: string;

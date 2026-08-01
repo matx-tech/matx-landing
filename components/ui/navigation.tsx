@@ -100,6 +100,10 @@ export function Navigation({ onOpenRegistration }: NavigationProps) {
         ease: gsapEase(motionTokens.easing.emphasized),
       });
     } else {
+      if (prefersReducedMotion) {
+        gsap.set(items, { opacity: 0, x: -motionTokens.distance.lg });
+        return;
+      }
       gsap.to(items, {
         opacity: 0,
         x: -motionTokens.distance.lg,

@@ -62,13 +62,18 @@ export const staggers = {
   menuItemExit: 0.04,
 } as const;
 
-/** GSAP-friendly spring presets — currently unused but available for future adoption. */
+/** GSAP-compatible spring-like presets — currently unused but available for future adoption. */
 export const springs = {
-  snappy:  { type: 'spring' as const, stiffness: 300, damping: 30 },
-  gentle:  { type: 'spring' as const, stiffness: 120, damping: 14 },
-  bouncy:  { type: 'spring' as const, stiffness: 400, damping: 10 },
-  instant: { type: 'spring' as const, stiffness: 600, damping: 35 },
-  release: { type: 'spring' as const, stiffness: 200, damping: 20, restDelta: 0.001 },
+  /** Snappy: 'back.out(1.7)' — overshoot and settle quickly. */
+  snappy:  'back.out(1.7)',
+  /** Gentle: 'power2.out' — smooth deceleration. */
+  gentle:  'power2.out',
+  /** Bouncy: 'elastic.out(1, 0.3)' — playful elastic bounce. */
+  bouncy:  'elastic.out(1, 0.3)',
+  /** Instant: 'expo.out' — near-instant settling. */
+  instant: 'expo.out',
+  /** Release: 'power3.out' — floaty release. */
+  release: 'power3.out',
 } as const;
 
 /**

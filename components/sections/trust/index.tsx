@@ -57,6 +57,10 @@ export function TrustSection() {
       // Pillar cards — batched ScrollTrigger for staggered entrance
       const cards = gsap.utils.toArray<HTMLDivElement>('.trust-pillar', sectionRef.current);
 
+      // Initialize hidden state so cards don't flash visible before ScrollTrigger
+      // fires onEnter.  ctx.revert() restores inline styles during cleanup.
+      gsap.set(cards, { y: motionTokens.distance.lg, opacity: 0, scale: 0.95 });
+
       ScrollTrigger.batch(cards, {
         onEnter: (elements) => {
           gsap.fromTo(
@@ -154,25 +158,25 @@ export function TrustSection() {
                   Tuvastatud signaal
                 </div>
                 <div className="text-sm text-text-primary">
-                  Võimalik veamuster: „Liidab lugejad ja nimetajad eraldi\u201c (kontrollitav signaal)
+                  Võimalik veamuster: „Liidab lugejad ja nimetajad eraldi{'\u201c'} (kontrollitav signaal)
                 </div>
               </div>
 
-              <div className="p-4 bg-green-50 rounded-lg border border-green-200">
-                <div className="text-xs font-medium text-green-800 uppercase tracking-wider mb-2">
+              <div className="p-4 bg-success-surface rounded-lg border border-success-border">
+                <div className="text-xs font-medium text-success uppercase tracking-wider mb-2">
                   Soovitus
                 </div>
-                <div className="text-sm text-green-900 mb-3">
+                <div className="text-sm text-success-strong mb-3">
                   Harjuta murdarvu liitmist sammu-sammult
                 </div>
                 <div className="flex gap-2 flex-wrap">
-                  <span className="px-3 py-1 text-xs font-medium rounded bg-white border border-green-300 text-green-800">
+                  <span className="px-3 py-1 text-xs font-medium rounded bg-card border border-success-border text-success">
                     Võta vastu
                   </span>
-                  <span className="px-3 py-1 text-xs font-medium rounded bg-white border border-green-300 text-green-800">
+                  <span className="px-3 py-1 text-xs font-medium rounded bg-card border border-success-border text-success">
                     Muuda
                   </span>
-                  <span className="px-3 py-1 text-xs font-medium rounded bg-white border border-green-300 text-green-800">
+                  <span className="px-3 py-1 text-xs font-medium rounded bg-card border border-success-border text-success">
                     Ignoreeri
                   </span>
                 </div>

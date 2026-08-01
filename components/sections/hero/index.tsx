@@ -25,20 +25,20 @@ export function HeroSection({ onOpenRegistration }: HeroSectionProps) {
     // Reduced motion: instant visibility for CTAs, trust line, badges
     mm.add('(prefers-reduced-motion: reduce)', () => {
       const elements = [
-        ctasRef.current?.children,
+        ...Array.from(ctasRef.current?.children ?? []),
         trustRef.current,
-        badgesRef.current?.children,
-      ].flat().filter(Boolean);
+        ...Array.from(badgesRef.current?.children ?? []),
+      ].filter(Boolean);
       gsap.set(elements, { opacity: 1, y: 0 });
     });
 
     // Full animation: staggered reveal after headline completes
     mm.add('(prefers-reduced-motion: no-preference)', () => {
       const elements = [
-        ctasRef.current?.children,
+        ...Array.from(ctasRef.current?.children ?? []),
         trustRef.current,
-        badgesRef.current?.children,
-      ].flat().filter(Boolean) as (Element | HTMLDivElement)[];
+        ...Array.from(badgesRef.current?.children ?? []),
+      ].filter(Boolean) as (Element | HTMLDivElement)[];
 
       gsap.set(elements, { opacity: 0, y: motionTokens.distance.md });
 

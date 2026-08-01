@@ -3,7 +3,7 @@
 import { useRef, useEffect } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { Award, GraduationCap, ExternalLink, Mail } from 'lucide-react';
+import { Award, GraduationCap, Mail, MessageCircle, Building2, GitBranch } from 'lucide-react';
 import { usePrefersReducedMotion } from '@/lib/hooks/use-prefers-reduced-motion';
 import { motionTokens, gsapEase, staggers } from '@/lib/motion-tokens';
 
@@ -27,18 +27,19 @@ export function FooterSection() {
     }
 
     const ctx = gsap.context(() => {
-      // Staggered entrance for the four footer grid sections
-      sectionsRef.current.forEach((section, index) => {
-        if (!section) return;
-
+      // Staggered entrance for all footer grid sections — one tween with
+      // stagger instead of a per-section loop so a single ScrollTrigger
+      // controls the entire entrance + reversal.
+      const sectionTargets = sectionsRef.current.filter(Boolean);
+      if (sectionTargets.length > 0) {
         gsap.fromTo(
-          section,
+          sectionTargets,
           { y: motionTokens.distance.lg, opacity: 0 },
           {
             y: 0,
             opacity: 1,
             duration: motionTokens.duration.slow,
-            delay: index * staggers.card,
+            stagger: staggers.card,
             ease: gsapEase(motionTokens.easing.smooth),
             scrollTrigger: {
               trigger: footerRef.current,
@@ -47,7 +48,7 @@ export function FooterSection() {
             },
           }
         );
-      });
+      }
 
       // Bottom bar
       if (bottomRef.current) {
@@ -80,7 +81,7 @@ export function FooterSection() {
             scrollTrigger: {
               trigger: footerRef.current,
               start: 'top 90%',
-              end: 'top 60%',
+              end: 'bottom bottom',
               scrub: 0.5,
             },
           }
@@ -131,22 +132,22 @@ export function FooterSection() {
                 </a>
               </li>
               <li>
-                <a href="#erinevus" className="text-text-secondary hover:text-primary transition-colors text-sm focus-ring-target rounded-md" style={{ textDecoration: 'underline' }}>
-                  Erinevus
+                <a href="#töövoog" className="text-text-secondary hover:text-primary transition-colors text-sm focus-ring-target rounded-md" style={{ textDecoration: 'underline' }}>
+                  Töövoog
                 </a>
               </li>
               <li>
-                <a href="#teemad" className="text-text-secondary hover:text-primary transition-colors text-sm focus-ring-target rounded-md" style={{ textDecoration: 'underline' }}>
+                <a href="#võimekused" className="text-text-secondary hover:text-primary transition-colors text-sm focus-ring-target rounded-md" style={{ textDecoration: 'underline' }}>
                   Teemad
                 </a>
               </li>
               <li>
-                <a href="#opitee" className="text-text-secondary hover:text-primary transition-colors text-sm focus-ring-target rounded-md" style={{ textDecoration: 'underline' }}>
+                <a href="#õpilasele" className="text-text-secondary hover:text-primary transition-colors text-sm focus-ring-target rounded-md" style={{ textDecoration: 'underline' }}>
                   Õpitee
                 </a>
               </li>
               <li>
-                <a href="#opetajale" className="text-text-secondary hover:text-primary transition-colors text-sm focus-ring-target rounded-md" style={{ textDecoration: 'underline' }}>
+                <a href="#õpetajale" className="text-text-secondary hover:text-primary transition-colors text-sm focus-ring-target rounded-md" style={{ textDecoration: 'underline' }}>
                   Õpetajale
                 </a>
               </li>
@@ -193,7 +194,7 @@ export function FooterSection() {
                 className="w-11 h-11 rounded-lg bg-elevated border border-border flex items-center justify-center hover:bg-surface transition-colors focus-ring-target"
                 aria-label="MATx Twitter"
               >
-                <ExternalLink className="w-4 h-4 text-text-secondary" />
+                <MessageCircle className="w-4 h-4 text-text-secondary" />
               </a>
               <a
                 href="https://linkedin.com/company/matx-ee"
@@ -202,7 +203,7 @@ export function FooterSection() {
                 className="w-11 h-11 rounded-lg bg-elevated border border-border flex items-center justify-center hover:bg-surface transition-colors focus-ring-target"
                 aria-label="MATx LinkedIn"
               >
-                <ExternalLink className="w-4 h-4 text-text-secondary" />
+                <Building2 className="w-4 h-4 text-text-secondary" />
               </a>
               <a
                 href="https://github.com/matx-ee"
@@ -211,7 +212,7 @@ export function FooterSection() {
                 className="w-11 h-11 rounded-lg bg-elevated border border-border flex items-center justify-center hover:bg-surface transition-colors focus-ring-target"
                 aria-label="MATx GitHub"
               >
-                <ExternalLink className="w-4 h-4 text-text-secondary" />
+                <GitBranch className="w-4 h-4 text-text-secondary" />
               </a>
               <a
                 href="mailto:andri@matx.ee"

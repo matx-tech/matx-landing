@@ -80,17 +80,16 @@ export function TopicsSection() {
     return () => ctx.revert();
   }, [prefersReducedMotion]);
 
-  const scrollTo = useCallback((direction: 'prev' | 'next') => {
+  // Extracted movement logic shared by scrollTo, handleDotClick, and the
+  // Observer callbacks — uses gsap.set so Draggable shares the transform cache.
+  const moveToIndex = useCallback((index: number) => {
     if (!trackRef.current) return;
-    const newIndex = direction === 'next'
-      ? Math.min(activeIndex + 1, TOPIC_AREAS.length - 1)
-      : Math.max(activeIndex - 1, 0);
-    setActiveIndex(newIndex);
+    setActiveIndex(index);
 
-    const targetX = -(newIndex / (TOPIC_AREAS.length - 1)) * (trackRef.current.scrollWidth - trackRef.current.parentElement!.clientWidth);
+    const targetX = -(index / (TOPIC_AREAS.length - 1)) * (trackRef.current.scrollWidth - trackRef.current.parentElement!.clientWidth);
 
     if (prefersReducedMotion) {
-      trackRef.current.style.transform = `translateX(${targetX}px)`;
+      gsap.set(trackRef.current, { x: targetX });
     } else {
       gsap.killTweensOf(trackRef.current);
       gsap.to(trackRef.current, {
@@ -100,7 +99,21 @@ export function TopicsSection() {
         overwrite: 'auto',
       });
     }
-  }, [activeIndex, prefersReducedMotion]);
+  }, [prefersReducedMotion]);
+
+  const scrollTo = useCallback((direction: 'prev' | 'next') => {
+    if (!trackRef.current) return;
+    const newIndex = direction === 'next'
+      ? Math.min(activeIndex + 1, TOPIC_AREAS.length - 1)
+      : Math.max(activeIndex - 1, 0);
+    moveToIndex(newIndex);
+  }, [activeIndex, moveToIndex]);
+
+  // Stable ref so Observer callbacks don't need scrollTo / moveToIndex in deps
+  const moveToIndexRef = useRef(moveToIndex);
+  moveToIndexRef.current = moveToIndex;
+  const activeIndexRef = useRef(activeIndex);
+  activeIndexRef.current = activeIndex;
 
   // Observer: horizontal wheel/swipe on carousel viewport → prev/next navigation
   useEffect(() => {
@@ -113,33 +126,18 @@ export function TopicsSection() {
         target: viewport,
         type: 'wheel,touch,pointer',
         wheelSpeed: -1,
-        onRight: () => scrollTo('next'),
-        onLeft: () => scrollTo('prev'),
+        onRight: () => moveToIndexRef.current(Math.min(activeIndexRef.current + 1, TOPIC_AREAS.length - 1)),
+        onLeft: () => moveToIndexRef.current(Math.max(activeIndexRef.current - 1, 0)),
         tolerance: 20,
         preventDefault: true,
       });
     }, viewport);
 
     return () => ctx.revert();
-  }, [prefersReducedMotion, scrollTo]);
+  }, [prefersReducedMotion]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleDotClick = (index: number) => {
-    setActiveIndex(index);
-    if (!trackRef.current) return;
-
-    const targetX = -(index / (TOPIC_AREAS.length - 1)) * (trackRef.current.scrollWidth - trackRef.current.parentElement!.clientWidth);
-
-    if (prefersReducedMotion) {
-      trackRef.current.style.transform = `translateX(${targetX}px)`;
-    } else {
-      gsap.killTweensOf(trackRef.current);
-      gsap.to(trackRef.current, {
-        x: targetX,
-        duration: motionTokens.duration.normal,
-        ease: gsapEase(motionTokens.easing.standard),
-        overwrite: 'auto',
-      });
-    }
+    moveToIndex(index);
   };
 
   return (

@@ -82,16 +82,18 @@ export function CTASection({ onOpenRegistration }: CTASectionProps) {
       }
 
       // Timing: when the stats section enters viewport, scramble each number
+      // Derive target text from the element's rendered content so it stays in
+      // sync with the JSX without duplicating literals.
       const statValues: { element: HTMLDivElement | null; target: string; chars: string }[] = [
-        { element: statsRef.current[0], target: '150+', chars: '0123456789+' },
-        { element: statsRef.current[1], target: '85%', chars: '0123456789%' },
-        { element: statsRef.current[2], target: '2.3×', chars: '0123456789.×' },
+        { element: statsRef.current[0], target: statsRef.current[0]?.textContent ?? '150+', chars: '0123456789+' },
+        { element: statsRef.current[1], target: statsRef.current[1]?.textContent ?? '85%', chars: '0123456789%' },
+        { element: statsRef.current[2], target: statsRef.current[2]?.textContent ?? '2.3×', chars: '0123456789.×' },
       ];
 
       statValues.forEach(({ element, target, chars }) => {
         if (!element) return;
 
-        const scrabbleTween = gsap.to(element, {
+        const scrambleTween = gsap.to(element, {
           scrambleText: { text: target, chars, revealDelay: 0.3, speed: 0.6 },
           duration: motionTokens.duration.slow,
           paused: true,
@@ -100,7 +102,7 @@ export function CTASection({ onOpenRegistration }: CTASectionProps) {
         ScrollTrigger.create({
           trigger: element,
           start: 'top 85%',
-          onEnter: () => scrabbleTween.play(),
+          onEnter: () => scrambleTween.play(),
         });
       });
 

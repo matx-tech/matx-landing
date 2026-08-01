@@ -33,50 +33,42 @@ export const useLenis = () => useContext(LenisContext);
 
 export function LenisProvider({ children }: { children: React.ReactNode }) {
   const lenisRef = useRef<Lenis | null>(null);
+  const reducedMotionRef = useRef(false);
 
   useEffect(() => {
     const reducedMotion =
       typeof window !== 'undefined' &&
       window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    const lenis = new Lenis({
-      // When reduced motion is preferred, disable smooth scrolling entirely
-      lerp: reducedMotion ? 0 : 0.1,
-      duration: reducedMotion ? 0 : 1.2,
-      smoothWheel: !reducedMotion,
-      touchMultiplier: reducedMotion ? 1 : 2,
-      autoRaf: true,
-    });
+    reducedMotionRef.current = reducedMotion;
 
-    lenisRef.current = lenis;
-
-    if (!reducedMotion) {
-      lenis.on('scroll', ScrollTrigger.update);
-
-      ScrollTrigger.scrollerProxy(document.body, {
-        scrollTop: function(value) {
-          if (arguments.length && lenis) {
-            lenis.scrollTo(value as number);
-          }
-          return lenis ? lenis.scroll : 0;
-        },
-        getBoundingClientRect() {
-          return {
-            top: 0,
-            left: 0,
-            width: window.innerWidth,
-            height: window.innerHeight,
-          };
-        },
-        pinType: 'fixed',
+    function createLenis(rm: boolean) {
+      return new Lenis({
+        lerp: rm ? 0 : 0.1,
+        duration: rm ? 0 : 1.2,
+        smoothWheel: !rm,
+        touchMultiplier: rm ? 1 : 2,
+        autoRaf: true,
       });
     }
 
+    let lenis = createLenis(reducedMotion);
+    lenisRef.current = lenis;
+
+    lenis.on('scroll', ScrollTrigger.update);
+
     // Subscribe to live reduced-motion changes
     const mql = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const handleChange = () => {
-      // Re-create lenis on preference change — simplest way to toggle smooth scrolling
-      window.location.reload();
+    const handleChange = (e: MediaQueryListEvent) => {
+      const rm = e.matches;
+      reducedMotionRef.current = rm;
+
+      // Destroy current instance and recreate with updated options
+      lenis.destroy();
+      lenis = createLenis(rm);
+      lenisRef.current = lenis;
+      lenis.on('scroll', ScrollTrigger.update);
+      ScrollTrigger.refresh();
     };
     mql.addEventListener('change', handleChange);
 
@@ -114,7 +106,7 @@ export function LenisProvider({ children }: { children: React.ReactNode }) {
     if (targetElement instanceof HTMLElement) {
       lenisRef.current.scrollTo(targetElement, {
         offset: -80, // Account for fixed nav height
-        duration: 1.2,
+        duration: reducedMotionRef.current ? 0 : 1.2,
       });
 
       // Focus the section heading after scroll animation completes
@@ -129,7 +121,7 @@ export function LenisProvider({ children }: { children: React.ReactNode }) {
             }
             heading.focus({ preventScroll: true });
           }
-        }, 1400); // Slightly longer than scroll duration
+        }, reducedMotionRef.current ? 0 : 1400); // Slightly longer than scroll duration
       }
     } else if (typeof target === 'number') {
       lenisRef.current.scrollTo(target);
