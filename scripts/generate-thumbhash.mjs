@@ -14,8 +14,8 @@
 
 import { rgbaToThumbHash, thumbHashToDataURL } from 'thumbhash';
 import sharp from 'sharp';
-import { writeFileSync, mkdirSync } from 'fs';
-import { join, dirname } from 'path';
+import { writeFileSync, mkdirSync, existsSync } from 'fs';
+import { join, dirname, basename } from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -37,8 +37,24 @@ async function generateThumbHash(imagePath, maxDim = 100) {
 
 // --- Generate from source screenshots ---
 
-const mobile = await generateThumbHash(join(base, 'mobile-matx.png'));
-const desktop = await generateThumbHash(join(base, 'desktop-matx.png'));
+const MOBILE_PATH = join(base, 'mobile-matx.png');
+const DESKTOP_PATH = join(base, 'desktop-matx.png');
+
+for (const path of [MOBILE_PATH, DESKTOP_PATH]) {
+  if (!existsSync(path)) {
+    console.error(
+      `\n  Missing source screenshot: ${basename(path)}\n` +
+      `  Expected at: ${path}\n\n` +
+      `  Place a mobile portrait and desktop landscape screenshot in the\n` +
+      `  project root, then re-run:\n` +
+      `    node scripts/generate-thumbhash.mjs\n`
+    );
+    process.exit(1);
+  }
+}
+
+const mobile = await generateThumbHash(MOBILE_PATH);
+const desktop = await generateThumbHash(DESKTOP_PATH);
 
 console.log(`Mobile:  ${mobile.base64Hash}  (data URL: ${mobile.dataUrl.length} chars)`);
 console.log(`Desktop: ${desktop.base64Hash}  (data URL: ${desktop.dataUrl.length} chars)`);
