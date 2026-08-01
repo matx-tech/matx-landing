@@ -21,6 +21,11 @@ export const PRODUCT_FIXTURE = {
     isCorrect: false,
   },
 
+  // Feedback shown to the student
+  feedback: {
+    text: 'Oled proovinud liita lugejaid ja nimetajaid eraldi. Murdude liitmisel tuleb esmalt leida ühine nimetaja.',
+  },
+
   // Signal detection
   signal: {
     pattern: 'Liidab lugejad ja nimetajad eraldi',
@@ -33,6 +38,7 @@ export const PRODUCT_FIXTURE = {
   retry: {
     question: '1/3 + 1/6 = ?',
     rationale: 'Lihtsam ülesanne sama mustri kontrollimiseks',
+    hint: 'Proovi sama meetodit lihtsamal ülesandel',
     expectedPattern: 'Kas õpilane liidab jälle lugejad ja nimetajad eraldi?',
   },
 
@@ -46,6 +52,13 @@ export const PRODUCT_FIXTURE = {
       { label: 'Ignoreeri', action: 'ignore' },
     ],
   },
+
+  // Recurring error-pattern examples for the problem-section pattern visual
+  patternExamples: [
+    { expression: '3/4 + 1/2', wrongAnswer: '4/6' },
+    { expression: '1/3 + 1/6', wrongAnswer: '2/9' },
+    { expression: '2/5 + 1/10', wrongAnswer: '3/15' },
+  ],
 } as const;
 
 // Capability records with status, source, and boundaries

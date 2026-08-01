@@ -1,53 +1,65 @@
 'use client';
 
-import { useRef, useEffect } from 'react';
+import { useRef } from 'react';
 import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
+import { SCROLL_INDICATOR_LABEL } from '@/lib/content/landing-copy';
+import { motionTokens, gsapEase, customEases } from '@/lib/motion-tokens';
 
-export function ScrollIndicator() {
+interface ScrollIndicatorProps {
+  hideLabel?: boolean;
+}
+
+export function ScrollIndicator({ hideLabel = false }: ScrollIndicatorProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mouseRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    if (!containerRef.current || !mouseRef.current) return;
+  useGSAP(() => {
+    const container = containerRef.current;
+    const mouse = mouseRef.current;
+    if (!container || !mouse) return;
 
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const mm = gsap.matchMedia();
 
-    if (prefersReducedMotion) {
-      // Show indicator without animation
-      gsap.set(containerRef.current, { opacity: 1, y: 0 });
-      gsap.set(mouseRef.current, { y: 0 });
-      return;
-    }
-
-    gsap.set(containerRef.current, { opacity: 0, y: -20 });
-    gsap.to(containerRef.current, {
-      opacity: 1,
-      y: 0,
-      duration: 0.3,
-      delay: 3.2,
-      ease: 'cubic-bezier(0.2, 0, 0, 1)',
+    mm.add('(prefers-reduced-motion: reduce)', () => {
+      gsap.set(container, { opacity: 1, y: 0 });
+      gsap.set(mouse, { y: 0 });
     });
 
-    gsap.to(mouseRef.current, {
-      y: 8,
-      duration: 1.2,
-      repeat: -1,
-      yoyo: true,
-      ease: 'cubic-bezier(0.4, 0, 0.2, 1)',
+    mm.add('(prefers-reduced-motion: no-preference)', () => {
+      gsap.set(container, { opacity: 0, y: -motionTokens.distance.md });
+      gsap.to(container, {
+        opacity: 1,
+        y: 0,
+        duration: motionTokens.duration.normal,
+        delay: 3.2,
+        ease: gsapEase(motionTokens.easing.emphasized),
+      });
+
+      gsap.to(mouse, {
+        y: motionTokens.distance.sm,
+        duration: motionTokens.duration.crawl,
+        repeat: -1,
+        yoyo: true,
+        ease: customEases.bounce,
+      });
     });
 
-    return () => {
-      gsap.killTweensOf(containerRef.current);
-      gsap.killTweensOf(mouseRef.current);
-    };
-  }, []);
+    return () => mm.revert();
+  }, { scope: containerRef });
 
   return (
     <div
       ref={containerRef}
       className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
+      role="img"
+      aria-label={SCROLL_INDICATOR_LABEL}
     >
-      <span className="text-text-secondary text-sm tracking-wider uppercase">Scroll</span>
+      {!hideLabel && (
+        <span className="text-text-secondary text-sm tracking-wider uppercase">
+          {SCROLL_INDICATOR_LABEL}
+        </span>
+      )}
       <div className="w-6 h-10 rounded-full border-2 border-text-secondary/50 flex items-start justify-center p-1">
         <div
           ref={mouseRef}

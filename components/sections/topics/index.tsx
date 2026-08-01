@@ -1,90 +1,152 @@
 'use client';
 
-import { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect, useState, useCallback } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Draggable } from 'gsap/Draggable';
+import { Observer } from 'gsap/Observer';
 import { ChevronLeft, ChevronRight, Plus, Minus, X, Divide } from 'lucide-react';
 import { TOPICS_SECTION, SECTION_IDS } from '@/lib/content/landing-copy';
 import { TOPIC_AREAS } from '@/lib/content/landing-evidence';
 import { CapabilityStatusBadge } from '@/components/ui/capability-status';
-
-if (typeof window !== 'undefined') {
-  gsap.registerPlugin(ScrollTrigger, Draggable);
-}
+import { usePrefersReducedMotion } from '@/lib/hooks/use-prefers-reduced-motion';
+import { motionTokens, gsapEase } from '@/lib/motion-tokens';
 
 const TOPIC_ICONS = [Plus, Minus, X, Divide, Plus, Minus];
 
 export function TopicsSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
+  const viewportRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
+  const prefersReducedMotion = usePrefersReducedMotion();
 
   useEffect(() => {
     if (!sectionRef.current) return;
+    if (prefersReducedMotion) {
+      // Ensure section title is visible when motion is disabled
+      const title = sectionRef.current.querySelector('.section-title');
+      if (title) gsap.set(title, { opacity: 1, y: 0 });
+      return;
+    }
 
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (prefersReducedMotion) return;
+    const ctx = gsap.context(() => {
+      const sectionTitle = sectionRef.current!.querySelector('.section-title');
+      if (!sectionTitle) return;
 
-    gsap.fromTo(
-      sectionRef.current.querySelector('.section-title'),
-      { y: 60, opacity: 0 },
-      {
-        y: 0,
-        opacity: 1,
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: 'top 70%',
-          end: 'top 30%',
-          scrub: 1,
-        },
-      }
-    );
-  }, []);
+      gsap.fromTo(
+        sectionTitle,
+        { y: motionTokens.distance.xl, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: motionTokens.duration.slow,
+          ease: gsapEase(motionTokens.easing.smooth),
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: 'top 70%',
+            end: 'top 30%',
+            scrub: 1,
+          },
+        }
+      );
+    }, sectionRef);
+
+    return () => ctx.revert();
+  }, [prefersReducedMotion]);
 
   useEffect(() => {
     if (!trackRef.current) return;
 
     const track = trackRef.current;
 
-    Draggable.create(track, {
-      type: 'x',
-      bounds: {
-        minX: -track.scrollWidth + track.parentElement!.clientWidth,
-        maxX: 0,
-      },
-      inertia: true,
-      throwResistance: 0.5,
-      onDragEnd: function () {
-        const progress = Math.abs(this.x / (track.scrollWidth - track.parentElement!.clientWidth));
-        const newIndex = Math.round(progress * (TOPIC_AREAS.length - 1));
-        setActiveIndex(Math.min(newIndex, TOPIC_AREAS.length - 1));
-      },
-    });
+    const ctx = gsap.context(() => {
+      Draggable.create(track, {
+        type: 'x',
+        bounds: {
+          minX: -track.scrollWidth + track.parentElement!.clientWidth,
+          maxX: 0,
+        },
+        inertia: !prefersReducedMotion,
+        throwResistance: 0.5,
+        onDragEnd: function () {
+          const progress = Math.abs(this.x / (track.scrollWidth - track.parentElement!.clientWidth));
+          const newIndex = Math.round(progress * (TOPIC_AREAS.length - 1));
+          setActiveIndex(Math.min(newIndex, TOPIC_AREAS.length - 1));
+        },
+      });
+    }, track);
 
-    return () => {
-      Draggable.get(track)?.kill();
-    };
-  }, []);
+    return () => ctx.revert();
+  }, [prefersReducedMotion]);
 
-  const scrollTo = (direction: 'prev' | 'next') => {
+  // Extracted movement logic shared by scrollTo, handleDotClick, and the
+  // Observer callbacks — uses gsap.set so Draggable shares the transform cache.
+  const moveToIndex = useCallback((index: number) => {
+    if (!trackRef.current) return;
+    setActiveIndex(index);
+
+    const targetX = -(index / (TOPIC_AREAS.length - 1)) * (trackRef.current.scrollWidth - trackRef.current.parentElement!.clientWidth);
+
+    if (prefersReducedMotion) {
+      gsap.set(trackRef.current, { x: targetX });
+    } else {
+      gsap.killTweensOf(trackRef.current);
+      gsap.to(trackRef.current, {
+        x: targetX,
+        duration: motionTokens.duration.normal,
+        ease: gsapEase(motionTokens.easing.standard),
+        overwrite: 'auto',
+      });
+    }
+  }, [prefersReducedMotion]);
+
+  const scrollTo = useCallback((direction: 'prev' | 'next') => {
     if (!trackRef.current) return;
     const newIndex = direction === 'next'
       ? Math.min(activeIndex + 1, TOPIC_AREAS.length - 1)
       : Math.max(activeIndex - 1, 0);
-    setActiveIndex(newIndex);
+    moveToIndex(newIndex);
+  }, [activeIndex, moveToIndex]);
 
-    const targetX = -(newIndex / (TOPIC_AREAS.length - 1)) * (trackRef.current.scrollWidth - trackRef.current.parentElement!.clientWidth);
-    gsap.to(trackRef.current, {
-      x: targetX,
-      duration: 0.3,
-      ease: 'cubic-bezier(0, 0, 0.2, 1)',
-    });
+  // Stable ref so Observer callbacks don't need scrollTo / moveToIndex in deps
+  const moveToIndexRef = useRef(moveToIndex);
+  const activeIndexRef = useRef(activeIndex);
+
+  // Keep both refs current after every committed render so Observer
+  // callbacks always see the latest values without depending on them.
+  useEffect(() => {
+    moveToIndexRef.current = moveToIndex;
+    activeIndexRef.current = activeIndex;
+  });
+
+  // Observer: horizontal wheel/swipe on carousel viewport → prev/next navigation
+  useEffect(() => {
+    if (!viewportRef.current || prefersReducedMotion) return;
+
+    const viewport = viewportRef.current;
+
+    const ctx = gsap.context(() => {
+      Observer.create({
+        target: viewport,
+        type: 'wheel,touch,pointer',
+        wheelSpeed: -1,
+        onRight: () => moveToIndexRef.current(Math.min(activeIndexRef.current + 1, TOPIC_AREAS.length - 1)),
+        onLeft: () => moveToIndexRef.current(Math.max(activeIndexRef.current - 1, 0)),
+        tolerance: 20,
+      });
+    }, viewport);
+
+    return () => ctx.revert();
+  }, [prefersReducedMotion]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handleDotClick = (index: number) => {
+    moveToIndex(index);
   };
 
   return (
     <section ref={sectionRef} id={SECTION_IDS.capabilities} className="relative py-24 md:py-32 lg:py-40 bg-surface overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-b from-canvas via-transparent to-canvas pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-b from-canvas via-transparent to-transparent pointer-events-none" />
 
       <div className="relative z-10">
         {/* Section Title */}
@@ -124,7 +186,7 @@ export function TopicsSection() {
           </button>
 
           {/* Carousel Track */}
-          <div className="overflow-hidden px-4 md:px-8 lg:px-16">
+          <div ref={viewportRef} className="overflow-hidden px-4 md:px-8 lg:px-16">
             <div
               ref={trackRef}
               className="flex gap-6 md:gap-8 cursor-grab active:cursor-grabbing"
@@ -180,17 +242,8 @@ export function TopicsSection() {
             {TOPIC_AREAS.map((_, index) => (
               <button
                 key={index}
-                onClick={() => {
-                  setActiveIndex(index);
-                  if (trackRef.current) {
-                    const targetX = -(index / (TOPIC_AREAS.length - 1)) * (trackRef.current.scrollWidth - trackRef.current.parentElement!.clientWidth);
-                    gsap.to(trackRef.current, {
-                      x: targetX,
-                      duration: 0.3,
-                      ease: 'cubic-bezier(0, 0, 0.2, 1)',
-                    });
-                  }
-                }}
+                type="button"
+                onClick={() => handleDotClick(index)}
                 className={`w-2 h-2 rounded-full transition-all focus-ring-target min-w-[44px] min-h-[44px] flex items-center justify-center`}
                 aria-label={`Mine slaidile ${index + 1}`}
               >

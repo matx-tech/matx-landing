@@ -10,6 +10,9 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { STUDENT_STORY, SECTION_IDS } from '@/lib/content/landing-copy';
 import { PRODUCT_FIXTURE } from '@/lib/content/landing-evidence';
+import { usePrefersReducedMotion } from '@/lib/hooks/use-prefers-reduced-motion';
+import { motionTokens, gsapEase } from '@/lib/motion-tokens';
+import { InlineFractionalExpression } from '@/components/ui/fraction';
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
@@ -18,25 +21,30 @@ if (typeof window !== 'undefined') {
 export function StudentSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const stepsRef = useRef<(HTMLLIElement | null)[]>([]);
+  const prefersReducedMotion = usePrefersReducedMotion();
 
   useEffect(() => {
     if (!sectionRef.current) return;
-
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (prefersReducedMotion) return;
+    if (prefersReducedMotion) {
+      // Ensure all animated elements are visible when motion is disabled
+      stepsRef.current.forEach((step) => {
+        if (step) gsap.set(step, { opacity: 1, x: 0 });
+      });
+      return;
+    }
 
     const ctx = gsap.context(() => {
-      stepsRef.current.forEach((step, index) => {
+      stepsRef.current.forEach((step) => {
         if (!step) return;
 
         gsap.fromTo(
           step,
-          { opacity: 0, x: -20 },
+          { opacity: 0, x: -motionTokens.distance.md },
           {
             opacity: 1,
             x: 0,
-            duration: 0.5,
-            ease: 'power2.out',
+            duration: motionTokens.duration.slow,
+            ease: gsapEase(motionTokens.easing.smooth),
             scrollTrigger: {
               trigger: step,
               start: 'top 80%',
@@ -48,15 +56,15 @@ export function StudentSection() {
     }, sectionRef);
 
     return () => ctx.revert();
-  }, []);
+  }, [prefersReducedMotion]);
 
   return (
     <section
       ref={sectionRef}
       id={SECTION_IDS.student}
-      className="py-24 md:py-32 lg:py-40 bg-surface"
+      className="py-24 md:py-32 lg:py-40 bg-surface section-fade-from-canvas"
     >
-      <div className="container mx-auto px-4 md:px-8 lg:px-16">
+      <div className="relative z-10 container mx-auto px-4 md:px-8 lg:px-16">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Left: Content */}
           <div>
@@ -67,75 +75,25 @@ export function StudentSection() {
               {STUDENT_STORY.description}
             </p>
 
-            {/* Student flow steps */}
+            {/* Student flow steps — data-driven */}
             <ol className="space-y-6">
-              <li
-                ref={(el) => {
-                  stepsRef.current[0] = el;
-                }}
-                className="flex gap-4"
-              >
-                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-semibold text-sm">
-                  1
-                </div>
-                <div>
-                  <h3 className="font-semibold text-foreground mb-1">Õpilane lahendab ülesande</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Digitaalselt või paberil, oma tempos
-                  </p>
-                </div>
-              </li>
-
-              <li
-                ref={(el) => {
-                  stepsRef.current[1] = el;
-                }}
-                className="flex gap-4"
-              >
-                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-semibold text-sm">
-                  2
-                </div>
-                <div>
-                  <h3 className="font-semibold text-foreground mb-1">Saab arusaadava tagasiside</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Selge selgitus, mitte ainult "vale" märge
-                  </p>
-                </div>
-              </li>
-
-              <li
-                ref={(el) => {
-                  stepsRef.current[2] = el;
-                }}
-                className="flex gap-4"
-              >
-                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-semibold text-sm">
-                  3
-                </div>
-                <div>
-                  <h3 className="font-semibold text-foreground mb-1">Proovib sihitud harjutust</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Järgmine samm on selge ja asjakohane
-                  </p>
-                </div>
-              </li>
-
-              <li
-                ref={(el) => {
-                  stepsRef.current[3] = el;
-                }}
-                className="flex gap-4"
-              >
-                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-green-100 text-green-700 flex items-center justify-center font-semibold text-sm">
-                  ✓
-                </div>
-                <div>
-                  <h3 className="font-semibold text-foreground mb-1">Jätkab harjutamist</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Üks õige kordus ei tähenda veel valdamist
-                  </p>
-                </div>
-              </li>
+              {STUDENT_STORY.steps.map((step, index) => (
+                <li
+                  key={step.title}
+                  ref={(el) => {
+                    stepsRef.current[index] = el;
+                  }}
+                  className="flex gap-4"
+                >
+                  <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center font-semibold text-sm ${step.badgeClass}`}>
+                    {step.badge}
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-foreground mb-1">{step.title}</h3>
+                    <p className="text-sm text-muted-foreground">{step.description}</p>
+                  </div>
+                </li>
+              ))}
             </ol>
           </div>
 
@@ -150,7 +108,7 @@ export function StudentSection() {
               <div className="text-sm font-semibold text-foreground mb-2">Ülesanne</div>
               <div className="p-4 bg-surface rounded-lg border border-border">
                 <div className="text-base font-medium text-foreground">
-                  {PRODUCT_FIXTURE.task.question}
+                  <InlineFractionalExpression expression={PRODUCT_FIXTURE.task.question} />
                 </div>
               </div>
             </div>
@@ -160,17 +118,17 @@ export function StudentSection() {
               <div className="text-sm font-semibold text-foreground mb-2">Õpilase vastus</div>
               <div className="p-4 bg-red-50 rounded-lg border border-red-200">
                 <div className="text-base font-mono text-red-700">
-                  {PRODUCT_FIXTURE.answer.submitted}
+                  <InlineFractionalExpression expression={PRODUCT_FIXTURE.answer.submitted} />
                 </div>
               </div>
             </div>
 
-            {/* Feedback */}
+            {/* Feedback — from fixture */}
             <div className="mb-6">
               <div className="text-sm font-semibold text-foreground mb-2">Tagasiside</div>
               <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
                 <p className="text-sm text-blue-900">
-                  Oled proovinud liita lugejaid ja nimetajaid eraldi. Murdude liitmisel tuleb esmalt leida ühine nimetaja.
+                  {PRODUCT_FIXTURE.feedback.text}
                 </p>
               </div>
             </div>
@@ -180,25 +138,14 @@ export function StudentSection() {
               <div className="text-sm font-semibold text-foreground mb-2">Järgmine harjutus</div>
               <div className="p-4 bg-green-50 rounded-lg border border-green-200">
                 <div className="text-base font-medium text-green-900">
-                  {PRODUCT_FIXTURE.retry.question}
+                  <InlineFractionalExpression expression={PRODUCT_FIXTURE.retry.question} />
                 </div>
                 <div className="text-xs text-green-700 mt-2">
-                  Proovi sama meetodit lihtsamal ülesandel
+                  {PRODUCT_FIXTURE.retry.hint}
                 </div>
               </div>
             </div>
           </div>
-        </div>
-
-        {/* Accessibility fallback */}
-        <div className="sr-only">
-          <h3>Õpilase töövoog:</h3>
-          <ol>
-            <li>Õpilane lahendab ülesande digitaalselt või paberil</li>
-            <li>Saab arusaadava tagasiside</li>
-            <li>Proovib sihitud harjutust</li>
-            <li>Jätkab harjutamist - üks õige kordus ei tähenda veel valdamist</li>
-          </ol>
         </div>
       </div>
     </section>

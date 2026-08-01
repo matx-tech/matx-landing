@@ -4,38 +4,94 @@ import { useRef, useEffect } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Shield, Eye, FileText } from 'lucide-react';
-import { TRUST_PILLARS } from '@/lib/content/landing-copy';
+import { TRUST_PILLARS, SECTION_IDS } from '@/lib/content/landing-copy';
+import { usePrefersReducedMotion } from '@/lib/hooks/use-prefers-reduced-motion';
+import { motionTokens, gsapEase, staggers } from '@/lib/motion-tokens';
+
+if (typeof window !== 'undefined') {
+  gsap.registerPlugin(ScrollTrigger);
+}
+
+const TRUST_ICONS: Record<string, typeof Shield | typeof Eye | typeof FileText> = {
+  shield: Shield,
+  eye: Eye,
+  'file-text': FileText,
+};
 
 export function TrustSection() {
   const sectionRef = useRef<HTMLElement>(null);
+  const prefersReducedMotion = usePrefersReducedMotion();
 
   useEffect(() => {
     if (!sectionRef.current) return;
+    if (prefersReducedMotion) {
+      // Ensure all animated elements are visible when motion is disabled
+      const title = sectionRef.current.querySelector('.section-title');
+      if (title) gsap.set(title, { opacity: 1, y: 0 });
+      const pillars = sectionRef.current.querySelectorAll('.trust-pillar');
+      gsap.set(pillars, { opacity: 1, y: 0, scale: 1 });
+      return;
+    }
 
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (prefersReducedMotion) return;
+    const ctx = gsap.context(() => {
+      const sectionTitle = sectionRef.current!.querySelector('.section-title');
+      if (!sectionTitle) return;
 
-    gsap.fromTo(
-      sectionRef.current.querySelector('.section-title'),
-      { y: 60, opacity: 0 },
-      {
-        y: 0,
-        opacity: 1,
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: 'top 70%',
-          end: 'top 30%',
-          scrub: 1,
+      gsap.fromTo(
+        sectionTitle,
+        { y: motionTokens.distance.xl, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: motionTokens.duration.slow,
+          ease: gsapEase(motionTokens.easing.smooth),
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: 'top 70%',
+            end: 'top 30%',
+            scrub: 1,
+          },
+        }
+      );
+
+      // Pillar cards — batched ScrollTrigger for staggered entrance
+      const cards = gsap.utils.toArray<HTMLDivElement>('.trust-pillar', sectionRef.current);
+
+      // Initialize hidden state so cards don't flash visible before ScrollTrigger
+      // fires onEnter.  ctx.revert() restores inline styles during cleanup.
+      gsap.set(cards, { y: motionTokens.distance.lg, opacity: 0, scale: 0.95 });
+
+      ScrollTrigger.batch(cards, {
+        onEnter: (elements) => {
+          gsap.fromTo(
+            elements,
+            { y: motionTokens.distance.lg, opacity: 0, scale: 0.95 },
+            {
+              y: 0,
+              opacity: 1,
+              scale: 1,
+              duration: motionTokens.duration.slow,
+              stagger: staggers.card,
+              ease: gsapEase(motionTokens.easing.smooth),
+            }
+          );
         },
-      }
-    );
+        onLeaveBack: (elements) => {
+          gsap.to(elements, {
+            y: motionTokens.distance.lg,
+            opacity: 0,
+            scale: 0.95,
+            duration: motionTokens.duration.fast,
+            stagger: staggers.card,
+            ease: gsapEase(motionTokens.easing.accelerate),
+          });
+        },
+        start: 'top 85%',
+      });
+    }, sectionRef);
 
-    return () => {
-      ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
-    };
-  }, []);
-
-  const pillarIcons = [Shield, Eye, FileText];
+    return () => ctx.revert();
+  }, [prefersReducedMotion]);
 
   return (
     <section ref={sectionRef} id="usaldus" className="relative py-24 md:py-32 lg:py-40 bg-canvas overflow-hidden">
@@ -60,13 +116,16 @@ export function TrustSection() {
 
         {/* Trust Pillars */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16 max-w-5xl mx-auto">
-          {TRUST_PILLARS.map((pillar, index) => {
-            const Icon = pillarIcons[index];
+          {TRUST_PILLARS.map((pillar) => {
+            const Icon = TRUST_ICONS[pillar.icon];
 
             return (
-              <div key={pillar.title} className="card p-8 text-center group">
+              <div
+                key={pillar.title}
+                className="trust-pillar card p-8 text-center group"
+              >
                 <div className="w-16 h-16 rounded-xl mx-auto mb-6 flex items-center justify-center bg-primary/10 group-hover:scale-110 transition-transform">
-                  <Icon className="w-8 h-8 text-primary" />
+                  {Icon && <Icon className="w-8 h-8 text-primary" />}
                 </div>
                 <h3 className="text-xl font-display font-semibold text-text-primary mb-3">
                   {pillar.title}
@@ -99,25 +158,25 @@ export function TrustSection() {
                   Tuvastatud signaal
                 </div>
                 <div className="text-sm text-text-primary">
-                  Võimalik veamuster: "Liidab lugejad ja nimetajad eraldi" (kontrollitav signaal)
+                  Võimalik veamuster: „Liidab lugejad ja nimetajad eraldi{'\u201c'} (kontrollitav signaal)
                 </div>
               </div>
 
-              <div className="p-4 bg-green-50 rounded-lg border border-green-200">
-                <div className="text-xs font-medium text-green-800 uppercase tracking-wider mb-2">
+              <div className="p-4 bg-success-surface rounded-lg border border-success-border">
+                <div className="text-xs font-medium text-success uppercase tracking-wider mb-2">
                   Soovitus
                 </div>
-                <div className="text-sm text-green-900 mb-3">
+                <div className="text-sm text-success-strong mb-3">
                   Harjuta murdarvu liitmist sammu-sammult
                 </div>
                 <div className="flex gap-2 flex-wrap">
-                  <span className="px-3 py-1 text-xs font-medium rounded bg-white border border-green-300 text-green-800">
+                  <span className="px-3 py-1 text-xs font-medium rounded bg-card border border-success-border text-success">
                     Võta vastu
                   </span>
-                  <span className="px-3 py-1 text-xs font-medium rounded bg-white border border-green-300 text-green-800">
+                  <span className="px-3 py-1 text-xs font-medium rounded bg-card border border-success-border text-success">
                     Muuda
                   </span>
-                  <span className="px-3 py-1 text-xs font-medium rounded bg-white border border-green-300 text-green-800">
+                  <span className="px-3 py-1 text-xs font-medium rounded bg-card border border-success-border text-success">
                     Ignoreeri
                   </span>
                 </div>
@@ -126,16 +185,16 @@ export function TrustSection() {
           </div>
         </div>
 
-        {/* Link to IT/procurement details */}
+        {/* Link to adoption section with procurement/IT info */}
         <div className="text-center mt-12">
           <p className="text-text-secondary mb-4">
-            IT-juhile ja hankeametnikule: tehniline ülevaade ja turvadetailid
+            IT-juhile ja hankeametnikule: Kuidas alustada ja tehnilised detailid
           </p>
           <a
-            href="#piloot"
+            href={`#${SECTION_IDS.pilot}`}
             className="inline-flex items-center gap-2 text-primary hover:text-secondary transition-colors focus-ring-target rounded-md min-h-[44px] px-4"
           >
-            <span>Vaata IT-dokumentatsiooni</span>
+            <span>Vaata alustamise marsruute</span>
             <span aria-hidden="true">→</span>
           </a>
         </div>

@@ -2,112 +2,115 @@
 
 import { useRef, useEffect, useState, useCallback } from 'react';
 import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Menu, X, Award } from 'lucide-react';
 import * as Dialog from '@radix-ui/react-dialog';
-import { LANDING_NAV_ITEMS } from '@/lib/content/landing-copy';
+import { LANDING_NAV_ITEMS, SECTION_IDS, CALENDLY_URL } from '@/lib/content/landing-copy';
+import { usePrefersReducedMotion } from '@/lib/hooks/use-prefers-reduced-motion';
+import { motionTokens, gsapEase, staggers } from '@/lib/motion-tokens';
+
+if (typeof window !== 'undefined') {
+  gsap.registerPlugin(ScrollTrigger);
+}
 
 const navItems = LANDING_NAV_ITEMS;
 
-interface NavigationProps {
-  onOpenRegistration?: () => void;
-}
+const PILOT_HREF = `#${SECTION_IDS.pilot}`;
 
-export function Navigation({ onOpenRegistration }: NavigationProps) {
+interface NavigationProps {}
+
+export function Navigation(_props: NavigationProps) {
   const [isOpen, setIsOpen] = useState(false);
   const navRef = useRef<HTMLElement>(null);
   const menuItemsRef = useRef<HTMLDivElement[]>([]);
+  const prefersReducedMotion = usePrefersReducedMotion();
 
   useEffect(() => {
     const nav = navRef.current;
     if (!nav) return;
 
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (prefersReducedMotion) {
       gsap.set(nav, { y: 0, opacity: 1 });
       return;
     }
 
-    gsap.set(nav, { y: -100, opacity: 0 });
+    // Initial entrance
+    gsap.set(nav, { y: -motionTokens.distance.xxl, opacity: 0 });
     gsap.to(nav, {
       y: 0,
       opacity: 1,
-      duration: 0.3,
+      duration: motionTokens.duration.normal,
       delay: 0.5,
-      ease: 'cubic-bezier(0.2, 0, 0, 1)',
+      ease: gsapEase(motionTokens.easing.emphasized),
     });
 
-    let lastScrollY = window.scrollY;
-    let ticking = false;
+    // Scroll-driven hide/show via ScrollTrigger — uses quickTo for performance
+    const yTo = gsap.quickTo(nav, 'y', { duration: motionTokens.duration.fast, ease: gsapEase(motionTokens.easing.standard) });
+    const opacityTo = gsap.quickTo(nav, 'opacity', { duration: motionTokens.duration.fast, ease: gsapEase(motionTokens.easing.standard) });
 
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
+    let wasHidden = false;
+    const st = ScrollTrigger.create({
+      trigger: document.body,
+      start: 'top top',
+      onUpdate: (self) => {
+        const isHidden = self.scroll() > 100 && self.direction === 1;
+        if (isHidden === wasHidden) return;
+        wasHidden = isHidden;
 
-      if (!ticking) {
-        window.requestAnimationFrame(() => {
-          if (currentScrollY > lastScrollY && currentScrollY > 100) {
-            gsap.to(nav, {
-              y: -100,
-              opacity: 0.5,
-              duration: 0.25,
-              ease: 'cubic-bezier(0.4, 0, 1, 1)',
-            });
-          } else {
-            gsap.to(nav, {
-              y: 0,
-              opacity: 1,
-              duration: 0.25,
-              ease: 'cubic-bezier(0, 0, 0.2, 1)',
-            });
-          }
-          lastScrollY = currentScrollY;
-          ticking = false;
-        });
-        ticking = true;
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
+        if (isHidden) {
+          yTo(-motionTokens.distance.xxl);
+          opacityTo(0.5);
+        } else {
+          yTo(0);
+          opacityTo(1);
+        }
+      },
+    });
 
     return () => {
-      window.removeEventListener('scroll', handleScroll);
+      st.kill();
       gsap.killTweensOf(nav);
     };
-  }, []);
+  }, [prefersReducedMotion]);
 
   useEffect(() => {
     const items = menuItemsRef.current.filter(Boolean);
 
+    // Guard: on initial load the mobile menu is closed and Radix's Portal
+    // doesn't mount the content, so ref callbacks haven't fired yet.
+    if (items.length === 0) return;
+
     if (isOpen) {
+      if (prefersReducedMotion) {
+        gsap.set(items, { opacity: 1, x: 0 });
+        return;
+      }
       gsap.set(items, {
-        clipPath: 'inset(0 100% 0 0)',
         opacity: 0,
-        x: -30,
+        x: -motionTokens.distance.lg,
       });
 
       gsap.to(items, {
-        clipPath: 'inset(0 0% 0 0)',
         opacity: 1,
         x: 0,
-        duration: 0.3,
-        stagger: 0.06,
-        ease: 'cubic-bezier(0.2, 0, 0, 1)',
+        duration: motionTokens.duration.normal,
+        stagger: staggers.menuItem,
+        ease: gsapEase(motionTokens.easing.emphasized),
       });
     } else {
+      if (prefersReducedMotion) {
+        gsap.set(items, { opacity: 0, x: -motionTokens.distance.lg });
+        return;
+      }
       gsap.to(items, {
-        clipPath: 'inset(0 100% 0 0)',
         opacity: 0,
-        x: -30,
-        duration: 0.25,
-        stagger: 0.04,
-        ease: 'cubic-bezier(0.4, 0, 1, 1)',
+        x: -motionTokens.distance.lg,
+        duration: motionTokens.duration.fast,
+        stagger: staggers.menuItemExit,
+        ease: gsapEase(motionTokens.easing.accelerate),
       });
     }
-  }, [isOpen]);
-
-  const handleRegistrationClick = useCallback(() => {
-    setIsOpen(false);
-    onOpenRegistration?.();
-  }, [onOpenRegistration]);
+  }, [isOpen, prefersReducedMotion]);
 
   const handleOpenChange = useCallback((open: boolean) => {
     setIsOpen(open);
@@ -149,13 +152,13 @@ export function Navigation({ onOpenRegistration }: NavigationProps) {
           {/* CTA Buttons */}
           <div className="hidden md:flex items-center gap-2 xl:gap-4">
             <a
-              href="#piloot"
+              href={PILOT_HREF}
               className="px-3 py-2 rounded-lg text-sm font-medium text-text-secondary hover:text-text-primary transition-colors focus-ring-target min-h-[44px] flex items-center whitespace-nowrap"
             >
               Liitu piloodiga
             </a>
             <a
-              href="https://calendly.com/matx-ee/15min"
+              href={CALENDLY_URL}
               target="_blank"
               rel="noopener noreferrer"
               className="btn-primary px-4 xl:px-6 py-2 rounded-lg text-sm font-medium focus-ring-target min-h-[44px] whitespace-nowrap"
@@ -167,7 +170,7 @@ export function Navigation({ onOpenRegistration }: NavigationProps) {
           {/* Mobile Menu Button - Dialog Trigger */}
           <Dialog.Trigger asChild>
             <button
-              className="lg:hidden w-11 h-11 rounded-lg bg-elevated flex items-center justify-center focus-ring-target"
+              className="xl:hidden w-11 h-11 rounded-lg bg-elevated flex items-center justify-center focus-ring-target"
               aria-label="Ava menüü"
             >
               {isOpen ? (
@@ -183,7 +186,10 @@ export function Navigation({ onOpenRegistration }: NavigationProps) {
       {/* Mobile Menu - Radix Dialog */}
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 bg-canvas/95 z-40 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
-        <Dialog.Content className="fixed inset-0 z-50 flex flex-col items-start justify-center h-full px-8 md:px-16 focus:outline-none">
+        <Dialog.Content
+          className="fixed inset-0 z-50 flex flex-col items-start justify-center h-full px-8 md:px-16 focus:outline-none data-[state=closed]:animate-out data-[state=closed]:fade-out-0"
+          style={{ animationDuration: '0.5s' }}
+        >
           <Dialog.Title className="sr-only">Navigatsioonimenüü</Dialog.Title>
           <Dialog.Description className="sr-only">
             Valige menüüst soovitud osa või sulgege menüü
@@ -214,14 +220,14 @@ export function Navigation({ onOpenRegistration }: NavigationProps) {
             className="overflow-hidden mt-8 flex flex-col gap-4"
           >
             <a
-              href="#piloot"
+              href={PILOT_HREF}
               onClick={() => setIsOpen(false)}
               className="px-6 py-3 rounded-lg bg-primary text-text-inverse font-semibold focus-ring-target min-h-[44px] text-center"
             >
               Liitu piloodiga
             </a>
             <a
-              href="https://calendly.com/matx-ee/15min"
+              href={CALENDLY_URL}
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => setIsOpen(false)}

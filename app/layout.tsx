@@ -2,7 +2,7 @@ import './globals.css';
 import type { Metadata } from 'next';
 import { Public_Sans, Inter, IBM_Plex_Mono } from 'next/font/google';
 import { LenisProvider } from '@/components/providers/lenis-provider';
-import 'katex/dist/katex.min.css';
+import { SITE_META } from '@/lib/content/landing-copy';
 
 const publicSans = Public_Sans({
   subsets: ['latin'],
@@ -26,10 +26,9 @@ const ibmPlexMono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://matx.ee'),
-  title: 'MATx — Õpilase harjutamine ja õpetaja otsus ühes töövoos',
-  description:
-    'MATx seob õpilase vastused, jälgitavad signaalid ja õpetaja tegevussoovituse üheks läbipaistvaks töövooks. Piloot Eesti põhikoolides.',
+  metadataBase: new URL(SITE_META.url),
+  title: SITE_META.title,
+  description: SITE_META.shortDescription,
   keywords: [
     'matemaatika',
     'Eesti',
@@ -42,26 +41,26 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: 'MATx' }, { name: 'Andri Suga' }, { name: 'Tom Kristian Abel' }],
   openGraph: {
-    title: 'MATx — Õpilase harjutamine ja õpetaja otsus ühes töövoos',
-    description: 'Seob õpilase vastused, jälgitavad signaalid ja õpetaja tegevussoovituse üheks läbipaistvaks töövooks.',
-    url: 'https://matx.ee',
+    title: SITE_META.title,
+    description: SITE_META.shortDescription,
+    url: SITE_META.url,
     siteName: 'MATx',
     type: 'website',
-    locale: 'et_EE',
+    locale: SITE_META.locale,
   },
   twitter: {
-    card: 'summary_large_image',
-    title: 'MATx — Õpilase harjutamine ja õpetaja otsus ühes töövoos',
-    description: 'Seob õpilase vastused, jälgitavad signaalid ja õpetaja tegevussoovituse üheks läbipaistvaks töövooks.',
+    card: 'summary',
+    title: SITE_META.title,
+    description: SITE_META.shortDescription,
   },
   robots: {
     index: true,
     follow: true,
   },
   alternates: {
-    canonical: 'https://matx.ee',
+    canonical: SITE_META.url,
     languages: {
-      'et-EE': 'https://matx.ee',
+      'et-EE': SITE_META.url,
     },
   },
 };
@@ -70,8 +69,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="et" className={`${publicSans.variable} ${inter.variable} ${ibmPlexMono.variable}`}>
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -79,9 +76,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               '@context': 'https://schema.org',
               '@type': 'EducationalOrganization',
               name: 'MATx',
-              description: 'Seob õpilase harjutamise, arusaadava tagasiside ja õpetaja tegevussoovituse üheks jälgitavaks töövooks',
-              url: 'https://matx.ee',
-              logo: 'https://matx.ee/logo.png',
+              description: SITE_META.longDescription,
+              url: SITE_META.url,
               foundingDate: '2026',
               founders: [
                 { '@type': 'Person', name: 'Andri Suga' },

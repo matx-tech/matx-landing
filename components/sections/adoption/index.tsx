@@ -8,19 +8,22 @@
 import { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { ADOPTION_ROUTES, SECTION_IDS } from '@/lib/content/landing-copy';
+import { ADOPTION_ROUTES, SECTION_IDS, CALENDLY_URL, type AudienceId } from '@/lib/content/landing-copy';
 import { BookOpen, School, FileText, Server } from 'lucide-react';
+import { useLenis } from '@/components/providers/lenis-provider';
+import { usePrefersReducedMotion } from '@/lib/hooks/use-prefers-reduced-motion';
+import { motionTokens, gsapEase, staggers } from '@/lib/motion-tokens';
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
 }
 
-const AUDIENCE_ICONS = {
-  'Õpetajale': BookOpen,
-  'Koolijuhile': School,
-  'Hankele': FileText,
-  'IT-le': Server,
-} as const;
+const AUDIENCE_ICONS: Record<AudienceId, typeof BookOpen | typeof School | typeof FileText | typeof Server> = {
+  teacher: BookOpen,
+  principal: School,
+  procurement: FileText,
+  it: Server,
+};
 
 interface AdoptionRoutesProps {
   onOpenRegistration?: () => void;
@@ -28,56 +31,74 @@ interface AdoptionRoutesProps {
 
 export function AdoptionSection({ onOpenRegistration }: AdoptionRoutesProps) {
   const sectionRef = useRef<HTMLElement>(null);
-  const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
+  const { scrollTo } = useLenis();
+  const prefersReducedMotion = usePrefersReducedMotion();
 
   useEffect(() => {
     if (!sectionRef.current) return;
-
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (prefersReducedMotion) return;
+    if (prefersReducedMotion) {
+      // Ensure all animated elements are visible when motion is disabled
+      const cards = sectionRef.current.querySelectorAll('.adoption-card');
+      gsap.set(cards, { opacity: 1, y: 0 });
+      return;
+    }
 
     const ctx = gsap.context(() => {
-      cardsRef.current.forEach((card, index) => {
-        if (!card) return;
+      // Adoption route cards — batched ScrollTrigger
+      const cards = gsap.utils.toArray<HTMLDivElement>('.adoption-card', sectionRef.current);
 
-        gsap.fromTo(
-          card,
-          { opacity: 0, y: 30 },
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.5,
-            delay: index * 0.1,
-            ease: 'power2.out',
-            scrollTrigger: {
-              trigger: card,
-              start: 'top 85%',
-              toggleActions: 'play none none reverse',
-            },
-          }
-        );
+      ScrollTrigger.batch(cards, {
+        onEnter: (elements) => {
+          gsap.fromTo(
+            elements,
+            { opacity: 0, y: motionTokens.distance.lg },
+            {
+              opacity: 1,
+              y: 0,
+              duration: motionTokens.duration.slow,
+              stagger: staggers.card,
+              ease: gsapEase(motionTokens.easing.smooth),
+            }
+          );
+        },
+        onLeaveBack: (elements) => {
+          gsap.to(elements, {
+            opacity: 0,
+            y: motionTokens.distance.lg,
+            duration: motionTokens.duration.fast,
+            stagger: staggers.card,
+            ease: gsapEase(motionTokens.easing.accelerate),
+          });
+        },
+        start: 'top 85%',
       });
     }, sectionRef);
 
     return () => ctx.revert();
-  }, []);
+  }, [prefersReducedMotion]);
 
   const handleCTAClick = (action: string) => {
     if (action === 'registration' && onOpenRegistration) {
       onOpenRegistration();
     } else if (action === 'calendly') {
-      window.open('https://calendly.com/matx-demo', '_blank');
+      const newWin = window.open(CALENDLY_URL, '_blank', 'noopener,noreferrer');
+      if (newWin) newWin.opener = null;
+    } else if (action === 'procurement') {
+      const el = document.getElementById(SECTION_IDS.pilot);
+      if (el) scrollTo(el);
+    } else if (action === 'technical') {
+      const el = document.getElementById(SECTION_IDS.pilot);
+      if (el) scrollTo(el);
     }
-    // Other actions would need implementation
   };
 
   return (
     <section
       ref={sectionRef}
       id={SECTION_IDS.pilot}
-      className="py-24 md:py-32 lg:py-40 bg-background"
+      className="py-24 md:py-32 lg:py-40 bg-canvas section-fade-from-surface"
     >
-      <div className="container mx-auto px-4 md:px-8 lg:px-16">
+      <div className="relative z-10 container mx-auto px-4 md:px-8 lg:px-16">
         {/* Section header */}
         <div className="max-w-3xl mx-auto text-center mb-16">
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-4">
@@ -91,15 +112,12 @@ export function AdoptionSection({ onOpenRegistration }: AdoptionRoutesProps) {
         {/* Adoption route cards */}
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
           {ADOPTION_ROUTES.map((route, index) => {
-            const Icon = AUDIENCE_ICONS[route.audience as keyof typeof AUDIENCE_ICONS];
+            const Icon = AUDIENCE_ICONS[route.audienceId];
 
             return (
               <div
                 key={route.audience}
-                ref={(el) => {
-                  cardsRef.current[index] = el;
-                }}
-                className="bg-card rounded-xl p-6 shadow-sm border border-border hover:shadow-md transition-shadow"
+                className="adoption-card bg-card rounded-xl p-6 shadow-sm border border-border hover:shadow-md transition-shadow"
               >
                 {/* Icon */}
                 <div className="w-12 h-12 rounded-lg bg-primary/10 text-primary flex items-center justify-center mb-4">
@@ -123,8 +141,9 @@ export function AdoptionSection({ onOpenRegistration }: AdoptionRoutesProps) {
 
                 {/* CTA */}
                 <button
+                  type="button"
                   onClick={() => handleCTAClick(route.ctaAction)}
-                  className="w-full px-4 py-2.5 text-sm font-medium rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                  className="w-full px-4 py-2.5 text-sm font-medium rounded-lg bg-primary text-text-inverse hover:bg-primary/90 transition-colors focus-ring-target min-h-[44px]"
                   aria-label={`${route.cta} - ${route.audience}`}
                 >
                   {route.cta}

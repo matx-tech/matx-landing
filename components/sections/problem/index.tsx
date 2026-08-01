@@ -4,6 +4,14 @@ import { useRef, useEffect } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ScrollIndicator } from '@/components/sections/hero/scroll-indicator';
+import { PRODUCT_FIXTURE } from '@/lib/content/landing-evidence';
+import { Fraction, InlineFractionalExpression } from '@/components/ui/fraction';
+import { usePrefersReducedMotion } from '@/lib/hooks/use-prefers-reduced-motion';
+import { motionTokens, gsapEase, staggers } from '@/lib/motion-tokens';
+
+if (typeof window !== 'undefined') {
+  gsap.registerPlugin(ScrollTrigger);
+}
 
 const storyBeats = [
   {
@@ -37,53 +45,72 @@ export function ProblemSection() {
   const containerRef = useRef<HTMLDivElement>(null);
   const beatRefs = useRef<HTMLDivElement[]>([]);
   const textRefs = useRef<HTMLDivElement[]>([]);
+  const prefersReducedMotion = usePrefersReducedMotion();
 
   useEffect(() => {
     if (!sectionRef.current) return;
 
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (prefersReducedMotion) return;
+    if (prefersReducedMotion) {
+      textRefs.current.forEach((text) => {
+        if (text?.children) gsap.set(text.children, { y: 0, opacity: 1 });
+      });
+      return;
+    }
 
     const beats = beatRefs.current;
     const texts = textRefs.current;
 
-    beats.forEach((beat, index) => {
-      if (!beat) return;
+    const ctx = gsap.context(() => {
+      beats.forEach((beat, index) => {
+        if (!beat) return;
 
-      const text = texts[index];
-      if (!text) return;
+        const text = texts[index];
+        if (!text) return;
 
-      gsap.set(text.children, { y: 50, opacity: 0 });
+        gsap.set(text.children, { y: motionTokens.distance.xl, opacity: 0 });
 
-      ScrollTrigger.create({
-        trigger: beat,
-        start: 'top center',
-        end: 'bottom center',
-        onEnter: () => {
-          gsap.to(text.children, {
-            y: 0,
-            opacity: 1,
-            duration: 0.3,
-            stagger: 0.08,
-            ease: 'cubic-bezier(0.2, 0, 0, 1)',
-          });
-        },
-        onLeaveBack: () => {
-          gsap.to(text.children, {
-            y: 50,
+        // Pre-create enter + leave tweens inside the context so they're tracked and
+        // reverted on unmount (no orphaned tweens from ScrollTrigger callbacks).
+        const enterTween = gsap.to(text.children, {
+          y: 0,
+          opacity: 1,
+          duration: motionTokens.duration.normal,
+          stagger: staggers.word,
+          ease: gsapEase(motionTokens.easing.emphasized),
+          paused: true,
+        });
+
+        const leaveBackTween = gsap.fromTo(text.children,
+          { y: 0, opacity: 1 },
+          {
+            y: motionTokens.distance.xl,
             opacity: 0,
-            duration: 0.25,
-            stagger: 0.05,
-            ease: 'cubic-bezier(0.4, 0, 1, 1)',
-          });
-        },
-      });
-    });
+            duration: motionTokens.duration.fast,
+            stagger: staggers.character * 2,
+            ease: gsapEase(motionTokens.easing.accelerate),
+            paused: true,
+            immediateRender: false,
+          }
+        );
 
-    return () => {
-      ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
-    };
-  }, []);
+        ScrollTrigger.create({
+          trigger: beat,
+          start: 'top center',
+          end: 'bottom center',
+          onEnter: () => enterTween.play(),
+          onLeave: () => enterTween.reverse(),
+          onEnterBack: () => leaveBackTween.reverse(1),
+          onLeaveBack: () => leaveBackTween.play(),
+        });
+      });
+    }, sectionRef);
+
+    // Force recalculation so beats already in the viewport receive their
+    // enter state immediately (e.g. after reduced-motion is toggled off).
+    ScrollTrigger.refresh();
+
+    return () => ctx.revert();
+  }, [prefersReducedMotion]);
 
   return (
     <section ref={sectionRef} id="probleem" className="relative bg-surface">
@@ -96,7 +123,7 @@ export function ProblemSection() {
             }}
             className="relative min-h-screen flex items-center justify-center py-20"
           >
-            <div className="absolute inset-0 bg-gradient-to-b from-canvas via-surface to-canvas opacity-50" />
+            <div className="absolute inset-0 bg-gradient-to-b from-canvas via-surface to-transparent opacity-10" />
 
             <div
               ref={(el) => {
@@ -104,9 +131,9 @@ export function ProblemSection() {
               }}
               className="relative z-10 container mx-auto px-4 md:px-8 lg:px-16 max-w-5xl"
             >
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 items-center">
                 {/* Left: Text */}
-                <div className="text-center lg:text-left">
+                <div className="text-center lg:text-left max-w-prose">
                   <span className={`inline-block text-sm uppercase tracking-widest mb-4 font-mono ${
                     beat.color === 'primary' ? 'text-primary' :
                     beat.color === 'accent' ? 'text-accent' :
@@ -126,7 +153,7 @@ export function ProblemSection() {
 
                 {/* Right: Visual */}
                 <div className="flex justify-center">
-                  <div className="relative w-full max-w-md min-h-64 md:min-h-80 rounded-xl bg-elevated border border-border overflow-hidden p-6">
+                  <div className="relative w-full max-w-md min-h-0 rounded-xl bg-elevated border border-border p-4 md:p-6">
                     <div className={`absolute top-0 left-0 w-32 h-32 rounded-full blur-3xl ${
                       beat.color === 'primary' ? 'bg-primary/15' :
                       beat.color === 'accent' ? 'bg-accent/15' :
@@ -142,10 +169,10 @@ export function ProblemSection() {
                       {/* Visual content based on beat type */}
                       {beat.visual === 'answer' && (
                         <div className="space-y-4">
-                          <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Näidisandmed</div>
+                          <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{PRODUCT_FIXTURE.label}</div>
                           <div className="p-4 bg-card rounded-lg border border-border">
-                            <div className="text-sm font-medium mb-2">3/4 + 1/2 = ?</div>
-                            <div className="text-sm text-muted-foreground">Õpilase vastus: <span className="font-mono text-destructive">4/6</span></div>
+                            <div className="text-sm font-medium mb-2"><InlineFractionalExpression expression={PRODUCT_FIXTURE.task.question} /></div>
+                            <div className="text-sm text-muted-foreground">Õpilase vastus:{' '}<span className="font-mono text-destructive"><InlineFractionalExpression expression={PRODUCT_FIXTURE.answer.submitted} /></span></div>
                           </div>
                           <div className="text-xs text-muted-foreground italic">
                             Õpilane ei tea, mida järgmisena harjutada
@@ -155,22 +182,16 @@ export function ProblemSection() {
 
                       {beat.visual === 'pattern' && (
                         <div className="space-y-4">
-                          <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Näidisandmed</div>
+                          <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{PRODUCT_FIXTURE.label}</div>
                           <div className="space-y-2">
-                            <div className="p-3 bg-card rounded border border-border text-xs">
-                              <span className="text-muted-foreground">3/4 + 1/2 = </span>
-                              <span className="font-mono text-destructive">4/6</span>
-                            </div>
-                            <div className="p-3 bg-card rounded border border-border text-xs">
-                              <span className="text-muted-foreground">1/3 + 1/6 = </span>
-                              <span className="font-mono text-destructive">2/9</span>
-                            </div>
-                            <div className="p-3 bg-card rounded border border-border text-xs">
-                              <span className="text-muted-foreground">2/5 + 1/10 = </span>
-                              <span className="font-mono text-destructive">3/15</span>
-                            </div>
+                            {PRODUCT_FIXTURE.patternExamples.map((example) => (
+                              <div key={example.expression} className="p-3 bg-card rounded border border-border text-xs">
+                                <span className="text-muted-foreground"><InlineFractionalExpression expression={example.expression} /> = </span>
+                                <span className="font-mono text-destructive"><InlineFractionalExpression expression={example.wrongAnswer} /></span>
+                              </div>
+                            ))}
                           </div>
-                          <div className="text-xs text-amber-600 bg-amber-50 px-3 py-2 rounded border border-amber-200">
+                          <div className="text-xs text-amber-800 bg-amber-50 px-3 py-2 rounded border border-amber-200">
                             Võimalik veamuster: liidab lugejad ja nimetajad eraldi
                           </div>
                         </div>
@@ -198,13 +219,7 @@ export function ProblemSection() {
               </div>
             </div>
 
-            {index < storyBeats.length - 1 && (
-              <div className="absolute bottom-8 left-1/2 -translate-x-1/2">
-                <div className="w-6 h-12 rounded-full border-2 border-text-secondary/30 flex items-start justify-center p-2">
-                  <div className="w-1.5 h-3 rounded-full bg-text-secondary/30 animate-bounce" />
-                </div>
-              </div>
-            )}
+            {index < storyBeats.length - 1 && <ScrollIndicator hideLabel />}
           </div>
         ))}
       </div>

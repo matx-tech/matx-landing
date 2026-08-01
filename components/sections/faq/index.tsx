@@ -1,54 +1,95 @@
 'use client';
 
-import { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect, useState, useLayoutEffect } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { Flip } from 'gsap/Flip';
 import { FAQ_ENTRIES, SECTION_IDS } from '@/lib/content/landing-copy';
+import { usePrefersReducedMotion } from '@/lib/hooks/use-prefers-reduced-motion';
+import { motionTokens, gsapEase, staggers } from '@/lib/motion-tokens';
 
 export function FAQSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const itemsRef = useRef<HTMLDivElement[]>([]);
   const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const flipStateRef = useRef<Flip.FlipState | null>(null);
+  const flippingRef = useRef(false);
+  const prefersReducedMotion = usePrefersReducedMotion();
 
   useEffect(() => {
     if (!sectionRef.current) return;
+    if (prefersReducedMotion) {
+      // Ensure all animated elements are visible when motion is disabled
+      itemsRef.current.forEach((item) => {
+        if (item) gsap.set(item, { opacity: 1, y: 0 });
+      });
+      return;
+    }
 
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (prefersReducedMotion) return;
+    const ctx = gsap.context(() => {
+      itemsRef.current.forEach((item, index) => {
+        if (!item) return;
 
-    itemsRef.current.forEach((item, index) => {
-      if (!item) return;
+        gsap.fromTo(
+          item,
+          { y: motionTokens.distance.lg, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: motionTokens.duration.normal,
+            delay: index * staggers.card,
+            ease: gsapEase(motionTokens.easing.emphasized),
+            scrollTrigger: {
+              trigger: item,
+              start: 'top 90%',
+              toggleActions: 'play none none reverse',
+            },
+          }
+        );
+      });
+    }, sectionRef);
 
-      gsap.fromTo(
-        item,
-        { y: 40, opacity: 0 },
-        {
-          y: 0,
-          opacity: 1,
-          duration: 0.3,
-          ease: 'cubic-bezier(0.2, 0, 0, 1)',
-          scrollTrigger: {
-            trigger: item,
-            start: 'top 90%',
-            toggleActions: 'play none none reverse',
-          },
-          delay: index * 0.1,
-        }
-      );
+    return () => ctx.revert();
+  }, [prefersReducedMotion]);
+
+  // Flip animation on accordion toggle
+  useLayoutEffect(() => {
+    if (!flipStateRef.current || prefersReducedMotion) return;
+
+    Flip.from(flipStateRef.current, {
+      duration: motionTokens.duration.normal,
+      ease: gsapEase(motionTokens.easing.smooth),
+      absolute: true,
+      onComplete: () => {
+        flippingRef.current = false;
+      },
     });
 
-    return () => {
-      ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
-    };
-  }, []);
+    flipStateRef.current = null;
+  }, [openIndex, prefersReducedMotion]);
 
   const handleToggle = (index: number) => {
+    if (prefersReducedMotion) {
+      setOpenIndex(openIndex === index ? null : index);
+      return;
+    }
+
+    // Capture current layout state for ALL accordion panels before toggling,
+    // so both the previously-open panel and the newly-opened panel animate.
+    const allPanels = gsap.utils.toArray<HTMLElement>('[id^="faq-panel-"]');
+    if (allPanels.length === 0) {
+      setOpenIndex(openIndex === index ? null : index);
+      return;
+    }
+
+    flipStateRef.current = Flip.getState(allPanels);
+    flippingRef.current = true;
     setOpenIndex(openIndex === index ? null : index);
   };
 
   return (
-    <section ref={sectionRef} id={SECTION_IDS.faq} className="relative py-24 md:py-32 bg-surface overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-b from-canvas via-transparent to-canvas pointer-events-none" />
+    <section ref={sectionRef} id={SECTION_IDS.faq} className="relative py-24 md:py-32 bg-surface overflow-hidden section-fade-from-canvas">
+      <div className="absolute inset-0 bg-gradient-to-b from-canvas via-transparent to-transparent pointer-events-none" />
 
       <div className="relative z-10 container mx-auto px-4 md:px-8 lg:px-16 max-w-4xl">
         {/* Section Title */}
@@ -97,14 +138,26 @@ export function FAQSection() {
                 <div
                   id={`faq-panel-${index}`}
                   role="region"
-                  className="grid transition-all duration-200 ease-out"
+                  className="grid"
                   style={{
                     gridTemplateRows: isOpen ? '1fr' : '0fr',
                   }}
                 >
                   <div className="overflow-hidden">
                     <div className="px-6 pb-5 text-text-secondary leading-relaxed">
-                      {item.answer}
+                      {'answerLink' in item ? (
+                        <>
+                          {item.answer}{' '}
+                          <a
+                            href={item.answerLink.href}
+                            className="text-primary hover:text-secondary underline transition-colors"
+                          >
+                            {item.answerLink.label}
+                          </a>
+                        </>
+                      ) : (
+                        item.answer
+                      )}
                     </div>
                   </div>
                 </div>

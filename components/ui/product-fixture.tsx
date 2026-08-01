@@ -6,10 +6,14 @@
 
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useGSAP } from '@gsap/react';
 import { PRODUCT_FIXTURE } from '@/lib/content/landing-evidence';
+import { InlineFractionalExpression } from '@/components/ui/fraction';
+import { usePrefersReducedMotion } from '@/lib/hooks/use-prefers-reduced-motion';
+import { motionTokens, gsapEase } from '@/lib/motion-tokens';
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
@@ -18,12 +22,16 @@ if (typeof window !== 'undefined') {
 interface ProductFixtureProps {
   animated?: boolean;
   triggerId?: string;
+  /** Seconds to wait before the panel stagger begins — use to sequence
+   *  the fixture after left-side headline / text animations complete. */
+  delay?: number;
   className?: string;
 }
 
 export function ProductFixture({
   animated = true,
   triggerId,
+  delay = 0,
   className = ''
 }: ProductFixtureProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -31,37 +39,63 @@ export function ProductFixture({
   const signalRef = useRef<HTMLDivElement>(null);
   const retryRef = useRef<HTMLDivElement>(null);
   const actionRef = useRef<HTMLDivElement>(null);
+  const prefersReducedMotion = usePrefersReducedMotion();
 
-  useEffect(() => {
-    if (!animated || !containerRef.current) return;
+  // Derive initial style opacity: always hidden (0) when animated and NOT reduced motion
+  const panelInitialOpacity = (animated && !prefersReducedMotion) ? 0 : undefined;
 
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (prefersReducedMotion) return;
+  useGSAP(
+    () => {
+      if (!animated || !containerRef.current) return;
 
-    const elements = [answerRef.current, signalRef.current, retryRef.current, actionRef.current];
+      const elements = [answerRef.current, signalRef.current, retryRef.current, actionRef.current];
 
-    // Set initial state
-    gsap.set(elements, { opacity: 0, y: 20 });
+      if (prefersReducedMotion) {
+        // Set all panels to their final visible state
+        const visibleElements = elements.filter(Boolean);
+        gsap.set(visibleElements, { opacity: 1, y: 0 });
+        return;
+      }
 
-    const timeline = gsap.timeline({
-      scrollTrigger: triggerId ? {
-        trigger: `#${triggerId}`,
-        start: 'top center',
-        end: 'bottom center',
-        toggleActions: 'play none none reverse',
-      } : undefined,
-    });
+      // Filter out any null refs before passing to GSAP (defensive against
+      // React commit-order edge cases where a child ref hasn't attached yet).
+      const validElements = elements.filter(Boolean);
+      if (validElements.length === 0) return;
 
-    timeline
-      .to(answerRef.current, { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out' })
-      .to(signalRef.current, { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out' }, '+=0.3')
-      .to(retryRef.current, { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out' }, '+=0.3')
-      .to(actionRef.current, { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out' }, '+=0.3');
+      // Set initial state
+      gsap.set(validElements, { opacity: 0, y: motionTokens.distance.md });
 
-    return () => {
-      timeline.kill();
-    };
-  }, [animated, triggerId]);
+      // Validate the trigger element exists in the DOM before passing selector to ScrollTrigger
+      let scrollTriggerConfig: ScrollTrigger.Vars | undefined;
+      if (triggerId) {
+        const triggerEl = document.getElementById(triggerId);
+        if (triggerEl) {
+          scrollTriggerConfig = { trigger: triggerEl, start: 'top center', end: 'bottom center', toggleActions: 'play none none reverse' };
+        }
+      }
+
+      const timeline = gsap.timeline({
+        defaults: { duration: motionTokens.duration.slow, ease: gsapEase(motionTokens.easing.smooth) },
+        scrollTrigger: scrollTriggerConfig,
+      });
+
+      // Guard individual refs before building the timeline chain — GSAP warns
+      // on null targets even inside a timeline.
+      const targets = {
+        answer: answerRef.current,
+        signal: signalRef.current,
+        retry: retryRef.current,
+        action: actionRef.current,
+      };
+
+      timeline
+        .to(targets.answer, { opacity: 1, y: 0 }, delay > 0 ? `+=${delay}` : undefined)
+        .to(targets.signal, { opacity: 1, y: 0 }, '+=0.3')
+        .to(targets.retry, { opacity: 1, y: 0 }, '+=0.3')
+        .to(targets.action, { opacity: 1, y: 0 }, '+=0.3');
+    },
+    { scope: containerRef, dependencies: [animated, triggerId, delay, prefersReducedMotion], revertOnUpdate: true },
+  );
 
   return (
     <section
@@ -78,13 +112,13 @@ export function ProductFixture({
       <div
         ref={answerRef}
         className="p-4 bg-card rounded-lg border border-border"
-        style={animated ? { opacity: 0 } : undefined}
+        style={panelInitialOpacity !== undefined ? { opacity: panelInitialOpacity } : undefined}
       >
         <div className="text-sm font-medium text-foreground mb-2">
-          {PRODUCT_FIXTURE.task.question}
+          <InlineFractionalExpression expression={PRODUCT_FIXTURE.task.question} />
         </div>
         <div className="text-sm text-muted-foreground mb-1">
-          Õpilase vastus: <span className="font-mono text-destructive">{PRODUCT_FIXTURE.answer.submitted}</span>
+          Õpilase vastus:{' '}<span className="font-mono text-destructive"><InlineFractionalExpression expression={PRODUCT_FIXTURE.answer.submitted} /></span>
         </div>
         <div className="text-xs text-muted-foreground">
           Oskus: {PRODUCT_FIXTURE.task.skill}
@@ -95,7 +129,7 @@ export function ProductFixture({
       <div
         ref={signalRef}
         className="p-4 bg-info-surface rounded-lg border border-info-border"
-        style={animated ? { opacity: 0 } : undefined}
+        style={panelInitialOpacity !== undefined ? { opacity: panelInitialOpacity } : undefined}
       >
         <div className="flex items-center justify-between mb-2">
           <span className="text-xs font-medium text-info uppercase tracking-wider">
@@ -114,13 +148,13 @@ export function ProductFixture({
       <div
         ref={retryRef}
         className="p-4 bg-card rounded-lg border border-border"
-        style={animated ? { opacity: 0 } : undefined}
+        style={panelInitialOpacity !== undefined ? { opacity: panelInitialOpacity } : undefined}
       >
         <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">
           Järgmine harjutus
         </div>
         <div className="text-sm font-medium text-foreground mb-2">
-          {PRODUCT_FIXTURE.retry.question}
+          <InlineFractionalExpression expression={PRODUCT_FIXTURE.retry.question} />
         </div>
         <div className="text-xs text-muted-foreground">
           {PRODUCT_FIXTURE.retry.rationale}
@@ -131,7 +165,7 @@ export function ProductFixture({
       <div
         ref={actionRef}
         className="p-4 bg-success-surface rounded-lg border border-success-border"
-        style={animated ? { opacity: 0 } : undefined}
+        style={panelInitialOpacity !== undefined ? { opacity: panelInitialOpacity } : undefined}
       >
         <div className="text-xs font-medium text-success uppercase tracking-wider mb-2">
           Õpetaja otsustab
@@ -146,8 +180,9 @@ export function ProductFixture({
           {PRODUCT_FIXTURE.teacherAction.options.map((option) => (
             <button
               key={option.action}
-              className="px-3 py-1.5 text-xs font-medium rounded border border-success-border bg-surface text-success-strong"
+              className="px-3 py-1.5 text-xs font-medium rounded border border-success-border bg-surface text-success-strong opacity-60 cursor-default"
               type="button"
+              disabled
               aria-disabled="true"
               title="Näidisandmed — tegevus ei ole selles vaates aktiivne"
             >
