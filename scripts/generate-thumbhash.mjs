@@ -14,7 +14,7 @@
 
 import { rgbaToThumbHash, thumbHashToDataURL } from 'thumbhash';
 import sharp from 'sharp';
-import { writeFileSync, mkdirSync, readFileSync, existsSync } from 'fs';
+import { writeFileSync, mkdirSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 

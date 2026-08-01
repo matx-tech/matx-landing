@@ -98,9 +98,6 @@ importers:
       three:
         specifier: ^0.166.1
         version: 0.166.1
-      thumbhash:
-        specifier: ^0.1.1
-        version: 0.1.1
       zip:
         specifier: ^1.2.0
         version: 1.2.0
@@ -135,6 +132,9 @@ importers:
       tailwindcss:
         specifier: ^3.4.19
         version: 3.4.19
+      thumbhash:
+        specifier: ^0.1.1
+        version: 0.1.1
       typescript:
         specifier: ^5.9.3
         version: 5.9.3

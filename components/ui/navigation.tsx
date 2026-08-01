@@ -30,11 +30,13 @@ export function Navigation(_props: NavigationProps) {
     if (!nav) return;
 
     if (prefersReducedMotion) {
+      nav.classList.remove('gsap-animate-on-mount');
       gsap.set(nav, { y: 0, opacity: 1 });
       return;
     }
 
-    // Initial entrance
+    // Initial entrance: strip CSS fallback so GSAP inline opacity takes effect.
+    nav.classList.remove('gsap-animate-on-mount');
     gsap.set(nav, { y: -motionTokens.distance.xxl, opacity: 0 });
     gsap.to(nav, {
       y: 0,
@@ -120,8 +122,7 @@ export function Navigation(_props: NavigationProps) {
     <Dialog.Root open={isOpen} onOpenChange={handleOpenChange}>
       <nav
         ref={navRef}
-        className="fixed top-0 left-0 right-0 z-50 px-4 md:px-8 lg:px-12 py-3 bg-surface border-b border-border"
-        style={prefersReducedMotion ? undefined : { opacity: 0 }}
+        className="gsap-animate-on-mount fixed top-0 left-0 right-0 z-50 px-4 md:px-8 lg:px-12 py-3 bg-surface border-b border-border"
       >
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           {/* Logo */}

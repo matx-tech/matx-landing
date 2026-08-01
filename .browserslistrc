@@ -3,8 +3,10 @@
 # very old Safari saves ~11 KB of polyfill code (Array.prototype.at,
 # flat, flatMap, Object.fromEntries, etc.) per the Lighthouse audit.
 #
-# Baseline: Widely Available as of 2022-09 (Chrome 105+, Safari 15.6+,
-# Firefox 104+, Edge 105+).
+# We use rolling "last 2 versions" per engine so the build target
+# automatically advances.  This is equivalent to Baseline Widely
+# Available (~30 months behind latest) and is appropriate for a
+# marketing site whose audience runs auto-updating browsers.
 
 last 2 Chrome versions
 last 2 Firefox versions

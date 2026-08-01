@@ -31,11 +31,17 @@ function scheduleIdle(cb: () => void): () => void {
     return () => { cancelled = true; cancelIdleCallback(id); };
   }
   // requestIdleCallback is not available in Safari < 15.4,
-  // so fall back to a rAF + microtask which still defers past paint.
+  // so fall back to a rAF + macrotask which still defers past paint.
+  let timeoutId: ReturnType<typeof setTimeout> | undefined;
   const raf = requestAnimationFrame(() => {
-    if (!cancelled) setTimeout(cb, 0);
+    if (cancelled) return;
+    timeoutId = setTimeout(() => { if (!cancelled) cb(); }, 0);
   });
-  return () => { cancelled = true; cancelAnimationFrame(raf); };
+  return () => {
+    cancelled = true;
+    cancelAnimationFrame(raf);
+    if (timeoutId !== undefined) clearTimeout(timeoutId);
+  };
 }
 
 export function AnimatedWordReveal({
@@ -180,11 +186,16 @@ export function MATxLogoAnimation({ delay = 0 }: { delay?: number }) {
       const mm = gsap.matchMedia();
 
       mm.add('(prefers-reduced-motion: reduce)', () => {
+        lettersRef.current.forEach((letter) => letter.classList.remove('gsap-animate-on-mount'));
         gsap.set(lettersRef.current, { scale: 1, opacity: 1, rotation: 0 });
       });
 
       mm.add('(prefers-reduced-motion: no-preference)', () => {
         const letters = lettersRef.current;
+
+        // Strip CSS fallback before gsap.set — .gsap-animate-on-mount has
+        // opacity: 1 !important which overrides GSAP inline styles.
+        letters.forEach((letter) => letter.classList.remove('gsap-animate-on-mount'));
 
         gsap.set(letters, {
           scale: 0,
