@@ -12,11 +12,12 @@ import { motionTokens, gsapEase, staggers } from '@/lib/motion-tokens';
 
 // Lazy-load the product fixture (right column visual) — it's below the fold
 // on mobile and to the right of the hero text on desktop.  Deferring it
-// removes GSAP ScrollTrigger + layout work from the critical path.
+// removes GSAP ScrollTrigger + layout work from the critical path. The
+// fixture is SSR-safe (module-scope guards in product-fixture.tsx), so the
+// above-the-fold visual is present in the server-rendered HTML.
 const ProductFixture = dynamic(
   () => import('@/components/ui/product-fixture').then((mod) => mod.ProductFixture),
   {
-    ssr: false,
     loading: () => (
       <div
         className="hidden lg:block w-full aspect-[4/3] rounded-2xl bg-surface/50 animate-pulse"
@@ -24,12 +25,22 @@ const ProductFixture = dynamic(
       />
     ),
   }
-) as React.ComponentType<{ animated?: boolean; triggerId?: string; delay?: number; className?: string }>;
+);
 
 // Decorative bounce arrow — not needed for first paint.
 const ScrollIndicator = dynamic(
   () => import('./scroll-indicator').then((mod) => mod.ScrollIndicator),
-  { ssr: false }
+  {
+    ssr: false,
+    // Reserve the indicator's slot (absolute bottom-center) while the chunk
+    // loads so it doesn't pop in; the fallback is purely decorative.
+    loading: () => (
+      <div
+        aria-hidden="true"
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 w-6 h-10 rounded-full border-2 border-text-secondary/50"
+      />
+    ),
+  }
 );
 
 export function HeroSection() {
