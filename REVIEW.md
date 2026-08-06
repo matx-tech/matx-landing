@@ -76,15 +76,18 @@ bug. Anything reading window/matchMedia/device size needs SSR-safe defaults
   management + arrow keys — and real names in aria-labels, not indices.
 - No duplicated sr-only lists that double-announce visible lists.
 - Keep static content server-rendered: below-the-fold sections may use
-  next/dynamic but NOT `ssr: false` — dropping content from server HTML
+  next/dynamic but NOT `ssr: false` (exception: decorative visuals with an
+  aria-hidden loading fallback, e.g. the hero ProductFixture at
+  components/sections/hero/index.tsx) — dropping content from server HTML
   removes story copy and anchors for no-JS users.
 
 ### 5. Performance (mobile is the primary audience)
 
 - Below-the-fold sections load via next/dynamic; above-the-fold stays
   static. GSAP plugins and heavy libraries lazy-load.
-- Lenis context value is memoized (value={{ scrollTo }} re-renders all
-  consumers on every provider render).
+- Lenis context value is intentionally NOT memoized — value={{ scrollTo }} is
+  a new object on every provider render, re-rendering all consumers on every
+  provider render (scrollTo itself is stable via useCallback).
 - Blur placeholders come from `scripts/generate-thumbhash.mjs`; changes must
   keep the source-screenshot existence check and clear error message.
 - .browserslistrc intentionally uses rolling "last 2 versions"; comments
@@ -105,7 +108,8 @@ bug. Anything reading window/matchMedia/device size needs SSR-safe defaults
   (see eslint.config.mjs `matx/intentional-react-hooks-patterns`). No
   repository-wide rule disables.
 - Satisfy exhaustive-deps: capture ref values, include live hook values.
-- Use Estonian quotes „…" in JSX text (ESLint JSX quote rule).
+- Use Estonian quotes „…" in JSX text (project convention — no ESLint rule
+  currently enforces this).
 
 ## Severity calibration
 
