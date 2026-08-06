@@ -53,13 +53,6 @@ updates:
           - "gsap"
           - "@gsap/*"
 
-      # React Three Fiber ecosystem — drei pins peer range on fiber + three.
-      r3f:
-        patterns:
-          - "three"
-          - "@types/three"
-          - "@react-three/*"
-
       # Tailwind CSS + PostCSS pipeline — config / plugin compatibility.
       tailwind:
         patterns:
@@ -100,8 +93,8 @@ updates:
           - "critters"
           - "@types/node"
 
-      # Production catch-all for uncategorised runtime deps (lucide,
-      # framer-motion, lenis, canvas-confetti, clsx, cva, zip).
+      # Production catch-all for uncategorised runtime deps (lucide-react,
+      # lenis, clsx, class-variance-authority).
       production:
         dependency-type: production
         patterns:
@@ -113,8 +106,6 @@ updates:
           - "gsap"
           - "@gsap/*"
           - "@radix-ui/*"
-          - "@react-three/*"
-          - "three"
           - "tailwindcss"
           - "postcss"
           - "autoprefixer"
