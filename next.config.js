@@ -1,3 +1,9 @@
+const withBundleAnalyzer =
+  process.env.ANALYZE === 'true'
+    ? // eslint-disable-next-line @typescript-eslint/no-require-imports -- next.config.js is CJS by design
+      require('@next/bundle-analyzer')({ enabled: true })
+    : (config) => config;
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // Modern image formats for all browsers (Baseline 2024)
@@ -31,4 +37,4 @@ const nextConfig = {
   },
 };
 
-module.exports = nextConfig;
+module.exports = withBundleAnalyzer(nextConfig);
