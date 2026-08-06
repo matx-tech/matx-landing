@@ -112,7 +112,7 @@ export function ContextSection() {
 
         {/* Context cards */}
         <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-          {NATIONAL_CONTEXT.map((context, index) => {
+          {NATIONAL_CONTEXT.map((context) => {
             const Icon = CONTEXT_ICONS[context.icon];
 
             return (

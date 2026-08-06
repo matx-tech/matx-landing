@@ -111,7 +111,7 @@ export function AdoptionSection({ onOpenRegistration }: AdoptionRoutesProps) {
 
         {/* Adoption route cards */}
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
-          {ADOPTION_ROUTES.map((route, index) => {
+          {ADOPTION_ROUTES.map((route) => {
             const Icon = AUDIENCE_ICONS[route.audienceId];
 
             return (

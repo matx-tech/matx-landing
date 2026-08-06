@@ -5,7 +5,7 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ScrollIndicator } from '@/components/sections/hero/scroll-indicator';
 import { PRODUCT_FIXTURE } from '@/lib/content/landing-evidence';
-import { Fraction, InlineFractionalExpression } from '@/components/ui/fraction';
+import { InlineFractionalExpression } from '@/components/ui/fraction';
 import { usePrefersReducedMotion } from '@/lib/hooks/use-prefers-reduced-motion';
 import { motionTokens, gsapEase, staggers } from '@/lib/motion-tokens';
 

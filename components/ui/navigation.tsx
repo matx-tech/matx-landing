@@ -1,6 +1,7 @@
 'use client';
 
 import { useRef, useEffect, useState, useCallback } from 'react';
+import Link from 'next/link';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Menu, X, Award } from 'lucide-react';
@@ -17,9 +18,7 @@ const navItems = LANDING_NAV_ITEMS;
 
 const PILOT_HREF = `#${SECTION_IDS.pilot}`;
 
-interface NavigationProps {}
-
-export function Navigation(_props: NavigationProps) {
+export function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
   const navRef = useRef<HTMLElement>(null);
   const menuItemsRef = useRef<HTMLDivElement[]>([]);
@@ -126,7 +125,7 @@ export function Navigation(_props: NavigationProps) {
       >
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           {/* Logo */}
-          <a href="/" className="inline-flex items-center gap-2 focus-ring-target rounded-md">
+          <Link href="/" className="inline-flex items-center gap-2 focus-ring-target rounded-md">
             <span className="text-2xl font-display font-bold">
               <span className="text-primary">MAT</span>
               <span className="text-secondary">x</span>
@@ -135,7 +134,7 @@ export function Navigation(_props: NavigationProps) {
               <Award className="w-3 h-3 text-warning" />
               <span className="text-xs text-text-secondary">FELLIN HÄKK</span>
             </div>
-          </a>
+          </Link>
 
           {/* Desktop Nav */}
           <div className="hidden xl:flex items-center gap-5 2xl:gap-8">

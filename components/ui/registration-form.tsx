@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { X, Check, Loader2, AlertCircle } from 'lucide-react';
 import * as Dialog from '@radix-ui/react-dialog';
 

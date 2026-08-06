@@ -134,9 +134,6 @@ export const TOPICS_SECTION = {
   description: 'Praegune õppesisu katab valitud põhikooli matemaatika oskusi. Uued teemad lisatakse piloodi käigus.',
 } as const;
 
-// Icon identifiers for context cards
-type ContextIconId = 'trending-down' | 'clock' | 'minus';
-
 // National context cards
 export const NATIONAL_CONTEXT = [
   {
@@ -161,9 +158,6 @@ export const NATIONAL_CONTEXT = [
     icon: 'minus' as const,
   },
 ] as const;
-
-// Icon identifiers for trust pillars
-type TrustIconId = 'shield' | 'eye' | 'file-text';
 
 // Trust pillars
 export const TRUST_PILLARS = [

@@ -142,7 +142,7 @@ export function TopicsSection() {
     }, viewport);
 
     return () => ctx.revert();
-  }, [prefersReducedMotion]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [prefersReducedMotion]);
 
   const handleDotClick = (index: number) => {
     moveToIndex(index);
