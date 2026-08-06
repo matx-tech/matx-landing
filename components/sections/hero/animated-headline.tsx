@@ -67,6 +67,7 @@ export function AnimatedWordReveal({
       mm.add('(prefers-reduced-motion: no-preference)', () => {
         const el = containerRef.current!;
         let split: ReturnType<typeof SplitText.create> | null = null;
+        let revealTween: gsap.core.Tween | null = null;
         const cancelIdle = scheduleIdle(() => {
           split = SplitText.create(el, {
             type: 'words',
@@ -85,7 +86,7 @@ export function AnimatedWordReveal({
             transformOrigin: 'center bottom',
           });
 
-          gsap.to(split.words, {
+          revealTween = gsap.to(split.words, {
             y: 0,
             rotateX: 0,
             duration: motionTokens.duration.normal,
@@ -98,7 +99,12 @@ export function AnimatedWordReveal({
           el.classList.remove('gsap-animate-on-mount');
         });
 
-        return () => { cancelIdle(); split?.revert(); };
+        return () => {
+          cancelIdle();
+          // Deferred tween isn't tracked by the context, so kill it explicitly.
+          revealTween?.kill();
+          split?.revert();
+        };
       });
 
       return () => mm.revert();
@@ -146,16 +152,21 @@ export function AnimatedCharacterReveal({ children, className = '', delay = 1.5 
       // should hold its settle back.
       mm.add('(prefers-reduced-motion: no-preference)', () => {
         const el = containerRef.current!;
+        let revealTween: gsap.core.Tween | null = null;
         const cancelIdle = scheduleIdle(() => {
           el.classList.remove('gsap-animate-on-mount');
-          gsap.fromTo(
+          revealTween = gsap.fromTo(
             el,
             { y: motionTokens.distance.md },
             { y: 0, duration: motionTokens.duration.normal, ease: gsapEase(motionTokens.easing.emphasized) }
           );
         });
 
-        return cancelIdle;
+        return () => {
+          cancelIdle();
+          // Deferred tween isn't tracked by the context, so kill it explicitly.
+          revealTween?.kill();
+        };
       });
 
       return () => mm.revert();
