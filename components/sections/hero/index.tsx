@@ -96,7 +96,6 @@ export function HeroSection({ onOpenRegistration }: HeroSectionProps) {
             <div className="mb-10">
               <AnimatedCharacterReveal
                 className="text-lg md:text-xl text-text-secondary leading-relaxed"
-                delay={1.8}
               >
                 {HERO_COPY.support}
               </AnimatedCharacterReveal>

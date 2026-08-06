@@ -128,10 +128,9 @@ export function AnimatedWordReveal({
 interface AnimatedSublineProps {
   children: string;
   className?: string;
-  delay?: number;
 }
 
-export function AnimatedCharacterReveal({ children, className = '', delay = 1.5 }: AnimatedSublineProps) {
+export function AnimatedCharacterReveal({ children, className = '' }: AnimatedSublineProps) {
   const containerRef = useRef<HTMLParagraphElement>(null);
 
   useGSAP(
@@ -153,13 +152,17 @@ export function AnimatedCharacterReveal({ children, className = '', delay = 1.5 
       mm.add('(prefers-reduced-motion: no-preference)', () => {
         const el = containerRef.current!;
         let revealTween: gsap.core.Tween | null = null;
+        // Apply the reveal start in the layout effect (before first paint)
+        // so the deferred idle tween doesn't visibly snap the element down
+        // 16px from its rest position when it runs.
+        gsap.set(el, { y: motionTokens.distance.md });
         const cancelIdle = scheduleIdle(() => {
           el.classList.remove('gsap-animate-on-mount');
-          revealTween = gsap.fromTo(
-            el,
-            { y: motionTokens.distance.md },
-            { y: 0, duration: motionTokens.duration.normal, ease: gsapEase(motionTokens.easing.emphasized) }
-          );
+          revealTween = gsap.to(el, {
+            y: 0,
+            duration: motionTokens.duration.normal,
+            ease: gsapEase(motionTokens.easing.emphasized),
+          });
         });
 
         return () => {
@@ -171,7 +174,7 @@ export function AnimatedCharacterReveal({ children, className = '', delay = 1.5 
 
       return () => mm.revert();
     },
-    { scope: containerRef, dependencies: [delay, children], revertOnUpdate: true },
+    { scope: containerRef, dependencies: [children], revertOnUpdate: true },
   );
 
   return (
