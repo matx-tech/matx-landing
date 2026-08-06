@@ -6,17 +6,14 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ScrambleTextPlugin } from 'gsap/ScrambleTextPlugin';
 import { GraduationCap, Users } from 'lucide-react';
 import { usePrefersReducedMotion } from '@/lib/hooks/use-prefers-reduced-motion';
+import { useRegistration } from '@/components/providers/registration-provider';
 import { motionTokens, gsapEase, staggers } from '@/lib/motion-tokens';
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger, ScrambleTextPlugin);
 }
 
-interface CTASectionProps {
-  onOpenRegistration: () => void;
-}
-
-export function CTASection({ onOpenRegistration }: CTASectionProps) {
+export function CTASection() {
   const sectionRef = useRef<HTMLElement>(null);
   const titleRef = useRef<HTMLDivElement>(null);
   const statsRef = useRef<(HTMLDivElement | null)[]>([]);
@@ -24,6 +21,7 @@ export function CTASection({ onOpenRegistration }: CTASectionProps) {
   const marqueeRef = useRef<HTMLDivElement>(null);
   const motionDotRef = useRef<SVGCircleElement>(null);
   const prefersReducedMotion = usePrefersReducedMotion();
+  const { openRegistration } = useRegistration();
 
   useEffect(() => {
     if (!sectionRef.current || !titleRef.current) return;
@@ -230,7 +228,7 @@ export function CTASection({ onOpenRegistration }: CTASectionProps) {
               Liitu 10 pilootkooliga. Sügisesed klassid 7.-9. klassini.
             </p>
             <button
-              onClick={onOpenRegistration}
+              onClick={openRegistration}
               className="w-full px-6 py-3 text-base rounded-xl bg-primary text-text-inverse font-semibold hover:bg-primary/90 transition-all focus-ring-target min-h-[44px]"
             >
               Registreeri kool

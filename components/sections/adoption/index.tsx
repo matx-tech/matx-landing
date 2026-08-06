@@ -11,6 +11,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ADOPTION_ROUTES, SECTION_IDS, CALENDLY_URL, type AudienceId } from '@/lib/content/landing-copy';
 import { BookOpen, School, FileText, Server } from 'lucide-react';
 import { useLenis } from '@/components/providers/lenis-provider';
+import { useRegistration } from '@/components/providers/registration-provider';
 import { usePrefersReducedMotion } from '@/lib/hooks/use-prefers-reduced-motion';
 import { motionTokens, gsapEase, staggers } from '@/lib/motion-tokens';
 
@@ -25,13 +26,10 @@ const AUDIENCE_ICONS: Record<AudienceId, typeof BookOpen | typeof School | typeo
   it: Server,
 };
 
-interface AdoptionRoutesProps {
-  onOpenRegistration?: () => void;
-}
-
-export function AdoptionSection({ onOpenRegistration }: AdoptionRoutesProps) {
+export function AdoptionSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const { scrollTo } = useLenis();
+  const { openRegistration } = useRegistration();
   const prefersReducedMotion = usePrefersReducedMotion();
 
   useEffect(() => {
@@ -78,8 +76,8 @@ export function AdoptionSection({ onOpenRegistration }: AdoptionRoutesProps) {
   }, [prefersReducedMotion]);
 
   const handleCTAClick = (action: string) => {
-    if (action === 'registration' && onOpenRegistration) {
-      onOpenRegistration();
+    if (action === 'registration') {
+      openRegistration();
     } else if (action === 'calendly') {
       const newWin = window.open(CALENDLY_URL, '_blank', 'noopener,noreferrer');
       if (newWin) newWin.opener = null;

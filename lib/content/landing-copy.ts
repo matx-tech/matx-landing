@@ -275,6 +275,7 @@ export const NAV_LABELS = {
 // Section IDs for navigation
 export const SECTION_IDS = {
   hero: 'hero',
+  problem: 'probleem',
   workflow: 'töövoog',
   student: 'õpilasele',
   teacher: 'õpetajale',

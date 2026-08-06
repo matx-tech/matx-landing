@@ -5,9 +5,9 @@ import dynamic from 'next/dynamic';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 import { AnimatedWordReveal, AnimatedCharacterReveal, MATxLogoAnimation } from './animated-headline';
-import { ScrollIndicator } from './scroll-indicator';
 import { HERO_COPY, SECTION_IDS } from '@/lib/content/landing-copy';
 import { Award, GraduationCap } from 'lucide-react';
+import { useRegistration } from '@/components/providers/registration-provider';
 import { motionTokens, gsapEase, staggers } from '@/lib/motion-tokens';
 
 // Lazy-load the product fixture (right column visual) — it's below the fold
@@ -26,14 +26,17 @@ const ProductFixture = dynamic(
   }
 ) as React.ComponentType<{ animated?: boolean; triggerId?: string; delay?: number; className?: string }>;
 
-interface HeroSectionProps {
-  onOpenRegistration: () => void;
-}
+// Decorative bounce arrow — not needed for first paint.
+const ScrollIndicator = dynamic(
+  () => import('./scroll-indicator').then((mod) => mod.ScrollIndicator),
+  { ssr: false }
+);
 
-export function HeroSection({ onOpenRegistration }: HeroSectionProps) {
+export function HeroSection() {
   const ctasRef = useRef<HTMLDivElement>(null);
   const trustRef = useRef<HTMLParagraphElement>(null);
   const badgesRef = useRef<HTMLDivElement>(null);
+  const { openRegistration } = useRegistration();
 
   useGSAP(() => {
     const mm = gsap.matchMedia();
@@ -104,7 +107,7 @@ export function HeroSection({ onOpenRegistration }: HeroSectionProps) {
             <div ref={ctasRef} className="flex flex-col sm:flex-row items-center lg:items-start lg:justify-start justify-center gap-4 mb-8">
               <button
                 type="button"
-                onClick={onOpenRegistration}
+                onClick={openRegistration}
                 className="btn-primary min-w-[240px] sm:min-w-[280px] px-8 py-4 text-lg rounded-xl font-semibold focus-ring-target min-h-[44px]"
               >
                 {HERO_COPY.primaryCTA}
