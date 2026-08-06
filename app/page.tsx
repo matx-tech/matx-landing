@@ -38,7 +38,10 @@ const StudentSection = dynamic(
 );
 
 const ProblemSection = dynamic(
-  () => import('@/components/sections/problem').then((mod) => mod.ProblemSection)
+  () => import('@/components/sections/problem').then((mod) => mod.ProblemSection),
+  {
+    loading: () => <SectionSkeleton bgClass="bg-surface" heightClass="h-[80vh]" />,
+  }
 );
 
 const TeacherSection = dynamic(
@@ -52,13 +55,7 @@ const ContextSection = dynamic(
 const TopicsSection = dynamic(
   () => import('@/components/sections/topics').then((mod) => mod.TopicsSection),
   {
-    loading: () => (
-      <section className="py-24 md:py-32 lg:py-40 bg-surface">
-        <div className="container mx-auto px-4 md:px-8 lg:px-16 text-center">
-          <div className="h-96 bg-card/30 rounded-2xl animate-pulse" />
-        </div>
-      </section>
-    ),
+    loading: () => <SectionSkeleton />,
   }
 );
 
@@ -67,19 +64,31 @@ const AdoptionSection = dynamic(
 );
 
 const TrustSection = dynamic(
-  () => import('@/components/sections/trust').then((mod) => mod.TrustSection)
+  () => import('@/components/sections/trust').then((mod) => mod.TrustSection),
+  {
+    loading: () => <SectionSkeleton bgClass="bg-canvas" />,
+  }
 );
 
 const FAQSection = dynamic(
-  () => import('@/components/sections/faq').then((mod) => mod.FAQSection)
+  () => import('@/components/sections/faq').then((mod) => mod.FAQSection),
+  {
+    loading: () => <SectionSkeleton heightClass="h-64" />,
+  }
 );
 
 const CTASection = dynamic(
-  () => import('@/components/sections/cta').then((mod) => mod.CTASection)
+  () => import('@/components/sections/cta').then((mod) => mod.CTASection),
+  {
+    loading: () => <SectionSkeleton heightClass="h-[70vh]" />,
+  }
 );
 
 const FooterSection = dynamic(
-  () => import('@/components/sections/footer').then((mod) => mod.FooterSection)
+  () => import('@/components/sections/footer').then((mod) => mod.FooterSection),
+  {
+    loading: () => <SectionSkeleton bgClass="bg-canvas" sectionClass="py-16" heightClass="h-64" />,
+  }
 );
 
 export default function Home() {
@@ -120,10 +129,12 @@ export default function Home() {
         <SectionGate>
           <CTASection />
         </SectionGate>
-        <SectionGate>
-          <FooterSection />
-        </SectionGate>
       </main>
+      {/* Footer stays outside <main> so the <footer> landmark keeps its
+          contentinfo role instead of being nested inside the main landmark. */}
+      <SectionGate>
+        <FooterSection />
+      </SectionGate>
     </RegistrationProvider>
   );
 }
