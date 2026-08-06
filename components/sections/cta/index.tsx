@@ -179,7 +179,9 @@ export function CTASection({ onOpenRegistration }: CTASectionProps) {
               scrub: 1,
             },
           });
-        });
+        })
+        // Decorative dot — fail silently if the on-demand chunk can't load.
+        .catch(() => {});
       }
     }, sectionRef);
 
