@@ -3,13 +3,12 @@
 import { useRef, useEffect } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { MotionPathPlugin } from 'gsap/MotionPathPlugin';
 import { GraduationCap, Users } from 'lucide-react';
 import { usePrefersReducedMotion } from '@/lib/hooks/use-prefers-reduced-motion';
 import { motionTokens, gsapEase, staggers } from '@/lib/motion-tokens';
 
 if (typeof window !== 'undefined') {
-  gsap.registerPlugin(ScrollTrigger, MotionPathPlugin);
+  gsap.registerPlugin(ScrollTrigger);
 }
 
 interface CTASectionProps {
@@ -38,6 +37,9 @@ export function CTASection({ onOpenRegistration }: CTASectionProps) {
       }
       return;
     }
+
+    let cancelled = false;
+    let motionTween: ReturnType<typeof gsap.to> | null = null;
 
     const ctx = gsap.context(() => {
       gsap.set(lines, { y: motionTokens.distance.xxl, opacity: 0 });
@@ -154,27 +156,37 @@ export function CTASection({ onOpenRegistration }: CTASectionProps) {
         });
       }
 
-      // MotionPath: decorative dot follows the SVG text curve on scroll
+      // MotionPath: decorative dot follows the SVG text curve on scroll.
+      // The plugin is ~12KB — lazy-load it so it never ships in the main
+      // bundle; the import resolves to a separate on-demand chunk.
       if (motionDotRef.current && document.querySelector('#ctaPath')) {
-        gsap.to(motionDotRef.current, {
-          motionPath: {
-            path: '#ctaPath',
-            align: '#ctaPath',
-            alignOrigin: [0.5, 0.5],
-          },
-          duration: motionTokens.duration.crawl,
-          ease: 'none',
-          scrollTrigger: {
-            trigger: marqueeRef.current,
-            start: 'top 80%',
-            end: 'bottom 20%',
-            scrub: 1,
-          },
+        void import('gsap/MotionPathPlugin').then(({ MotionPathPlugin }) => {
+          if (cancelled) return;
+          gsap.registerPlugin(MotionPathPlugin);
+          motionTween = gsap.to(motionDotRef.current, {
+            motionPath: {
+              path: '#ctaPath',
+              align: '#ctaPath',
+              alignOrigin: [0.5, 0.5],
+            },
+            duration: motionTokens.duration.crawl,
+            ease: 'none',
+            scrollTrigger: {
+              trigger: marqueeRef.current,
+              start: 'top 80%',
+              end: 'bottom 20%',
+              scrub: 1,
+            },
+          });
         });
       }
     }, sectionRef);
 
-    return () => ctx.revert();
+    return () => {
+      cancelled = true;
+      motionTween?.kill();
+      ctx.revert();
+    };
   }, [prefersReducedMotion]);
 
   return (
