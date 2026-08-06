@@ -45,11 +45,8 @@ const AdoptionSection = dynamic(
 );
 
 // Modal — only its JS ships when the user actually opens the form.
-const RegistrationForm = dynamic(
-  () => import('@/components/ui/registration-form').then((mod) => mod.RegistrationForm),
-  {
-    ssr: false,
-  }
+const RegistrationForm = dynamic(() =>
+  import('@/components/ui/registration-form').then((mod) => mod.RegistrationForm)
 );
 
 export default function Home() {
