@@ -150,6 +150,11 @@ export function RegistrationProvider({ children }: { children: React.ReactNode }
     [handleCancelPendingOpen]
   );
 
+  const registrationContextValue = useMemo(
+    () => ({ openRegistration: handleOpenRegistration }),
+    [handleOpenRegistration]
+  );
+
   useEffect(
     () => () => {
       if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
@@ -158,7 +163,7 @@ export function RegistrationProvider({ children }: { children: React.ReactNode }
   );
 
   return (
-    <RegistrationContext.Provider value={{ openRegistration: handleOpenRegistration }}>
+    <RegistrationContext.Provider value={registrationContextValue}>
       {children}
       <RegistrationChunkContext.Provider value={registrationChunkContextValue}>
         {isRegistrationOpen && (
