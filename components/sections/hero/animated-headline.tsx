@@ -81,14 +81,12 @@ export function AnimatedWordReveal({
 
           gsap.set(split.words, {
             y: motionTokens.distance.xxl,
-            opacity: 0,
             rotateX: -90,
             transformOrigin: 'center bottom',
           });
 
           gsap.to(split.words, {
             y: 0,
-            opacity: 1,
             rotateX: 0,
             duration: motionTokens.duration.normal,
             stagger,
@@ -140,34 +138,24 @@ export function AnimatedCharacterReveal({ children, className = '', delay = 1.5 
         containerRef.current?.classList.remove('gsap-animate-on-mount');
       });
 
+      // Whole-element slide, transform only. No SplitText: this <p> is the
+      // LCP element, and char-splitting replaces its text node with ~110
+      // spans at idle time — a fresh contentful paint that re-fires LCP
+      // (~3.8s on throttled mobile vs 0.26s real). Transform-only keeps the
+      // original paint as LCP. delay=0: this is the LCP element, nothing
+      // should hold its settle back.
       mm.add('(prefers-reduced-motion: no-preference)', () => {
         const el = containerRef.current!;
-        let split: ReturnType<typeof SplitText.create> | null = null;
         const cancelIdle = scheduleIdle(() => {
-          split = SplitText.create(el, {
-            type: 'chars',
-            charsClass: 'inline-block',
-            // See AnimatedWordReveal: avoid GSAP's automatic aria-label on
-            // the <p> (prohibited attribute). Text stays readable by AT.
-            aria: 'none',
-          });
-
-          gsap.set(split.chars, {
-            y: motionTokens.distance.md,
-          });
-
-          gsap.to(split.chars, {
-            y: 0,
-            duration: motionTokens.duration.fast,
-            stagger: staggers.character,
-            ease: gsapEase(motionTokens.easing.emphasized),
-            delay,
-          });
-
           el.classList.remove('gsap-animate-on-mount');
+          gsap.fromTo(
+            el,
+            { y: motionTokens.distance.md },
+            { y: 0, duration: motionTokens.duration.normal, ease: gsapEase(motionTokens.easing.emphasized) }
+          );
         });
 
-        return () => { cancelIdle(); split?.revert(); };
+        return cancelIdle;
       });
 
       return () => mm.revert();
