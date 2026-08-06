@@ -90,7 +90,10 @@ export function LenisProvider({ children }: { children: React.ReactNode }) {
         ScrollTrigger.refresh();
       };
       mql.addEventListener('change', handleChange);
-    });
+    })
+    // Lenis is a progressive enhancement: if the lazy chunk fails to load,
+    // keep native scrolling — nothing depends on the instance.
+    .catch(() => {});
 
     return () => {
       disposed = true;
@@ -135,7 +138,17 @@ export function LenisProvider({ children }: { children: React.ReactNode }) {
       // Focus the section heading after scroll animation completes
       if (options?.focusHeading !== false) {
         setTimeout(() => {
-          const heading = targetElement.querySelector('h2, h1');
+          // SectionGate swaps its id-bearing placeholder for the mounted
+          // section while we scroll, detaching the element captured above.
+          // Re-resolve the selector so the heading lives in the real section.
+          const liveTarget =
+            typeof target === 'string'
+              ? document.querySelector(target)
+              : targetElement.isConnected
+                ? targetElement
+                : null;
+
+          const heading = liveTarget?.querySelector('h2, h1');
 
           if (heading instanceof HTMLElement) {
             // Ensure heading can receive focus
