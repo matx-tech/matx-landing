@@ -185,6 +185,9 @@ export function CTASection() {
 
     return () => {
       cancelled = true;
+      // Kill the scrub ScrollTrigger before the tween — the trigger can
+      // outlive the tween and keep a dead scrub attached to the marquee.
+      motionTween?.scrollTrigger?.kill();
       motionTween?.kill();
       ctx.revert();
     };
@@ -228,6 +231,7 @@ export function CTASection() {
               Liitu 10 pilootkooliga. Sügisesed klassid 7.-9. klassini.
             </p>
             <button
+              type="button"
               onClick={openRegistration}
               className="w-full px-6 py-3 text-base rounded-xl bg-primary text-text-inverse font-semibold hover:bg-primary/90 transition-all focus-ring-target min-h-[44px]"
             >
