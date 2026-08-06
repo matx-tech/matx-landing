@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, createContext, useContext, useCallback } from 'react';
-import Lenis from 'lenis';
+import type Lenis from 'lenis';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
@@ -42,49 +42,62 @@ export function LenisProvider({ children }: { children: React.ReactNode }) {
     // animation loops and reduces jank.
     gsap.ticker.lagSmoothing(false);
 
-    function createLenis(rm: boolean) {
-      return new Lenis({
-        lerp: rm ? 0 : 0.1,
-        duration: rm ? 0 : 1.2,
-        smoothWheel: !rm,
-        touchMultiplier: rm ? 1 : 2,
-        autoRaf: false,
-      });
-    }
+    let disposed = false;
+    let mql: MediaQueryList | null = null;
+    let handleChange: ((e: MediaQueryListEvent) => void) | null = null;
+    let lenisInstance: Lenis | null = null;
 
-    function registerRaf(instance: Lenis) {
-      // Remove previous callback first so we never double-register
-      if (tickerCbRef.current) gsap.ticker.remove(tickerCbRef.current);
-      const cb = (time: number) => instance.raf(time * 1000);
-      tickerCbRef.current = cb;
-      gsap.ticker.add(cb);
-    }
+    // Lenis is a smooth-scroll enhancement, not a prerequisite for content.
+    // Load it lazily so the library stays out of the initial JS bundle.
+    void import('lenis').then(({ default: LenisClass }) => {
+      if (disposed) return;
 
-    let lenis = createLenis(reducedMotion);
-    lenisRef.current = lenis;
+      function createLenis(rm: boolean) {
+        return new LenisClass({
+          lerp: rm ? 0 : 0.1,
+          duration: rm ? 0 : 1.2,
+          smoothWheel: !rm,
+          touchMultiplier: rm ? 1 : 2,
+          autoRaf: false,
+        });
+      }
 
-    registerRaf(lenis);
-    lenis.on('scroll', ScrollTrigger.update);
+      function registerRaf(instance: Lenis) {
+        // Remove previous callback first so we never double-register
+        if (tickerCbRef.current) gsap.ticker.remove(tickerCbRef.current);
+        const cb = (time: number) => instance.raf(time * 1000);
+        tickerCbRef.current = cb;
+        gsap.ticker.add(cb);
+      }
 
-    // Subscribe to live reduced-motion changes
-    const mql = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const handleChange = (e: MediaQueryListEvent) => {
-      const rm = e.matches;
-      reducedMotionRef.current = rm;
+      lenisInstance = createLenis(reducedMotion);
+      lenisRef.current = lenisInstance;
 
-      lenis.destroy();
-      lenis = createLenis(rm);
-      lenisRef.current = lenis;
-      registerRaf(lenis);
-      lenis.on('scroll', ScrollTrigger.update);
-      ScrollTrigger.refresh();
-    };
-    mql.addEventListener('change', handleChange);
+      registerRaf(lenisInstance);
+      lenisInstance.on('scroll', ScrollTrigger.update);
+
+      // Subscribe to live reduced-motion changes
+      mql = window.matchMedia('(prefers-reduced-motion: reduce)');
+      handleChange = (e: MediaQueryListEvent) => {
+        const rm = e.matches;
+        reducedMotionRef.current = rm;
+
+        lenisInstance?.destroy();
+        lenisInstance = createLenis(rm);
+        lenisRef.current = lenisInstance;
+        registerRaf(lenisInstance);
+        lenisInstance.on('scroll', ScrollTrigger.update);
+        ScrollTrigger.refresh();
+      };
+      mql.addEventListener('change', handleChange);
+    });
 
     return () => {
-      mql.removeEventListener('change', handleChange);
+      disposed = true;
       if (tickerCbRef.current) gsap.ticker.remove(tickerCbRef.current);
-      lenis.destroy();
+      if (mql && handleChange) mql.removeEventListener('change', handleChange);
+      lenisInstance?.destroy();
+      lenisRef.current = null;
     };
   }, []);
 
@@ -147,7 +160,9 @@ export function LenisProvider({ children }: { children: React.ReactNode }) {
       if (!(anchor instanceof HTMLAnchorElement)) return;
 
       const href = anchor.getAttribute('href');
-      if (href && href.length > 1) {
+      // If the lazy Lenis chunk hasn't arrived yet, let the browser do the
+      // native anchor jump instead of swallowing the click.
+      if (href && href.length > 1 && lenisRef.current) {
         e.preventDefault();
         scrollTo(href, { focusHeading: true });
       }
