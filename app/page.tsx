@@ -10,7 +10,6 @@ import { TrustSection } from '@/components/sections/trust';
 import { FAQSection } from '@/components/sections/faq';
 import { CTASection } from '@/components/sections/cta';
 import { FooterSection } from '@/components/sections/footer';
-import { RegistrationForm } from '@/components/ui/registration-form';
 
 const EvidenceLoopSection = dynamic(
   () => import('@/components/sections/evidence-loop').then((mod) => mod.EvidenceLoopSection)
@@ -45,6 +44,14 @@ const AdoptionSection = dynamic(
   () => import('@/components/sections/adoption').then((mod) => mod.AdoptionSection)
 );
 
+// Modal — only its JS ships when the user actually opens the form.
+const RegistrationForm = dynamic(
+  () => import('@/components/ui/registration-form').then((mod) => mod.RegistrationForm),
+  {
+    ssr: false,
+  }
+);
+
 export default function Home() {
   const [isRegistrationOpen, setIsRegistrationOpen] = useState(false);
 
@@ -75,7 +82,9 @@ export default function Home() {
         <CTASection onOpenRegistration={handleOpenRegistration} />
       </main>
       <FooterSection />
-      <RegistrationForm isOpen={isRegistrationOpen} onClose={handleCloseRegistration} />
+      {isRegistrationOpen && (
+        <RegistrationForm isOpen onClose={handleCloseRegistration} />
+      )}
     </>
   );
 }
