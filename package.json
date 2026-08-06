@@ -10,7 +10,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "audit:mobile": "lighthouse http://localhost:3000 --preset=perf --throttling-method=simulate --throttling.rttMs=150 --throttling.throughputKbps=1638.4 --throttling.uploadThroughputKbps=750 --throttling.cpuSlowdownMultiplier=4 --output-path=.audits/mobile-$(date +%Y%m%d-%H%M%S).report.html --save-assets=false",
+    "audit:desktop": "lighthouse http://localhost:3000 --preset=desktop --output-path=.audits/desktop-$(date +%Y%m%d-%H%M%S).report.html --save-assets=false"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",

@@ -37,6 +37,9 @@ yarn-error.log*
 # test artifacts
 /test-results/
 
+# lighthouse audit reports
+/.audits/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
