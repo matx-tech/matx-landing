@@ -8,13 +8,19 @@ const publicSans = Public_Sans({
   subsets: ['latin'],
   variable: '--font-display',
   display: 'swap',
-  weight: ['400', '500', '600', '700'],
+  // Only weights actually used: every font-display element is font-bold or font-semibold.
+  weight: ['600', '700'],
 });
 
 const inter = Inter({
   subsets: ['latin'],
   variable: '--font-inter',
-  display: 'swap',
+  // optional + preload:false — body text paints in the system fallback
+  // immediately; if Inter misses the optional window it is never swapped in,
+  // eliminating the late font-swap flash/CLS on slow devices. The hero display
+  // font (Public Sans) is preloaded separately and keeps `swap`.
+  display: 'optional',
+  preload: false,
   weight: ['400', '500', '600'],
 });
 
@@ -22,7 +28,8 @@ const ibmPlexMono = IBM_Plex_Mono({
   subsets: ['latin'],
   variable: '--font-ibm-mono',
   display: 'swap',
-  weight: ['400', '500'],
+  // All 10 font-mono usages are default-weight.
+  weight: ['400'],
 });
 
 export const metadata: Metadata = {
