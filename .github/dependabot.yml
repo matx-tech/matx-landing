@@ -23,7 +23,13 @@ updates:
       prefix-development: "deps(dev)"
       include: scope
     rebase-strategy: auto
-    insecure-external-code-execution: allow
+    # Install scripts intentionally NOT allowed (default `deny`): a
+    # compromised dependency could otherwise run arbitrary code with
+    # Dependabot's token scope during automated updates. None of our
+    # dependencies require lifecycle scripts — sharp ≥0.33 ships prebuilt
+    # binaries via optionalDependencies (no postinstall; verified 0.35.3),
+    # and the rest are pure JS. If an update ever fails for a missing
+    # install script, pin that package and review the script explicitly.
 
     # ── Groups ────────────────────────────────────────────────────────────
 
