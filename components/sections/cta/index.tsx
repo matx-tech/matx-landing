@@ -3,12 +3,13 @@
 import { useRef, useEffect } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { MotionPathPlugin } from 'gsap/MotionPathPlugin';
 import { GraduationCap, Users } from 'lucide-react';
 import { usePrefersReducedMotion } from '@/lib/hooks/use-prefers-reduced-motion';
 import { motionTokens, gsapEase, staggers } from '@/lib/motion-tokens';
 
 if (typeof window !== 'undefined') {
-  gsap.registerPlugin(ScrollTrigger);
+  gsap.registerPlugin(ScrollTrigger, MotionPathPlugin);
 }
 
 interface CTASectionProps {
