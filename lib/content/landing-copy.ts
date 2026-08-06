@@ -220,15 +220,22 @@ export const ADOPTION_ROUTES = [
     audience: 'IT-le',
     audienceId: 'it' as const,
     title: 'Tehniline ülevaade',
-    description: 'Arhitektuuri, turvalisuse ja integratsiooni detailid on peatselt saadaval. Vahepeal tutvu alustamise võimalustega.',
-    cta: 'Vaata alustamise võimalusi',
+    description: 'Arhitektuur, turvameetmed ja vastavusstaatus ühel lehel: identiteet ja sessioonid, pseudonüümimine, integratsioonid ja hankedokumendid.',
+    cta: 'Vaata tehnilist ülevaadet',
     ctaAction: 'technical',
-    ctaRoute: null as string | null,
+    ctaRoute: '/tehniline',
   },
 ] as const;
 
+// FAQ entry shape — answerLink is optional; only rendered when present
+export interface FAQEntry {
+  question: string;
+  answer: string;
+  answerLink?: { href: string; label: string };
+}
+
 // FAQ entries
-export const FAQ_ENTRIES = [
+export const FAQ_ENTRIES: readonly FAQEntry[] = [
   {
     question: 'Kellele MATx on mõeldud?',
     answer: 'MATx on loodud põhikooli matemaatikaõpetajatele ja õpilastele. Praegu oleme piloodifaasis valitud koolidega.',
@@ -247,8 +254,7 @@ export const FAQ_ENTRIES = [
   },
   {
     question: 'Kuidas andmeid kasutatakse?',
-    answer: 'Õpilase vastused ja veamustrid jäävad õpetajale nähtavaks. Andmeid kasutatakse soovituste genereerimiseks. Täpne andmekaitse poliitika on saadaval siin.',
-    answerLink: { href: '/privaatsus', label: 'Privaatsuspoliitika' },
+    answer: 'Õpilase vastused ja veamustrid jäävad õpetajale nähtavaks. Andmeid kasutatakse soovituste genereerimiseks. Pilootfaasis saad täpse andmekaitse info piloodilepingust.',
   },
   {
     question: 'Kuidas piloodiga liituda?',

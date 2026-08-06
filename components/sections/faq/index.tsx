@@ -145,7 +145,7 @@ export function FAQSection() {
                 >
                   <div className="overflow-hidden">
                     <div className="px-6 pb-5 text-text-secondary leading-relaxed">
-                      {'answerLink' in item ? (
+                      {item.answerLink ? (
                         <>
                           {item.answer}{' '}
                           <a

@@ -6,6 +6,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ADOPTION_ROUTES, SECTION_IDS, CALENDLY_URL, type AudienceId } from '@/lib/content/landing-copy';
@@ -32,6 +33,7 @@ interface AdoptionRoutesProps {
 export function AdoptionSection({ onOpenRegistration }: AdoptionRoutesProps) {
   const sectionRef = useRef<HTMLElement>(null);
   const { scrollTo } = useLenis();
+  const router = useRouter();
   const prefersReducedMotion = usePrefersReducedMotion();
 
   useEffect(() => {
@@ -78,15 +80,17 @@ export function AdoptionSection({ onOpenRegistration }: AdoptionRoutesProps) {
   }, [prefersReducedMotion]);
 
   const handleCTAClick = (action: string) => {
+    const route = ADOPTION_ROUTES.find((r) => r.ctaAction === action)?.ctaRoute;
+    if (route) {
+      router.push(route);
+      return;
+    }
     if (action === 'registration' && onOpenRegistration) {
       onOpenRegistration();
     } else if (action === 'calendly') {
       const newWin = window.open(CALENDLY_URL, '_blank', 'noopener,noreferrer');
       if (newWin) newWin.opener = null;
-    } else if (action === 'procurement') {
-      const el = document.getElementById(SECTION_IDS.pilot);
-      if (el) scrollTo(el);
-    } else if (action === 'technical') {
+    } else if (action === 'procurement' || action === 'technical') {
       const el = document.getElementById(SECTION_IDS.pilot);
       if (el) scrollTo(el);
     }
