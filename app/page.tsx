@@ -7,8 +7,6 @@ import { ScrollProgress } from '@/components/ui/scroll-progress';
 import { HeroSection } from '@/components/sections/hero';
 import { ProblemSection } from '@/components/sections/problem';
 import { TrustSection } from '@/components/sections/trust';
-import { FAQSection } from '@/components/sections/faq';
-import { CTASection } from '@/components/sections/cta';
 import { FooterSection } from '@/components/sections/footer';
 import { dialogCloseDelayMs } from '@/lib/dialog-timing';
 
@@ -43,6 +41,14 @@ const TopicsSection = dynamic(
 
 const AdoptionSection = dynamic(
   () => import('@/components/sections/adoption').then((mod) => mod.AdoptionSection)
+);
+
+const FAQSection = dynamic(
+  () => import('@/components/sections/faq').then((mod) => mod.FAQSection)
+);
+
+const CTASection = dynamic(
+  () => import('@/components/sections/cta').then((mod) => mod.CTASection)
 );
 
 // Cancel channel for the chunk-loading fallback: next/dynamic renders the
