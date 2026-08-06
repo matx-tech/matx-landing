@@ -9,16 +9,12 @@ const eslintConfig = defineConfig([
   ...nextTypescript,
   {
     name: 'matx/intentional-react-hooks-patterns',
+    files: ['components/ui/registration-form.tsx'],
     rules: {
-      // This project does not use the React Compiler; the compiler-style
-      // purity rules flag intentional patterns:
-      //  - set-state-in-effect: hydration-gated client-only initialization
-      //    (localStorage draft rehydration, "ready" flag before mounting
-      //    WebGL) and lazy Lenis instance creation.
-      //  - purity: procedural particle data generated with Math.random()
-      //    inside useMemo for the R3F hero fields.
+      // Hydration-gated localStorage draft rehydration: reading the saved
+      // draft once in an effect and calling setFormData is intentional and
+      // can't move into the state initializer without a hydration mismatch.
       'react-hooks/set-state-in-effect': 'off',
-      'react-hooks/purity': 'off',
     },
   },
   {
