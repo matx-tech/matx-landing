@@ -5,13 +5,6 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { usePrefersReducedMotion } from '@/lib/hooks/use-prefers-reduced-motion';
 
-const mathCharacters = [
-  '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-  '+', '-', '×', '÷', '=', '(', ')', '^', '√', 'π',
-  'x', 'y', 'z', 'a', 'b', 'c', 'n', 'm',
-  '%', 'Σ', '∫', '∂', '∞', '≠', '≤', '≥',
-];
-
 function MathParticleField() {
   const meshRef = useRef<THREE.Points>(null);
   const mouseRef = useRef({ x: 0, y: 0 });
@@ -119,8 +112,8 @@ function MathParticleField() {
   return (
     <points ref={meshRef}>
       <bufferGeometry>
-        <bufferAttribute attach="attributes-position" count={count} array={positions} itemSize={3} />
-        <bufferAttribute attach="attributes-scale" count={count} array={scales} itemSize={1} />
+        <bufferAttribute attach="attributes-position" args={[positions, 3]} />
+        <bufferAttribute attach="attributes-scale" args={[scales, 1]} />
       </bufferGeometry>
       <shaderMaterial
         vertexShader={vertexShader}
