@@ -1,6 +1,73 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@import "tw-animate-css";
+
+/* ── Tailwind v4 theme (migrated from tailwind.config.ts) ────────────────
+   All color tokens are `@theme inline` aliases of the semantic CSS
+   variables declared in @layer base below — utilities inline the var()
+   reference, so light/dark mappings keep working at runtime. */
+
+/* v3 config: backgroundImage.gradient-radial — used with from-/via-/to- stops */
+@utility bg-gradient-radial {
+  background-image: radial-gradient(var(--tw-gradient-stops));
+}
+
+@theme inline {
+  --font-display: 'Public Sans', system-ui, sans-serif;
+  --font-inter: 'Inter', system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', 'Consolas', monospace;
+
+  --color-canvas: var(--color-bg-canvas);
+  --color-surface: var(--color-bg-surface);
+  --color-elevated: var(--color-bg-elevated);
+  --color-brand: var(--color-bg-brand);
+  --color-brand-container: var(--color-bg-brand-container);
+  --color-primary: var(--color-action-primary-bg);
+  --color-secondary: var(--color-accent);
+  --color-accent: var(--color-feedback-warning);
+  --color-text-primary: var(--color-text-primary);
+  --color-text-secondary: var(--color-text-secondary);
+  --color-text-inverse: var(--color-text-inverse);
+  --color-border: var(--color-border);
+  --color-border-strong: var(--color-border-strong);
+  --color-success: var(--color-feedback-success);
+  --color-alert: var(--color-feedback-error);
+  --color-warning: var(--color-feedback-warning);
+  --color-info: var(--color-feedback-info);
+  --color-info-surface: var(--color-bg-info-subtle);
+  --color-info-border: var(--color-border-info);
+  --color-info-strong: var(--color-text-info-strong);
+  --color-success-surface: var(--color-bg-success-subtle);
+  --color-success-border: var(--color-border-success);
+  --color-success-strong: var(--color-text-success-strong);
+  --color-danger: var(--color-action-danger-bg-hover);
+  --color-focus-ring: var(--color-focus-ring);
+
+  /* Typography scale — non-default overrides from the v3 config */
+  --text-xs: 1rem;
+  --text-sm: 1.125rem;
+  --text-base: 1.25rem;
+  --text-lg: 1.5rem;
+  --text-xl: 1.875rem;
+  --text-2xl: 2.25rem;
+  --text-3xl: 3rem;
+  --text-4xl: 3.75rem;
+  --text-5xl: 4.5rem;
+
+  --leading-tight: 1.2;
+
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 20px;
+
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-card-hover: 0 4px 12px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.04);
+  --shadow-elevated: 0 8px 24px rgba(0, 0, 0, 0.12);
+  --shadow-dropdown: 0 4px 16px rgba(0, 0, 0, 0.1);
+
+  --background-image-gradient-brand: linear-gradient(135deg, var(--color-blue-700) 0%, var(--color-teal-700) 100%);
+}
 
 @layer base {
   :root {

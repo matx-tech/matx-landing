@@ -17,14 +17,6 @@ const eslintConfig = defineConfig([
       'react-hooks/set-state-in-effect': 'off',
     },
   },
-  {
-    name: 'matx/cjs-config-files',
-    files: ['tailwind.config.ts'],
-    rules: {
-      // Tailwind configs load CJS plugins via require() by convention.
-      '@typescript-eslint/no-require-imports': 'off',
-    },
-  },
   globalIgnores([
     '.next/**',
     'out/**',
