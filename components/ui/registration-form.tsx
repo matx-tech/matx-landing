@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { X, Check, Loader2, AlertCircle } from 'lucide-react';
 import * as Dialog from '@radix-ui/react-dialog';
+import { dialogExitMs } from '@/lib/dialog-timing';
 
 const roles = [
   'Koolijuht / Direktor',
@@ -225,7 +226,10 @@ export function RegistrationForm({ isOpen, onClose }: RegistrationFormProps) {
   return (
     <Dialog.Root open={isOpen} onOpenChange={handleOpenChange}>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 z-50 bg-canvas/95 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
+        <Dialog.Overlay
+          style={{ animationDuration: `${dialogExitMs}ms` }}
+          className="fixed inset-0 z-50 bg-canvas/95 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0"
+        />
         <Dialog.Content className="fixed left-[50%] top-[50%] z-50 w-full max-w-lg translate-x-[-50%] translate-y-[-50%] bg-elevated rounded-xl border border-border shadow-elevated overflow-hidden max-h-[90vh] overflow-y-auto focus:outline-none">
           <Dialog.Title className="sr-only">Registreeri kool pilootkatsetusele</Dialog.Title>
 
