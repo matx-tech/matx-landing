@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { Navigation } from '@/components/ui/navigation';
 import { ScrollProgress } from '@/components/ui/scroll-progress';
@@ -45,20 +45,57 @@ const AdoptionSection = dynamic(
 );
 
 // Modal — only its JS ships when the user actually opens the form.
-const RegistrationForm = dynamic(() =>
-  import('@/components/ui/registration-form').then((mod) => mod.RegistrationForm)
+const RegistrationForm = dynamic(
+  () => import('@/components/ui/registration-form').then((mod) => mod.RegistrationForm),
+  {
+    // First open fetches the chunk on a slow connection; show a lightweight
+    // overlay so the CTA click never looks dead.
+    loading: () => (
+      <div
+        role="status"
+        className="fixed inset-0 z-50 flex items-center justify-center bg-canvas/95"
+      >
+        <div
+          aria-hidden="true"
+          className="h-10 w-10 animate-spin rounded-full border-2 border-primary border-t-transparent"
+        />
+        <span className="sr-only">Laadime registreerimisvormi…</span>
+      </div>
+    ),
+  }
 );
 
 export default function Home() {
   const [isRegistrationOpen, setIsRegistrationOpen] = useState(false);
+  // Keep the dialog mounted briefly after close so Radix Presence can play
+  // the exit fade before the lazy chunk unmounts.
+  const [isRegistrationClosing, setIsRegistrationClosing] = useState(false);
+  const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const handleOpenRegistration = () => {
+  const handleOpenRegistration = useCallback(() => {
+    if (closeTimerRef.current) {
+      clearTimeout(closeTimerRef.current);
+      closeTimerRef.current = null;
+    }
+    setIsRegistrationClosing(false);
     setIsRegistrationOpen(true);
-  };
+  }, []);
 
-  const handleCloseRegistration = () => {
-    setIsRegistrationOpen(false);
-  };
+  const handleCloseRegistration = useCallback(() => {
+    setIsRegistrationClosing(true);
+    closeTimerRef.current = setTimeout(() => {
+      setIsRegistrationOpen(false);
+      setIsRegistrationClosing(false);
+      closeTimerRef.current = null;
+    }, 200); // slightly longer than the overlay's 150ms fade-out
+  }, []);
+
+  useEffect(
+    () => () => {
+      if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
+    },
+    []
+  );
 
   return (
     <>
@@ -80,7 +117,7 @@ export default function Home() {
       </main>
       <FooterSection />
       {isRegistrationOpen && (
-        <RegistrationForm isOpen onClose={handleCloseRegistration} />
+        <RegistrationForm isOpen={!isRegistrationClosing} onClose={handleCloseRegistration} />
       )}
     </>
   );
