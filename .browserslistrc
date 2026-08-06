@@ -4,9 +4,11 @@
 # flat, flatMap, Object.fromEntries, etc.) per the Lighthouse audit.
 #
 # We use rolling "last 2 versions" per engine so the build target
-# automatically advances.  This is equivalent to Baseline Widely
-# Available (~30 months behind latest) and is appropriate for a
-# marketing site whose audience runs auto-updating browsers.
+# automatically advances. This selects the latest two releases per
+# engine, NOT Baseline Widely Available (which is derived from
+# compatibility data) — but it is appropriate for a marketing site
+# whose audience runs auto-updating browsers. Keep the Browserslist
+# database updated (caniuse-lite) for the rolling targets to advance.
 
 last 2 Chrome versions
 last 2 Firefox versions
