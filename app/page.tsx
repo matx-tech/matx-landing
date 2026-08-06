@@ -6,6 +6,27 @@ import { HeroSection } from '@/components/sections/hero';
 import { RegistrationProvider } from '@/components/providers/registration-provider';
 import { SECTION_IDS } from '@/lib/content/landing-copy';
 
+// Placeholder shown while a gated section's chunk loads — mirrors the
+// section's background/padding so SectionGate keeps layout stable and
+// the reveal doesn't shift CLS.
+function SectionSkeleton({
+  bgClass = 'bg-surface',
+  heightClass = 'h-96',
+  sectionClass = 'py-24 md:py-32 lg:py-40',
+}: {
+  bgClass?: string;
+  heightClass?: string;
+  sectionClass?: string;
+}) {
+  return (
+    <section className={`${sectionClass} ${bgClass}`}>
+      <div className="container mx-auto px-4 md:px-8 lg:px-16 text-center">
+        <div className={`${heightClass} bg-card/30 rounded-2xl animate-pulse`} />
+      </div>
+    </section>
+  );
+}
+
 // Below-fold sections: dynamic + SectionGate so their chunks (and GSAP setup)
 // load on demand when the user scrolls near them, not in the initial bundle.
 const EvidenceLoopSection = dynamic(
