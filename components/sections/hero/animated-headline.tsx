@@ -71,6 +71,12 @@ export function AnimatedWordReveal({
           split = SplitText.create(el, {
             type: 'words',
             wordsClass: 'inline-block overflow-hidden',
+            // Don't let SplitText stamp aria-label on the element (GSAP 3.13+
+            // default `aria: "auto"`): the hero headline is a plain <h1>/<p>
+            // where aria-label is a prohibited attribute (Lighthouse
+            // aria-prohibited-attr). The split pieces stay real text nodes,
+            // so assistive tech reads them in DOM order without the label.
+            aria: 'none',
           });
 
           gsap.set(split.words, {
@@ -141,15 +147,16 @@ export function AnimatedCharacterReveal({ children, className = '', delay = 1.5 
           split = SplitText.create(el, {
             type: 'chars',
             charsClass: 'inline-block',
+            // See AnimatedWordReveal: avoid GSAP's automatic aria-label on
+            // the <p> (prohibited attribute). Text stays readable by AT.
+            aria: 'none',
           });
 
           gsap.set(split.chars, {
-            opacity: 0,
             y: motionTokens.distance.md,
           });
 
           gsap.to(split.chars, {
-            opacity: 1,
             y: 0,
             duration: motionTokens.duration.fast,
             stagger: staggers.character,
