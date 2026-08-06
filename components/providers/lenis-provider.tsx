@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState, createContext, useContext, useCallback } from 'react';
+import { useEffect, useRef, createContext, useContext, useCallback } from 'react';
 import Lenis from 'lenis';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -17,19 +17,17 @@ if (typeof window !== 'undefined') {
 }
 
 interface LenisContextValue {
-  lenis: Lenis | null;
   scrollTo: (target: string | number | HTMLElement, options?: { focusHeading?: boolean }) => void;
 }
 
 const LenisContext = createContext<LenisContextValue>({
-  lenis: null,
   scrollTo: () => {},
 });
 
 export const useLenis = () => useContext(LenisContext);
 
 export function LenisProvider({ children }: { children: React.ReactNode }) {
-  const [lenis, setLenis] = useState<Lenis | null>(null);
+  const lenisRef = useRef<Lenis | null>(null);
   const reducedMotionRef = useRef(false);
   const tickerCbRef = useRef<((time: number) => void) | null>(null);
 
@@ -63,7 +61,7 @@ export function LenisProvider({ children }: { children: React.ReactNode }) {
     }
 
     let lenis = createLenis(reducedMotion);
-    setLenis(lenis);
+    lenisRef.current = lenis;
 
     registerRaf(lenis);
     lenis.on('scroll', ScrollTrigger.update);
@@ -76,7 +74,7 @@ export function LenisProvider({ children }: { children: React.ReactNode }) {
 
       lenis.destroy();
       lenis = createLenis(rm);
-      setLenis(lenis);
+      lenisRef.current = lenis;
       registerRaf(lenis);
       lenis.on('scroll', ScrollTrigger.update);
       ScrollTrigger.refresh();
@@ -107,7 +105,7 @@ export function LenisProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const scrollTo = useCallback((target: string | number | HTMLElement, options?: { focusHeading?: boolean }) => {
-    if (!lenis) return;
+    if (!lenisRef.current) return;
 
     const targetElement = typeof target === 'string'
       ? document.querySelector(target)
@@ -116,7 +114,7 @@ export function LenisProvider({ children }: { children: React.ReactNode }) {
         : null;
 
     if (targetElement instanceof HTMLElement) {
-      lenis.scrollTo(targetElement, {
+      lenisRef.current.scrollTo(targetElement, {
         offset: -80, // Account for fixed nav height
         duration: reducedMotionRef.current ? 0 : 1.2,
       });
@@ -136,9 +134,9 @@ export function LenisProvider({ children }: { children: React.ReactNode }) {
         }, reducedMotionRef.current ? 0 : 1400); // Slightly longer than scroll duration
       }
     } else if (typeof target === 'number') {
-      lenis.scrollTo(target);
+      lenisRef.current.scrollTo(target);
     }
-  }, [lenis]);
+  }, []);
 
   // Handle anchor link clicks for focus management
   useEffect(() => {
@@ -162,7 +160,7 @@ export function LenisProvider({ children }: { children: React.ReactNode }) {
   }, [scrollTo]);
 
   return (
-    <LenisContext.Provider value={{ lenis, scrollTo }}>
+    <LenisContext.Provider value={{ scrollTo }}>
       {children}
     </LenisContext.Provider>
   );
