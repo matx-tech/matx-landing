@@ -85,9 +85,9 @@ bug. Anything reading window/matchMedia/device size needs SSR-safe defaults
 
 - Below-the-fold sections load via next/dynamic; above-the-fold stays
   static. GSAP plugins and heavy libraries lazy-load.
-- Lenis context value is intentionally NOT memoized — value={{ scrollTo }} is
-  a new object on every provider render, re-rendering all consumers on every
-  provider render (scrollTo itself is stable via useCallback).
+- Lenis context value is memoized (useMemo with scrollTo as the dependency) —
+  scrollTo is stable via useCallback, so the value object is created once and
+  consumers re-render only if scrollTo changes.
 - Blur placeholders come from `scripts/generate-thumbhash.mjs`; changes must
   keep the source-screenshot existence check and clear error message.
 - .browserslistrc intentionally uses rolling "last 2 versions"; comments

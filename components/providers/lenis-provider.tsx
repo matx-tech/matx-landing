@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, createContext, useContext, useCallback } from 'react';
+import { useEffect, useRef, createContext, useContext, useCallback, useMemo } from 'react';
 import type Lenis from 'lenis';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -191,8 +191,12 @@ export function LenisProvider({ children }: { children: React.ReactNode }) {
     };
   }, [scrollTo]);
 
+  // scrollTo is stable (useCallback with no deps), so the context value object
+  // is created once — consumers don't re-render when the provider re-renders.
+  const contextValue = useMemo(() => ({ scrollTo }), [scrollTo]);
+
   return (
-    <LenisContext.Provider value={{ scrollTo }}>
+    <LenisContext.Provider value={contextValue}>
       {children}
     </LenisContext.Provider>
   );
