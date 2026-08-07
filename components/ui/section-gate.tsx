@@ -120,11 +120,17 @@ export function SectionGate({
 
     // Park focus on the retry control only when focus was actually lost —
     // i.e. it dropped to <body> because the previous retry button unmounted
-    // with the error fallback. That re-parks focus after a failed retry while
-    // keeping the 200ms poll ticks and observer flushes from yanking focus
-    // back from wherever the user moved it.
+    // with the error fallback, or to the id-less gate's tabIndex=-1 revealed
+    // wrapper (the post-poll-cap fallback focuses it when the chunk hasn't
+    // resolved, and the slow path re-parks once the retry button mounts). No
+    // user keeps focus on a non-interactive wrapper, so re-parking from there
+    // is safe. Keeping the guard prevents the 200ms poll ticks and observer
+    // flushes from yanking focus back from wherever the user moved it.
     const focusRetry = (retry: HTMLButtonElement): void => {
-      if (document.activeElement === document.body) {
+      if (
+        document.activeElement === document.body ||
+        document.activeElement === revealedRef.current
+      ) {
         retry.focus({ preventScroll: true });
       }
     };
