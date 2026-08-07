@@ -123,6 +123,37 @@ export function Navigation() {
     setIsOpen(open);
   }, []);
 
+  /**
+   * Mobile menu links: closing the dialog unmounts the clicked anchor before
+   * the browser follows the hyperlink, which cancels navigation entirely
+   * (spec: following a hyperlink on a disconnected node is a no-op). So the
+   * default action is prevented and navigation is done manually:
+   * - internal anchors scroll after the dialog's exit animation releases the
+   *   body scroll lock;
+   * - external links open immediately, while the click is still a user
+   *   gesture (window.open in a timeout would be popup-blocked).
+   *
+   * ponytail: fixed 650ms delay tuned to the 0.5s exit animation; replace
+   * with an onOpenChange(false)-driven scroll if it ever flakes.
+   */
+  const handleMenuLinkClick = useCallback(
+    (event: React.MouseEvent<HTMLAnchorElement>) => {
+      const href = event.currentTarget.getAttribute('href');
+      const isExternal = href?.startsWith('http');
+      event.preventDefault();
+      setIsOpen(false);
+
+      if (isExternal && href) {
+        window.open(href, '_blank', 'noopener,noreferrer');
+        return;
+      }
+      window.setTimeout(() => {
+        if (href) window.location.hash = href;
+      }, 650);
+    },
+    []
+  );
+
   return (
     <Dialog.Root open={isOpen} onOpenChange={handleOpenChange}>
       <nav
@@ -212,7 +243,7 @@ export function Navigation() {
             >
               <a
                 href={item.href}
-                onClick={() => setIsOpen(false)}
+                onClick={handleMenuLinkClick}
                 className="text-3xl md:text-4xl font-display font-bold text-text-primary hover:text-primary transition-colors focus-ring-target rounded-md"
               >
                 {item.label}
@@ -228,7 +259,7 @@ export function Navigation() {
           >
             <a
               href={PILOT_HREF}
-              onClick={() => setIsOpen(false)}
+              onClick={handleMenuLinkClick}
               className="px-6 py-3 rounded-lg bg-primary text-text-inverse font-semibold focus-ring-target min-h-[44px] text-center"
             >
               Liitu piloodiga
@@ -237,7 +268,7 @@ export function Navigation() {
               href={CALENDLY_URL}
               target="_blank"
               rel="noopener noreferrer"
-              onClick={() => setIsOpen(false)}
+              onClick={handleMenuLinkClick}
               className="px-6 py-3 rounded-lg border border-border text-text-primary font-semibold hover:bg-surface transition-colors text-center focus-ring-target min-h-[44px]"
             >
               Broneeri vestlus
