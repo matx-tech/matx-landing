@@ -13,6 +13,10 @@ if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger, ScrambleTextPlugin);
 }
 
+// MotionPathPlugin (~12KB) is only used by the decorative dot — keep it in its
+// own on-demand chunk and share one import promise across mounts/effect re-runs.
+const motionPathPluginPromise = import('gsap/MotionPathPlugin');
+
 export function CTASection() {
   const sectionRef = useRef<HTMLElement>(null);
   const titleRef = useRef<HTMLDivElement>(null);
@@ -156,10 +160,8 @@ export function CTASection() {
       }
 
       // MotionPath: decorative dot follows the SVG text curve on scroll.
-      // The plugin is ~12KB — lazy-load it so it never ships in the main
-      // bundle; the import resolves to a separate on-demand chunk.
       if (motionDotRef.current && document.querySelector('#ctaPath')) {
-        void import('gsap/MotionPathPlugin').then(({ MotionPathPlugin }) => {
+        void motionPathPluginPromise.then(({ MotionPathPlugin }) => {
           if (cancelled) return;
           gsap.registerPlugin(MotionPathPlugin);
           motionTween = gsap.to(motionDotRef.current, {
@@ -169,7 +171,7 @@ export function CTASection() {
               alignOrigin: [0.5, 0.5],
             },
             duration: motionTokens.duration.crawl,
-            ease: 'none',
+            ease: gsapEase(motionTokens.easing.linear),
             scrollTrigger: {
               trigger: marqueeRef.current,
               start: 'top 80%',

@@ -77,7 +77,7 @@ export function FooterSection() {
           {
             scaleX: 1,
             duration: motionTokens.duration.crawl,
-            ease: 'none',
+            ease: gsapEase(motionTokens.easing.linear),
             scrollTrigger: {
               trigger: footerRef.current,
               start: 'top 90%',

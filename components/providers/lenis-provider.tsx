@@ -5,15 +5,14 @@ import type Lenis from 'lenis';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
-import { SplitText } from 'gsap/SplitText';
-import { CustomEase } from 'gsap/CustomEase';
+import { usePrefersReducedMotion } from '@/lib/hooks/use-prefers-reduced-motion';
 
 // Only register plugins that are needed across the entire site.
-// Per-section plugins (Draggable, Observer, Flip, MotionPathPlugin)
-// are registered locally in their respective components to keep the
-// initial JS bundle lean.
+// Per-section plugins (SplitText, CustomEase, Draggable, Observer, Flip,
+// MotionPathPlugin) are registered locally in their respective components
+// to keep the initial JS bundle lean.
 if (typeof window !== 'undefined') {
-  gsap.registerPlugin(ScrollTrigger, useGSAP, SplitText, CustomEase);
+  gsap.registerPlugin(ScrollTrigger, useGSAP);
 }
 
 interface LenisContextValue {
@@ -31,15 +30,15 @@ export function LenisProvider({ children }: { children: React.ReactNode }) {
   const reducedMotionRef = useRef(false);
   const tickerCbRef = useRef<((time: number) => void) | null>(null);
   const focusTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const prefersReducedMotion = usePrefersReducedMotion();
 
   useEffect(() => {
     // Share one rAF cycle between Lenis and GSAP — eliminates duplicate
     // animation loops and reduces jank.
     gsap.ticker.lagSmoothing(false);
+    reducedMotionRef.current = prefersReducedMotion;
 
     let disposed = false;
-    let mql: MediaQueryList | null = null;
-    let handleChange: ((e: MediaQueryListEvent) => void) | null = null;
     let lenisInstance: Lenis | null = null;
 
     // Lenis is a smooth-scroll enhancement, not a prerequisite for content.
@@ -57,12 +56,10 @@ export function LenisProvider({ children }: { children: React.ReactNode }) {
         });
       }
 
-      // Read the media query now, not before the async import — the
-      // captured value may be stale by the time the chunk arrives.
-      const rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      reducedMotionRef.current = rm;
-
-      lenisInstance = createLenis(rm);
+      // The hook value is the render-time preference; if it changed while the
+      // chunk was in flight, the effect re-runs (dep below), disposes this
+      // closure and rebuilds with the fresh value.
+      lenisInstance = createLenis(prefersReducedMotion);
       lenisRef.current = lenisInstance;
 
       function registerRaf(instance: Lenis) {
@@ -75,21 +72,6 @@ export function LenisProvider({ children }: { children: React.ReactNode }) {
 
       registerRaf(lenisInstance);
       lenisInstance.on('scroll', ScrollTrigger.update);
-
-      // Subscribe to live reduced-motion changes
-      mql = window.matchMedia('(prefers-reduced-motion: reduce)');
-      handleChange = (e: MediaQueryListEvent) => {
-        const rm = e.matches;
-        reducedMotionRef.current = rm;
-
-        lenisInstance?.destroy();
-        lenisInstance = createLenis(rm);
-        lenisRef.current = lenisInstance;
-        registerRaf(lenisInstance);
-        lenisInstance.on('scroll', ScrollTrigger.update);
-        ScrollTrigger.refresh();
-      };
-      mql.addEventListener('change', handleChange);
     })
     // Lenis is a progressive enhancement: if the lazy chunk fails to load,
     // keep native scrolling — nothing depends on the instance.
@@ -99,11 +81,10 @@ export function LenisProvider({ children }: { children: React.ReactNode }) {
       disposed = true;
       if (focusTimerRef.current) clearTimeout(focusTimerRef.current);
       if (tickerCbRef.current) gsap.ticker.remove(tickerCbRef.current);
-      if (mql && handleChange) mql.removeEventListener('change', handleChange);
       lenisInstance?.destroy();
       lenisRef.current = null;
     };
-  }, []);
+  }, [prefersReducedMotion]);
 
   useEffect(() => {
     let resizeTimer: ReturnType<typeof setTimeout>;

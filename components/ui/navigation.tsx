@@ -4,6 +4,7 @@ import { useRef, useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useGSAP } from '@gsap/react';
 import { Menu, X, Award } from 'lucide-react';
 import * as Dialog from '@radix-ui/react-dialog';
 import { LANDING_NAV_ITEMS, SECTION_IDS, CALENDLY_URL } from '@/lib/content/landing-copy';
@@ -24,7 +25,9 @@ export function Navigation() {
   const menuItemsRef = useRef<HTMLDivElement[]>([]);
   const prefersReducedMotion = usePrefersReducedMotion();
 
-  useEffect(() => {
+  // Layout-phase (useGSAP) so the entrance state is applied before paint —
+  // a passive useEffect would let the nav flash at its final position.
+  useGSAP(() => {
     const nav = navRef.current;
     if (!nav) return;
 
@@ -72,7 +75,7 @@ export function Navigation() {
       st.kill();
       gsap.killTweensOf(nav);
     };
-  }, [prefersReducedMotion]);
+  }, { dependencies: [prefersReducedMotion] });
 
   useEffect(() => {
     const items = menuItemsRef.current.filter(Boolean);

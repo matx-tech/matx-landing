@@ -20,7 +20,7 @@ const ProductFixture = dynamic(
   {
     loading: () => (
       <div
-        className="hidden lg:block w-full aspect-[4/3] rounded-2xl bg-surface/50 animate-pulse"
+        className="hidden lg:block w-full aspect-[4/3] rounded-2xl bg-surface/50 animate-pulse motion-reduce:animate-none"
         aria-hidden="true"
       />
     ),

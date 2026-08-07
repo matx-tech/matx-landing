@@ -12,24 +12,67 @@ const RegistrationChunkContext = createContext<{ cancel: () => void }>({ cancel:
 
 function RegistrationChunkFallback({ error, retry }: DynamicOptionsLoadingProps) {
   const { cancel } = useContext(RegistrationChunkContext);
+  const overlayRef = useRef<HTMLDivElement>(null);
+  const cancelButtonRef = useRef<HTMLButtonElement>(null);
+  const restoreFocusRef = useRef(false);
 
-  // While the chunk is loading, the Radix dialog isn't mounted yet — Escape
-  // would do nothing. Cancel the pending open here instead.
+  // Modal-shell semantics: focus the cancel control on show, trap Tab inside
+  // the overlay, and hand focus back to the opener when cancel runs.
   useEffect(() => {
+    const previouslyFocused =
+      document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    cancelButtonRef.current?.focus();
+
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') cancel();
+      if (event.key === 'Escape') {
+        restoreFocusRef.current = true;
+        cancel();
+        return;
+      }
+      if (event.key !== 'Tab' || !overlayRef.current) return;
+
+      const focusables = Array.from(
+        overlayRef.current.querySelectorAll<HTMLElement>(
+          'button:not([disabled]), [href], [tabindex]:not([tabindex="-1"])'
+        )
+      ).filter((el) => el.offsetParent !== null);
+
+      if (focusables.length === 0) return;
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
     };
+
     window.addEventListener('keydown', onKeyDown);
-    return () => window.removeEventListener('keydown', onKeyDown);
+    return () => {
+      window.removeEventListener('keydown', onKeyDown);
+      // Only steal focus back on cancel — when the chunk loads successfully
+      // the Radix dialog takes over focus management.
+      if (restoreFocusRef.current) previouslyFocused?.focus();
+    };
   }, [cancel]);
 
-  if (error) {
-    return (
-      <div
-        role="alert"
-        className="fixed inset-0 z-50 flex items-center justify-center bg-canvas/95"
-        onClick={cancel}
-      >
+  const handleCancel = () => {
+    restoreFocusRef.current = true;
+    cancel();
+  };
+
+  return (
+    <div
+      ref={overlayRef}
+      role="dialog"
+      aria-modal="true"
+      aria-label={error ? REGISTRATION_COPY.error : REGISTRATION_COPY.loading}
+      className="fixed inset-0 z-50 flex items-center justify-center bg-canvas/95"
+      onClick={handleCancel}
+    >
+      {error ? (
         <div
           className="flex flex-col items-center gap-4 px-6 text-center"
           onClick={(event) => event.stopPropagation()}
@@ -45,40 +88,34 @@ function RegistrationChunkFallback({ error, retry }: DynamicOptionsLoadingProps)
             </button>
             <button
               type="button"
-              onClick={cancel}
+              ref={cancelButtonRef}
+              onClick={handleCancel}
               className="rounded-lg border border-border px-6 py-3 font-semibold text-text-primary transition-colors hover:bg-surface focus-ring-target min-h-[44px]"
             >
               {REGISTRATION_COPY.close}
             </button>
           </div>
         </div>
-      </div>
-    );
-  }
-
-  return (
-    <div
-      role="status"
-      className="fixed inset-0 z-50 flex items-center justify-center bg-canvas/95"
-      onClick={cancel}
-    >
-      <div
-        className="flex flex-col items-center gap-6"
-        onClick={(event) => event.stopPropagation()}
-      >
+      ) : (
         <div
-          aria-hidden="true"
-          className="h-10 w-10 animate-spin rounded-full border-2 border-primary border-t-transparent"
-        />
-        <span className="sr-only">{REGISTRATION_COPY.loading}</span>
-        <button
-          type="button"
-          onClick={cancel}
-          className="rounded-lg border border-border px-6 py-3 font-semibold text-text-primary transition-colors hover:bg-surface focus-ring-target min-h-[44px]"
+          className="flex flex-col items-center gap-6"
+          onClick={(event) => event.stopPropagation()}
         >
-          {REGISTRATION_COPY.cancel}
-        </button>
-      </div>
+          <div
+            aria-hidden="true"
+            className="h-10 w-10 animate-spin rounded-full border-2 border-primary border-t-transparent"
+          />
+          <span className="sr-only">{REGISTRATION_COPY.loading}</span>
+          <button
+            type="button"
+            ref={cancelButtonRef}
+            onClick={handleCancel}
+            className="rounded-lg border border-border px-6 py-3 font-semibold text-text-primary transition-colors hover:bg-surface focus-ring-target min-h-[44px]"
+          >
+            {REGISTRATION_COPY.cancel}
+          </button>
+        </div>
+      )}
     </div>
   );
 }

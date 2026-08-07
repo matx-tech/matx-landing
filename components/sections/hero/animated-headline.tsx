@@ -6,6 +6,12 @@ import { useGSAP } from '@gsap/react';
 import { SplitText } from 'gsap/SplitText';
 import { motionTokens, gsapEase, staggers } from '@/lib/motion-tokens';
 
+// SplitText is owned by the hero headline animations — register at module
+// scope here instead of in the root provider.
+if (typeof window !== 'undefined') {
+  gsap.registerPlugin(SplitText);
+}
+
 interface AnimatedHeadlineProps {
   children: string;
   className?: string;
