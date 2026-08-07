@@ -1,0 +1,59 @@
+import { test, expect } from '../support/fixtures';
+import { revealSection } from '../support/helpers/reveal';
+
+test.describe('navigation', () => {
+  test('desktop nav: clicking a link scrolls to the section', async ({ openHome, page }) => {
+    test.skip(
+      (page.viewportSize()?.width ?? 0) < 1280,
+      'desktop nav is hidden below the xl breakpoint',
+    );
+    await openHome();
+
+    const link = page.locator('nav').getByRole('link', { name: 'KKK' });
+    await link.click();
+    await expect(page).toHaveURL(/#kkk/);
+    // Section content renders once the SectionGate opens on scroll.
+    await expect(page.getByRole('heading', { name: /KKK/i }).first()).toBeVisible();
+  });
+});
+
+test.describe('mobile menu', () => {
+  test('opens and closes the menu dialog', async ({ openHome, page }) => {
+    test.skip(
+      (page.viewportSize()?.width ?? 0) >= 1280,
+      'mobile menu button is hidden at the xl breakpoint',
+    );
+    await openHome();
+
+    const trigger = page.getByRole('button', { name: 'Ava menüü' });
+    await trigger.click();
+
+    const dialog = page.getByRole('dialog');
+    await expect(dialog).toBeVisible();
+    // Menu items are rendered inside the dialog.
+    await expect(dialog.getByRole('link', { name: 'KKK' })).toBeVisible();
+
+    await dialog.getByRole('button', { name: 'Sulge menüü' }).click();
+    await expect(dialog).not.toBeVisible();
+  });
+
+  test('menu link closes the dialog and jumps to the section', async ({ openHome, page }) => {
+    test.skip(
+      (page.viewportSize()?.width ?? 0) >= 1280,
+      'mobile menu button is hidden at the xl breakpoint',
+    );
+    await openHome();
+
+    await page.getByRole('button', { name: 'Ava menüü' }).click();
+    await page.getByRole('dialog').getByRole('link', { name: 'KKK' }).click();
+
+    await expect(page.getByRole('dialog')).not.toBeVisible();
+    await expect(page).toHaveURL(/#kkk/);
+
+    // While the dialog was open, Radix locks body scroll, so the anchor jump
+    // can't move the page — scroll explicitly now the dialog is closed.
+    const heading = page.getByRole('heading', { name: /KKK/i }).first();
+    await revealSection(page, 'kkk', heading);
+    await expect(heading).toBeVisible();
+  });
+});
