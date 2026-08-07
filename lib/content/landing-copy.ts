@@ -34,7 +34,7 @@ export const REGISTRATION_COPY = {
 } as const;
 
 // Shared URLs
-export const CALENDLY_URL = 'https://calendly.com/matx-demo' as const;
+export const CALENDLY_URL = 'https://calendly.com/matx-ee/15min' as const;
 
 // Site metadata — single source for OG/Twitter/JSON-LD
 export const SITE_META = {
