@@ -127,7 +127,7 @@ export function FooterSection() {
             <h3 className="text-text-primary font-display font-semibold mb-4 text-sm">Navigatsioon</h3>
             <ul className="space-y-2">
               <li>
-                <a href="#probleem" className="text-text-secondary hover:text-primary transition-colors text-sm focus-ring-target rounded-md" style={{ textDecoration: 'underline' }}>
+                <a href={`#${SECTION_IDS.problem}`} className="text-text-secondary hover:text-primary transition-colors text-sm focus-ring-target rounded-md" style={{ textDecoration: 'underline' }}>
                   Probleem
                 </a>
               </li>
