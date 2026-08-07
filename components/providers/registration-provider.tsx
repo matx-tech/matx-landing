@@ -14,14 +14,20 @@ function RegistrationChunkFallback({ error, retry }: DynamicOptionsLoadingProps)
   const { cancel } = useContext(RegistrationChunkContext);
   const overlayRef = useRef<HTMLDivElement>(null);
   const cancelButtonRef = useRef<HTMLButtonElement>(null);
+  const retryButtonRef = useRef<HTMLButtonElement>(null);
   const restoreFocusRef = useRef(false);
 
-  // Modal-shell semantics: focus the cancel control on show, trap Tab inside
-  // the overlay, and hand focus back to the opener when cancel runs.
+  // Modal-shell semantics: focus the primary action on show (retry in the
+  // error state, cancel while loading), trap Tab inside the overlay, and
+  // hand focus back to the opener when cancel runs.
   useEffect(() => {
     const previouslyFocused =
       document.activeElement instanceof HTMLElement ? document.activeElement : null;
-    cancelButtonRef.current?.focus();
+    if (error) {
+      retryButtonRef.current?.focus();
+    } else {
+      cancelButtonRef.current?.focus();
+    }
 
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
@@ -56,7 +62,7 @@ function RegistrationChunkFallback({ error, retry }: DynamicOptionsLoadingProps)
       // the Radix dialog takes over focus management.
       if (restoreFocusRef.current) previouslyFocused?.focus();
     };
-  }, [cancel]);
+  }, [cancel, error]);
 
   const handleCancel = () => {
     restoreFocusRef.current = true;
@@ -81,6 +87,7 @@ function RegistrationChunkFallback({ error, retry }: DynamicOptionsLoadingProps)
           <div className="flex gap-3">
             <button
               type="button"
+              ref={retryButtonRef}
               onClick={retry}
               className="rounded-lg bg-primary px-6 py-3 font-semibold text-text-inverse transition-colors hover:bg-primary/90 focus-ring-target min-h-[44px]"
             >
