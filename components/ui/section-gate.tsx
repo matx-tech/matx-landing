@@ -35,6 +35,10 @@ export function SectionGate({
   placeholderClassName = 'min-h-[50vh]',
 }: SectionGateProps) {
   const ref = useRef<HTMLDivElement>(null);
+  // Revealed-content wrapper for gates without an id: the placeholder (and
+  // its ref) unmounts once the gate opens, so this is the stable target for
+  // focus hand-off when the sr-only load button opens an id-less gate.
+  const revealedRef = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
   // Set when the sr-only load button (not a scroll) opened the gate — the
   // button unmounts with the placeholder, so focus must be handed off to the
@@ -83,18 +87,30 @@ export function SectionGate({
   // <body>. Poll for the real section — the loading skeleton also carries
   // the id but is aria-hidden and transient, so only stop on the mounted
   // section (or the error/retry state), which can take seconds on slow
-  // connections. preventScroll keeps the viewport where the user is.
+  // connections. Gates without an id can't be found by lookup, so poll the
+  // revealed wrapper for its first heading and fall back to the wrapper
+  // itself (tabIndex -1) so focus never drops to <body>. preventScroll
+  // keeps the viewport where the user is.
   useEffect(() => {
-    if (!visible || !openedByButtonRef.current || !id) return;
+    if (!visible || !openedByButtonRef.current) return;
     let cancelled = false;
     const poll = (remaining: number) => {
-      const el = document.getElementById(id);
-      if (el instanceof HTMLElement && el.getAttribute('aria-hidden') !== 'true') {
-        if (!el.hasAttribute('tabindex')) el.setAttribute('tabindex', '-1');
-        el.focus({ preventScroll: true });
+      const target = id
+        ? document.getElementById(id)
+        : revealedRef.current?.querySelector('h1, h2, h3, h4, h5, h6');
+      if (
+        target instanceof HTMLElement &&
+        target.getAttribute('aria-hidden') !== 'true' &&
+        target.closest('[aria-hidden="true"]') === null
+      ) {
+        if (!target.hasAttribute('tabindex')) target.setAttribute('tabindex', '-1');
+        target.focus({ preventScroll: true });
         return;
       }
-      if (remaining <= 0) return;
+      if (remaining <= 0) {
+        if (!id) revealedRef.current?.focus({ preventScroll: true });
+        return;
+      }
       setTimeout(() => {
         if (!cancelled) poll(remaining - 1);
       }, 200);
@@ -120,7 +136,16 @@ export function SectionGate({
     };
   }, [visible]);
 
-  if (visible) return <>{children}</>;
+  if (visible) {
+    // id-less gates (CTA, footer) get a stable wrapper for focus hand-off:
+    // it replaces the unmounted placeholder, and tabIndex -1 makes it a
+    // programmatic focus fallback if the chunk never resolves.
+    return id ? <>{children}</> : (
+      <div ref={revealedRef} tabIndex={-1}>
+        {children}
+      </div>
+    );
+  }
 
   // The placeholder keeps the anchor id and a visually-hidden load button
   // so keyboard-only users can open gated content without scrolling.
