@@ -32,8 +32,10 @@ const nextConfig = {
     ],
   },
   compiler: {
-    // Remove console.* in production (optional — comment out if needed for debugging)
-    // removeConsole: process.env.NODE_ENV === 'production',
+    // Optional: strip console.* in production while keeping error/warn so
+    // failure reporting (registration, Lenis, thumbhash) reaches telemetry.
+    // removeConsole:
+    //   process.env.NODE_ENV === 'production' ? { exclude: ['error', 'warn'] } : false,
   },
 };
 
