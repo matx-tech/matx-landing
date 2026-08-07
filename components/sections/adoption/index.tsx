@@ -10,7 +10,6 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ADOPTION_ROUTES, SECTION_IDS, CALENDLY_URL, type AudienceId } from '@/lib/content/landing-copy';
 import { BookOpen, School, FileText, Server } from 'lucide-react';
-import { useLenis } from '@/components/providers/lenis-provider';
 import { useRegistration } from '@/components/providers/registration-provider';
 import { usePrefersReducedMotion } from '@/lib/hooks/use-prefers-reduced-motion';
 import { motionTokens, gsapEase, staggers } from '@/lib/motion-tokens';
@@ -28,7 +27,6 @@ const AUDIENCE_ICONS: Record<AudienceId, typeof BookOpen | typeof School | typeo
 
 export function AdoptionSection() {
   const sectionRef = useRef<HTMLElement>(null);
-  const { scrollTo } = useLenis();
   const { openRegistration } = useRegistration();
   const prefersReducedMotion = usePrefersReducedMotion();
 
@@ -81,12 +79,6 @@ export function AdoptionSection() {
     } else if (action === 'calendly') {
       const newWin = window.open(CALENDLY_URL, '_blank', 'noopener,noreferrer');
       if (newWin) newWin.opener = null;
-    } else if (action === 'procurement') {
-      const el = document.getElementById(SECTION_IDS.pilot);
-      if (el) scrollTo(el);
-    } else if (action === 'technical') {
-      const el = document.getElementById(SECTION_IDS.pilot);
-      if (el) scrollTo(el);
     }
   };
 
