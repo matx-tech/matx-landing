@@ -83,12 +83,15 @@ export function SectionGate({
   // Focus hand-off when the sr-only load button opened the gate: the button
   // unmounts with the placeholder, so without this keyboard focus drops to
   // <body>. The loading skeleton also carries the id but is aria-hidden and
-  // transient, so only hand off once the mounted section (or the error/retry
-  // state) replaces it — which can take seconds on slow connections. Gates
-  // without an id can't be found by lookup, so poll the revealed wrapper for
-  // its first heading; only once the poll cap is hit does focus fall back to
-  // the wrapper itself (tabIndex -1) so focus never drops to <body>.
-  // preventScroll keeps the viewport where the user is.
+  // transient, so only hand off once the mounted section replaces it — which
+  // can take seconds on slow connections. The failed-chunk error/retry state
+  // (data-gate-state="error") is not the real content either: focus its retry
+  // control so keyboard users can act immediately, but keep the hand-off armed
+  // until the real section mounts after a successful retry, then hand focus
+  // into it. Gates without an id can't be found by lookup, so poll the
+  // revealed wrapper for its first heading; only once the poll cap is hit does
+  // focus fall back to the wrapper itself (tabIndex -1) so focus never drops
+  // to <body>. preventScroll keeps the viewport where the user is.
   useEffect(() => {
     if (!visible || !openedByButtonRef.current) return;
     let cancelled = false;
@@ -105,6 +108,16 @@ export function SectionGate({
       );
     };
 
+    // The failed-chunk fallback section (or its wrapper, for id-less gates)
+    // isn't the final hand-off target — return its retry control so focus
+    // lands on the actionable element without committing the hand-off.
+    const errorRetryTarget = (target: HTMLElement): HTMLButtonElement | null =>
+      (target.closest('[data-gate-state="error"]') ??
+        target.querySelector('[data-gate-state="error"]'))?.querySelector<HTMLButtonElement>(
+        'button'
+      ) ??
+      null;
+
     const tryHandOff = (): boolean => {
       if (cancelled) return true;
       const target = resolveTarget();
@@ -113,6 +126,14 @@ export function SectionGate({
         target.getAttribute('aria-hidden') !== 'true' &&
         target.closest('[aria-hidden="true"]') === null
       ) {
+        // Error/retry state: park focus on the retry button and keep watching
+        // for the real section — stopping here would strand focus on <body>
+        // once the retry button unmounts with the error fallback.
+        const retry = errorRetryTarget(target);
+        if (retry) {
+          retry.focus({ preventScroll: true });
+          return false;
+        }
         if (!target.hasAttribute('tabindex')) target.setAttribute('tabindex', '-1');
         target.focus({ preventScroll: true });
         return true;
@@ -137,8 +158,13 @@ export function SectionGate({
       }
       if (remaining <= 0) {
         // id-less gates get a final non-scroll fallback so focus never drops
-        // to <body> even if the chunk never resolves.
-        if (!id) revealedRef.current?.focus({ preventScroll: true });
+        // to <body> even if the chunk never resolves — but prefer the retry
+        // control when the failed-chunk fallback is showing.
+        if (!id) {
+          const wrapper = revealedRef.current;
+          const retry = wrapper ? errorRetryTarget(wrapper) : null;
+          (retry ?? wrapper)?.focus({ preventScroll: true });
+        }
         return; // slow path below keeps watching
       }
       timerId = setTimeout(() => poll(remaining - 1), 200);

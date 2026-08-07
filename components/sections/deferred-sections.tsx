@@ -34,8 +34,11 @@ function SectionSkeleton({
   if (error) {
     // Failed chunk fetch: surface a retry instead of an eternal skeleton.
     // Keeping the anchor id here also preserves nav links while retrying.
+    // data-gate-state="error" tells SectionGate this is the retry fallback,
+    // not the real content — its focus hand-off stays armed so the section
+    // that mounts after a successful retry still receives focus.
     return (
-      <section id={id} className={`${sectionClass} ${bgClass}`}>
+      <section id={id} data-gate-state="error" className={`${sectionClass} ${bgClass}`}>
         <div className="container mx-auto px-4 md:px-8 lg:px-16 text-center">
           <div className={`${heightClass} flex flex-col items-center justify-center gap-4 rounded-2xl bg-border/40`}>
             <p className="text-text-secondary">Sektsiooni laadimine ebaõnnestus.</p>
