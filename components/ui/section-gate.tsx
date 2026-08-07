@@ -187,7 +187,7 @@ export function SectionGate({
           const wrapper = revealedRef.current;
           const retry = wrapper ? errorRetryTarget(wrapper) : null;
           if (retry) focusRetry(retry);
-          else wrapper?.focus({ preventScroll: true });
+          else if (document.activeElement === document.body) wrapper?.focus({ preventScroll: true });
         }
         return; // slow path below keeps watching
       }
