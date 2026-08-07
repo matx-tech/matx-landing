@@ -15,27 +15,28 @@ const nextConfig = {
   // Compress responses (gzip/brotli) — Cloudflare handles this but
   // Next.js built-in compression catches dev/preview deploys.
   compress: true,
-  // Tree-shake unused code from barrel imports (experimental in Next.js 14)
-  experimental: {
-    optimizePackageImports: [
-      'lucide-react',
-      '@radix-ui/react-accordion',
-      '@radix-ui/react-dialog',
-      '@radix-ui/react-dropdown-menu',
-      '@radix-ui/react-popover',
-      '@radix-ui/react-progress',
-      '@radix-ui/react-scroll-area',
-      '@radix-ui/react-separator',
-      '@radix-ui/react-tabs',
-      '@radix-ui/react-toast',
-      '@radix-ui/react-tooltip',
-    ],
-  },
+  // Tree-shake unused code from barrel imports (stable top-level option
+  // since Next 15 — the old `experimental` key is silently ignored in 16).
+  optimizePackageImports: [
+    'lucide-react',
+    '@radix-ui/react-accordion',
+    '@radix-ui/react-dialog',
+    '@radix-ui/react-dropdown-menu',
+    '@radix-ui/react-popover',
+    '@radix-ui/react-progress',
+    '@radix-ui/react-scroll-area',
+    '@radix-ui/react-separator',
+    '@radix-ui/react-tabs',
+    '@radix-ui/react-toast',
+    '@radix-ui/react-tooltip',
+  ],
   compiler: {
-    // Optional: strip console.* in production while keeping error/warn so
-    // failure reporting (registration, Lenis, thumbhash) reaches telemetry.
-    // removeConsole:
-    //   process.env.NODE_ENV === 'production' ? { exclude: ['error', 'warn'] } : false,
+    // removeConsole is deliberately left disabled — console.error/warn in
+    // the lazy chunk paths (registration, Lenis, thumbhash) reach
+    // telemetry in production. If stripping is ever wanted, the exclusion
+    // form is:
+    //   removeConsole:
+    //     process.env.NODE_ENV === 'production' ? { exclude: ['error', 'warn'] } : false,
   },
 };
 

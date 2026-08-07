@@ -63,9 +63,7 @@ updates:
         patterns:
           - "tailwindcss"
           - "postcss"
-          - "autoprefixer"
           - "tailwind-merge"
-          - "tailwindcss-animate"
 
       # ESLint core + TypeScript parser/plugin — parser / plugin compatibility.
       eslint:
@@ -89,7 +87,6 @@ updates:
         patterns:
           - "typescript"
           - "npm-check-updates"
-          - "critters"
           - "@types/node"
 
       # Production catch-all for uncategorised runtime deps (lucide-react,

@@ -182,7 +182,7 @@ export function ProductFixture({
               key={option.action}
               className="px-3 py-1.5 text-xs font-medium rounded border border-success-border bg-surface text-success-strong opacity-60 cursor-default"
               type="button"
-              aria-disabled="true"
+              disabled
               title="Näidisandmed — tegevus ei ole selles vaates aktiivne"
             >
               {option.label}

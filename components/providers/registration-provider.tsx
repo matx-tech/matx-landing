@@ -77,13 +77,23 @@ function RegistrationChunkFallback({ error, retry }: DynamicOptionsLoadingProps)
     cancel();
   };
 
+  // Modal shell: lock background scroll while the chunk loads — the loaded
+  // Radix dialog locks scroll too, so both states behave the same.
+  useEffect(() => {
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, []);
+
   return (
     <div
       ref={overlayRef}
       role="dialog"
       aria-modal="true"
       aria-label={error ? REGISTRATION_COPY.error : REGISTRATION_COPY.loading}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-canvas/95"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-canvas/95 touch-none"
       onClick={handleCancel}
     >
       {error ? (
@@ -179,6 +189,11 @@ export function RegistrationProvider({ children }: { children: React.ReactNode }
   }, []);
 
   const handleCloseRegistration = useCallback(() => {
+    // Clear any pending timer first: a second close inside the exit-fade
+    // window must not orphan a timer that would slam a reopened dialog shut.
+    if (closeTimerRef.current) {
+      clearTimeout(closeTimerRef.current);
+    }
     setIsRegistrationClosing(true);
     closeTimerRef.current = setTimeout(() => {
       setIsRegistrationOpen(false);

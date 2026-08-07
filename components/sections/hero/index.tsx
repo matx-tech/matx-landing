@@ -18,11 +18,16 @@ import { motionTokens, gsapEase, staggers } from '@/lib/motion-tokens';
 const ProductFixture = dynamic(
   () => import('@/components/ui/product-fixture').then((mod) => mod.ProductFixture),
   {
+    // Match the fixture's real stack geometry (label + 4 panels) at every
+    // breakpoint — the old hidden-on-mobile box reserved nothing, so the
+    // fixture popped in (~400px CLS) when its chunk hydrated.
     loading: () => (
-      <div
-        className="hidden lg:block w-full aspect-[4/3] rounded-2xl bg-surface/50 animate-pulse motion-reduce:animate-none"
-        aria-hidden="true"
-      />
+      <div className="w-full space-y-4" aria-hidden="true">
+        <div className="h-4 w-24 rounded bg-border/40 animate-pulse motion-reduce:animate-none" />
+        {[0, 1, 2, 3].map((i) => (
+          <div key={i} className="h-24 rounded-lg bg-border/40 animate-pulse motion-reduce:animate-none" />
+        ))}
+      </div>
     ),
   }
 );
@@ -31,14 +36,12 @@ const ProductFixture = dynamic(
 const ScrollIndicator = dynamic(
   () => import('./scroll-indicator').then((mod) => mod.ScrollIndicator),
   {
-    ssr: false,
-    // Reserve the indicator's slot (absolute bottom-center) while the chunk
-    // loads so it doesn't pop in; the fallback is purely decorative.
+    // SSR'd so the indicator + its a11y label exist without JS (the chunk
+    // is tiny). The fallback matches the real component's initial state
+    // (opacity 0 until the 3.2s entrance) so the slot never flashes a
+    // visible circle that then disappears.
     loading: () => (
-      <div
-        aria-hidden="true"
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 w-6 h-10 rounded-full border-2 border-text-secondary/50"
-      />
+      <div aria-hidden="true" className="absolute bottom-8 left-1/2 -translate-x-1/2 opacity-0" />
     ),
   }
 );
@@ -70,23 +73,20 @@ export function HeroSection() {
         ...Array.from(badgesRef.current?.children ?? []),
       ].filter(Boolean) as (Element | HTMLDivElement)[];
 
-      gsap.fromTo(
-        elements,
-        { opacity: 0, y: motionTokens.distance.md },
-        {
-          opacity: 1,
-          y: 0,
-          duration: motionTokens.duration.normal,
-          delay: 2.2,
-          stagger: staggers.card,
-          ease: gsapEase(motionTokens.easing.emphasized),
-          // Keep CTAs visible until the reveal actually starts (same
-          // immediateRender: false pattern as the headline) — a delayed
-          // gsap.set at mount would leave the primary CTA invisible for
-          // the whole headline animation on slow devices.
-          immediateRender: false,
-        }
-      );
+      // Set the hidden state at mount, then reveal after the headline
+      // sequence — the previous immediateRender: false version showed the
+      // finished CTAs until 2.2s and then snapped them hidden, a visible
+      // blink on every load. The tradeoff (CTA hidden until the reveal)
+      // matches the headline's own delayed reveal.
+      gsap.set(elements, { opacity: 0, y: motionTokens.distance.md });
+      gsap.to(elements, {
+        opacity: 1,
+        y: 0,
+        duration: motionTokens.duration.normal,
+        delay: 2.2,
+        stagger: staggers.card,
+        ease: gsapEase(motionTokens.easing.emphasized),
+      });
     });
 
     return () => mm.revert();

@@ -40,17 +40,16 @@ async function generateThumbHash(imagePath, maxDim = 100) {
 const MOBILE_PATH = join(base, 'mobile-matx.png');
 const DESKTOP_PATH = join(base, 'desktop-matx.png');
 
-for (const path of [MOBILE_PATH, DESKTOP_PATH]) {
-  if (!existsSync(path)) {
-    console.error(
-      `\n  Missing source screenshot: ${basename(path)}\n` +
-      `  Expected at: ${path}\n\n` +
-      `  Place a mobile portrait and desktop landscape screenshot in the\n` +
+const missing = [MOBILE_PATH, DESKTOP_PATH].filter((path) => !existsSync(path));
+if (missing.length > 0) {
+  console.error(
+    `\n  Missing source screenshot${missing.length > 1 ? 's' : ''}:\n` +
+      missing.map((path) => `    - ${basename(path)}  (expected at ${path})`).join('\n') +
+      `\n\n  Place a mobile portrait and desktop landscape screenshot in the\n` +
       `  project root, then re-run:\n` +
       `    node scripts/generate-thumbhash.mjs\n`
-    );
-    process.exit(1);
-  }
+  );
+  process.exit(1);
 }
 
 try {

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 interface SectionGateProps {
   children: ReactNode;
@@ -73,7 +74,34 @@ export function SectionGate({
     };
   }, [visible]);
 
+  // The mounted section is taller/shorter than the placeholder; refresh
+  // scroll math (ScrollTrigger triggers, Lenis limit) once the frame
+  // settles and again after a typical chunk fetch.
+  // ponytail: heuristic timer; swap for a MutationObserver on children if
+  // gate reveals drift again with slower chunks.
+  useEffect(() => {
+    if (!visible) return;
+    const raf = requestAnimationFrame(() => ScrollTrigger.refresh());
+    const timer = setTimeout(() => ScrollTrigger.refresh(), 500);
+    return () => {
+      cancelAnimationFrame(raf);
+      clearTimeout(timer);
+    };
+  }, [visible]);
+
   if (visible) return <>{children}</>;
 
-  return <div ref={ref} id={id} className={`${placeholderClassName} scroll-mt-20`} aria-hidden="true" />;
+  // The placeholder keeps the anchor id and a visually-hidden load button
+  // so keyboard-only users can open gated content without scrolling.
+  return (
+    <div ref={ref} id={id} className={`relative ${placeholderClassName} scroll-mt-20`}>
+      <button
+        type="button"
+        onClick={() => setVisible(true)}
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 rounded-lg bg-surface px-4 py-2 text-sm font-semibold text-text-primary shadow-card focus-ring-target"
+      >
+        Laadi sisu
+      </button>
+    </div>
+  );
 }

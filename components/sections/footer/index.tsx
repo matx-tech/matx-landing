@@ -3,10 +3,15 @@
 import { useRef, useEffect } from 'react';
 import Link from 'next/link';
 import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Award, GraduationCap, Mail, MessageCircle, Building2, GitBranch } from 'lucide-react';
 import { usePrefersReducedMotion } from '@/lib/hooks/use-prefers-reduced-motion';
 import { motionTokens, gsapEase, staggers } from '@/lib/motion-tokens';
 import { SECTION_IDS, CALENDLY_URL } from '@/lib/content/landing-copy';
+
+if (typeof window !== 'undefined') {
+  gsap.registerPlugin(ScrollTrigger);
+}
 
 export function FooterSection() {
   const footerRef = useRef<HTMLElement>(null);

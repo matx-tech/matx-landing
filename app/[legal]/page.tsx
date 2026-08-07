@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
-import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import { SITE_META } from '@/lib/content/landing-copy';
 
 // Legal documents. Content is intentionally minimal and honest: these pages
 // exist so every legal link on the site resolves to a real route. The full
@@ -14,7 +14,7 @@ const LEGAL_DOCS = {
     sections: [
       {
         heading: 'Mida me kogume',
-        body: 'Piloodi registreerimisel kooli nimi, kontaktisiku nimi, roll, e-post ja telefoninumber. Õpilase andmeid registreerimisleht ei kogu.',
+        body: 'Piloodi registreerimisel kooli nimi, kontaktisiku nimi, roll, e-post, telefoninumber ja klassirühmade arv. Õpilase andmeid registreerimisleht ei kogu.',
       },
       {
         heading: 'Milleks me andmeid kasutame',
@@ -81,10 +81,23 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { legal } = await params;
   const doc = LEGAL_DOCS[legal as LegalSlug];
-  if (!doc) return { title: 'MATx' };
+  // dynamicParams=false 404s unknown slugs at routing, so doc is defined.
   return {
     title: `${doc.title} — MATx`,
     description: doc.description,
+    openGraph: {
+      title: `${doc.title} — MATx`,
+      description: doc.description,
+      url: `${SITE_META.url}/${legal}`,
+      siteName: SITE_META.title,
+      locale: SITE_META.locale,
+      type: 'website',
+    },
+    twitter: {
+      card: 'summary',
+      title: `${doc.title} — MATx`,
+      description: doc.description,
+    },
   };
 }
 
@@ -95,7 +108,6 @@ export default async function LegalPage({
 }) {
   const { legal } = await params;
   const doc = LEGAL_DOCS[legal as LegalSlug];
-  if (!doc) return notFound();
 
   return (
     <main id="main" className="pt-16 min-h-screen">

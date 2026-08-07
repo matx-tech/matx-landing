@@ -254,7 +254,7 @@ export function TopicsSection() {
                 <span className={`block w-2 h-2 rounded-full transition-all ${
                   index === activeIndex
                     ? 'bg-primary w-6'
-                    : 'bg-border hover:bg-borderStrong'
+                    : 'bg-border hover:bg-border-strong'
                 }`} />
               </button>
             ))}

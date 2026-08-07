@@ -34,7 +34,10 @@ interface AnimatedHeadlineProps {
 function scheduleIdle(cb: () => void): () => void {
   let cancelled = false;
   if (typeof requestIdleCallback !== 'undefined') {
-    const id = requestIdleCallback(() => { if (!cancelled) cb(); });
+    // timeout: a busy main thread must not starve the reveal forever — the
+    // fallback class stays applied and the LCP subline sits offset until
+    // the callback eventually runs.
+    const id = requestIdleCallback(() => { if (!cancelled) cb(); }, { timeout: 1000 });
     return () => { cancelled = true; cancelIdleCallback(id); };
   }
   // requestIdleCallback is not available in Safari < 15.4,
@@ -90,12 +93,17 @@ export function AnimatedWordReveal({
         // has opacity: 1 !important which overrides GSAP inline styles.
         el.classList.remove('gsap-animate-on-mount');
 
-        // fromTo with immediateRender: false — the start state (words
-        // displaced below, edge-on) is applied when the tween actually
-        // starts, after `delay`, not at split time. A separate gsap.set
-        // here would make the words vanish on idle and sit invisible
-        // through the delay — a visible flash of the finished headline
-        // followed by a jump (first paint is at rest).
+        // Apply the start state immediately at split time. The tween keeps
+        // immediateRender: false (the from-values are already in place) so
+        // the `delay` runs with words hidden — without this set, the
+        // finished headline stays visible through the whole delay and then
+        // snaps hidden and re-reveals on every load.
+        gsap.set(split.words, {
+          y: motionTokens.distance.xxl,
+          rotateX: -90,
+          transformOrigin: 'center bottom',
+        });
+
         revealTween = gsap.fromTo(
           split.words,
           {
@@ -173,8 +181,11 @@ export function AnimatedCharacterReveal({ children, className = '' }: AnimatedSu
       // so the deferred idle tween doesn't visibly snap the element down
       // 16px from its rest position when it runs.
       gsap.set(el, { y: motionTokens.distance.md });
+      // Strip the CSS fallback in the same tick as the set — deferring it
+      // to idle would leave the !important class (and the 16px offset)
+      // applied for however long the main thread stays busy.
+      el.classList.remove('gsap-animate-on-mount');
       const cancelIdle = scheduleIdle(() => {
-        el.classList.remove('gsap-animate-on-mount');
         revealTween = gsap.to(el, {
           y: 0,
           duration: motionTokens.duration.normal,

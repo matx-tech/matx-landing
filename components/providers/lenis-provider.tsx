@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, createContext, useContext, useCallback, useMemo } from 'react';
+import { useEffect, useLayoutEffect, useRef, createContext, useContext, useCallback, useMemo } from 'react';
 import type Lenis from 'lenis';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -32,11 +32,17 @@ export function LenisProvider({ children }: { children: React.ReactNode }) {
   const focusTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const prefersReducedMotion = usePrefersReducedMotion();
 
+  // Mirror the render-time preference before paint — the effect-driven ref
+  // would lag by a render, letting the first interaction (anchor click,
+  // scrollTo) read a stale value.
+  useLayoutEffect(() => {
+    reducedMotionRef.current = prefersReducedMotion;
+  }, [prefersReducedMotion]);
+
   useEffect(() => {
     // Share one rAF cycle between Lenis and GSAP — eliminates duplicate
     // animation loops and reduces jank.
     gsap.ticker.lagSmoothing(false);
-    reducedMotionRef.current = prefersReducedMotion;
 
     let disposed = false;
     let lenisInstance: Lenis | null = null;
@@ -165,21 +171,50 @@ export function LenisProvider({ children }: { children: React.ReactNode }) {
       focusHeading();
     } else if (typeof target === 'number') {
       lenisRef.current.scrollTo(target);
+    } else if (typeof target === 'string') {
+      // The target isn't in the DOM yet — a gated section whose chunk is
+      // still loading (its id-bearing placeholder was already swapped for
+      // the skeleton, which carries the id too). Poll briefly for the real
+      // element instead of dropping the scroll entirely.
+      const poll = (remaining: number) => {
+        const el = document.querySelector(target);
+        if (el instanceof HTMLElement) {
+          if (!lenisRef.current) {
+            const behavior: ScrollBehavior = reducedMotionRef.current ? 'auto' : 'smooth';
+            const top = el.getBoundingClientRect().top + window.scrollY - 80;
+            window.scrollTo({ top: Math.max(top, 0), behavior });
+          } else {
+            lenisRef.current.scrollTo(el, {
+              offset: -80, // Account for fixed nav height
+              duration: reducedMotionRef.current ? 0 : 1.2,
+            });
+          }
+          focusHeading();
+          return;
+        }
+        if (remaining <= 0) return;
+        setTimeout(() => poll(remaining - 1), 200);
+      };
+      poll(15);
     }
   }, []);
 
   // Handle anchor link clicks for focus management
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
+      // Let modified clicks (Cmd/Ctrl/Shift/Alt) and non-primary buttons
+      // keep native browser behavior (open in new tab, etc.).
+      if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
       // Early exit: only intercept clicks on anchor elements with hash hrefs
       if (!(e.target instanceof HTMLElement)) return;
       const anchor = e.target.closest('a[href^="#"]');
       if (!(anchor instanceof HTMLAnchorElement)) return;
 
       const href = anchor.getAttribute('href');
-      // If the lazy Lenis chunk hasn't arrived yet, let the browser do the
-      // native anchor jump instead of swallowing the click.
-      if (href && href.length > 1 && lenisRef.current) {
+      // Intercept on both the Lenis and native paths — scrollTo handles
+      // each (nav offset + heading focus), so a missing Lenis chunk no
+      // longer drops the focus behavior.
+      if (href && href.length > 1) {
         e.preventDefault();
         scrollTo(href, { focusHeading: true });
       }
