@@ -19,7 +19,7 @@ function SectionSkeleton({
   return (
     <section className={`${sectionClass} ${bgClass}`}>
       <div className="container mx-auto px-4 md:px-8 lg:px-16 text-center">
-        <div className={`${heightClass} bg-card/30 rounded-2xl animate-pulse motion-reduce:animate-none`} />
+        <div className={`${heightClass} bg-border/40 rounded-2xl animate-pulse motion-reduce:animate-none`} />
       </div>
     </section>
   );

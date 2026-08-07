@@ -19,6 +19,7 @@
   --color-canvas: var(--color-bg-canvas);
   --color-surface: var(--color-bg-surface);
   --color-elevated: var(--color-bg-elevated);
+  --color-card: var(--color-bg-surface);
   --color-brand: var(--color-bg-brand);
   --color-brand-container: var(--color-bg-brand-container);
   --color-primary: var(--color-action-primary-bg);
