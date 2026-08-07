@@ -90,7 +90,7 @@ export function AdoptionSection({ onOpenRegistration }: AdoptionRoutesProps) {
     } else if (action === 'calendly') {
       const newWin = window.open(CALENDLY_URL, '_blank', 'noopener,noreferrer');
       if (newWin) newWin.opener = null;
-    } else if (action === 'procurement' || action === 'technical') {
+    } else if (action === 'procurement') {
       const el = document.getElementById(SECTION_IDS.pilot);
       if (el) scrollTo(el);
     }
