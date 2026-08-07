@@ -135,6 +135,26 @@ const SECURITY_CONTROLS: StatusRow[] = [
     status: 'Kavandatud',
     note: 'Põhiharul kommenteeritud välja; taastamine kavandatud.',
   },
+  {
+    title: 'Puhkeoleku krüpteerimine',
+    detail: 'Andmebaasi ja varukoopiate krüpteerimine koos võtmehaldusega.',
+    status: 'Kavandatud',
+  },
+  {
+    title: 'Andmete säilitamine ja kustutamine',
+    detail: 'Säilitustähtajad õppeaasta ja õpilase kaupa, kustutamine DSR-i alusel ja lepingu lõppedes.',
+    status: 'Kavandatud',
+  },
+  {
+    title: 'Intsidentide käsitlus',
+    detail: 'Intsidentide register, GDPR Art. 33 72h teavitus, DPO kontakt.',
+    status: 'Kavandatud',
+  },
+  {
+    title: 'Vastutustundlik avalikustamine',
+    detail: 'security@matx.ee; vastuse aeg ja PGP-võti avalikustatakse koos poliitikaga.',
+    status: 'Kavandatud',
+  },
 ];
 
 // Compliance status per regime. Honest scope: NIS2/DORA are NOT in legal
@@ -179,7 +199,7 @@ const COMPLIANCE_ROWS: StatusRow[] = [
   {
     title: 'Eesti õigus (IKS, PGS, AKI)',
     detail: 'IKS digitaalne nõusolek alates 13. eluaastast, isikuandmete kaitse seadus, AKI koolide juhendmaterjalid.',
-    status: 'Piloodis',
+    status: 'Kavandatud',
     note: 'Nõusoleku- ja vanusepiiri loogika on compliance-harul; põhiharul puudub.',
   },
 ];
@@ -202,20 +222,48 @@ const INTEGRATION_ROWS: StatusRow[] = [
     status: 'Piloodis',
   },
   {
-    title: 'Kolmandad osapooled',
-    detail: 'Jälgijaid pole. Ainus väline teenus on demobroneering (Calendly).',
+    title: 'AI-töötlus (OpenAI, Anthropic)',
+    detail: 'Käsikirja OCR ja õpianalüüsi tekstitöötlus kolmanda osapoole AI-teenustega.',
+    status: 'Piloodis',
+    note: 'Andmetöötluse tingimused kinnitatakse enne pilootlepinguid.',
+  },
+  {
+    title: 'EATF allkirjastamine',
+    detail: 'Tõendite ja BKT hetktõmmiste ajaallkirjastamine EATF-i kaudu (RSA-4096 + ML-DSA-65).',
+    status: 'Piloodis',
+  },
+  {
+    title: 'Kolmandad osapooled (leht)',
+    detail: 'Landing-lehel jälgijaid pole; ainus väline teenus lehel on demobroneering (Calendly). Platvormi kolmandad osapooled on loetletud ülal.',
     status: 'Saadaval',
   },
 ];
 
 // Architecture facts that are true today (verified against the repo).
 const ARCHITECTURE_ROWS: StatusRow[] = [
-  { title: 'Esikiht', detail: 'React 18, TypeScript, Vite, Tailwind', status: 'Saadaval' },
+  {
+    title: 'Esikiht',
+    detail: 'React 18, TypeScript, Tailwind; landing-leht Next.js, platvormi klient Vite.',
+    status: 'Saadaval',
+  },
   { title: 'Tagakiht', detail: 'Express, TypeScript, Drizzle ORM', status: 'Saadaval' },
-  { title: 'Andmebaas', detail: 'PostgreSQL (relatsiooniline), Redis (järjekorrad ja limiidid)', status: 'Saadaval' },
+  {
+    title: 'Andmebaas',
+    detail: 'PostgreSQL (relatsiooniline), Redis (järjekorrad; limiidid turbeharul).',
+    status: 'Saadaval',
+  },
   { title: 'Kohanduv õpimootor', detail: 'BKT valdamismudel, reeglipõhine ja selgitatav — soovitus, mitte diagnoos', status: 'Piloodis' },
   { title: 'Koodigraaf', detail: 'ts-morph indekseerija, SQLite, BullMQ, Docker-sandbox', status: 'Piloodis' },
-  { title: 'Paigaldus', detail: 'Docker Compose + Caddy (isemajutatud); hallatud pilv on avatud otsus', status: 'Piloodis' },
+  {
+    title: 'Paigaldus',
+    detail: 'Docker Compose + Caddy (isemajutatud, HTTPS); hallatud pilv on avatud otsus',
+    status: 'Piloodis',
+  },
+  {
+    title: 'Andmete asukoht',
+    detail: 'Isemajutatud paigaldus; andmete asukohariik avalikustatakse enne pilootlepinguid.',
+    status: 'Kavandatud',
+  },
 ];
 
 export default function TechnicalOverviewPage() {
@@ -237,6 +285,7 @@ export default function TechnicalOverviewPage() {
           <p className="text-lg text-text-secondary leading-relaxed">
             MATx-i arhitektuur, turvameetmed ja vastavusstaatus IT- ja hanketiimidele.
             Kõik väited on märgistatud staatusega ja allikapõhised — mitte lubadused.
+            Väited põhinevad MATx-i platvormi lähtekoodil; viited harudele osutavad platvormi repositooriumile.
           </p>
         </header>
 
