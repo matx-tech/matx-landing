@@ -173,16 +173,16 @@ Haridus- ja Teadusministeerium / Haridus- ja Noorteamet / Kiviõli Riigikool).
 2. Riigihangete seaduse ja teiste seaduste muutmise seadus — https://riigiteataja.ee/et/akt/103072026003
 3. Eelnõu seletuskiri (79 lk) — https://cms.advokatuur.ee/app/uploads/2025/09/RHS-SK.pdf
 4. Kaubanduskoja ülevaade eelnõust — https://koda.ee (24.09.2025)
-5. Valitsuse teade — https://valitsus.ee/uudised/riik-lihtsustab-riigihangete-reegleid; ERR 1609904110
+5. Valitsuse teade — https://valitsus.ee/uudised/riik-lihtsustab-riigihangete-reegleid; https://err.ee/1609904110
 6. RTK KKK (menetluste tähtajad) — https://rtk.ee/korduma-kippuvad-kusimused-riigihangete-teemal
 7. Rahandusministeerium: Riigihangete valdkonna statistika ja kokkuvõte 2025 (08.05.2026) —
    https://fin.ee; sama 2024 (05.06.2025)
 8. Riigihangete registri avaandmed (lepinguteated 2026 I poolaasta) —
-   riigihanked.riik.ee/rhr/api/public/v1/opendata/notice_award/2026/month/2/xml (kuud 2–7)
+   https://riigihanked.riik.ee/rhr/api/public/v1/opendata/notice_award/2026/month/2/xml (kuud 2–7)
 9. TenderGlass: HTM hankijaprofiil — https://tenderglass.com (registri koondandmed)
 10. Opiq koolipakett 2026/27 hinnad — https://opiq.ee
 11. TTJA digiligipääsetavus — https://ttja.ee/avaliku-sektori-digiligipaasetavus
-12. EN 301 549 V3.2.1 — etsi.org; EU Web Accessibility Directive 2016/2102
+12. EN 301 549 V3.2.1 — https://etsi.org; EU Web Accessibility Directive 2016/2102
 13. Komisjoni delegeeritud määrus (EL) 2025/2152 (piirmäärad 2026–2027) — https://eur-lex.europa.eu
 14. Direktiiv 2011/7/EL (hilinenud maksete direktiiv)
 15. RaM juhend: hankelepingute muutmine kriisiolukorras (04/2026) — https://fin.ee (leppetrahvi praktika)

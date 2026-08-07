@@ -221,7 +221,7 @@ export const ADOPTION_ROUTES = [
     audience: 'IT-le',
     audienceId: 'it' as const,
     title: 'Tehniline ülevaade',
-    description: 'Arhitektuur, turvameetmed ja vastavusstaatus ühel lehel: identiteet ja sessioonid, pseudonüümimine, integratsioonid ja hankedokumendid.',
+    description: 'Arhitektuur, turvameetmed ja vastavusstaatus ühel lehel: identiteet ja sessioonid, pseudonüümimine, integratsioonid ja hankeinfo.',
     cta: 'Vaata tehnilist ülevaadet',
     ctaAction: 'technical',
     ctaRoute: '/tehniline',
