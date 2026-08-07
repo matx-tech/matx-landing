@@ -14,8 +14,19 @@ if (typeof window !== 'undefined') {
 }
 
 // MotionPathPlugin (~12KB) is only used by the decorative dot — keep it in its
-// own on-demand chunk and share one import promise across mounts/effect re-runs.
-const motionPathPluginPromise = import('gsap/MotionPathPlugin');
+// own on-demand chunk, fetched only when the section effect actually needs it.
+// The promise is cached across mounts/effect re-runs; on failure it's dropped
+// so a later mount can retry (callers attach their own rejection handler).
+let motionPathPluginPromise: Promise<typeof import('gsap/MotionPathPlugin')> | null = null;
+function loadMotionPathPlugin(): Promise<typeof import('gsap/MotionPathPlugin')> {
+  if (!motionPathPluginPromise) {
+    motionPathPluginPromise = import('gsap/MotionPathPlugin').catch((error) => {
+      motionPathPluginPromise = null;
+      throw error;
+    });
+  }
+  return motionPathPluginPromise;
+}
 
 export function CTASection() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -161,7 +172,7 @@ export function CTASection() {
 
       // MotionPath: decorative dot follows the SVG text curve on scroll.
       if (motionDotRef.current && document.querySelector('#ctaPath')) {
-        void motionPathPluginPromise.then(({ MotionPathPlugin }) => {
+        void loadMotionPathPlugin().then(({ MotionPathPlugin }) => {
           if (cancelled) return;
           gsap.registerPlugin(MotionPathPlugin);
           motionTween = gsap.to(motionDotRef.current, {
