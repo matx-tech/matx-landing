@@ -110,34 +110,34 @@ export function DeferredSections() {
   return (
     <>
       {/* Narrative order: hero → evidence loop → student → problem → teacher → context → topics → adoption → trust → faq → cta */}
-      <SectionGate id={SECTION_IDS.workflow}>
+      <SectionGate id={SECTION_IDS.workflow} placeholderClassName="min-h-[36rem]">
         <EvidenceLoopSection />
       </SectionGate>
-      <SectionGate id={SECTION_IDS.student}>
+      <SectionGate id={SECTION_IDS.student} placeholderClassName="min-h-[36rem]">
         <StudentSection />
       </SectionGate>
-      <SectionGate id={SECTION_IDS.problem}>
+      <SectionGate id={SECTION_IDS.problem} placeholderClassName="min-h-[calc(80vh+12rem)]">
         <ProblemSection />
       </SectionGate>
-      <SectionGate id={SECTION_IDS.teacher}>
+      <SectionGate id={SECTION_IDS.teacher} placeholderClassName="min-h-[calc(90vh+12rem)]">
         <TeacherSection />
       </SectionGate>
-      <SectionGate id={SECTION_IDS.context}>
+      <SectionGate id={SECTION_IDS.context} placeholderClassName="min-h-[36rem]">
         <ContextSection />
       </SectionGate>
-      <SectionGate id={SECTION_IDS.capabilities}>
+      <SectionGate id={SECTION_IDS.capabilities} placeholderClassName="min-h-[36rem]">
         <TopicsSection />
       </SectionGate>
-      <SectionGate id={SECTION_IDS.pilot}>
+      <SectionGate id={SECTION_IDS.pilot} placeholderClassName="min-h-[36rem]">
         <AdoptionSection />
       </SectionGate>
-      <SectionGate id={SECTION_IDS.trust}>
+      <SectionGate id={SECTION_IDS.trust} placeholderClassName="min-h-[36rem]">
         <TrustSection />
       </SectionGate>
-      <SectionGate id={SECTION_IDS.faq}>
+      <SectionGate id={SECTION_IDS.faq} placeholderClassName="min-h-[28rem]">
         <FAQSection />
       </SectionGate>
-      <SectionGate>
+      <SectionGate placeholderClassName="min-h-[calc(70vh+12rem)]">
         <CTASection />
       </SectionGate>
     </>
@@ -148,7 +148,7 @@ export function DeferredSections() {
 // instead of being nested inside the main landmark.
 export function DeferredFooter() {
   return (
-    <SectionGate>
+    <SectionGate placeholderClassName="min-h-[20rem]">
       <FooterSection />
     </SectionGate>
   );
