@@ -26,6 +26,7 @@ export function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
   const navRef = useRef<HTMLElement>(null);
   const menuItemsRef = useRef<HTMLDivElement[]>([]);
+  const pendingHashTimerRef = useRef<number | null>(null);
   const prefersReducedMotion = usePrefersReducedMotion();
 
   // Layout-phase (useGSAP) so the entrance state is applied before paint —
@@ -120,6 +121,12 @@ export function Navigation() {
   }, [isOpen, prefersReducedMotion]);
 
   const handleOpenChange = useCallback((open: boolean) => {
+    // Cancelling the menu (without a link click) must also cancel a pending
+    // hash jump, or the user gets yanked to a section they didn't choose.
+    if (!open && pendingHashTimerRef.current) {
+      window.clearTimeout(pendingHashTimerRef.current);
+      pendingHashTimerRef.current = null;
+    }
     setIsOpen(open);
   }, []);
 
@@ -138,16 +145,34 @@ export function Navigation() {
    */
   const handleMenuLinkClick = useCallback(
     (event: React.MouseEvent<HTMLAnchorElement>) => {
+      // Modified clicks (ctrl/cmd/shift/alt/middle) keep native browser
+      // behavior — e.g. ctrl+click opens the link in a new tab.
+      if (
+        event.button !== 0 ||
+        event.metaKey ||
+        event.ctrlKey ||
+        event.shiftKey ||
+        event.altKey
+      ) {
+        return;
+      }
       const href = event.currentTarget.getAttribute('href');
       const isExternal = href?.startsWith('http');
       event.preventDefault();
       setIsOpen(false);
 
+      // A later click supersedes a pending jump from an earlier one.
+      if (pendingHashTimerRef.current) {
+        window.clearTimeout(pendingHashTimerRef.current);
+        pendingHashTimerRef.current = null;
+      }
+
       if (isExternal && href) {
         window.open(href, '_blank', 'noopener,noreferrer');
         return;
       }
-      window.setTimeout(() => {
+      pendingHashTimerRef.current = window.setTimeout(() => {
+        pendingHashTimerRef.current = null;
         if (href) window.location.hash = href;
       }, 650);
     },
