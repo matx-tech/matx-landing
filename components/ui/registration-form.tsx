@@ -230,7 +230,9 @@ export function RegistrationForm({ isOpen, onClose }: RegistrationFormProps) {
           style={{ animationDuration: `${dialogExitMs}ms` }}
           className="fixed inset-0 z-50 bg-canvas/95 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0"
         />
-        <Dialog.Content className="fixed left-[50%] top-[50%] z-50 w-full max-w-lg translate-x-[-50%] translate-y-[-50%] bg-elevated rounded-xl border border-border shadow-elevated overflow-hidden max-h-[90vh] overflow-y-auto focus:outline-none">
+        <Dialog.Content
+          className="fixed left-[50%] top-[50%] z-50 w-full max-w-lg translate-x-[-50%] translate-y-[-50%] bg-elevated rounded-xl border border-border shadow-elevated overflow-hidden max-h-[90vh] overflow-y-auto focus:outline-none data-[state=closed]:animate-out data-[state=closed]:fade-out-0"
+        >
           <Dialog.Title className="sr-only">Registreeri kool pilootkatsetusele</Dialog.Title>
 
           {/* Live region for announcements */}
