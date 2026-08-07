@@ -157,6 +157,11 @@ export function FooterSection() {
                   KKK
                 </a>
               </li>
+              <li>
+                <a href="/tehniline" className="text-text-secondary hover:text-primary transition-colors text-sm focus-ring-target rounded-md" style={{ textDecoration: 'underline' }}>
+                  Tehniline ülevaade
+                </a>
+              </li>
             </ul>
           </div>
 

@@ -191,7 +191,7 @@ export function ProblemSection() {
                               </div>
                             ))}
                           </div>
-                          <div className="text-xs text-amber-800 bg-amber-50 px-3 py-2 rounded border border-amber-200">
+                          <div className="text-xs text-amber-800 bg-amber-50 px-3 py-2 rounded border border-amber-200 dark:bg-surface dark:text-amber-400 dark:border-amber-400/40">
                             Võimalik veamuster: liidab lugejad ja nimetajad eraldi
                           </div>
                         </div>

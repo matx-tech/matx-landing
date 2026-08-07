@@ -211,7 +211,8 @@ export const ADOPTION_ROUTES = [
     audience: 'Hankele',
     audienceId: 'procurement' as const,
     title: 'Hankeinfo',
-    description: 'Hinnakiri, lepingutingimused ja tehnilised nõuded on saadaval peatselt. Vahepeal tutvu alustamise võimalustega.',
+    description:
+      'Enamik koolide tarkvaraoste jääb alla riigihangete seaduse piirmäära: kuni 30 000 € (alates 01.11.2026 kuni 50 000 €) saab MATx-i soetada otse hankekorra järgi ilma riigihangeta. Hinnakiri (õpilasepõhine aastahind), lepingutingimused ja tehnilised nõuded on koostamisel ja avaldatakse siin.',
     cta: 'Vaata alustamise võimalusi',
     ctaAction: 'procurement',
     ctaRoute: null as string | null,

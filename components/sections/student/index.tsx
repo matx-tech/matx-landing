@@ -116,8 +116,8 @@ export function StudentSection() {
             {/* Student response */}
             <div className="mb-6">
               <div className="text-sm font-semibold text-foreground mb-2">Õpilase vastus</div>
-              <div className="p-4 bg-red-50 rounded-lg border border-red-200">
-                <div className="text-base font-mono text-red-700">
+              <div className="p-4 bg-red-50 rounded-lg border border-red-200 dark:bg-surface dark:border-red-400/40">
+                <div className="text-base font-mono text-red-700 dark:text-red-400">
                   <InlineFractionalExpression expression={PRODUCT_FIXTURE.answer.submitted} />
                 </div>
               </div>
@@ -126,8 +126,8 @@ export function StudentSection() {
             {/* Feedback — from fixture */}
             <div className="mb-6">
               <div className="text-sm font-semibold text-foreground mb-2">Tagasiside</div>
-              <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
-                <p className="text-sm text-blue-900">
+              <div className="p-4 bg-blue-50 rounded-lg border border-blue-200 dark:bg-surface dark:border-blue-400/40">
+                <p className="text-sm text-blue-900 dark:text-blue-400">
                   {PRODUCT_FIXTURE.feedback.text}
                 </p>
               </div>
@@ -136,11 +136,11 @@ export function StudentSection() {
             {/* Next exercise */}
             <div>
               <div className="text-sm font-semibold text-foreground mb-2">Järgmine harjutus</div>
-              <div className="p-4 bg-green-50 rounded-lg border border-green-200">
-                <div className="text-base font-medium text-green-900">
+              <div className="p-4 bg-green-50 rounded-lg border border-green-200 dark:bg-surface dark:border-success-border">
+                <div className="text-base font-medium text-green-900 dark:text-success-strong">
                   <InlineFractionalExpression expression={PRODUCT_FIXTURE.retry.question} />
                 </div>
-                <div className="text-xs text-green-700 mt-2">
+                <div className="text-xs text-green-700 mt-2 dark:text-success-strong">
                   {PRODUCT_FIXTURE.retry.hint}
                 </div>
               </div>

@@ -345,30 +345,30 @@ export function TeacherSection() {
 
         {/* Intervention Card */}
         <div className="max-w-4xl mx-auto">
-          <div className="bg-green-50 rounded-xl p-6 border border-green-200">
+          <div className="bg-green-50 rounded-xl p-6 border border-green-200 dark:bg-surface dark:border-success-border">
             <div className="flex items-start justify-between mb-4">
-              <h3 className="text-lg font-semibold text-green-900">Õpetaja sekkumine</h3>
+              <h3 className="text-lg font-semibold text-green-900 dark:text-success-strong">Õpetaja sekkumine</h3>
               <CapabilityStatusBadge status="Saadaval" />
             </div>
 
             <div className="space-y-3 mb-4">
               <div>
-                <div className="text-xs font-medium text-green-800 uppercase tracking-wider mb-1">Soovitus</div>
-                <div className="text-sm text-green-900">{PRODUCT_FIXTURE.teacherAction.recommendation}</div>
+                <div className="text-xs font-medium text-green-800 uppercase tracking-wider mb-1 dark:text-success-strong">Soovitus</div>
+                <div className="text-sm text-green-900 dark:text-success-strong">{PRODUCT_FIXTURE.teacherAction.recommendation}</div>
               </div>
 
               <div>
-                <div className="text-xs font-medium text-green-800 uppercase tracking-wider mb-1">Põhjendus</div>
-                <div className="text-sm text-green-700">{PRODUCT_FIXTURE.teacherAction.evidence}</div>
+                <div className="text-xs font-medium text-green-800 uppercase tracking-wider mb-1 dark:text-success-strong">Põhjendus</div>
+                <div className="text-sm text-green-700 dark:text-success-strong">{PRODUCT_FIXTURE.teacherAction.evidence}</div>
               </div>
             </div>
 
-            <div className="flex gap-3 flex-wrap pt-4 border-t border-green-200">
-              <div className="text-xs font-medium text-green-800 uppercase tracking-wider">Õpetaja valikud:</div>
+            <div className="flex gap-3 flex-wrap pt-4 border-t border-green-200 dark:border-success-border">
+              <div className="text-xs font-medium text-green-800 uppercase tracking-wider dark:text-success-strong">Õpetaja valikud:</div>
               {PRODUCT_FIXTURE.teacherAction.options.map((option) => (
                 <button
                   key={option.action}
-                  className="px-3 py-1.5 text-xs font-medium rounded border border-green-300 bg-white text-green-800 hover:bg-green-100 transition-colors"
+                  className="px-3 py-1.5 text-xs font-medium rounded border border-green-300 bg-white text-green-800 hover:bg-green-100 transition-colors dark:bg-surface dark:border-success-border dark:text-success-strong dark:hover:bg-success-surface"
                   type="button"
                   aria-disabled="true"
                   title="Näidisandmed — tegevus ei ole selles vaates aktiivne"

@@ -79,8 +79,9 @@ export function EvidenceLoopSection() {
   }, [prefersReducedMotion]);
 
   const caveatStyles: Record<string, string> = {
-    info: 'text-blue-600 bg-blue-50 border-blue-200',
-    success: 'text-green-800 bg-green-50 border-green-200',
+    info: 'text-blue-600 bg-blue-50 border-blue-200 dark:text-blue-400 dark:bg-surface dark:border-blue-400/40',
+    success:
+      'text-green-800 bg-green-50 border-green-200 dark:text-success-strong dark:bg-surface dark:border-success-border',
   };
 
   return (

@@ -1,7 +1,12 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { ChevronDown, GitBranch } from 'lucide-react';
 import { CapabilityStatusBadge } from '@/components/ui/capability-status';
-import type { CapabilityStatus } from '@/lib/content/landing-copy';
+import { CopyButton } from '@/components/ui/copy-button';
+import { TechnicalTOC } from '@/components/ui/technical-toc';
+import { ExportMarkdown } from '@/components/tehniline/export-markdown';
+import { StatusFilterSection } from '@/components/tehniline/status-filter';
+import { StatusCard, TechText, type StatusRow } from '@/components/tehniline/status-card';
 
 export const metadata: Metadata = {
   title: 'Tehniline ülevaade — MATx',
@@ -18,6 +23,9 @@ export const metadata: Metadata = {
   },
 };
 
+// Freshness anchor — updated whenever claims on this page change.
+const LAST_UPDATED = '07.08.2026';
+
 // Status legend used across the page. Stated plainly, not as a promise.
 const LEGEND = [
   { status: 'Saadaval' as const, meaning: 'on praegu kasutusel' },
@@ -25,32 +33,61 @@ const LEGEND = [
   { status: 'Kavandatud' as const, meaning: 'sihtseis — plaanis, pole veel kasutusele võetud' },
 ];
 
-interface StatusRow {
-  title: string;
-  detail: string;
-  note?: string;
-  status: CapabilityStatus;
-}
+// Section anchors — also used by the on-page table of contents.
+const SECTIONS = [
+  { id: 'kokkuvõte', label: 'Kokkuvõte' },
+  { id: 'arhitektuur', label: 'Arhitektuur' },
+  { id: 'turvameetmed', label: 'Turvameetmed' },
+  { id: 'vastavus', label: 'Vastavus' },
+  { id: 'integratsioonid', label: 'Integratsioonid' },
+  { id: 'hanked', label: 'Hanked' },
+  { id: 'allikad', label: 'Allikad ja kontroll' },
+  { id: 'glossar', label: 'Glossar' },
+  { id: 'kontakt', label: 'Kontakt' },
+] as const;
 
-function StatusCard({ title, detail, note, status }: StatusRow) {
+// KPI accent per status — shares the badge token colors so the band reads
+// as one system.
+const STATUS_ACCENT: Record<StatusRow['status'], string> = {
+  Saadaval: 'text-success-strong',
+  Piloodis: 'text-amber-700 dark:text-amber-400',
+  Kavandatud: 'text-text-secondary',
+};
+
+// Segmented ratio-bar fills — same palette as the badges and KPI accents.
+const STATUS_BAR_FILL: Record<StatusRow['status'], string> = {
+  Saadaval: 'bg-success-strong',
+  Piloodis: 'bg-warning',
+  Kavandatud: 'bg-borderStrong',
+};
+
+function SectionHeading({
+  id,
+  title,
+  lead,
+}: {
+  id: string;
+  title: string;
+  lead?: string;
+}) {
   return (
-    <li className="rounded-xl border border-border bg-card p-5">
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <h3 className="font-semibold text-text-primary">{title}</h3>
-          <p className="text-sm text-text-secondary mt-1">{detail}</p>
-          {note && <p className="text-xs text-text-secondary mt-2 italic">{note}</p>}
-        </div>
-        <CapabilityStatusBadge status={status} />
-      </div>
-    </li>
+    <div id={id} className="scroll-mt-24 mb-6">
+      <h2 className="text-2xl font-semibold text-text-primary">{title}</h2>
+      {lead && <p className="text-sm text-text-secondary leading-relaxed mt-2">{lead}</p>}
+    </div>
   );
 }
 
 // Target-state security controls. Statuses reflect TODAY's real deployment,
 // not the end-state. Items locked to the compliance branch are marked
-// Kavandatud until merged — see the note below the table.
+// Kavandatud until merged — see the notes and the sources section.
 const SECURITY_CONTROLS: StatusRow[] = [
+  {
+    title: 'Post-kvantum allkirjad (ML-DSA-65)',
+    detail: 'EATF-i tõendite ja BKT hetktõmmiste allkirjastamine.',
+    status: 'Piloodis',
+    note: 'server/eatf.ts ja server/bktSnapshotSign.ts on põhiharul olemas.',
+  },
   {
     title: 'Sessioonid PostgreSQL-is (PgStore)',
     detail: 'httpOnly, sameSite=strict, IP+UA sõrmejälg, CSRF double-submit konstantaegse võrdlusega.',
@@ -106,12 +143,6 @@ const SECURITY_CONTROLS: StatusRow[] = [
     note: 'SIEM-i ja tarneahela lüüsid on kavandatud; matx-hack submodule on hetkel funktsiooniharul.',
   },
   {
-    title: 'Post-kvantum allkirjad (ML-DSA-65)',
-    detail: 'EATF-i tõendite ja BKT hetktõmmiste allkirjastamine.',
-    status: 'Piloodis',
-    note: 'server/eatf.ts ja server/bktSnapshotSign.ts on põhiharul olemas.',
-  },
-  {
     title: 'Sandbox-isolatsioon',
     detail: 'Mitte-root kasutaja, seccomp, no-new-privileges, pids-limit, image digesti kinnitus.',
     status: 'Kavandatud',
@@ -161,12 +192,6 @@ const SECURITY_CONTROLS: StatusRow[] = [
 // scope for education — stated as such, not claimed.
 const COMPLIANCE_ROWS: StatusRow[] = [
   {
-    title: 'GDPR (2016/679)',
-    detail: 'Kohaldub. Vastutav töötleja on kool/omavalitsus, volitatud töötleja MATx. Art. 8 alaealiste erikaitse (vanusepiir 13+, vanema nõusolek).',
-    status: 'Kavandatud',
-    note: 'Alaealiste andmete kaitse on pilootfaasi põhirõhk; täismahus vastavus sihtseisus.',
-  },
-  {
     title: 'EU AI Act (2024/1689)',
     detail: 'Kohanduv õpimootor (BKT) on hinnatud Annex III §3 haridusvaldkonna riskiklassi; Art. 6(3)(c) enesehindamine on otsustamisel. Õpetaja inimese-kontroll säilib.',
     status: 'Piloodis',
@@ -177,6 +202,12 @@ const COMPLIANCE_ROWS: StatusRow[] = [
     detail: 'Haridus ei kuulu lisadesse I/II — otsene kohustus ei laiene. Meetmed on võetud aluseks hea tavana.',
     status: 'Piloodis',
     note: 'Siht on NIS2-põhine baastase, mitte formaalne vastavus.',
+  },
+  {
+    title: 'GDPR (2016/679)',
+    detail: 'Kohaldub. Vastutav töötleja on kool/omavalitsus, volitatud töötleja MATx. Art. 8 alaealiste erikaitse (vanusepiir 13+, vanema nõusolek).',
+    status: 'Kavandatud',
+    note: 'Alaealiste andmete kaitse on pilootfaasi põhirõhk; täismahus vastavus sihtseisus.',
   },
   {
     title: 'DORA (2022/2554)',
@@ -207,16 +238,6 @@ const COMPLIANCE_ROWS: StatusRow[] = [
 // Integration status. Integrations are future-state — no overclaiming.
 const INTEGRATION_ROWS: StatusRow[] = [
   {
-    title: 'HarID/TAAT OIDC',
-    detail: 'Koolide identiteediföderatsioon (PKCE, elutsükli käsitlus).',
-    status: 'Kavandatud',
-  },
-  {
-    title: 'EHIS (Eesti Hariduse Infosüsteem)',
-    detail: 'Hariduse infosüsteemi liidestused on kaalumisel.',
-    status: 'Kavandatud',
-  },
-  {
     title: 'Käsikirja OCR',
     detail: 'Käsikirja tuvastus egress-lüüsi taga; EL/Eesti pakkuja kaalumisel.',
     status: 'Piloodis',
@@ -236,6 +257,101 @@ const INTEGRATION_ROWS: StatusRow[] = [
     title: 'Kolmandad osapooled (leht)',
     detail: 'Landing-lehel jälgijaid pole; ainus väline teenus lehel on demobroneering (Calendly). Platvormi kolmandad osapooled on loetletud ülal.',
     status: 'Saadaval',
+  },
+  {
+    title: 'HarID/TAAT OIDC',
+    detail: 'Koolide identiteediföderatsioon (PKCE, elutsükli käsitlus).',
+    status: 'Kavandatud',
+  },
+  {
+    title: 'EHIS (Eesti Hariduse Infosüsteem)',
+    detail: 'Hariduse infosüsteemi liidestused on kaalumisel.',
+    status: 'Kavandatud',
+  },
+];
+
+// Hankeinfo — reference data for procurement teams. Sources at the end of the
+// "Hanked" section. Statuses describe MATx's own deliverables, not the law.
+const PROCUREMENT_ROUTES = [
+  {
+    band: 'Kuni 30 000 € (kuni 31.10.2026) / kuni 50 000 € (alates 01.11.2026)',
+    route: 'Otsetellimine — riigihangete seadus ei kohaldu; ost hankekorra järgi.',
+    note: 'Enamik ühe kooli tarkvaralitsentside oste jääb sellesse klassi ja ei jõua riigihangete registrisse.',
+  },
+  {
+    band: '30 000–60 000 € (kuni 31.10.2026) / 50 000–140 000 € (riik) või 216 000 € (omavalitsus) (alates 01.11.2026)',
+    route: 'Lihthange — pakkumuste tähtaeg min 10 päeva, alates 01.11.2026 min 15 päeva.',
+    note: 'Keskmine kestus teatest lepinguni 2025. aastal: 47 päeva.',
+  },
+  {
+    band: '60 000–140 000 € (riik) või 216 000 € (omavalitsus) — kehtib kuni 31.10.2026',
+    route: 'Avatud hankemenetlus — pakkumuste tähtaeg min 15 päeva.',
+    note: 'Keskmine kestus teatest lepinguni 2025. aastal: 72 päeva.',
+  },
+  {
+    band: 'Alates 140 000 € (riik) või 216 000 € (omavalitsus)',
+    route: 'Rahvusvaheline (EL) menetlus — teade ka EL Teatajas (TED), pakkumuste tähtaeg min 30 päeva.',
+    note: 'EL piirmäärad 2026–2027: 140 000 € (keskvalitsus) / 216 000 € (kohalikud omavalitsused).',
+  },
+];
+
+const PRICE_BENCHMARKS = [
+  { label: 'Kõik lepingud', median: '~67 000 €', mean: '~401 000 €', note: 'n≈4 000 lepinguteadet' },
+  { label: 'Tarkvara (CPV 48*)', median: '~68 000 €', mean: '~246 000 €', note: 'n=134' },
+  { label: 'IT-teenused (CPV 72*)', median: '~121 000 €', mean: '~349 000 €', note: 'n=181' },
+  { label: 'Haridus- ja koolitusteenused (CPV 80*)', median: '~46 000 €', mean: '~98 000 €', note: 'n=105' },
+  { label: 'Tarkvarapaketid (CPV 48900000)', median: '~59 000 €', mean: '~279 000 €', note: 'n=70' },
+  {
+    label: 'Õpikeskkonna hinnaankur: Opiq koolipakett 2026/27',
+    median: '3–5 €/õp/kuu',
+    mean: '≈30–50 €/õp/aastas',
+    note: 'Soodushind alates 50% õpilastest, vähemalt 9 kuud',
+  },
+];
+
+const CONTRACT_NORMS = [
+  {
+    title: 'Kestus',
+    detail: 'RHS ei piira lepingu kestust — lepinguvabadus. Tarkvaralitsentside lepingud on Eesti praktikas tavaliselt 12–36 kuud; raamlepingud kuni 4 aastat (direktiiv 2014/24/EL art 33).',
+  },
+  {
+    title: 'Maksetähtaeg',
+    detail: 'Vähemalt 30 kalendripäeva (hilinenud maksete direktiiv 2011/7/EL); hankelepingutes kasutusel standardina.',
+  },
+  {
+    title: 'Garantii ja leppetrahv',
+    detail: 'Õiguskaitsevahendid — leppetrahv, hinna alandamine, taganemine, ülesütlemine (RHS § 95 lg 4). Määrad on lepinguvabadus ja määratakse hanke alusdokumentides.',
+  },
+  {
+    title: 'Intellektuaalomand',
+    detail: 'Alates 01.11.2026 võib hankija IP-korra määrata alusdokumentides (uus RHS § 77 lg 6²). MATx-i puhul jääb platvormi ja õppevara intellektuaalomand MATx-ile, kool saab kasutuslitsentsi.',
+  },
+  {
+    title: 'Lepingu lõpp',
+    detail: 'Andmete eksport ja kustutamine lepingu lõppedes — vt „Andmete säilitamine ja kustutamine“ turvameetmete all.',
+  },
+];
+
+const TENDER_TECH_REQUIREMENTS = [
+  {
+    title: 'Juurdepääsetavus',
+    detail: 'EN 301 549 / WCAG 2.1 AA — avaliku sektori veebidele ja rakendustele kohustuslik alates 2019 (direktiiv 2016/2102, üle võetud avaliku teabe seadusesse; järelevalve TTJA). Ka lepingu alusel avalikke ülesandeid täitvad eraõiguslikud teenuseosutajad peavad vastama.',
+  },
+  {
+    title: 'Andmekaitse',
+    detail: 'GDPR art 8 (nõusolek alates 13. eluaastast) ja IKS; kool on vastutav töötleja, MATx volitatud töötleja. Andmete asukohariik avaldatakse enne pilootlepinguid.',
+  },
+  {
+    title: 'Identiteet ja integratsioonid',
+    detail: 'HarID/TAAT OIDC, EHIS, eKool/Stuudium — staatused integratsioonide tabelis.',
+  },
+  {
+    title: 'AI-komponent',
+    detail: 'Kohanduv õpimootor (BKT) — EU AI Act 2024/1689 III lisa § 3 haridusvaldkonna riskiklass; enesehindamine pooleli, õpetaja kontroll säilib — staatus vastavuse tabelis.',
+  },
+  {
+    title: 'Turve',
+    detail: 'E-ITS/ISKE baastase, NIS2 hea tava, turvapäised (CSP/HSTS), pseudonüümimine — staatused turvameetmete tabelis.',
   },
 ];
 
@@ -266,10 +382,142 @@ const ARCHITECTURE_ROWS: StatusRow[] = [
   },
 ];
 
+const ALL_ROWS = [
+  ...ARCHITECTURE_ROWS,
+  ...SECURITY_CONTROLS,
+  ...COMPLIANCE_ROWS,
+  ...INTEGRATION_ROWS,
+];
+
+const STATUS_COUNTS = LEGEND.map(({ status }) => ({
+  status,
+  count: ALL_ROWS.filter((row) => row.status === status).length,
+}));
+
+// Glossary — terms used on this page, expanded once for non-security readers.
+const GLOSSARY: { term: string; definition: string }[] = [
+  { term: 'BKT', definition: 'MATx-i kohanduv õpimootor: reeglipõhine valdamismudel, mis annab soovituse, mitte diagnoosi (platvormisisene lühend).' },
+  { term: 'EATF', definition: 'Eesti Ajatempliteenus — aja- ja allkirjatemplid tõenditele ning BKT hetktõmmistele.' },
+  { term: 'DSR', definition: 'Data Subject Request — GDPR-i andmesubjekti taotlus (juurdepääs, parandus, kustutamine, kaasaskantavus).' },
+  { term: 'PITR', definition: 'Point-in-Time Recovery — andmebaasi taastamine suvalisse ajahetke.' },
+  { term: 'RPO', definition: 'Recovery Point Objective — maksimaalne aktsepteeritav andmekadu (siht ≤ 24 h).' },
+  { term: 'RTO', definition: 'Recovery Time Objective — maksimaalne aktsepteeritav taasteaeg (siht ≤ 4 h).' },
+  { term: 'SBOM', definition: 'Software Bill of Materials — tarkvara koostisosade (sh teekide) nimekiri.' },
+  { term: 'SIEM', definition: 'Turbeinfo- ja sündmushaldus — logide koondamine ja analüüs.' },
+  { term: 'HMAC', definition: 'Võtmealuseline räsi — pseudonüümimislüüs isikustatud ID-de maskeerimiseks.' },
+  { term: 'OIDC', definition: 'OpenID Connect — identiteediföderatsiooni protokoll (sisselogimine kooli id-teenuse kaudu).' },
+  { term: 'PKCE', definition: 'Proof Key for Code Exchange — OIDC-voo kaitse koodi vahetamisel.' },
+  { term: 'HarID', definition: 'Eesti haridusvaldkonna identiteediteenus.' },
+  { term: 'IKS', definition: 'Isikuandmete kaitse seadus.' },
+  { term: 'PGS', definition: 'Põhikooli- ja gümnaasiumiseadus.' },
+  { term: 'AKI', definition: 'Andmekaitse Inspektsioon — Eesti andmekaitse järelevalveasutus.' },
+  { term: 'ML-DSA-65', definition: 'NIST-i postkvantum-allkirjaalgoritm (turvakategooria 3) — tulevakindlad allkirjad.' },
+  { term: 'seccomp', definition: 'Linuxi tuumamehhanism, mis piirab sandbox-protsesside süsteemikutseid.' },
+  { term: 'PgStore', definition: 'PostgreSQL-põhine sessioonihoidla.' },
+];
+
+const GITHUB_URL = 'https://github.com/matx-ee';
+
+// Subset of architecture rows promoted to the "At a glance" metric grid in
+// the summary. Same data source as the full list — no duplication.
+const AT_A_GLANCE_TITLES = [
+  'Esikiht',
+  'Tagakiht',
+  'Andmebaas',
+  'Kohanduv õpimootor',
+  'Paigaldus',
+  'Andmete asukoht',
+];
+
+/**
+ * Static layered architecture diagram built from ARCHITECTURE_ROWS —
+ * spatial map for readers who think in systems, not prose. No invented
+ * relationships: layers and side components come from the data arrays.
+ */
+function ArchitectureDiagram() {
+  const layerTitles = ['Esikiht', 'Tagakiht', 'Andmebaas'];
+  const sideTitles = ['Kohanduv õpimootor', 'Koodigraaf'];
+
+  const layers = layerTitles
+    .map((title) => ARCHITECTURE_ROWS.find((row) => row.title === title))
+    .filter((row): row is StatusRow => row !== undefined);
+  const sides = sideTitles
+    .map((title) => ARCHITECTURE_ROWS.find((row) => row.title === title))
+    .filter((row): row is StatusRow => row !== undefined);
+  const deploy = ARCHITECTURE_ROWS.find((row) => row.title === 'Paigaldus');
+
+  return (
+    <div className="rounded-xl border border-border bg-elevated p-6">
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_220px]">
+        <div>
+          {layers.map((row, index) => (
+            <div key={row.title}>
+              <div className="rounded-lg border border-border bg-surface p-4 shadow-card">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <h3 className="text-sm font-semibold text-text-primary">{row.title}</h3>
+                    <p className="text-xs text-text-secondary mt-0.5 leading-relaxed">
+                      <TechText text={row.detail} />
+                    </p>
+                  </div>
+                  <CapabilityStatusBadge status={row.status} />
+                </div>
+              </div>
+              {index < layers.length - 1 && (
+                <div className="flex justify-center py-1.5" aria-hidden="true">
+                  <ChevronDown className="w-4 h-4 text-borderStrong" />
+                </div>
+              )}
+            </div>
+          ))}
+          {deploy && (
+            <div className="rounded-lg border border-dashed border-border bg-surface p-4 mt-1.5">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <h3 className="text-sm font-semibold text-text-primary">Paigaldus</h3>
+                  <p className="text-xs text-text-secondary mt-0.5 leading-relaxed">
+                    <TechText text={deploy.detail} />
+                  </p>
+                </div>
+                <CapabilityStatusBadge status={deploy.status} />
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div>
+          <h3 className="text-xs font-medium text-text-secondary uppercase tracking-wide mb-2">
+            Külgkomponendid
+          </h3>
+          <ul className="space-y-3">
+            {sides.map((row) => (
+              <li key={row.title} className="rounded-lg border border-border bg-surface p-4 shadow-card">
+                <div className="flex items-center justify-between gap-2 mb-1">
+                  <h4 className="text-sm font-semibold text-text-primary">{row.title}</h4>
+                  <CapabilityStatusBadge status={row.status} />
+                </div>
+                <p className="text-xs text-text-secondary leading-relaxed">
+                  <TechText text={row.detail} />
+                </p>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function TechnicalOverviewPage() {
   return (
     <main id="main" className="min-h-screen bg-canvas">
-      <div className="container mx-auto px-4 md:px-8 lg:px-16 py-16 md:py-24 max-w-4xl">
+      <div className="container mx-auto px-4 md:px-8 lg:px-16 py-16 md:py-24 max-w-6xl">
+        <div className="xl:grid xl:grid-cols-[minmax(0,1fr)_260px] xl:gap-12">
+        {/* Content column — must be a single grid child, otherwise CSS grid
+            auto-placement spreads each section across both columns and the
+            sticky rail loses its column (seen: header squeezed into the
+            260px rail at xl widths). */}
+        <div className="min-w-0">
         {/* Breadcrumb */}
         <nav aria-label="Leivajälg" className="mb-8">
           <Link href="/" className="text-sm text-text-secondary hover:text-primary transition-colors">
@@ -285,15 +533,151 @@ export default function TechnicalOverviewPage() {
           <p className="text-lg text-text-secondary leading-relaxed">
             MATx-i arhitektuur, turvameetmed ja vastavusstaatus IT- ja hanketiimidele.
             Kõik väited on märgistatud staatusega ja allikapõhised — mitte lubadused.
-            Väited põhinevad MATx-i platvormi lähtekoodil; viited harudele osutavad platvormi repositooriumile.
+            Väited põhinevad platvormi avalikul lähtekoodil; haruviited osutavad platvormi
+            repositooriumile. Ajakohastatud: {LAST_UPDATED}.
           </p>
+          <div className="flex flex-wrap items-center gap-3 mt-6">
+            <a
+              href={GITHUB_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-4 py-2 text-sm font-medium text-text-primary hover:border-borderStrong hover:shadow-card-hover transition-all focus-ring-target"
+            >
+              <GitBranch className="w-4 h-4 text-text-secondary" aria-hidden="true" />
+              github.com/matx-ee
+            </a>
+            <CopyButton
+              value={GITHUB_URL}
+              label="Kopeeri lingi aadress"
+              className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-4 py-2 text-sm font-medium text-text-secondary hover:border-borderStrong hover:text-text-primary transition-colors focus-ring-target"
+            >
+              Kopeeri link
+            </CopyButton>
+            <ExportMarkdown
+              lastUpdated={LAST_UPDATED}
+              githubUrl={GITHUB_URL}
+              sections={[
+                { heading: 'Arhitektuur', rows: ARCHITECTURE_ROWS },
+                { heading: 'Turvameetmed', rows: SECURITY_CONTROLS },
+                { heading: 'Vastavus', rows: COMPLIANCE_ROWS },
+                { heading: 'Integratsioonid', rows: INTEGRATION_ROWS },
+              ]}
+              glossary={GLOSSARY}
+            />
+          </div>
         </header>
 
-        {/* Status legend */}
-        <section aria-labelledby="legend-heading" className="mb-12">
-          <h2 id="legend-heading" className="text-xl font-semibold text-text-primary mb-4">
-            Staatused
+        {/* Table of contents — sticky chip row on mobile/tablet; desktop uses
+            the sticky rail. Stays put while the evaluator scrolls. */}
+        <nav
+          aria-label="Sisukord"
+          className="xl:hidden sticky top-0 z-40 -mx-4 px-4 py-3 mb-12 bg-canvas/90 backdrop-blur-sm"
+        >
+          <h2 className="text-sm font-semibold text-text-primary mb-2">Selles lehes</h2>
+          <ul className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            {SECTIONS.map(({ id, label }) => (
+              <li key={id}>
+                <a
+                  href={`#${id}`}
+                  className="inline-flex items-center whitespace-nowrap rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text-secondary hover:text-primary hover:border-borderStrong transition-colors focus-ring-target"
+                >
+                  {label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+
+        {/* Executive summary — the 10-second answer for an evaluator */}
+        <section id="kokkuvõte" aria-labelledby="kokkuvõte-heading" className="scroll-mt-24 mb-12">
+          <h2 id="kokkuvõte-heading" className="text-2xl font-semibold text-text-primary mb-4">
+            Kokkuvõte
           </h2>
+          <div className="rounded-xl border border-border bg-elevated p-6 shadow-card">
+            {/* KPI band — the trust signal an evaluator needs in the first
+                ten seconds: how much is live vs target-state today. */}
+            <h3 className="text-sm font-semibold text-text-primary mb-3">Staatus ühel pilgul</h3>
+            <dl className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-8">
+              {STATUS_COUNTS.map(({ status, count }) => {
+                const meaning = LEGEND.find((item) => item.status === status)?.meaning ?? '';
+                return (
+                  <div key={status} className="rounded-lg border border-border bg-surface p-4">
+                    <dt className="flex items-center justify-between gap-2">
+                      <CapabilityStatusBadge status={status} />
+                    </dt>
+                    <dd className={`mt-3 text-3xl font-bold tabular-nums ${STATUS_ACCENT[status]}`}>
+                      {count}
+                    </dd>
+                    <dd className="text-xs text-text-secondary mt-1">{meaning}</dd>
+                  </div>
+                );
+              })}
+            </dl>
+
+            {/* Ratio bar — same STATUS_COUNTS data, drawn instead of
+                described; the count tiles above stay the semantic source. */}
+            <div
+              role="img"
+              aria-label={`Kokku ${ALL_ROWS.length} meedet: ${STATUS_COUNTS.map(({ status, count }) => `${status} ${count}`).join(', ')}`}
+              className="flex h-2.5 w-full overflow-hidden rounded-full border border-border mb-8"
+            >
+              {STATUS_COUNTS.map(({ status, count }) => (
+                <span
+                  key={status}
+                  aria-hidden="true"
+                  className={STATUS_BAR_FILL[status]}
+                  style={{ width: `${(count / ALL_ROWS.length) * 100}%` }}
+                />
+              ))}
+            </div>
+
+            <ul className="space-y-3 text-sm text-text-secondary leading-relaxed">
+              <li>
+                <strong className="text-text-primary">Mis see on.</strong> Adaptiivne
+                matemaatikaõpikeskkond Eesti põhikoolile. Kohanduv õpimootor (BKT) annab õpetajale
+                kontrollitava soovituse — otsus jääb õpetajale.
+              </li>
+              <li>
+                <strong className="text-text-primary">Faas.</strong> Piloot. Täna on kasutusel
+                esikiht, tagakiht ja andmebaas; suurem osa turvameetmetest on sihtseisus, mitte
+                veel põhiharul.
+              </li>
+              <li>
+                <strong className="text-text-primary">Kontrollitavus.</strong> Lähtekood on avalik{' '}
+                <a
+                  href={GITHUB_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary hover:text-secondary underline transition-colors"
+                >
+                  GitHubis
+                </a>
+                ; iga väite juures on märge selle hetkeseisu kohta.
+              </li>
+            </ul>
+
+            {/* At a glance — key facts as scannable metrics, same data as the full list */}
+            <h3 className="text-sm font-semibold text-text-primary mt-6 mb-3">Ühe pilguga</h3>
+            <dl className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {ARCHITECTURE_ROWS.filter((row) => AT_A_GLANCE_TITLES.includes(row.title)).map((row) => (
+                <div key={row.title} className="rounded-lg border border-border bg-surface p-4">
+                  <div className="flex items-center justify-between gap-2 mb-1.5">
+                    <dt className="text-sm font-semibold text-text-primary">{row.title}</dt>
+                    <CapabilityStatusBadge status={row.status} />
+                  </div>
+                  <dd className="text-xs text-text-secondary leading-relaxed">
+                    <TechText text={row.detail} />
+                  </dd>
+                </div>
+              ))}
+            </dl>
+
+          </div>
+        </section>
+
+        {/* Status legend */}
+        <section aria-label="Staatuste legend" className="mb-12">
+          <h2 className="text-xl font-semibold text-text-primary mb-4">Staatuste tähendus</h2>
           <ul className="space-y-2">
             {LEGEND.map((item) => (
               <li key={item.status} className="flex items-center gap-3">
@@ -322,76 +706,316 @@ export default function TechnicalOverviewPage() {
 
         {/* Architecture */}
         <section aria-labelledby="arhitektuur-heading" className="mb-12">
-          <h2 id="arhitektuur-heading" className="text-2xl font-semibold text-text-primary mb-6">
-            Arhitektuur
-          </h2>
-          <ul className="space-y-3">
-            {ARCHITECTURE_ROWS.map((row) => (
-              <StatusCard key={row.title} {...row} />
-            ))}
-          </ul>
+          <SectionHeading
+            id="arhitektuur"
+            title="Arhitektuur"
+            lead="Kihiline paigaldus, mis on täna kasutusel. Selgitatav õpimootor — soovitus, mitte musta kasti hinnang."
+          />
+          <ArchitectureDiagram />
         </section>
 
         {/* Security controls */}
-        <section aria-labelledby="turve-heading" className="mb-12">
-          <h2 id="turve-heading" className="text-2xl font-semibold text-text-primary mb-6">
-            Turvameetmed
-          </h2>
-          <ul className="space-y-3">
-            {SECURITY_CONTROLS.map((row) => (
-              <StatusCard key={row.title} {...row} />
-            ))}
-          </ul>
+        <section aria-labelledby="turvameetmed-heading" className="mb-12">
+          <SectionHeading
+            id="turvameetmed"
+            title="Turvameetmed"
+            lead="Täna kasutusel olevad meetmed on üleval täiskaaluga; sihtseisu meetmed on kokkuvolditud. Staatused kajastavad tegelikku paigaldust, mitte lubadust."
+          />
+          <StatusFilterSection
+            rows={SECURITY_CONTROLS}
+            plannedLabel="Kavandatud turvameetmed"
+          />
         </section>
 
         {/* Compliance */}
         <section aria-labelledby="vastavus-heading" className="mb-12">
-          <h2 id="vastavus-heading" className="text-2xl font-semibold text-text-primary mb-6">
-            Vastavus
-          </h2>
-          <ul className="space-y-3">
-            {COMPLIANCE_ROWS.map((row) => (
-              <StatusCard key={row.title} {...row} />
-            ))}
-          </ul>
+          <SectionHeading
+            id="vastavus"
+            title="Vastavus"
+            lead="NIS2 ja DORA ei ole haridussektorile kohalduvad nõuded — seda öeldakse välja, mitte ei väideta vastavust. GDPR kohaldub: vastutav töötleja on kool, volitatud töötleja MATx."
+          />
+          <StatusFilterSection rows={COMPLIANCE_ROWS} plannedLabel="Kavandatud vastavustegevused" />
         </section>
 
         {/* Integrations */}
         <section aria-labelledby="integratsioonid-heading" className="mb-12">
-          <h2 id="integratsioonid-heading" className="text-2xl font-semibold text-text-primary mb-6">
-            Integratsioonid
-          </h2>
-          <ul className="space-y-3">
-            {INTEGRATION_ROWS.map((row) => (
-              <StatusCard key={row.title} {...row} />
-            ))}
-          </ul>
+          <SectionHeading
+            id="integratsioonid"
+            title="Integratsioonid"
+            lead="Aktiivsed liidestused on üleval; kavandatud föderatsioonid on kokkuvolditud."
+          />
+          <StatusFilterSection rows={INTEGRATION_ROWS} plannedLabel="Kavandatud liidestused" />
         </section>
 
-        {/* Security contact */}
+        {/* Hankeinfo — reference data for procurement teams */}
+        <section aria-labelledby="hanked-heading" className="mb-12">
+          <SectionHeading
+            id="hanked"
+            title="Hanked"
+            lead="Taustinfo hanketiimidele: ostuteed ja piirmäärad, hinnaklassid ning lepingupraktika Eesti avalikus sektoris. MATx-i hankepakett ise on koostamisel — allolev on raamistik, mille alusel seda hinnata."
+          />
+
+          <h3 className="text-lg font-semibold text-text-primary mb-3">
+            Ostuteed ja piirmäärad (asjad ja teenused, ilma käibemaksuta)
+          </h3>
+          {/* Structured data reads as a table, not prose: band thresholds
+              compare vertically; the note column keeps the caveats out of
+              the way. Scrolls horizontally on narrow viewports. */}
+          <div
+            className="rounded-xl border border-border bg-card overflow-x-auto mb-8 shadow-card"
+            role="region"
+            aria-label="Ostuteede ja piirmäärade tabel — horisontaalselt keritav"
+            tabIndex={0}
+          >
+            <table className="w-full min-w-[680px] text-sm">
+              <thead>
+                <tr className="border-b border-border text-left text-text-primary">
+                  <th className="px-5 py-3 font-semibold">Piirmäär</th>
+                  <th className="px-5 py-3 font-semibold">Menetlus</th>
+                  <th className="px-5 py-3 font-semibold">Märkus</th>
+                </tr>
+              </thead>
+              <tbody>
+                {PROCUREMENT_ROUTES.map((route) => (
+                  <tr key={route.band} className="border-b border-border last:border-0 odd:bg-canvas">
+                    <td className="px-5 py-3 text-text-primary font-medium align-top">
+                      <TechText text={route.band} />
+                    </td>
+                    <td className="px-5 py-3 text-text-secondary leading-relaxed align-top">
+                      <TechText text={route.route} />
+                    </td>
+                    <td className="px-5 py-3 text-text-secondary text-xs leading-relaxed align-top">
+                      {route.note}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <h3 className="text-lg font-semibold text-text-primary mb-3">Hinnaklassid</h3>
+          {/* Horizontal scroll on narrow viewports: the table keeps its
+              column widths (min-w) and scrolls instead of crushing text —
+              no column gets clipped by the card boundary. */}
+          <div
+            className="rounded-xl border border-border bg-card overflow-x-auto mb-8 shadow-card"
+            role="region"
+            aria-label="Hinnaklasside võrdlustabel — horisontaalselt keritav"
+            tabIndex={0}
+          >
+            <table className="w-full min-w-[680px] text-sm">
+              <thead>
+                <tr className="border-b border-border text-left text-text-primary">
+                  <th className="px-5 py-3 font-semibold">Kategooria</th>
+                  <th className="px-5 py-3 font-semibold text-right">Mediaan</th>
+                  <th className="px-5 py-3 font-semibold text-right">Keskmine</th>
+                  <th className="px-5 py-3 font-semibold">Märkus</th>
+                </tr>
+              </thead>
+              <tbody>
+                {PRICE_BENCHMARKS.map((row) => (
+                  <tr key={row.label} className="border-b border-border last:border-0 odd:bg-canvas">
+                    <td className="px-5 py-3 text-text-primary">{row.label}</td>
+                    <td className="px-5 py-3 text-text-secondary tabular-nums whitespace-nowrap text-right">
+                      {row.median}
+                    </td>
+                    <td className="px-5 py-3 text-text-secondary tabular-nums whitespace-nowrap text-right">
+                      {row.mean}
+                    </td>
+                    <td className="px-5 py-3 text-text-secondary text-xs leading-relaxed">{row.note}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <h3 className="text-lg font-semibold text-text-primary mb-3">Lepingupraktika</h3>
+          <ul className="grid gap-3 md:grid-cols-2 mb-8">
+            {CONTRACT_NORMS.map((row) => (
+              <li key={row.title} className="rounded-xl border border-border bg-card p-5 shadow-card hover:shadow-card-hover transition-shadow">
+                <h4 className="font-semibold text-text-primary">{row.title}</h4>
+                <p className="text-sm text-text-secondary mt-1 leading-relaxed">
+                  <TechText text={row.detail} />
+                </p>
+              </li>
+            ))}
+          </ul>
+
+          <h3 className="text-lg font-semibold text-text-primary mb-3">Tehnilised nõuded</h3>
+          <ul className="grid gap-3 md:grid-cols-2 mb-8">
+            {TENDER_TECH_REQUIREMENTS.map((row) => (
+              <li key={row.title} className="rounded-xl border border-border bg-card p-5 shadow-card hover:shadow-card-hover transition-shadow">
+                <h4 className="font-semibold text-text-primary">{row.title}</h4>
+                <p className="text-sm text-text-secondary mt-1 leading-relaxed">
+                  <TechText text={row.detail} />
+                </p>
+              </li>
+            ))}
+          </ul>
+
+          <ul className="space-y-3 mb-8">
+            <StatusCard
+              title="Hankepakett (hinnakiri, lepingutingimused, tehniline kirjeldus)"
+              detail="Õpilasepõhine aastahind, lepingu üldtingimused ja tehniline kirjeldus koostatakse enne piloodi laiendamist. Seni arutame hankeprotsessi ja ajakava vestluse käigus — kontaktid lehe lõpus."
+              status="Kavandatud"
+            />
+          </ul>
+
+          <div className="rounded-xl border border-border bg-elevated p-6">
+            <p className="font-medium text-text-primary text-sm mb-4">Hankeinfo allikad</p>
+            {/* Structured definition list — one source per row, term + citation,
+                instead of a paragraph wall. Same facts, scannable. */}
+            <dl className="space-y-4 text-xs text-text-secondary leading-relaxed">
+              <div>
+                <dt className="font-medium text-text-primary">Piirmäärad ja menetlused</dt>
+                <dd className="mt-0.5">
+                  <TechText text="Riigihangete seadus § 14–15 (RT I, 01.07.2017, 1) ja riigihangete seaduse ja teiste seaduste muutmise seadus (RT I, 03.07.2026, 3; jõustub 01.11.2026); EL piirmäärad 2026–2027: komisjoni delegeeritud määrus (EL) 2025/2152." />
+                </dd>
+              </div>
+              <div>
+                <dt className="font-medium text-text-primary">Hinnaklassid</dt>
+                <dd className="mt-0.5">
+                  Riigihangete registri avaandmed (lepinguteated, 2026. a I poolaasta;
+                  mediaanid ja keskmised arvutatud maksumusega teadetest). Ühe kooli alla 30 000 €
+                  ostud ei kajastu registris.
+                </dd>
+              </div>
+              <div>
+                <dt className="font-medium text-text-primary">Õpikeskkonna hinnaankur</dt>
+                <dd className="mt-0.5">
+                  Opiq koolipakett 2026/27 (opiq.ee); soodushind alates 50% õpilastest vähemalt
+                  9 kuuks.
+                </dd>
+              </div>
+              <div>
+                <dt className="font-medium text-text-primary">Menetluse kestused ja pakkujate arv</dt>
+                <dd className="mt-0.5">
+                  Rahandusministeeriumi riigihangete valdkonna statistika ja kokkuvõte 2025
+                  (fin.ee).
+                </dd>
+              </div>
+              <div>
+                <dt className="font-medium text-text-primary">Juurdepääsetavus ja maksetähtaeg</dt>
+                <dd className="mt-0.5">
+                  <TechText text="Direktiiv (EL) 2016/2102, EN 301 549 V3.2.1; järelevalve TTJA (ttja.ee). Maksetähtaeg: direktiiv 2011/7/EL." />
+                </dd>
+              </div>
+            </dl>
+          </div>
+        </section>
+
+        {/* Sources & verification */}
+        <section aria-labelledby="allikad-heading" className="mb-12">
+          <SectionHeading
+            id="allikad"
+            title="Allikad ja kontroll"
+            lead="Selle lehe väärtus on selles, et väiteid saab ise kontrollida."
+          />
+          <div className="rounded-xl border border-border bg-elevated p-6 space-y-3 text-sm text-text-secondary leading-relaxed">
+            <p>
+              Väidete alus on MATx-i platvormi avalik lähtekood:{' '}
+              <a
+                href={GITHUB_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary hover:text-secondary underline transition-colors"
+              >
+                github.com/matx-ee
+              </a>
+              . Kaartide märkustes viidatakse harule või teekonnale (nt{' '}
+              <code className="font-mono text-xs">server/eatf.ts</code>,{' '}
+              <code className="font-mono text-xs">server/bktSnapshotSign.ts</code>).
+            </p>
+            <p>
+              „Compliance-haru&ldquo; (viide: <code className="font-mono text-xs">release/matx-compliance-rc-2026-06-22</code>)
+              on eraldiseisev turbearendusharu, mis ühendatakse põhiharuga enne piloodi
+              laiendamist. Kuni ühendamiseni on need meetmed märgitud „Kavandatud&ldquo;.
+            </p>
+            <p className="text-xs">
+              Leht ajakohastatud: {LAST_UPDATED}. Staatused muutuvad ühendamiste käigus;
+              kontrolli enne hankeekspertnäidisele tuginemist harude hetkeseisu.
+            </p>
+          </div>
+        </section>
+
+        {/* Glossary */}
+        <section aria-labelledby="glossar-heading" className="mb-12">
+          <SectionHeading
+            id="glossar"
+            title="Glossar"
+            lead="Lühendid ühes kohas lahti kirjutatud — mõeldud hanketiimidele, kelle jaoks osa termineid on uued."
+          />
+          <details className="group rounded-xl border border-border bg-elevated">
+            <summary className="flex items-center justify-between gap-4 cursor-pointer px-5 py-4 text-sm font-medium text-text-primary hover:bg-surface transition-colors focus-ring-target rounded-xl list-none [&::-webkit-details-marker]:hidden">
+              <span className="flex items-center gap-2.5">
+                <ChevronDown
+                  className="w-4 h-4 shrink-0 text-text-secondary transition-transform duration-200 group-open:rotate-180"
+                  aria-hidden="true"
+                />
+                Terminid ({GLOSSARY.length})
+              </span>
+            </summary>
+            <dl className="px-5 pb-5 grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3">
+              {GLOSSARY.map(({ term, definition }) => (
+                <div key={term} className="border-t border-border pt-2">
+                  <dt className="text-sm font-semibold text-text-primary font-mono">{term}</dt>
+                  <dd className="text-sm text-text-secondary mt-0.5">{definition}</dd>
+                </div>
+              ))}
+            </dl>
+          </details>
+        </section>
+
+        {/* Security & procurement contact */}
         <section aria-labelledby="kontakt-heading" className="mb-12">
           <h2 id="kontakt-heading" className="text-2xl font-semibold text-text-primary mb-4">
-            Turvalisuse kontakt
+            Kontakt
           </h2>
-          <p className="text-sm text-text-secondary leading-relaxed mb-4">
-            Turvapuudusest teada andmiseks (vastutustundlik avalikustamine) kirjuta
-            aadressile{' '}
-            <a
-              href="mailto:security@matx.ee"
-              className="text-primary hover:text-secondary underline transition-colors"
-            >
-              security@matx.ee
-            </a>
-            . See on teadaanne, mitte tugikanal.
-          </p>
-          <p className="text-sm text-text-secondary leading-relaxed">
-            Hanke- ja lepinguküsimuste korral vaata{' '}
-            <Link href="/#piloot" className="text-primary hover:text-secondary underline transition-colors">
-              alustamise võimalusi
-            </Link>
-            .
-          </p>
+          <div className="rounded-xl border border-border bg-elevated p-6 space-y-4 text-sm text-text-secondary leading-relaxed">
+            <p>
+              <strong className="text-text-primary">Turvapuudus</strong> (vastutustundlik
+              avalikustamine):{' '}
+              <a
+                href="mailto:security@matx.ee"
+                className="text-primary hover:text-secondary underline transition-colors"
+              >
+                security@matx.ee
+              </a>{' '}
+              <CopyButton
+                value="security@matx.ee"
+                label="Kopeeri meiliaadress"
+                className="inline-flex items-center justify-center w-8 h-8 rounded-md border border-border text-text-secondary hover:text-text-primary hover:border-borderStrong transition-colors focus-ring-target align-middle"
+              />
+              . See on teadaanne, mitte tugikanal.
+            </p>
+            <p>
+              <strong className="text-text-primary">Hanke- ja lepinguküsimused</strong>
+              , sh hankedokumendid ja andmetöötluslepingud:{' '}
+              <a
+                href="mailto:andri@matx.ee"
+                className="text-primary hover:text-secondary underline transition-colors"
+              >
+                andri@matx.ee
+              </a>{' '}
+              <CopyButton
+                value="andri@matx.ee"
+                label="Kopeeri meiliaadress"
+                className="inline-flex items-center justify-center w-8 h-8 rounded-md border border-border text-text-secondary hover:text-text-primary hover:border-borderStrong transition-colors focus-ring-target align-middle"
+              />{' '}
+              või{' '}
+              <Link href="/#piloot" className="text-primary hover:text-secondary underline transition-colors">
+                alustamise võimalused
+              </Link>
+              .
+            </p>
+          </div>
         </section>
+
+        </div>
+
+        {/* Sticky rail — desktop TOC with scroll-spy */}
+        <TechnicalTOC items={SECTIONS} />
+        </div>
       </div>
     </main>
   );

@@ -219,7 +219,7 @@ export function RegistrationForm({ isOpen, onClose }: RegistrationFormProps) {
 
   const inputClassName = (hasError: boolean): string =>
     `w-full px-4 py-3 rounded-lg bg-surface border text-text-primary placeholder:text-text-secondary/50 focus-ring-target transition-colors ${
-      hasError ? 'border-red-600 focus:border-red-600' : 'border-border'
+      hasError ? 'border-red-600 dark:border-red-400 focus:border-red-600 dark:border-red-400' : 'border-border'
     }`;
 
   return (
@@ -270,7 +270,7 @@ export function RegistrationForm({ isOpen, onClose }: RegistrationFormProps) {
               {/* School Name */}
               <div>
                 <label htmlFor="schoolName" className="block text-sm font-medium text-text-primary mb-2">
-                  Kooli nimi <span className="text-red-600">*</span>
+                  Kooli nimi <span className="text-red-600 dark:text-red-400">*</span>
                 </label>
                 <input
                   id="schoolName"
@@ -287,7 +287,7 @@ export function RegistrationForm({ isOpen, onClose }: RegistrationFormProps) {
                   aria-describedby={errors.schoolName ? 'schoolName-error' : undefined}
                 />
                 {errors.schoolName && (
-                  <p id="schoolName-error" className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                  <p id="schoolName-error" className="mt-1 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
                     <AlertCircle className="w-4 h-4" />
                     {errors.schoolName}
                   </p>
@@ -297,7 +297,7 @@ export function RegistrationForm({ isOpen, onClose }: RegistrationFormProps) {
               {/* Contact Name */}
               <div>
                 <label htmlFor="contactName" className="block text-sm font-medium text-text-primary mb-2">
-                  Kontaktisiku nimi <span className="text-red-600">*</span>
+                  Kontaktisiku nimi <span className="text-red-600 dark:text-red-400">*</span>
                 </label>
                 <input
                   id="contactName"
@@ -313,7 +313,7 @@ export function RegistrationForm({ isOpen, onClose }: RegistrationFormProps) {
                   aria-describedby={errors.contactName ? 'contactName-error' : undefined}
                 />
                 {errors.contactName && (
-                  <p id="contactName-error" className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                  <p id="contactName-error" className="mt-1 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
                     <AlertCircle className="w-4 h-4" />
                     {errors.contactName}
                   </p>
@@ -323,7 +323,7 @@ export function RegistrationForm({ isOpen, onClose }: RegistrationFormProps) {
               {/* Role */}
               <div>
                 <label htmlFor="role" className="block text-sm font-medium text-text-primary mb-2">
-                  Roll <span className="text-red-600">*</span>
+                  Roll <span className="text-red-600 dark:text-red-400">*</span>
                 </label>
                 <select
                   id="role"
@@ -345,7 +345,7 @@ export function RegistrationForm({ isOpen, onClose }: RegistrationFormProps) {
                   ))}
                 </select>
                 {errors.role && (
-                  <p id="role-error" className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                  <p id="role-error" className="mt-1 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
                     <AlertCircle className="w-4 h-4" />
                     {errors.role}
                   </p>
@@ -356,7 +356,7 @@ export function RegistrationForm({ isOpen, onClose }: RegistrationFormProps) {
               {formData.role === 'Muu haridustöötaja' && (
                 <div>
                   <label htmlFor="otherRole" className="block text-sm font-medium text-text-primary mb-2">
-                    Täpsustage roll <span className="text-red-600">*</span>
+                    Täpsustage roll <span className="text-red-600 dark:text-red-400">*</span>
                   </label>
                   <input
                     id="otherRole"
@@ -371,7 +371,7 @@ export function RegistrationForm({ isOpen, onClose }: RegistrationFormProps) {
                     aria-describedby={errors.otherRole ? 'otherRole-error' : undefined}
                   />
                   {errors.otherRole && (
-                    <p id="otherRole-error" className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                    <p id="otherRole-error" className="mt-1 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
                       <AlertCircle className="w-4 h-4" />
                       {errors.otherRole}
                     </p>
@@ -382,7 +382,7 @@ export function RegistrationForm({ isOpen, onClose }: RegistrationFormProps) {
               {/* Email */}
               <div>
                 <label htmlFor="email" className="block text-sm font-medium text-text-primary mb-2">
-                  Asutuse e-post <span className="text-red-600">*</span>
+                  Asutuse e-post <span className="text-red-600 dark:text-red-400">*</span>
                 </label>
                 <input
                   id="email"
@@ -399,7 +399,7 @@ export function RegistrationForm({ isOpen, onClose }: RegistrationFormProps) {
                   aria-describedby={errors.email ? 'email-error' : undefined}
                 />
                 {errors.email && (
-                  <p id="email-error" className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                  <p id="email-error" className="mt-1 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
                     <AlertCircle className="w-4 h-4" />
                     {errors.email}
                   </p>
@@ -409,7 +409,7 @@ export function RegistrationForm({ isOpen, onClose }: RegistrationFormProps) {
               {/* Phone */}
               <div>
                 <label htmlFor="phone" className="block text-sm font-medium text-text-primary mb-2">
-                  Telefoninumber <span className="text-red-600">*</span>
+                  Telefoninumber <span className="text-red-600 dark:text-red-400">*</span>
                 </label>
                 <input
                   id="phone"
@@ -426,7 +426,7 @@ export function RegistrationForm({ isOpen, onClose }: RegistrationFormProps) {
                   aria-describedby={errors.phone ? 'phone-error' : undefined}
                 />
                 {errors.phone && (
-                  <p id="phone-error" className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                  <p id="phone-error" className="mt-1 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
                     <AlertCircle className="w-4 h-4" />
                     {errors.phone}
                   </p>
@@ -436,7 +436,7 @@ export function RegistrationForm({ isOpen, onClose }: RegistrationFormProps) {
               {/* Class Groups */}
               <div>
                 <label htmlFor="classGroups" className="block text-sm font-medium text-text-primary mb-2">
-                  7.-9. klassi klassirühmade arv <span className="text-red-600">*</span>
+                  7.-9. klassi klassirühmade arv <span className="text-red-600 dark:text-red-400">*</span>
                 </label>
                 <input
                   id="classGroups"
@@ -451,7 +451,7 @@ export function RegistrationForm({ isOpen, onClose }: RegistrationFormProps) {
                   aria-describedby={errors.classGroups ? 'classGroups-error' : undefined}
                 />
                 {errors.classGroups && (
-                  <p id="classGroups-error" className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                  <p id="classGroups-error" className="mt-1 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
                     <AlertCircle className="w-4 h-4" />
                     {errors.classGroups}
                   </p>

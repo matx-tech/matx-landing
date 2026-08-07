@@ -22,6 +22,7 @@ const config: Config = {
         canvas: 'var(--color-bg-canvas)',
         surface: 'var(--color-bg-surface)',
         elevated: 'var(--color-bg-elevated)',
+        card: 'var(--color-bg-elevated)',
         brand: 'var(--color-bg-brand)',
         brandContainer: 'var(--color-bg-brand-container)',
         primary: 'var(--color-action-primary-bg)',

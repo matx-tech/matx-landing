@@ -250,6 +250,13 @@
     overflow-wrap: break-word;
   }
 
+  /* Display type stays unbroken — body copy hyphenates, headings must not
+     (an Estonian heading like "Tehniline ülevaade" would otherwise render
+     as "Tehnili-ne üle-vaade" in a narrow column) */
+  h1, h2, h3, h4, h5 {
+    hyphens: manual;
+  }
+
   ::selection {
     background-color: var(--color-action-primary-bg-disabled);
     color: var(--color-text-primary);
