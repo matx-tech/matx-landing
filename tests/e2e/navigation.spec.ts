@@ -11,7 +11,8 @@ test.describe('navigation', () => {
 
     const link = page.locator('nav').getByRole('link', { name: 'KKK' });
     await link.click();
-    await expect(page).toHaveURL(/#kkk/);
+    // Lenis intercepts anchor clicks and scrolls without setting location.hash,
+    // so assert the scroll outcome, not the URL.
     // Section content renders once the SectionGate opens on scroll.
     await expect(page.getByRole('heading', { name: /KKK/i }).first()).toBeVisible();
   });
@@ -48,10 +49,10 @@ test.describe('mobile menu', () => {
     await page.getByRole('dialog').getByRole('link', { name: 'KKK' }).click();
 
     await expect(page.getByRole('dialog')).not.toBeVisible();
-    await expect(page).toHaveURL(/#kkk/);
 
     // While the dialog was open, Radix locks body scroll, so the anchor jump
     // can't move the page — scroll explicitly now the dialog is closed.
+    // (Lenis also scrolls without setting location.hash, so no URL assertion.)
     const heading = page.getByRole('heading', { name: /KKK/i }).first();
     await revealSection(page, 'kkk', heading);
     await expect(heading).toBeVisible();

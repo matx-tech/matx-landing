@@ -18,7 +18,13 @@ export const test = base.extend<Fixtures>({
   openHome: async ({ page, baseURL }, use) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.goto(baseURL ?? '/', { waitUntil: 'domcontentloaded' });
-    await page.locator('nav').waitFor({ state: 'visible' });
+    // True hydration signal: the nav SSR's with the `gsap-animate-on-mount`
+    // class, which its useGSAP layout effect removes during hydration commit —
+    // only JS can remove it, so its absence means React listeners are attached.
+    await page.waitForFunction(() => {
+      const nav = document.querySelector('nav');
+      return nav !== null && !nav.classList.contains('gsap-animate-on-mount');
+    });
     await use(async () => page);
   },
 });
