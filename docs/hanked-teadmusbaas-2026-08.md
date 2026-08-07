@@ -71,17 +71,21 @@ Tõlgendus hankija jaoks:
   energiaprojektid (max 49,9 mln €). Mediaan on esinduslikum.
 - Haridussektori (CPV 80*) mediaan ~46 000 € — hinnapõhine otsus on Eestis norm
   (2025: 87% hankest madalaima hinna alusel, 74% mahust — RaM 2025 statistika).
-- **Ühe kooli tarkvaraostud jäävad enamasti alla 30 000 €** → RHS ei kohaldu ja need
-  ei kajastu registris (registris on 29% teadetest < 30 000 €, mis on vabatahtlikud
-  väikehanked). Seega „koolitarkvara hanke mediaan“ kui selline ei ole registrist
-  arvutatav — see on oluline ausust mõjutav piirang.
+- Ühe kooli tarkvaraostude jaotust alla 30 000 € ei saa registrist kindlaks teha, kuna
+  riigihangete seadus neile ei kohaldu ja need jäävad registrisse kandmata, välja arvatud
+  juhul, kui hankija need vabatahtlikult avaldab. Registris on 29% teadetest < 30 000 €
+  (vabatahtlikud väikehanked). Seega „koolitarkvara hanke mediaan" kui selline ei ole
+  registrist arvutatav — see on oluline ausust mõjutav piirang.
 
-Metoodika: /tmp/rhr/analyze2.py (ajutine; kirjeldus piisav taasesituseks). Andmed:
-https://riigihanked.riik.ee/rhr/api/public/v1/opendata/notice_award/2026/month/{2..7}/xml
+Metoodika: analüüsiskript ja versioonitud andmete hetktõmmis tuleks lisada repositooriumisse
+taasesituse tagamiseks, või avaldada manifest, mis sisaldab teatete ID-sid, filtreerimis- ja
+agregatsioonireegleid, protsentuaalseid jaotusi, päringu kuupäeva ja kontrollsummasid. Andmed
+pärit riigihangete registri avatud andmetest (eForms ContractAwardNotice XML-failid 2026. a
+kuude 2-7 kohta, saadaval riigihanked.riik.ee/rhr/api avaliku API kaudu).
 
 ### Õpikeskkondade hinnaankur (avalikud hinnakirjad)
 
-- **Opiq koolipakett 2026/27** (kõik õppeained, 444 õppekomplekti): 5,10 €/õpilane/kuu;
+- **Opiq koolipakett 2025/26** (kõik õppeained, 299 õppekomplekti): 5,10 €/õpilane/kuu;
   soodushind 4,10 €/kuu (≥50% kooli õpilastest, ≥9 kuud); algklassid 3,10 €/kuu.
   Aastas ≈ 31–51 €/õpilane. Allikas: opiq.ee/Packages/Details?packageKey=StudentPackage2025ForSchool.
 - eKool: avalikku koolihinnakirja ei avaldata (vanema premium-tasud kuni ~3,45 €/kuu
@@ -91,10 +95,15 @@ https://riigihanked.riik.ee/rhr/api/public/v1/opendata/notice_award/2026/month/{
 
 ### Reaalsed haridusvaldkonna IT-hangete väärtused (registrist, TenderGlass koond)
 
+Järgnevad näited pärinevad TenderGlass-i hankijaprofiilist ja illustreerivad haridusvaldkonna
+IT-hangete suurusjärku. Iga näite puhul tuleks märkida täpne registriteate number või kirje ID
+stabiilse viitamise tagamiseks; kui konkreetsed viited pole kättesaadavad, tuleks need näited
+esitada illustratiivsete näidetena.
+
 - Eksamite Infosüsteemi (EIS) tehniline audit — 50 000 € (HTM, 01/2026).
-- „Aasta õpetaja gala“ korraldamine 2026 — 120 000 € (HTM, 02/2026).
+- „Aasta õpetaja gala" korraldamine 2026 — 120 000 € (HTM, 02/2026).
 - Atlassian toodete konsultatsioon ja arendus — 350 000 € (HTM, 02/2026).
-- Täienduskoolituste infosüsteemi „Juhan“ hooldus- ja arendustööd — 48 kuud (HTM, 03/2026).
+- Täienduskoolituste infosüsteemi „Juhan" hooldus- ja arendustööd — 48 kuud (HTM, 03/2026).
 - Eesti keele iseseisva õppe e-teenuste raamleping — 1 500 000 € (HTM, 01/2025, lõpetatud).
 - Kirjastamis- ja trükiteenuse raamleping (Haridus- ja Noorteamet) — 300 000 € (08/2026).
 - Digitahvlid ja ribakõlarid (Kiviõli Riigikool) — 350 000 € (05/2025).
@@ -106,12 +115,17 @@ https://riigihanked.riik.ee/rhr/api/public/v1/opendata/notice_award/2026/month/{
    seadusesse). Kohustus laieneb ka eraõiguslikele isikutele, kes täidavad lepingu alusel
    avalikke ülesandeid (sh osutavad avalikke teenuseid). Järelevalve: TTJA.
    Allikad: ttja.ee/avaliku-sektori-digiligipaasetavus; W3C WAI riigileht.
-2. **Andmekaitse**: GDPR (2016/679) — kool/omavalitsus vastutav töötleja, tarnija volitatud
-   töötleja; art 8 alaealiste erikaitse (13+ nõusolek); IKS; andmete asukoht Eesti/EL.
+2. **Andmekaitse**: GDPR (2016/679). Vastutava ja volitatud töötleja rollid sõltuvad konkreetsest
+   töötlustegevusest ja õiguslikust alusest. Tarnija on volitatud töötleja vaid siis, kui ta tegutseb
+   dokumenteeritud juhiste alusel; muudel juhtudel võib ta olla iseseisev või ühine vastutav töötleja.
+   Art 8 alaealiste erikaitse: 13+ vanusepiir ja vanema nõusolek kohalduvad vaid nõusolekupõhiste
+   (Art. 6(1)(a)) infotehnoloogiateenuste puhul, mida pakutakse otse lapsele. IKS; andmete asukoht Eesti/EL.
 3. **Identiteet ja koostalitlus**: HarID/TAAT OIDC (koolide identiteediföderatsioon),
    EHIS, eKool/Stuudiumi liidestused — MATx-i staatused /tehniline lehel.
-4. **AI-komponent**: EU AI Act (2024/1689) III lisa § 3 — hariduse AI kõrge riskiga klass;
-   riskijuhtimine, läbipaistvus, inimese järelevalve. MATx-i BKT enesehindamine pooleli.
+4. **AI-komponent**: EU AI Act (2024/1689). MATx-i kasutusjuht on haridus, riskihinnangu tulemus
+   tuleks dokumenteerida. Annex III punkt 3 käsitleb hariduse AI-süsteeme teatud tingimustel kõrge
+   riskiga; Art. 6(3) erand võib kohalduda. Riskijuhtimine, läbipaistvus, inimese järelevalve.
+   MATx-i BKT enesehindamine pooleli.
 5. **Turve**: E-ITS/ISKE baastase (ühilduv ISO 27001), NIS2 hea tava, CSP/HSTS, pseudonüümimine.
 6. **Hankedokumentide formaat**: tehniline kirjeldus RHS § 87–88 järgi; kvalifitseerimine
    majandusliku ja kutsealase suutlikkuse põhjal (käibekapital, sarnased litsentsiprojektid).
@@ -121,11 +135,12 @@ https://riigihanked.riik.ee/rhr/api/public/v1/opendata/notice_award/2026/month/{
 - **Kestus**: RHS ei reguleeri — lepinguvabadus (RaM KKK). Tarkvaralitsentside lepingud
   tavaliselt 12–36 kuud; raamlepingud kuni 4 aastat (direktiiv 2014/24/EL art 33; näide:
   „Juhan“ hooldus-arendus 48 kuud).
-- **Maksetähtaeg**: vähemalt 30 kalendripäeva (direktiiv 2011/7/EL hilinenud maksete vastu;
-  hankelepingute üldtingimustes standard).
-- **Garantii ja leppetrahv**: õiguskaitsevahendid loetletud RHS § 95 lg 4 (leppetrahv, hinna
-  alandamine, taganemine, ülesütlemine, kahju hüvitamine); määrad lepinguvabadus, seatakse
-  alusdokumentides; RaM juhend rõhutab mõistlikke määrasid.
+- **Maksetähtaeg**: tavaliselt kuni 30 kalendripäeva; kuni 60 päeva vaid juhul, kui see on
+  sõnaselgelt kokku lepitud ja objektiivselt põhjendatud (direktiiv 2011/7/EL hilinenud maksete
+  vastu; hankelepingute üldtingimustes standard).
+- **Garantii ja leppetrahv**: õiguskaitsevahendid hõlmavad leppetrahvi, hinna alandamist,
+  taganemist, ülesütlemist (RHS § 124) ja kahju hüvitamist (VÕS või lepingu õiguskaitsesätted);
+  määrad lepinguvabadus, seatakse alusdokumentides; RaM juhend rõhutab mõistlikke määrasid.
 - **IP**: alates 01.11.2026 hankija võib IP-korra määrata alusdokumentides (uus § 77 lg 6²);
   eelnõu eesmärk: jätta loodud IP vaikimisi ettevõtjale, hankijale ainult vältimatult vajalik.
 - **Andmete väljaviimine**: lepingu lõppedes eksport/kustutamine; DSR-reeglid.
@@ -136,8 +151,11 @@ https://riigihanked.riik.ee/rhr/api/public/v1/opendata/notice_award/2026/month/{
 
 1. **Hind**: õpilasepõhine aastatasu (Eesti standard); avalda hinnakiri — hind on otsustav
    kriteerium 87% hangetes. Väikekoolidele/algklassidele diferentseeritud tase nagu Opiq-il.
-2. **Ostutee**: reklaami koolidele otsetellimist (< 30 000 €; alates 01.11.2026 < 50 000 €)
-   ja omavalitsustele lihthanget — mitte „avatud hankemenetlust“.
+2. **Ostutee**: koolidele ja omavalitsustele võib soovitada alla piirmäära soetust, mis toimuks
+   organisatsiooni siseste hankekorra reeglite ja hankeõiguse põhimõtete järgi (< 30 000 €;
+   alates 01.11.2026 < 50 000 €), arvestades et väärtuse hindamisel tuleb arvesse võtta ka
+   prognoositavad lisavajadused või pikendused. Lihthange võib olla sobiv järgmise väärtusklassi
+   puhul — mitte „avatud hankemenetlust".
 3. **Leping**: 12–36 kuud, maksetähtaeg 30 päeva, mõistlik leppetrahv, IP jääb MATx-ile,
    andmete eksport lepingu lõppedes.
 4. **Tehniline dokumentatsioon**: valmista juurdepääsetavuse seisukoht (EN 301 549) —

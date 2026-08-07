@@ -26,8 +26,10 @@ export function CopyButton({
   const [copied, setCopied] = useState(false);
 
   const handleCopy = async () => {
+    let success = false;
     try {
       await navigator.clipboard.writeText(value);
+      success = true;
     } catch {
       const el = document.createElement('textarea');
       el.value = value;
@@ -37,11 +39,16 @@ export function CopyButton({
       el.select();
       // Deprecated in TS DOM lib but the only fallback that works in
       // non-secure contexts where the async Clipboard API is absent.
-      (document as unknown as { execCommand: (cmd: string) => boolean }).execCommand('copy');
-      document.body.removeChild(el);
+      try {
+        success = (document as unknown as { execCommand: (cmd: string) => boolean }).execCommand('copy');
+      } finally {
+        document.body.removeChild(el);
+      }
     }
-    setCopied(true);
-    window.setTimeout(() => setCopied(false), 2000);
+    if (success) {
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 2000);
+    }
   };
 
   return (

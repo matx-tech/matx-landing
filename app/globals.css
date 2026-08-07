@@ -255,6 +255,7 @@
      as "Tehnili-ne üle-vaade" in a narrow column) */
   h1, h2, h3, h4, h5 {
     hyphens: manual;
+    overflow-wrap: normal;
   }
 
   ::selection {

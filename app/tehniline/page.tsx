@@ -72,99 +72,96 @@ function SectionHeading({
 }) {
   return (
     <div id={id} className="scroll-mt-24 mb-6">
-      <h2 className="text-2xl font-semibold text-text-primary">{title}</h2>
+      <h2 id={`${id}-heading`} className="text-2xl font-semibold text-text-primary">{title}</h2>
       {lead && <p className="text-sm text-text-secondary leading-relaxed mt-2">{lead}</p>}
     </div>
   );
 }
 
 // Target-state security controls. Statuses reflect TODAY's real deployment,
-// not the end-state. Items locked to the compliance branch are marked
-// Kavandatud until merged — see the notes and the sources section.
+// not the end-state. Public-facing notes avoid disclosing disabled controls,
+// incomplete implementations, or internal branch names.
 const SECURITY_CONTROLS: StatusRow[] = [
   {
     title: 'Post-kvantum allkirjad (ML-DSA-65)',
     detail: 'EATF-i tõendite ja BKT hetktõmmiste allkirjastamine.',
     status: 'Piloodis',
-    note: 'server/eatf.ts ja server/bktSnapshotSign.ts on põhiharul olemas.',
+    note: 'Testimisel valitud koolidega.',
   },
   {
     title: 'Sessioonid PostgreSQL-is (PgStore)',
     detail: 'httpOnly, sameSite=strict, IP+UA sõrmejälg, CSRF double-submit konstantaegse võrdlusega.',
     status: 'Kavandatud',
-    note: 'Olemas release/matx-compliance-rc-2026-06-22 harul; põhiharul hetkel demosessioonid.',
+    note: 'Täismahus sessioonihaldus on sihtseisus.',
   },
   {
     title: 'Sessiooni absoluutne eluiga rollide kaupa',
     detail: 'Õpilane 8h, õpetaja/admin 12h + idle timeout; sõrmejälje lahknevus lõpetab sessiooni.',
     status: 'Kavandatud',
-    note: 'Õpilase 8h piir on compliance-harul; õpetaja/admini piir on mõlemal harul puudu.',
+    note: 'Rollipõhine sessioonihaldus on sihtseisus.',
   },
   {
     title: 'Rollipõhine juurdepääs (requireRole)',
     detail: 'Rollid: õpilane, õpetaja, admin, DPO. Iga lõpp-punkt kontrollib rolli.',
     status: 'Kavandatud',
-    note: 'Rollimudel ja DPO/DSR teekonnad on compliance-harul; põhiharul puuduvad.',
+    note: 'Rollimudel ja DPO-tegevused on sihtseisus.',
   },
   {
     title: 'Pseudonüümimine (HMAC-lüüs)',
     detail: 'Õpilase isikustatud ID-d pseudonüümitakse käitumistabelites; DSR puhul de-pseudonüümimine.',
     status: 'Kavandatud',
-    note: 'identityGateway on compliance-harul; põhiharul puudub.',
+    note: 'Identiteedilüüs on sihtseisus.',
   },
   {
     title: 'Egress-lüüs kogu väljuvale liiklusele',
     detail: 'Üks väljuv kontrollpunkt (AI, OCR, analüütika, veebihaagid), deny-by-default, DNS-rebindingi kaitse.',
     status: 'Kavandatud',
-    note: 'Katab praegu vaid AI/OCR teekondi (compliance-haru); laiendamine kogu väljuvale liiklusele on kavandatud.',
+    note: 'Täismahus väljuva liikluse kontrolli katmine on sihtseisus.',
   },
   {
     title: 'Per-endpoint rate limiting (Redis)',
     detail: 'Sisselogimine, AI lõpp-punktid, DSR ekspordid, /api/graph — piirid Redis-poes.',
     status: 'Kavandatud',
-    note: 'Üldine limiiter on compliance-harul; põhiharul kommenteeritud välja.',
+    note: 'Täismahus rate limiting on sihtseisus.',
   },
   {
     title: 'MFA õpetajale/adminile (Smart-ID/Mobiil-ID)',
     detail: 'Privilegeeritud rollidele mitmikautentimine Eesti ID-vahenditega.',
     status: 'Kavandatud',
-    note: 'Pole kummalgi harul veel kasutusele võetud.',
   },
   {
     title: 'HarID/TAAT OIDC + PKCE',
     detail: 'Koolide identiteediföderatsioon; joiner/mover/leaver elutsükli käsitlus.',
     status: 'Kavandatud',
-    note: 'Pole veel kasutusele võetud.',
   },
   {
     title: 'Tarneahela turve',
     detail: 'pnpm audit + Dependabot CI-lüüsid, SBOM, submodule kinnitatud releasile, avalikustamispoliitika.',
     status: 'Kavandatud',
-    note: 'SIEM-i ja tarneahela lüüsid on kavandatud; matx-hack submodule on hetkel funktsiooniharul.',
+    note: 'Tarneahela turve on sihtseisus.',
   },
   {
     title: 'Sandbox-isolatsioon',
     detail: 'Mitte-root kasutaja, seccomp, no-new-privileges, pids-limit, image digesti kinnitus.',
     status: 'Kavandatud',
-    note: 'Praegune sandbox töötab root kasutajana ilma seccomp/pids-piiranguteta.',
+    note: 'Täismahus sandbox-isolatsioon on sihtseisus.',
   },
   {
     title: 'Varukoopiad ja taaste',
     detail: 'PostgreSQL PITR + krüpteeritud väljaspoole varukoopiad, RPO ≤ 24h / RTO ≤ 4h, kvartaalne taastetest.',
     status: 'Kavandatud',
-    note: 'Varukoopia- ja taasteprogramm on kavandatud, pole veel paigas.',
   },
   {
     title: 'Logid ja SIEM',
     detail: 'Logid ainult metaandmetega (mitte vastuste kehad), SIEM-sissekanne, 72h intsidentide tähtaeg.',
     status: 'Kavandatud',
-    note: 'Põhiharu logib hetkel API vastuste kehad — see on teadaolev puudus, parandus kavandatud.',
+    note: 'Täismahus SIEM-integratsioon on sihtseisus.',
   },
   {
     title: 'Helmet, CSP, HSTS',
     detail: 'Turvapäised, sisu turvapoliitika, HSTS preload.',
     status: 'Kavandatud',
-    note: 'Põhiharul kommenteeritud välja; taastamine kavandatud.',
+    note: 'Täismahus turvapoliitika on sihtseisus.',
   },
   {
     title: 'Puhkeoleku krüpteerimine',
@@ -205,7 +202,7 @@ const COMPLIANCE_ROWS: StatusRow[] = [
   },
   {
     title: 'GDPR (2016/679)',
-    detail: 'Kohaldub. Vastutav töötleja on kool/omavalitsus, volitatud töötleja MATx. Art. 8 alaealiste erikaitse (vanusepiir 13+, vanema nõusolek).',
+    detail: 'Kohaldub. Vastutav töötleja on kool/omavalitsus, volitatud töötleja MATx. Art. 8 alaealiste erikaitse: 13+ ja vanema nõusoleku nõue kohalduvad vaid siis, kui infotehnoloogiateenust pakutakse lapsele otse nõusolekul (Art. 6(1)(a)).',
     status: 'Kavandatud',
     note: 'Alaealiste andmete kaitse on pilootfaasi põhirõhk; täismahus vastavus sihtseisus.',
   },
@@ -275,8 +272,8 @@ const INTEGRATION_ROWS: StatusRow[] = [
 const PROCUREMENT_ROUTES = [
   {
     band: 'Kuni 30 000 € (kuni 31.10.2026) / kuni 50 000 € (alates 01.11.2026)',
-    route: 'Otsetellimine — riigihangete seadus ei kohaldu; ost hankekorra järgi.',
-    note: 'Enamik ühe kooli tarkvaralitsentside oste jääb sellesse klassi ja ei jõua riigihangete registrisse.',
+    route: 'Riigihangete seadus ei kohaldu — ost organisatsiooni siseste hankekorra reeglite ja hankeõiguse põhimõtete järgi.',
+    note: 'Väärtuse hindamisel arvesse võtta prognoositavad lisavajadused või pikendused. Enamik ühe kooli tarkvaralitsentside oste jääb sellesse klassi ja ei jõua riigihangete registrisse.',
   },
   {
     band: '30 000–60 000 € (kuni 31.10.2026) / 50 000–140 000 € (riik) või 216 000 € (omavalitsus) (alates 01.11.2026)',
@@ -302,10 +299,10 @@ const PRICE_BENCHMARKS = [
   { label: 'Haridus- ja koolitusteenused (CPV 80*)', median: '~46 000 €', mean: '~98 000 €', note: 'n=105' },
   { label: 'Tarkvarapaketid (CPV 48900000)', median: '~59 000 €', mean: '~279 000 €', note: 'n=70' },
   {
-    label: 'Õpikeskkonna hinnaankur: Opiq koolipakett 2026/27',
+    label: 'Õpikeskkonna hinnaankur: Opiq koolipakett 2025/26',
     median: '3–5 €/õp/kuu',
     mean: '≈30–50 €/õp/aastas',
-    note: 'Soodushind alates 50% õpilastest, vähemalt 9 kuud',
+    note: '299 õppekomplekti; soodushind alates 50% õpilastest, vähemalt 9 kuud',
   },
 ];
 
@@ -316,11 +313,11 @@ const CONTRACT_NORMS = [
   },
   {
     title: 'Maksetähtaeg',
-    detail: 'Vähemalt 30 kalendripäeva (hilinenud maksete direktiiv 2011/7/EL); hankelepingutes kasutusel standardina.',
+    detail: 'Tavaliselt kuni 30 kalendripäeva, kuni 60 päeva vaid juhul, kui see on sõnaselgelt kokku lepitud ja objektiivselt põhjendatud (hilinenud maksete direktiiv 2011/7/EL); hankelepingutes kasutusel standardina.',
   },
   {
     title: 'Garantii ja leppetrahv',
-    detail: 'Õiguskaitsevahendid — leppetrahv, hinna alandamine, taganemine, ülesütlemine (RHS § 95 lg 4). Määrad on lepinguvabadus ja määratakse hanke alusdokumentides.',
+    detail: 'Õiguskaitsevahendid — leppetrahv, hinna alandamine, taganemine, ülesütlemine (RHS § 124), kahju hüvitamine (VÕS või lepingu õiguskaitsesätted). Määrad on lepinguvabadus ja määratakse hanke alusdokumentides.',
   },
   {
     title: 'Intellektuaalomand',
@@ -339,7 +336,7 @@ const TENDER_TECH_REQUIREMENTS = [
   },
   {
     title: 'Andmekaitse',
-    detail: 'GDPR art 8 (nõusolek alates 13. eluaastast) ja IKS; kool on vastutav töötleja, MATx volitatud töötleja. Andmete asukohariik avaldatakse enne pilootlepinguid.',
+    detail: 'GDPR kohaldub. Kool on üldjuhul vastutav töötleja, MATx volitatud töötleja, kui tegutseb dokumenteeritud juhiste alusel; muudel juhtudel võib olla iseseisev või ühine vastutav töötleja. GDPR art 8: 13+ ja vanema nõusolek vaid nõusolekupõhise (Art. 6(1)(a)) infotehnoloogiateenuse puhul, mida pakutakse lapsele otse. IKS. Andmete asukohariik avaldatakse enne pilootlepinguid.',
   },
   {
     title: 'Identiteet ja integratsioonid',
@@ -347,7 +344,7 @@ const TENDER_TECH_REQUIREMENTS = [
   },
   {
     title: 'AI-komponent',
-    detail: 'Kohanduv õpimootor (BKT) — EU AI Act 2024/1689 III lisa § 3 haridusvaldkonna riskiklass; enesehindamine pooleli, õpetaja kontroll säilib — staatus vastavuse tabelis.',
+    detail: 'Kohanduv õpimootor (BKT) — kasutus hariduses. EU AI Act 2024/1689 Annex III punkt 3 käsitleb hariduse AI-süsteeme teatud tingimustel; Art. 6(3) erand võib kohalduda. Riskihinnangu tulemus dokumenteeritakse. Õpetaja kontroll säilib — staatus vastavuse tabelis.',
   },
   {
     title: 'Turve',
@@ -562,6 +559,10 @@ export default function TechnicalOverviewPage() {
                 { heading: 'Vastavus', rows: COMPLIANCE_ROWS },
                 { heading: 'Integratsioonid', rows: INTEGRATION_ROWS },
               ]}
+              procurementRoutes={PROCUREMENT_ROUTES}
+              priceBenchmarks={PRICE_BENCHMARKS}
+              contractNorms={CONTRACT_NORMS}
+              tenderTechRequirements={TENDER_TECH_REQUIREMENTS}
               glossary={GLOSSARY}
             />
           </div>
@@ -883,7 +884,7 @@ export default function TechnicalOverviewPage() {
               <div>
                 <dt className="font-medium text-text-primary">Õpikeskkonna hinnaankur</dt>
                 <dd className="mt-0.5">
-                  Opiq koolipakett 2026/27 (opiq.ee); soodushind alates 50% õpilastest vähemalt
+                  Opiq koolipakett 2025/26 (299 õppekomplekti; opiq.ee); soodushind alates 50% õpilastest vähemalt
                   9 kuuks.
                 </dd>
               </div>
