@@ -4,6 +4,7 @@ import { useRef } from 'react';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 import { SplitText } from 'gsap/SplitText';
+import { usePrefersReducedMotion } from '@/lib/hooks/use-prefers-reduced-motion';
 import { motionTokens, gsapEase, staggers } from '@/lib/motion-tokens';
 
 // SplitText is owned by the hero headline animations — register at module
@@ -57,75 +58,75 @@ export function AnimatedWordReveal({
   delay = 0.5,
 }: AnimatedHeadlineProps) {
   const containerRef = useRef<HTMLHeadingElement>(null);
+  const prefersReducedMotion = usePrefersReducedMotion();
 
   useGSAP(
     () => {
-      if (!containerRef.current) return;
-
-      const mm = gsap.matchMedia();
+      const el = containerRef.current;
+      if (!el) return;
 
       // Reduced motion: text is already visible via CSS fallback.
-      mm.add('(prefers-reduced-motion: reduce)', () => {
-        containerRef.current?.classList.remove('gsap-animate-on-mount');
-      });
+      if (prefersReducedMotion) {
+        el.classList.remove('gsap-animate-on-mount');
+        return;
+      }
 
       // Full animation: defer SplitText past first paint to avoid forced reflow.
-      mm.add('(prefers-reduced-motion: no-preference)', () => {
-        const el = containerRef.current!;
-        let split: ReturnType<typeof SplitText.create> | null = null;
-        let revealTween: gsap.core.Tween | null = null;
-        const cancelIdle = scheduleIdle(() => {
-          split = SplitText.create(el, {
-            type: 'words',
-            wordsClass: 'inline-block overflow-hidden',
-            // Don't let SplitText stamp aria-label on the element (GSAP 3.13+
-            // default `aria: "auto"`): the hero headline is a plain <h1>/<p>
-            // where aria-label is a prohibited attribute (Lighthouse
-            // aria-prohibited-attr). The split pieces stay real text nodes,
-            // so assistive tech reads them in DOM order without the label.
-            aria: 'none',
-          });
-
-          // Strip the CSS fallback before gsap.set — .gsap-animate-on-mount
-          // has opacity: 1 !important which overrides GSAP inline styles.
-          el.classList.remove('gsap-animate-on-mount');
-
-          // fromTo with immediateRender: false — the start state (words
-          // displaced below, edge-on) is applied when the tween actually
-          // starts, after `delay`, not at split time. A separate gsap.set
-          // here would make the words vanish on idle and sit invisible
-          // through the delay — a visible flash of the finished headline
-          // followed by a jump (first paint is at rest).
-          revealTween = gsap.fromTo(
-            split.words,
-            {
-              y: motionTokens.distance.xxl,
-              rotateX: -90,
-              transformOrigin: 'center bottom',
-            },
-            {
-              y: 0,
-              rotateX: 0,
-              duration: motionTokens.duration.normal,
-              stagger,
-              ease: gsapEase(motionTokens.easing.emphasized),
-              delay,
-              immediateRender: false,
-            }
-          );
+      let split: ReturnType<typeof SplitText.create> | null = null;
+      let revealTween: gsap.core.Tween | null = null;
+      const cancelIdle = scheduleIdle(() => {
+        split = SplitText.create(el, {
+          type: 'words',
+          wordsClass: 'inline-block overflow-hidden',
+          // Don't let SplitText stamp aria-label on the element (GSAP 3.13+
+          // default `aria: "auto"`): the hero headline is a plain <h1>/<p>
+          // where aria-label is a prohibited attribute (Lighthouse
+          // aria-prohibited-attr). The split pieces stay real text nodes,
+          // so assistive tech reads them in DOM order without the label.
+          aria: 'none',
         });
 
-        return () => {
-          cancelIdle();
-          // Deferred tween isn't tracked by the context, so kill it explicitly.
-          revealTween?.kill();
-          split?.revert();
-        };
+        // Strip the CSS fallback before gsap.set — .gsap-animate-on-mount
+        // has opacity: 1 !important which overrides GSAP inline styles.
+        el.classList.remove('gsap-animate-on-mount');
+
+        // fromTo with immediateRender: false — the start state (words
+        // displaced below, edge-on) is applied when the tween actually
+        // starts, after `delay`, not at split time. A separate gsap.set
+        // here would make the words vanish on idle and sit invisible
+        // through the delay — a visible flash of the finished headline
+        // followed by a jump (first paint is at rest).
+        revealTween = gsap.fromTo(
+          split.words,
+          {
+            y: motionTokens.distance.xxl,
+            rotateX: -90,
+            transformOrigin: 'center bottom',
+          },
+          {
+            y: 0,
+            rotateX: 0,
+            duration: motionTokens.duration.normal,
+            stagger,
+            ease: gsapEase(motionTokens.easing.emphasized),
+            delay,
+            immediateRender: false,
+          }
+        );
       });
 
-      return () => mm.revert();
+      return () => {
+        cancelIdle();
+        // Deferred tween isn't tracked by the context, so kill it explicitly.
+        revealTween?.kill();
+        split?.revert();
+      };
     },
-    { scope: containerRef, dependencies: [stagger, delay, children], revertOnUpdate: true },
+    {
+      scope: containerRef,
+      dependencies: [prefersReducedMotion, stagger, delay, children],
+      revertOnUpdate: true,
+    },
   );
 
   return (
@@ -148,16 +149,18 @@ interface AnimatedSublineProps {
 
 export function AnimatedCharacterReveal({ children, className = '' }: AnimatedSublineProps) {
   const containerRef = useRef<HTMLParagraphElement>(null);
+  const prefersReducedMotion = usePrefersReducedMotion();
 
   useGSAP(
     () => {
-      if (!containerRef.current) return;
+      const el = containerRef.current;
+      if (!el) return;
 
-      const mm = gsap.matchMedia();
-
-      mm.add('(prefers-reduced-motion: reduce)', () => {
-        containerRef.current?.classList.remove('gsap-animate-on-mount');
-      });
+      // Reduced motion: text is already visible via CSS fallback.
+      if (prefersReducedMotion) {
+        el.classList.remove('gsap-animate-on-mount');
+        return;
+      }
 
       // Whole-element slide, transform only. No SplitText: this <p> is the
       // LCP element, and char-splitting replaces its text node with ~110
@@ -165,32 +168,31 @@ export function AnimatedCharacterReveal({ children, className = '' }: AnimatedSu
       // (~3.8s on throttled mobile vs 0.26s real). Transform-only keeps the
       // original paint as LCP. delay=0: this is the LCP element, nothing
       // should hold its settle back.
-      mm.add('(prefers-reduced-motion: no-preference)', () => {
-        const el = containerRef.current!;
-        let revealTween: gsap.core.Tween | null = null;
-        // Apply the reveal start in the layout effect (before first paint)
-        // so the deferred idle tween doesn't visibly snap the element down
-        // 16px from its rest position when it runs.
-        gsap.set(el, { y: motionTokens.distance.md });
-        const cancelIdle = scheduleIdle(() => {
-          el.classList.remove('gsap-animate-on-mount');
-          revealTween = gsap.to(el, {
-            y: 0,
-            duration: motionTokens.duration.normal,
-            ease: gsapEase(motionTokens.easing.emphasized),
-          });
+      let revealTween: gsap.core.Tween | null = null;
+      // Apply the reveal start in the layout effect (before first paint)
+      // so the deferred idle tween doesn't visibly snap the element down
+      // 16px from its rest position when it runs.
+      gsap.set(el, { y: motionTokens.distance.md });
+      const cancelIdle = scheduleIdle(() => {
+        el.classList.remove('gsap-animate-on-mount');
+        revealTween = gsap.to(el, {
+          y: 0,
+          duration: motionTokens.duration.normal,
+          ease: gsapEase(motionTokens.easing.emphasized),
         });
-
-        return () => {
-          cancelIdle();
-          // Deferred tween isn't tracked by the context, so kill it explicitly.
-          revealTween?.kill();
-        };
       });
 
-      return () => mm.revert();
+      return () => {
+        cancelIdle();
+        // Deferred tween isn't tracked by the context, so kill it explicitly.
+        revealTween?.kill();
+      };
     },
-    { scope: containerRef, dependencies: [children], revertOnUpdate: true },
+    {
+      scope: containerRef,
+      dependencies: [prefersReducedMotion, children],
+      revertOnUpdate: true,
+    },
   );
 
   return (
