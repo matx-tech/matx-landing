@@ -40,6 +40,8 @@ export function SectionGate({
     const el = ref.current;
     if (!el) return;
 
+    let rafId: number | null = null;
+
     const check = () => {
       if (visible) return;
       const rect = el.getBoundingClientRect();
@@ -50,12 +52,24 @@ export function SectionGate({
       }
     };
 
+    // Coalesce scroll/resize into one layout read per frame — a rect read
+    // per event per still-closed gate is main-thread work on the throttled
+    // mobile CPUs this page targets.
+    const scheduleCheck = () => {
+      if (rafId !== null) return;
+      rafId = requestAnimationFrame(() => {
+        rafId = null;
+        check();
+      });
+    };
+
     check(); // sections already near the viewport at load
-    window.addEventListener('scroll', check, { passive: true });
-    window.addEventListener('resize', check);
+    window.addEventListener('scroll', scheduleCheck, { passive: true });
+    window.addEventListener('resize', scheduleCheck);
     return () => {
-      window.removeEventListener('scroll', check);
-      window.removeEventListener('resize', check);
+      window.removeEventListener('scroll', scheduleCheck);
+      window.removeEventListener('resize', scheduleCheck);
+      if (rafId !== null) cancelAnimationFrame(rafId);
     };
   }, [visible]);
 
