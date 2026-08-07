@@ -103,13 +103,27 @@ export function LenisProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const scrollTo = useCallback((target: string | number | HTMLElement, options?: { focusHeading?: boolean }) => {
-    if (!lenisRef.current) return;
-
     const targetElement = typeof target === 'string'
       ? document.querySelector(target)
       : target instanceof HTMLElement
         ? target
         : null;
+
+    // Lenis is a progressive enhancement: while the lazy chunk is still
+    // loading (or if it failed — the .catch above never retries), fall back
+    // to native scrolling so direct scrollTo() consumers (adoption route
+    // cards, nav links) never swallow clicks.
+    if (!lenisRef.current) {
+      const behavior: ScrollBehavior = reducedMotionRef.current ? 'auto' : 'smooth';
+      if (targetElement instanceof HTMLElement) {
+        // Same fixed-nav offset as the Lenis path (-80).
+        const top = targetElement.getBoundingClientRect().top + window.scrollY - 80;
+        window.scrollTo({ top: Math.max(top, 0), behavior });
+      } else if (typeof target === 'number') {
+        window.scrollTo({ top: target, behavior });
+      }
+      return;
+    }
 
     if (targetElement instanceof HTMLElement) {
       lenisRef.current.scrollTo(targetElement, {
