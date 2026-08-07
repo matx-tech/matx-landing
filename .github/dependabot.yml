@@ -116,12 +116,6 @@ updates:
           - "eslint-config-next"
           - "@typescript-eslint/*"
 
-    ignore:
-      # lucide-react is pinned to a specific major for icon stability.
-      # Bump manually when we audit icon names against the changelog.
-      - dependency-name: lucide-react
-        update-types: ["version-update:semver-major"]
-
   # ── GitHub Actions ──────────────────────────────────────────────────────
   - package-ecosystem: github-actions
     directory: /
