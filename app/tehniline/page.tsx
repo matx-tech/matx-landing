@@ -164,7 +164,7 @@ const SECURITY_CONTROLS: StatusRow[] = [
     title: 'Helmet, CSP, HSTS',
     detail: 'Turvapäised, sisu turvapoliitika, HSTS preload.',
     status: 'Kavandatud',
-    note: 'Põhiharul kommenteeritud välja; taastamine kavandatud.',
+    note: 'Taastamine ja kinnitamine on kavandatud enne piloodi laiendamist.',
   },
   {
     title: 'Puhkeoleku krüpteerimine',
@@ -195,7 +195,7 @@ const COMPLIANCE_ROWS: StatusRow[] = [
     title: 'EU AI Act (2024/1689)',
     detail: 'Kohanduv õpimootor (BKT) on hinnatud Annex III §3 haridusvaldkonna riskiklassi; Art. 6(3)(c) enesehindamine on otsustamisel. Õpetaja inimese-kontroll säilib.',
     status: 'Piloodis',
-    note: 'FRIA ja gate-scope otsused on compliance-harul; allkirjastamine ja Art. 49 registreerimine on kavandatud.',
+    note: 'FRIA ja ulatuse otsused on testimisel; allkirjastamine ja Art. 49 registreerimine on kavandatud.',
   },
   {
     title: 'NIS2 (2022/2555)',
@@ -205,7 +205,7 @@ const COMPLIANCE_ROWS: StatusRow[] = [
   },
   {
     title: 'GDPR (2016/679)',
-    detail: 'Kohaldub. Vastutav töötleja on kool/omavalitsus, volitatud töötleja MATx. Art. 8 alaealiste erikaitse (vanusepiir 13+, vanema nõusolek).',
+    detail: 'Kohaldub. Vastutav töötleja on kool/omavalitsus, volitatud töötleja MATx. Art. 8 alaealiste erikaitse (Eestis vanusepiir 13+, vanema nõusolek) kehtib juhul, kui õiguslikuks aluseks on nõusolek (art 6 lg 1 p a) infoühiskonna teenuse puhul, mida pakutakse otse lapsele.',
     status: 'Kavandatud',
     note: 'Alaealiste andmete kaitse on pilootfaasi põhirõhk; täismahus vastavus sihtseisus.',
   },
@@ -229,9 +229,9 @@ const COMPLIANCE_ROWS: StatusRow[] = [
   },
   {
     title: 'Eesti õigus (IKS, PGS, AKI)',
-    detail: 'IKS digitaalne nõusolek alates 13. eluaastast, isikuandmete kaitse seadus, AKI koolide juhendmaterjalid.',
+    detail: 'IKS digitaalne nõusolek alates 13. eluaastast (kehtib nõusolekupõhise infoühiskonna teenuse puhul, mida pakutakse otse lapsele), isikuandmete kaitse seadus, AKI koolide juhendmaterjalid.',
     status: 'Kavandatud',
-    note: 'Nõusoleku- ja vanusepiiri loogika on compliance-harul; põhiharul puudub.',
+    note: 'Nõusoleku- ja vanusepiiri loogika on testimisel turbearendusharus; ühendamine on kavandatud.',
   },
 ];
 
@@ -276,15 +276,15 @@ const PROCUREMENT_ROUTES = [
   {
     band: 'Kuni 30 000 € (kuni 31.10.2026) / kuni 50 000 € (alates 01.11.2026)',
     route: 'Otsetellimine — riigihangete seadus ei kohaldu; ost hankekorra järgi.',
-    note: 'Enamik ühe kooli tarkvaralitsentside oste jääb sellesse klassi ja ei jõua riigihangete registrisse.',
+    note: 'Ühe kooli tarkvaralitsentside ostud jäävad tihti alla piirmäära ega kajastu registris; täpset jaotust registriandmetest hinnata ei saa.',
   },
   {
-    band: '30 000–60 000 € (kuni 31.10.2026) / 50 000–140 000 € (riik) või 216 000 € (omavalitsus) (alates 01.11.2026)',
+    band: '30 000–59 999 € (kuni 31.10.2026) / 50 000–139 999 € (riik) või 215 999 € (omavalitsus) (alates 01.11.2026)',
     route: 'Lihthange — pakkumuste tähtaeg min 10 päeva, alates 01.11.2026 min 15 päeva.',
     note: 'Keskmine kestus teatest lepinguni 2025. aastal: 47 päeva.',
   },
   {
-    band: '60 000–140 000 € (riik) või 216 000 € (omavalitsus) — kehtib kuni 31.10.2026',
+    band: '60 000–139 999 € (riik) või 215 999 € (omavalitsus) — kehtib kuni 31.10.2026',
     route: 'Avatud hankemenetlus — pakkumuste tähtaeg min 15 päeva.',
     note: 'Keskmine kestus teatest lepinguni 2025. aastal: 72 päeva.',
   },
@@ -316,11 +316,11 @@ const CONTRACT_NORMS = [
   },
   {
     title: 'Maksetähtaeg',
-    detail: 'Vähemalt 30 kalendripäeva (hilinenud maksete direktiiv 2011/7/EL); hankelepingutes kasutusel standardina.',
+    detail: 'Tavaliselt kuni 30 kalendripäeva (hilinenud maksete direktiiv 2011/7/EL); kuni 60 päeva vaid erandina, kui see on sõnaselgelt kokku lepitud ja objektiivselt põhjendatud.',
   },
   {
     title: 'Garantii ja leppetrahv',
-    detail: 'Õiguskaitsevahendid — leppetrahv, hinna alandamine, taganemine, ülesütlemine (RHS § 95 lg 4). Määrad on lepinguvabadus ja määratakse hanke alusdokumentides.',
+    detail: 'Õiguskaitsevahendid — leppetrahv, hinna alandamine ja kahju hüvitamine VÕS-i ja lepingutingimuste alusel; hankelepingu ülesütlemine ja taganemine RHS § 124 alusel. Määrad on lepinguvabadus ja määratakse hanke alusdokumentides.',
   },
   {
     title: 'Intellektuaalomand',
@@ -339,7 +339,7 @@ const TENDER_TECH_REQUIREMENTS = [
   },
   {
     title: 'Andmekaitse',
-    detail: 'GDPR art 8 (nõusolek alates 13. eluaastast) ja IKS; kool on vastutav töötleja, MATx volitatud töötleja. Andmete asukohariik avaldatakse enne pilootlepinguid.',
+    detail: 'GDPR art 8 (nõusolek alates 13. eluaastast, kui õiguslikuks aluseks on nõusolek infoühiskonna teenuse puhul, mida pakutakse otse lapsele) ja IKS; vastutava ja volitatud töötleja rollid fikseeritakse andmetöötluslepingus. Andmete asukohariik avaldatakse enne pilootlepinguid.',
   },
   {
     title: 'Identiteet ja integratsioonid',
@@ -347,11 +347,39 @@ const TENDER_TECH_REQUIREMENTS = [
   },
   {
     title: 'AI-komponent',
-    detail: 'Kohanduv õpimootor (BKT) — EU AI Act 2024/1689 III lisa § 3 haridusvaldkonna riskiklass; enesehindamine pooleli, õpetaja kontroll säilib — staatus vastavuse tabelis.',
+    detail: 'Kohanduv õpimootor (BKT) — EU AI Act 2024/1689 III lisa § 3 hõlmab kindlaksmääratud hariduslikke kasutusjuhte; Art 6(3) erand võib välistada kõrge riski klassi, kui otsuseid oluliselt ei mõjutata ega profileerita; enesehindamine pooleli, õpetaja kontroll säilib — staatus vastavuse tabelis.',
   },
   {
     title: 'Turve',
     detail: 'E-ITS/ISKE baastase, NIS2 hea tava, turvapäised (CSP/HSTS), pseudonüümimine — staatused turvameetmete tabelis.',
+  },
+];
+
+// Hankeinfo allikad — üks allikas rea kohta; sama andmeallikas, mida kasutab
+// nii lehe allikaloend kui ka Markdowni eksport.
+const HANKE_SOURCES: { title: string; detail: string }[] = [
+  {
+    title: 'Piirmäärad ja menetlused',
+    detail:
+      'Riigihangete seadus § 14–15 (RT I, 01.07.2017, 1) ja riigihangete seaduse ja teiste seaduste muutmise seadus (RT I, 03.07.2026, 3; jõustub 01.11.2026); EL piirmäärad 2026–2027: komisjoni delegeeritud määrus (EL) 2025/2152.',
+  },
+  {
+    title: 'Hinnaklassid',
+    detail:
+      'Riigihangete registri avaandmed (lepinguteated, 2026. a I poolaasta; mediaanid ja keskmised arvutatud maksumusega teadetest). Ühe kooli alla 30 000 € ostud ei kajastu registris.',
+  },
+  {
+    title: 'Õpikeskkonna hinnaankur',
+    detail: 'Opiq koolipakett 2026/27 (opiq.ee); soodushind alates 50% õpilastest vähemalt 9 kuuks.',
+  },
+  {
+    title: 'Menetluse kestused ja pakkujate arv',
+    detail: 'Rahandusministeeriumi riigihangete valdkonna statistika ja kokkuvõte 2025 (fin.ee).',
+  },
+  {
+    title: 'Juurdepääsetavus ja maksetähtaeg',
+    detail:
+      'Direktiiv (EL) 2016/2102, EN 301 549 V3.2.1; järelevalve TTJA (ttja.ee). Maksetähtaeg: direktiiv 2011/7/EL.',
   },
 ];
 
@@ -922,14 +950,12 @@ export default function TechnicalOverviewPage() {
               >
                 github.com/matx-ee
               </a>
-              . Kaartide märkustes viidatakse harule või teekonnale (nt{' '}
-              <code className="font-mono text-xs">server/eatf.ts</code>,{' '}
-              <code className="font-mono text-xs">server/bktSnapshotSign.ts</code>).
+              . Iga kaardi juures on märge selle hetkeseisu kohta.
             </p>
             <p>
-              „Compliance-haru&ldquo; (viide: <code className="font-mono text-xs">release/matx-compliance-rc-2026-06-22</code>)
-              on eraldiseisev turbearendusharu, mis ühendatakse põhiharuga enne piloodi
-              laiendamist. Kuni ühendamiseni on need meetmed märgitud „Kavandatud&ldquo;.
+              Osa meetmeid on arendatud ja testimisel eraldi turbearendusharus, mis
+              ühendatakse põhiharuga enne piloodi laiendamist. Kuni ühendamiseni on need
+              meetmed märgitud „Kavandatud&ldquo;.
             </p>
             <p className="text-xs">
               Leht ajakohastatud: {LAST_UPDATED}. Staatused muutuvad ühendamiste käigus;
