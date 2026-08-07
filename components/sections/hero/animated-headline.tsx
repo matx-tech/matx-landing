@@ -90,20 +90,29 @@ export function AnimatedWordReveal({
           // has opacity: 1 !important which overrides GSAP inline styles.
           el.classList.remove('gsap-animate-on-mount');
 
-          gsap.set(split.words, {
-            y: motionTokens.distance.xxl,
-            rotateX: -90,
-            transformOrigin: 'center bottom',
-          });
-
-          revealTween = gsap.to(split.words, {
-            y: 0,
-            rotateX: 0,
-            duration: motionTokens.duration.normal,
-            stagger,
-            ease: gsapEase(motionTokens.easing.emphasized),
-            delay,
-          });
+          // fromTo with immediateRender: false — the start state (words
+          // displaced below, edge-on) is applied when the tween actually
+          // starts, after `delay`, not at split time. A separate gsap.set
+          // here would make the words vanish on idle and sit invisible
+          // through the delay — a visible flash of the finished headline
+          // followed by a jump (first paint is at rest).
+          revealTween = gsap.fromTo(
+            split.words,
+            {
+              y: motionTokens.distance.xxl,
+              rotateX: -90,
+              transformOrigin: 'center bottom',
+            },
+            {
+              y: 0,
+              rotateX: 0,
+              duration: motionTokens.duration.normal,
+              stagger,
+              ease: gsapEase(motionTokens.easing.emphasized),
+              delay,
+              immediateRender: false,
+            }
+          );
         });
 
         return () => {
