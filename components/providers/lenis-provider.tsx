@@ -30,14 +30,9 @@ export function LenisProvider({ children }: { children: React.ReactNode }) {
   const lenisRef = useRef<Lenis | null>(null);
   const reducedMotionRef = useRef(false);
   const tickerCbRef = useRef<((time: number) => void) | null>(null);
+  const focusTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    const reducedMotion =
-      typeof window !== 'undefined' &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-    reducedMotionRef.current = reducedMotion;
-
     // Share one rAF cycle between Lenis and GSAP — eliminates duplicate
     // animation loops and reduces jank.
     gsap.ticker.lagSmoothing(false);
@@ -62,6 +57,14 @@ export function LenisProvider({ children }: { children: React.ReactNode }) {
         });
       }
 
+      // Read the media query now, not before the async import — the
+      // captured value may be stale by the time the chunk arrives.
+      const rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      reducedMotionRef.current = rm;
+
+      lenisInstance = createLenis(rm);
+      lenisRef.current = lenisInstance;
+
       function registerRaf(instance: Lenis) {
         // Remove previous callback first so we never double-register
         if (tickerCbRef.current) gsap.ticker.remove(tickerCbRef.current);
@@ -69,9 +72,6 @@ export function LenisProvider({ children }: { children: React.ReactNode }) {
         tickerCbRef.current = cb;
         gsap.ticker.add(cb);
       }
-
-      lenisInstance = createLenis(reducedMotion);
-      lenisRef.current = lenisInstance;
 
       registerRaf(lenisInstance);
       lenisInstance.on('scroll', ScrollTrigger.update);
@@ -97,6 +97,7 @@ export function LenisProvider({ children }: { children: React.ReactNode }) {
 
     return () => {
       disposed = true;
+      if (focusTimerRef.current) clearTimeout(focusTimerRef.current);
       if (tickerCbRef.current) gsap.ticker.remove(tickerCbRef.current);
       if (mql && handleChange) mql.removeEventListener('change', handleChange);
       lenisInstance?.destroy();
@@ -137,7 +138,8 @@ export function LenisProvider({ children }: { children: React.ReactNode }) {
 
       // Focus the section heading after scroll animation completes
       if (options?.focusHeading !== false) {
-        setTimeout(() => {
+        if (focusTimerRef.current) clearTimeout(focusTimerRef.current);
+        focusTimerRef.current = setTimeout(() => {
           // SectionGate swaps its id-bearing placeholder for the mounted
           // section while we scroll, detaching the element captured above.
           // Re-resolve the selector so the heading lives in the real section.
@@ -157,6 +159,7 @@ export function LenisProvider({ children }: { children: React.ReactNode }) {
             }
             heading.focus({ preventScroll: true });
           }
+          focusTimerRef.current = null;
         }, reducedMotionRef.current ? 0 : 1400); // Slightly longer than scroll duration
       }
     } else if (typeof target === 'number') {

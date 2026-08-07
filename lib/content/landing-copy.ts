@@ -24,6 +24,15 @@ export const PROHIBITED_PHRASES = [
 // Shared UI labels
 export const SCROLL_INDICATOR_LABEL = 'Keri alla' as const;
 
+// Registration dialog chunk-fallback overlay
+export const REGISTRATION_COPY = {
+  error: 'Registreerimisvormi laadimine ebaõnnestus.',
+  retry: 'Proovi uuesti',
+  close: 'Sulge',
+  loading: 'Laadime registreerimisvormi…',
+  cancel: 'Tühista',
+} as const;
+
 // Shared URLs
 export const CALENDLY_URL = 'https://calendly.com/matx-demo' as const;
 

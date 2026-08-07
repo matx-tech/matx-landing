@@ -39,13 +39,18 @@ updates:
         patterns:
           - "@radix-ui/*"
 
-      # React + DOM + their @types — keep runtime and type stubs in sync.
-      react:
+      # Next.js + React + their type stubs / lint config / bundle analyzer —
+      # version-coupled (eslint-config-next and @next/bundle-analyzer track
+      # Next releases); single PR avoids skew between framework and tooling.
+      framework:
         patterns:
+          - "next"
           - "react"
           - "react-dom"
           - "@types/react"
           - "@types/react-dom"
+          - "eslint-config-next"
+          - "@next/bundle-analyzer"
 
       # GSAP core + React hook — hook pins a peer range on gsap.
       gsap:
@@ -62,17 +67,11 @@ updates:
           - "tailwind-merge"
           - "tailwindcss-animate"
 
-      # ESLint + Next.js ESLint config — parser / plugin compatibility.
+      # ESLint core + TypeScript parser/plugin — parser / plugin compatibility.
       eslint:
         patterns:
           - "eslint"
-          - "eslint-config-next"
           - "@typescript-eslint/*"
-
-      # Next.js — framework upgrades; eslint-config-next is in the eslint group.
-      nextjs:
-        patterns:
-          - "next"
 
       # Sharp is a native module; review carefully because prebuilt
       # binaries must match the deployment platform (Linux x64).

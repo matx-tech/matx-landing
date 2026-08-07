@@ -3,6 +3,7 @@
 import { useState, useRef, useCallback, useEffect, useContext, useMemo, createContext } from 'react';
 import dynamic, { type DynamicOptionsLoadingProps } from 'next/dynamic';
 import { dialogCloseDelayMs } from '@/lib/dialog-timing';
+import { REGISTRATION_COPY } from '@/lib/content/landing-copy';
 
 // Cancel channel for the chunk-loading fallback: next/dynamic renders the
 // `loading` fallback inside the page tree, so it can ask the provider to
@@ -33,21 +34,21 @@ function RegistrationChunkFallback({ error, retry }: DynamicOptionsLoadingProps)
           className="flex flex-col items-center gap-4 px-6 text-center"
           onClick={(event) => event.stopPropagation()}
         >
-          <p className="text-text-primary">Registreerimisvormi laadimine ebaõnnestus.</p>
+          <p className="text-text-primary">{REGISTRATION_COPY.error}</p>
           <div className="flex gap-3">
             <button
               type="button"
               onClick={retry}
               className="rounded-lg bg-primary px-6 py-3 font-semibold text-text-inverse transition-colors hover:bg-primary/90 focus-ring-target min-h-[44px]"
             >
-              Proovi uuesti
+              {REGISTRATION_COPY.retry}
             </button>
             <button
               type="button"
               onClick={cancel}
               className="rounded-lg border border-border px-6 py-3 font-semibold text-text-primary transition-colors hover:bg-surface focus-ring-target min-h-[44px]"
             >
-              Sulge
+              {REGISTRATION_COPY.close}
             </button>
           </div>
         </div>
@@ -69,13 +70,13 @@ function RegistrationChunkFallback({ error, retry }: DynamicOptionsLoadingProps)
           aria-hidden="true"
           className="h-10 w-10 animate-spin rounded-full border-2 border-primary border-t-transparent"
         />
-        <span className="sr-only">Laadime registreerimisvormi…</span>
+        <span className="sr-only">{REGISTRATION_COPY.loading}</span>
         <button
           type="button"
           onClick={cancel}
           className="rounded-lg border border-border px-6 py-3 font-semibold text-text-primary transition-colors hover:bg-surface focus-ring-target min-h-[44px]"
         >
-          Tühista
+          {REGISTRATION_COPY.cancel}
         </button>
       </div>
     </div>

@@ -80,6 +80,10 @@ export function AnimatedWordReveal({
             aria: 'none',
           });
 
+          // Strip the CSS fallback before gsap.set — .gsap-animate-on-mount
+          // has opacity: 1 !important which overrides GSAP inline styles.
+          el.classList.remove('gsap-animate-on-mount');
+
           gsap.set(split.words, {
             y: motionTokens.distance.xxl,
             rotateX: -90,
@@ -94,9 +98,6 @@ export function AnimatedWordReveal({
             ease: gsapEase(motionTokens.easing.emphasized),
             delay,
           });
-
-          // Remove CSS fallback right before GSAP hides text for animation.
-          el.classList.remove('gsap-animate-on-mount');
         });
 
         return () => {

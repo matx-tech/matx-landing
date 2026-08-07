@@ -12,9 +12,9 @@
 }
 
 @theme inline {
-  --font-display: 'Public Sans', system-ui, sans-serif;
-  --font-inter: 'Inter', system-ui, sans-serif;
-  --font-mono: 'IBM Plex Mono', 'Consolas', monospace;
+  --font-display: var(--font-public-sans);
+  --font-inter: var(--font-inter-next);
+  --font-mono: var(--font-ibm-plex-mono);
 
   --color-canvas: var(--color-bg-canvas);
   --color-surface: var(--color-bg-surface);

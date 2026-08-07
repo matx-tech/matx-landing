@@ -6,7 +6,7 @@ import { SITE_META } from '@/lib/content/landing-copy';
 
 const publicSans = Public_Sans({
   subsets: ['latin'],
-  variable: '--font-display',
+  variable: '--font-public-sans',
   display: 'swap',
   // Only weights actually used: every font-display element is font-bold or font-semibold.
   weight: ['600', '700'],
@@ -14,7 +14,7 @@ const publicSans = Public_Sans({
 
 const inter = Inter({
   subsets: ['latin'],
-  variable: '--font-inter',
+  variable: '--font-inter-next',
   // optional + preload:false — body text paints in the system fallback
   // immediately; if Inter misses the optional window it is never swapped in,
   // eliminating the late font-swap flash/CLS on slow devices. The hero display
@@ -26,7 +26,7 @@ const inter = Inter({
 
 const ibmPlexMono = IBM_Plex_Mono({
   subsets: ['latin'],
-  variable: '--font-ibm-mono',
+  variable: '--font-ibm-plex-mono',
   display: 'swap',
   // All 10 font-mono usages are default-weight.
   weight: ['400'],
