@@ -118,6 +118,17 @@ export function SectionGate({
       ) ??
       null;
 
+    // Park focus on the retry control only when focus was actually lost —
+    // i.e. it dropped to <body> because the previous retry button unmounted
+    // with the error fallback. That re-parks focus after a failed retry while
+    // keeping the 200ms poll ticks and observer flushes from yanking focus
+    // back from wherever the user moved it.
+    const focusRetry = (retry: HTMLButtonElement): void => {
+      if (document.activeElement === document.body) {
+        retry.focus({ preventScroll: true });
+      }
+    };
+
     const tryHandOff = (): boolean => {
       if (cancelled) return true;
       const target = resolveTarget();
@@ -131,16 +142,24 @@ export function SectionGate({
         // once the retry button unmounts with the error fallback.
         const retry = errorRetryTarget(target);
         if (retry) {
-          // Only grab focus when the retry button doesn't already have it —
-          // tryHandOff runs on every 200ms poll tick while the error fallback
-          // is showing, so re-focusing would yank keyboard focus back from the
-          // user if they tabbed away within the poll window.
-          if (document.activeElement !== retry) retry.focus({ preventScroll: true });
+          focusRetry(retry);
           return false;
         }
         if (!target.hasAttribute('tabindex')) target.setAttribute('tabindex', '-1');
         target.focus({ preventScroll: true });
         return true;
+      }
+      // id-less gates: the failed-chunk fallback has no heading, so
+      // resolveTarget() returns null while it's showing — check the revealed
+      // wrapper directly so the observer re-parks focus on each re-mounted
+      // retry button after a failed retry instead of stranding focus on
+      // <body>.
+      if (!id && revealedRef.current) {
+        const retry = errorRetryTarget(revealedRef.current);
+        if (retry) {
+          focusRetry(retry);
+          return false;
+        }
       }
       return false;
     };
@@ -167,7 +186,8 @@ export function SectionGate({
         if (!id) {
           const wrapper = revealedRef.current;
           const retry = wrapper ? errorRetryTarget(wrapper) : null;
-          (retry ?? wrapper)?.focus({ preventScroll: true });
+          if (retry) focusRetry(retry);
+          else wrapper?.focus({ preventScroll: true });
         }
         return; // slow path below keeps watching
       }
