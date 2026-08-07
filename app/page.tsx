@@ -4,6 +4,9 @@ import { HeroSection } from '@/components/sections/hero';
 import { DeferredSections, DeferredFooter } from '@/components/sections/deferred-sections';
 import { RegistrationProvider } from '@/components/providers/registration-provider';
 
+/**
+ * Renders the home page with registration context, navigation, primary content, and deferred sections.
+ */
 export default function Home() {
   return (
     <RegistrationProvider>

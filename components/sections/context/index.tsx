@@ -23,6 +23,11 @@ const CONTEXT_ICONS: Record<string, typeof TrendingDown | typeof Clock | typeof 
   'minus': Minus,
 };
 
+/**
+ * Renders national education-context information and its relevance to MATx.
+ *
+ * @returns The context section markup.
+ */
 export function ContextSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const prefersReducedMotion = usePrefersReducedMotion();

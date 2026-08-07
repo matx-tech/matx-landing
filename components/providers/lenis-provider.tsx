@@ -25,6 +25,11 @@ const LenisContext = createContext<LenisContextValue>({
 
 export const useLenis = () => useContext(LenisContext);
 
+/**
+ * Provides application-wide scrolling through Lenis with native scrolling fallback.
+ *
+ * @param children - The content rendered within the provider.
+ */
 export function LenisProvider({ children }: { children: React.ReactNode }) {
   const lenisRef = useRef<Lenis | null>(null);
   const reducedMotionRef = useRef(false);

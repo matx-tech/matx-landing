@@ -18,6 +18,9 @@ if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
 }
 
+/**
+ * Renders the student-focused landing-page section with learning steps and an example feedback interaction.
+ */
 export function StudentSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const stepsRef = useRef<(HTMLLIElement | null)[]>([]);

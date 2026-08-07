@@ -72,6 +72,11 @@ export const metadata: Metadata = {
   },
 };
 
+/**
+ * Defines the root document structure and wraps page content with the site's scrolling provider.
+ *
+ * @returns The root HTML document containing page content and MATx metadata.
+ */
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="et" className={`${publicSans.variable} ${inter.variable} ${ibmPlexMono.variable}`}>

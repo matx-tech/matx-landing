@@ -18,6 +18,9 @@ const TRUST_ICONS: Record<string, typeof Shield | typeof Eye | typeof FileText> 
   'file-text': FileText,
 };
 
+/**
+ * Presents MATx’s trust principles, recommendation transparency workflow, and adoption guidance.
+ */
 export function TrustSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const prefersReducedMotion = usePrefersReducedMotion();

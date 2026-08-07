@@ -21,6 +21,12 @@ import { fileURLToPath } from 'url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const base = join(__dirname, '..');
 
+/**
+ * Generates a ThumbHash and PNG data URL for an image resized within a maximum dimension.
+ * @param {string} imagePath - Path to the source image.
+ * @param {number} [maxDim=100] - Maximum width or height of the resized image.
+ * @returns {Promise<{base64Hash: string, dataUrl: string, width: number, height: number}>} The Base64-encoded hash, PNG data URL, and resized dimensions.
+ */
 async function generateThumbHash(imagePath, maxDim = 100) {
   const { data, info } = await sharp(imagePath)
     .resize(maxDim, maxDim, { fit: 'inside' })

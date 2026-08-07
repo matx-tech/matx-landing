@@ -16,6 +16,9 @@ if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
 }
 
+/**
+ * Renders the evidence workflow stages with responsive layout and scroll-based animations.
+ */
 export function EvidenceLoopSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const stagesRef = useRef<(HTMLLIElement | null)[]>([]);

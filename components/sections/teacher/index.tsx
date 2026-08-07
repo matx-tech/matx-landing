@@ -51,6 +51,9 @@ const heatmapLevelLabels = [
   'Kõrge',
 ];
 
+/**
+ * Renders an interactive teacher-focused section with class performance insights and intervention information.
+ */
 export function TeacherSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const heatmapRef = useRef<HTMLDivElement>(null);

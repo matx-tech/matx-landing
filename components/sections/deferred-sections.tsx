@@ -6,7 +6,14 @@ import { SECTION_IDS } from '@/lib/content/landing-copy';
 
 // Placeholder shown while a gated section's chunk loads — mirrors the
 // section's background/padding so SectionGate keeps layout stable and
-// the reveal doesn't shift CLS.
+/**
+ * Renders a layout-preserving placeholder or retry interface for a deferred section.
+ *
+ * @param error - Whether loading failed and the retry interface should be shown.
+ * @param retry - Callback invoked to retry loading the section.
+ * @param id - Anchor ID applied to the section.
+ * @returns The section placeholder or loading-error interface.
+ */
 function SectionSkeleton({
   error,
   retry,
@@ -73,7 +80,14 @@ interface SectionLoaderProps {
 // (lazy-dynamic/loadable.js renders it with `{ isLoading, pastDelay, error:
 // null }`), so a failed chunk would show an eternal skeleton with no way to
 // retry. Instead, fetch the chunk ourselves in an effect and track the
-// loading/error states explicitly — the retry UI then actually works.
+/**
+ * Loads and renders a deferred section with loading and retry states.
+ *
+ * @param loader - Loads the section component.
+ * @param skeletonProps - Props used to render the section placeholder.
+ * @param onRetry - Restarts loading after a failure.
+ * @returns The loaded section, a loading placeholder, or a retry interface.
+ */
 function SectionLoader({ loader, skeletonProps, onRetry }: SectionLoaderProps) {
   const [Section, setSection] = useState<ComponentType | null>(null);
   const [hasError, setHasError] = useState(false);
@@ -103,6 +117,13 @@ function SectionLoader({ loader, skeletonProps, onRetry }: SectionLoaderProps) {
   return <Section />;
 }
 
+/**
+ * Creates a section component that loads its content dynamically and supports retrying failed loads.
+ *
+ * @param loader - Loads the section component.
+ * @param skeletonProps - Configures the loading and error placeholders.
+ * @returns A section component that renders the loaded content or an appropriate placeholder.
+ */
 function createLazySection(
   loader: () => Promise<{ default: ComponentType }>,
   skeletonProps: SectionLoaderProps['skeletonProps']
@@ -215,6 +236,11 @@ const FooterSection = createLazySection(
   { bgClass: 'bg-canvas', sectionClass: 'py-16', heightClass: 'h-64' }
 );
 
+/**
+ * Renders the below-the-fold landing-page sections in narrative order.
+ *
+ * @returns The grouped deferred landing-page section elements.
+ */
 export function DeferredSections() {
   return (
     <>
@@ -254,7 +280,11 @@ export function DeferredSections() {
 }
 
 // Rendered outside <main> so the <footer> landmark keeps its contentinfo role
-// instead of being nested inside the main landmark.
+/**
+ * Renders the deferred footer section outside the main content landmark.
+ *
+ * @returns The gated footer section
+ */
 export function DeferredFooter() {
   return (
     <SectionGate placeholderClassName="min-h-[24rem]">

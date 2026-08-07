@@ -25,6 +25,9 @@ const AUDIENCE_ICONS: Record<AudienceId, typeof BookOpen | typeof School | typeo
   it: Server,
 };
 
+/**
+ * Renders audience-specific adoption routes with registration and scheduling actions.
+ */
 export function AdoptionSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const { openRegistration } = useRegistration();

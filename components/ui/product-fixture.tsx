@@ -28,6 +28,15 @@ interface ProductFixtureProps {
   className?: string;
 }
 
+/**
+ * Renders an educational workflow showing a student answer, detected signal, targeted retry, and teacher action.
+ *
+ * @param animated - Whether to animate the workflow panels.
+ * @param triggerId - The ID of the element that triggers the panel animation on scroll.
+ * @param delay - The initial delay before revealing the first panel.
+ * @param className - Additional CSS classes for the workflow container.
+ * @returns The rendered educational workflow.
+ */
 export function ProductFixture({
   animated = true,
   triggerId,

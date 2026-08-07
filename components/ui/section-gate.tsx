@@ -18,16 +18,10 @@ interface SectionGateProps {
 const REVEAL_MARGIN_PX = 600;
 
 /**
- * Defers a below-fold section until the user scrolls near it (600px lookahead).
- * The section is not rendered during SSR, so its chunk is never preloaded —
- * the next/dynamic import fires on demand when the gate opens, keeping the
- * section's GSAP/ScrollTrigger setup out of the initial main-thread work.
+ * Defers rendering a section until it is near the viewport or manually opened.
  *
- * Scroll-listener based (not IntersectionObserver): IO never delivers entries
- * for elements that are jumped past without ever intersecting (anchor links,
- * PageDown, scrollTo), so those gates would stay closed forever. A scroll
- * listener re-reads the placeholder rect on every scroll — including instant
- * jumps — and opens anything at or above the reveal line.
+ * @param id - Optional anchor ID for the section
+ * @returns A layout-preserving placeholder or the revealed section content
  */
 export function SectionGate({
   children,

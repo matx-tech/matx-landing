@@ -10,6 +10,12 @@ import { REGISTRATION_COPY } from '@/lib/content/landing-copy';
 // abandon the pending open via context instead of being a dead-end overlay.
 const RegistrationChunkContext = createContext<{ cancel: () => void }>({ cancel: () => {} });
 
+/**
+ * Renders a modal fallback while the registration form chunk is loading or has failed.
+ *
+ * @param error - The chunk-loading error, if loading failed
+ * @param retry - Retries loading the registration form chunk
+ */
 function RegistrationChunkFallback({ error, retry }: DynamicOptionsLoadingProps) {
   const { cancel } = useContext(RegistrationChunkContext);
   const overlayRef = useRef<HTMLDivElement>(null);
@@ -162,7 +168,11 @@ const RegistrationContext = createContext<{ openRegistration: () => void }>({
   openRegistration: () => {},
 });
 
-/** Opens the lazy-loaded registration dialog. Consumed by CTA sections. */
+/**
+ * Provides access to registration dialog controls.
+ *
+ * @returns The registration context value
+ */
 export function useRegistration() {
   return useContext(RegistrationContext);
 }

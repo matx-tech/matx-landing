@@ -19,6 +19,9 @@ const navItems = LANDING_NAV_ITEMS;
 
 const PILOT_HREF = `#${SECTION_IDS.pilot}`;
 
+/**
+ * Renders responsive navigation with desktop links, mobile menu controls, and calls to action.
+ */
 export function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
   const navRef = useRef<HTMLElement>(null);

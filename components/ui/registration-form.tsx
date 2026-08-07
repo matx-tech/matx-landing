@@ -51,6 +51,12 @@ interface RegistrationFormProps {
   onClose: () => void;
 }
 
+/**
+ * Renders a registration dialog for schools joining the pilot program.
+ *
+ * @param isOpen - Whether the dialog is open
+ * @param onClose - Called when the dialog closes
+ */
 export function RegistrationForm({ isOpen, onClose }: RegistrationFormProps) {
   const [consent, setConsent] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);

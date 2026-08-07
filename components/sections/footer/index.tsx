@@ -13,6 +13,9 @@ if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
 }
 
+/**
+ * Renders the MATx landing page footer with branding, navigation, contact links, legal links, and responsive entrance animations.
+ */
 export function FooterSection() {
   const footerRef = useRef<HTMLElement>(null);
   const sectionsRef = useRef<(HTMLDivElement | null)[]>([]);

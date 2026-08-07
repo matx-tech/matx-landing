@@ -19,6 +19,11 @@ if (typeof window !== 'undefined') {
 // The promise is cached across mounts/effect re-runs; on failure it's dropped
 // so a later mount can retry (callers attach their own rejection handler).
 let motionPathPluginPromise: Promise<typeof import('gsap/MotionPathPlugin')> | null = null;
+/**
+ * Loads the GSAP MotionPathPlugin and reuses the pending or resolved load.
+ *
+ * @returns The loaded MotionPathPlugin module
+ */
 function loadMotionPathPlugin(): Promise<typeof import('gsap/MotionPathPlugin')> {
   if (!motionPathPluginPromise) {
     motionPathPluginPromise = import('gsap/MotionPathPlugin').catch((error) => {
@@ -29,6 +34,9 @@ function loadMotionPathPlugin(): Promise<typeof import('gsap/MotionPathPlugin')>
   return motionPathPluginPromise;
 }
 
+/**
+ * Renders a call-to-action section for school registration and teacher consultations.
+ */
 export function CTASection() {
   const sectionRef = useRef<HTMLElement>(null);
   const titleRef = useRef<HTMLDivElement>(null);

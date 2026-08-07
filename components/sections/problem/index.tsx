@@ -41,6 +41,9 @@ const storyBeats = [
   },
 ];
 
+/**
+ * Presents the problem story beats, illustrating recurring student errors and the need for teacher guidance.
+ */
 export function ProblemSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);

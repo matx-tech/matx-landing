@@ -21,15 +21,10 @@ interface AnimatedHeadlineProps {
 }
 
 /**
- * Schedules a callback using requestIdleCallback (with rAF fallback) so
- * expensive layout operations don't block the first paint or contribute
- * to Total Blocking Time (TBT).
+ * Defers a callback until the browser is idle or has completed a paint.
  *
- * The 108ms forced-reflow Lighthouse audit traces to SplitText.create()
- * which synchronously reads layout properties then mutates the DOM.  By
- * deferring it past the initial render we let the browser paint text
- * immediately (backed by the `.gsap-animate-on-mount` CSS fallback) and
- * then apply the reveal animation on idle time.
+ * @param cb - The callback to invoke when scheduling completes
+ * @returns A function that cancels the scheduled callback
  */
 function scheduleIdle(cb: () => void): () => void {
   let cancelled = false;
@@ -54,6 +49,13 @@ function scheduleIdle(cb: () => void): () => void {
   };
 }
 
+/**
+ * Reveals heading text one word at a time with configurable timing.
+ *
+ * @param stagger - The delay between successive word animations.
+ * @param delay - The delay before the reveal begins.
+ * @returns The animated heading element.
+ */
 export function AnimatedWordReveal({
   children,
   className = '',
@@ -155,6 +157,11 @@ interface AnimatedSublineProps {
   className?: string;
 }
 
+/**
+ * Reveals paragraph content with a vertical slide animation while respecting reduced-motion preferences.
+ *
+ * @returns The rendered paragraph containing the provided content.
+ */
 export function AnimatedCharacterReveal({ children, className = '' }: AnimatedSublineProps) {
   const containerRef = useRef<HTMLParagraphElement>(null);
   const prefersReducedMotion = usePrefersReducedMotion();
@@ -213,6 +220,11 @@ export function AnimatedCharacterReveal({ children, className = '' }: AnimatedSu
   );
 }
 
+/**
+ * Animates the MATx logo letters into view with reduced-motion support.
+ *
+ * @param delay - The animation delay in seconds.
+ */
 export function MATxLogoAnimation({ delay = 0 }: { delay?: number }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const lettersRef = useRef<HTMLSpanElement[]>([]);
