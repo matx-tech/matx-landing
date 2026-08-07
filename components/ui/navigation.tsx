@@ -12,7 +12,7 @@ import { usePrefersReducedMotion } from '@/lib/hooks/use-prefers-reduced-motion'
 import { motionTokens, gsapEase, staggers } from '@/lib/motion-tokens';
 
 if (typeof window !== 'undefined') {
-  gsap.registerPlugin(ScrollTrigger);
+  gsap.registerPlugin(ScrollTrigger, useGSAP);
 }
 
 const navItems = LANDING_NAV_ITEMS;
