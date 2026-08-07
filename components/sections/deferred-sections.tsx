@@ -1,6 +1,6 @@
 'use client';
 
-import dynamic, { type DynamicOptionsLoadingProps } from 'next/dynamic';
+import { useEffect, useState, type ComponentType } from 'react';
 import { SectionGate } from '@/components/ui/section-gate';
 import { SECTION_IDS } from '@/lib/content/landing-copy';
 
@@ -14,7 +14,11 @@ function SectionSkeleton({
   bgClass = 'bg-surface',
   heightClass = 'h-96',
   sectionClass = 'py-24 md:py-32 lg:py-40',
-}: DynamicOptionsLoadingProps & {
+}: {
+  /** True when the chunk fetch failed — render the retry UI instead. */
+  error?: boolean;
+  /** Re-triggers the failed chunk fetch (only set on the error state). */
+  retry?: () => void;
   id?: string;
   bgClass?: string;
   heightClass?: string;
@@ -52,85 +56,163 @@ function SectionSkeleton({
   );
 }
 
-// Below-fold sections: dynamic + SectionGate so their chunks (and GSAP setup)
-// load on demand when the user scrolls near them, not in the initial bundle.
-// This whole tree lives in one client island so the page itself stays a
-// Server Component with only the hero rendered statically.
-const EvidenceLoopSection = dynamic(
-  () => import('@/components/sections/evidence-loop').then((mod) => mod.EvidenceLoopSection),
-  {
-    loading: (loadingProps) => <SectionSkeleton {...loadingProps} id={SECTION_IDS.workflow} bgClass="bg-canvas" />,
+interface SectionLoaderProps {
+  /** Dynamic import for the section chunk (a webpack-split module). */
+  loader: () => Promise<{ default: ComponentType }>;
+  skeletonProps: {
+    id?: string;
+    bgClass?: string;
+    heightClass?: string;
+    sectionClass?: string;
+  };
+  /** Called when the user retries after a failed chunk fetch. */
+  onRetry: () => void;
+}
+
+// next/dynamic's App Router `loading` fallback never receives `error`/`retry`
+// (lazy-dynamic/loadable.js renders it with `{ isLoading, pastDelay, error:
+// null }`), so a failed chunk would show an eternal skeleton with no way to
+// retry. Instead, fetch the chunk ourselves in an effect and track the
+// loading/error states explicitly — the retry UI then actually works.
+function SectionLoader({ loader, skeletonProps, onRetry }: SectionLoaderProps) {
+  const [Section, setSection] = useState<ComponentType | null>(null);
+  const [hasError, setHasError] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    loader()
+      .then((mod) => {
+        if (!cancelled) setSection(() => mod.default);
+      })
+      .catch(() => {
+        if (!cancelled) setHasError(true);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [loader]);
+
+  if (hasError) {
+    return <SectionSkeleton {...skeletonProps} error retry={onRetry} />;
   }
+
+  if (!Section) {
+    return <SectionSkeleton {...skeletonProps} />;
+  }
+
+  return <Section />;
+}
+
+function createLazySection(
+  loader: () => Promise<{ default: ComponentType }>,
+  skeletonProps: SectionLoaderProps['skeletonProps']
+): ComponentType {
+  // `key` remounts the loader on retry so it fetches the chunk again from a
+  // clean loading/error state.
+  function LazySection() {
+    const [attempt, setAttempt] = useState(0);
+    return (
+      <SectionLoader
+        key={attempt}
+        loader={loader}
+        skeletonProps={skeletonProps}
+        onRetry={() => setAttempt((n) => n + 1)}
+      />
+    );
+  }
+  return LazySection;
+}
+
+// Below-fold sections: lazy-loaded so their chunks (and GSAP setup) load on
+// demand when the user scrolls near them, not in the initial bundle. This
+// whole tree lives in one client island so the page itself stays a Server
+// Component with only the hero rendered statically.
+const EvidenceLoopSection = createLazySection(
+  () =>
+    import('@/components/sections/evidence-loop').then((mod) => ({
+      default: mod.EvidenceLoopSection,
+    })),
+  { id: SECTION_IDS.workflow, bgClass: 'bg-canvas' }
 );
 
-const StudentSection = dynamic(
-  () => import('@/components/sections/student').then((mod) => mod.StudentSection),
-  {
-    loading: (loadingProps) => <SectionSkeleton {...loadingProps} id={SECTION_IDS.student} />,
-  }
+const StudentSection = createLazySection(
+  () =>
+    import('@/components/sections/student').then((mod) => ({
+      default: mod.StudentSection,
+    })),
+  { id: SECTION_IDS.student }
 );
 
-const ProblemSection = dynamic(
-  () => import('@/components/sections/problem').then((mod) => mod.ProblemSection),
-  {
-    loading: (loadingProps) => <SectionSkeleton {...loadingProps} id={SECTION_IDS.problem} bgClass="bg-surface" heightClass="h-[80vh]" />,
-  }
+const ProblemSection = createLazySection(
+  () =>
+    import('@/components/sections/problem').then((mod) => ({
+      default: mod.ProblemSection,
+    })),
+  { id: SECTION_IDS.problem, bgClass: 'bg-surface', heightClass: 'h-[80vh]' }
 );
 
-const TeacherSection = dynamic(
-  () => import('@/components/sections/teacher').then((mod) => mod.TeacherSection),
-  {
-    loading: (loadingProps) => <SectionSkeleton {...loadingProps} id={SECTION_IDS.teacher} heightClass="h-[90vh]" />,
-  }
+const TeacherSection = createLazySection(
+  () =>
+    import('@/components/sections/teacher').then((mod) => ({
+      default: mod.TeacherSection,
+    })),
+  { id: SECTION_IDS.teacher, heightClass: 'h-[90vh]' }
 );
 
-const ContextSection = dynamic(
-  () => import('@/components/sections/context').then((mod) => mod.ContextSection),
-  {
-    loading: (loadingProps) => <SectionSkeleton {...loadingProps} id={SECTION_IDS.context} />,
-  }
+const ContextSection = createLazySection(
+  () =>
+    import('@/components/sections/context').then((mod) => ({
+      default: mod.ContextSection,
+    })),
+  { id: SECTION_IDS.context }
 );
 
-const TopicsSection = dynamic(
-  () => import('@/components/sections/topics').then((mod) => mod.TopicsSection),
-  {
-    loading: (loadingProps) => <SectionSkeleton {...loadingProps} id={SECTION_IDS.capabilities} />,
-  }
+const TopicsSection = createLazySection(
+  () =>
+    import('@/components/sections/topics').then((mod) => ({
+      default: mod.TopicsSection,
+    })),
+  { id: SECTION_IDS.capabilities }
 );
 
-const AdoptionSection = dynamic(
-  () => import('@/components/sections/adoption').then((mod) => mod.AdoptionSection),
-  {
-    loading: (loadingProps) => <SectionSkeleton {...loadingProps} id={SECTION_IDS.pilot} bgClass="bg-canvas" />,
-  }
+const AdoptionSection = createLazySection(
+  () =>
+    import('@/components/sections/adoption').then((mod) => ({
+      default: mod.AdoptionSection,
+    })),
+  { id: SECTION_IDS.pilot, bgClass: 'bg-canvas' }
 );
 
-const TrustSection = dynamic(
-  () => import('@/components/sections/trust').then((mod) => mod.TrustSection),
-  {
-    loading: (loadingProps) => <SectionSkeleton {...loadingProps} id={SECTION_IDS.trust} bgClass="bg-canvas" />,
-  }
+const TrustSection = createLazySection(
+  () =>
+    import('@/components/sections/trust').then((mod) => ({
+      default: mod.TrustSection,
+    })),
+  { id: SECTION_IDS.trust, bgClass: 'bg-canvas' }
 );
 
-const FAQSection = dynamic(
-  () => import('@/components/sections/faq').then((mod) => mod.FAQSection),
-  {
-    loading: (loadingProps) => <SectionSkeleton {...loadingProps} id={SECTION_IDS.faq} heightClass="h-64" />,
-  }
+const FAQSection = createLazySection(
+  () =>
+    import('@/components/sections/faq').then((mod) => ({
+      default: mod.FAQSection,
+    })),
+  { id: SECTION_IDS.faq, heightClass: 'h-64' }
 );
 
-const CTASection = dynamic(
-  () => import('@/components/sections/cta').then((mod) => mod.CTASection),
-  {
-    loading: (loadingProps) => <SectionSkeleton {...loadingProps} heightClass="h-[70vh]" />,
-  }
+const CTASection = createLazySection(
+  () =>
+    import('@/components/sections/cta').then((mod) => ({
+      default: mod.CTASection,
+    })),
+  { heightClass: 'h-[70vh]' }
 );
 
-const FooterSection = dynamic(
-  () => import('@/components/sections/footer').then((mod) => mod.FooterSection),
-  {
-    loading: (loadingProps) => <SectionSkeleton {...loadingProps} bgClass="bg-canvas" sectionClass="py-16" heightClass="h-64" />,
-  }
+const FooterSection = createLazySection(
+  () =>
+    import('@/components/sections/footer').then((mod) => ({
+      default: mod.FooterSection,
+    })),
+  { bgClass: 'bg-canvas', sectionClass: 'py-16', heightClass: 'h-64' }
 );
 
 export function DeferredSections() {

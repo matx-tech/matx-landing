@@ -84,20 +84,33 @@ export function SectionGate({
 
   // Focus hand-off when the sr-only load button opened the gate: the button
   // unmounts with the placeholder, so without this keyboard focus drops to
-  // <body>. Poll for the real section — the loading skeleton also carries
-  // the id but is aria-hidden and transient, so only stop on the mounted
-  // section (or the error/retry state), which can take seconds on slow
-  // connections. Gates without an id can't be found by lookup, so poll the
-  // revealed wrapper for its first heading and fall back to the wrapper
-  // itself (tabIndex -1) so focus never drops to <body>. preventScroll
-  // keeps the viewport where the user is.
+  // <body>. The loading skeleton also carries the id but is aria-hidden and
+  // transient, so only hand off once the mounted section (or the error/retry
+  // state) replaces it — which can take seconds on slow connections. Gates
+  // without an id can't be found by lookup, so poll the revealed wrapper for
+  // its first heading and fall back to the wrapper itself (tabIndex -1) so
+  // focus never drops to <body>. preventScroll keeps the viewport where the
+  // user is.
   useEffect(() => {
     if (!visible || !openedByButtonRef.current) return;
     let cancelled = false;
-    const poll = (remaining: number) => {
-      const target = id
-        ? document.getElementById(id)
-        : revealedRef.current?.querySelector('h1, h2, h3, h4, h5, h6');
+    let timerId: ReturnType<typeof setTimeout> | null = null;
+    let observer: MutationObserver | null = null;
+
+    const resolveTarget = (): HTMLElement | null => {
+      if (id) {
+        const el = document.getElementById(id);
+        return el instanceof HTMLElement ? el : null;
+      }
+      return (
+        revealedRef.current?.querySelector('h1, h2, h3, h4, h5, h6') ??
+        revealedRef.current
+      );
+    };
+
+    const tryHandOff = (): boolean => {
+      if (cancelled) return true;
+      const target = resolveTarget();
       if (
         target instanceof HTMLElement &&
         target.getAttribute('aria-hidden') !== 'true' &&
@@ -105,20 +118,68 @@ export function SectionGate({
       ) {
         if (!target.hasAttribute('tabindex')) target.setAttribute('tabindex', '-1');
         target.focus({ preventScroll: true });
+        return true;
+      }
+      return false;
+    };
+
+    const stop = () => {
+      cancelled = true;
+      if (timerId !== null) clearTimeout(timerId);
+      observer?.disconnect();
+      observer = null;
+    };
+
+    // Fast path: poll briefly so focus lands the moment the skeleton is
+    // swapped for the real section, without waiting on an observer flush.
+    const poll = (remaining: number) => {
+      if (cancelled) return;
+      if (tryHandOff()) {
+        stop();
         return;
       }
       if (remaining <= 0) {
+        // id-less gates get a final non-scroll fallback so focus never drops
+        // to <body> even if the chunk never resolves.
         if (!id) revealedRef.current?.focus({ preventScroll: true });
-        return;
+        return; // slow path below keeps watching
       }
-      setTimeout(() => {
-        if (!cancelled) poll(remaining - 1);
-      }, 200);
+      timerId = setTimeout(() => poll(remaining - 1), 200);
     };
-    poll(25); // ~5s cap — covers a slow chunk fetch, then gives up quietly
-    return () => {
-      cancelled = true;
-    };
+
+    // Slow path: a chunk that outlasts the poll cap (plausible on throttled
+    // mobile links) must still hand focus off once it mounts. Watch the gate
+    // container — the parent the skeleton/section render into — for the
+    // skeleton→section swap (childList) or the aria-hidden removal, and hand
+    // off whenever the mounted section appears, for as long as it takes.
+    const watchRoot = id
+      ? document.getElementById(id)?.parentElement ?? document.body
+      : revealedRef.current?.parentElement ?? document.body;
+    if (watchRoot) {
+      observer = new MutationObserver((mutations) => {
+        if (cancelled) return;
+        for (const mutation of mutations) {
+          if (
+            mutation.type === 'childList' ||
+            (mutation.type === 'attributes' && mutation.attributeName === 'aria-hidden')
+          ) {
+            if (tryHandOff()) {
+              stop();
+              return;
+            }
+          }
+        }
+      });
+      observer.observe(watchRoot, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['aria-hidden'],
+      });
+    }
+
+    poll(25); // ~5s of polling, then the observer takes over
+    return stop;
   }, [visible, id]);
 
   // The mounted section is taller/shorter than the placeholder; refresh
