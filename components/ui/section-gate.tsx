@@ -29,6 +29,10 @@ export function SectionGate({
   placeholderClassName = 'min-h-[50vh]',
 }: SectionGateProps) {
   const ref = useRef<HTMLDivElement>(null);
+  // Stable per-gate container that stays mounted across the placeholder →
+  // revealed-content swap — scopes the slow-path observer to this gate's own
+  // subtree instead of the shared <main>.
+  const containerRef = useRef<HTMLDivElement>(null);
   // Revealed-content wrapper for gates without an id: the placeholder (and
   // its ref) unmounts once the gate opens, so this is the stable target for
   // focus hand-off when the sr-only load button opens an id-less gate.
@@ -141,34 +145,22 @@ export function SectionGate({
     };
 
     // Slow path: a chunk that outlasts the poll cap (plausible on throttled
-    // mobile links) must still hand focus off once it mounts. Watch the gate
-    // container — the parent the skeleton/section render into — for the
-    // skeleton→section swap (childList) or the aria-hidden removal, and hand
-    // off whenever the mounted section appears, for as long as it takes.
-    const watchRoot = id
-      ? document.getElementById(id)?.parentElement ?? document.body
-      : revealedRef.current?.parentElement ?? document.body;
+    // mobile links) must still hand focus off once it mounts. Watch only this
+    // gate's own subtree — the stable container ref wraps both the placeholder
+    // and the revealed content — for the skeleton→section swap. That swap is a
+    // childList change, so no attributes/aria-hidden observation is needed;
+    // page-wide aria-hidden churn (FAQ toggles, sibling gate swaps) must not
+    // fire this per button-opened gate.
+    const watchRoot = containerRef.current;
     if (watchRoot) {
-      observer = new MutationObserver((mutations) => {
+      observer = new MutationObserver(() => {
         if (cancelled) return;
-        for (const mutation of mutations) {
-          if (
-            mutation.type === 'childList' ||
-            (mutation.type === 'attributes' && mutation.attributeName === 'aria-hidden')
-          ) {
-            if (tryHandOff()) {
-              stop();
-              return;
-            }
-          }
+        if (tryHandOff()) {
+          stop();
+          return;
         }
       });
-      observer.observe(watchRoot, {
-        childList: true,
-        subtree: true,
-        attributes: true,
-        attributeFilter: ['aria-hidden'],
-      });
+      observer.observe(watchRoot, { childList: true, subtree: true });
     }
 
     poll(25); // ~5s of polling, then the observer takes over
@@ -194,9 +186,15 @@ export function SectionGate({
     // id-less gates (CTA, footer) get a stable wrapper for focus hand-off:
     // it replaces the unmounted placeholder, and tabIndex -1 makes it a
     // programmatic focus fallback if the chunk never resolves.
-    return id ? <>{children}</> : (
-      <div ref={revealedRef} tabIndex={-1}>
-        {children}
+    return (
+      <div ref={containerRef}>
+        {id ? (
+          children
+        ) : (
+          <div ref={revealedRef} tabIndex={-1}>
+            {children}
+          </div>
+        )}
       </div>
     );
   }
@@ -204,17 +202,19 @@ export function SectionGate({
   // The placeholder keeps the anchor id and a visually-hidden load button
   // so keyboard-only users can open gated content without scrolling.
   return (
-    <div ref={ref} id={id} className={`relative ${placeholderClassName} scroll-mt-20`}>
-      <button
-        type="button"
-        onClick={() => {
-          openedByButtonRef.current = true;
-          setVisible(true);
-        }}
-        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 rounded-lg bg-surface px-4 py-2 text-sm font-semibold text-text-primary shadow-card focus-ring-target"
-      >
-        Laadi sisu
-      </button>
+    <div ref={containerRef}>
+      <div ref={ref} id={id} className={`relative ${placeholderClassName} scroll-mt-20`}>
+        <button
+          type="button"
+          onClick={() => {
+            openedByButtonRef.current = true;
+            setVisible(true);
+          }}
+          className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 rounded-lg bg-surface px-4 py-2 text-sm font-semibold text-text-primary shadow-card focus-ring-target"
+        >
+          Laadi sisu
+        </button>
+      </div>
     </div>
   );
 }
