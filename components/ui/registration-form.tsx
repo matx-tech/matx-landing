@@ -219,7 +219,7 @@ export function RegistrationForm({ isOpen, onClose }: RegistrationFormProps) {
 
   const inputClassName = (hasError: boolean): string =>
     `w-full px-4 py-3 rounded-lg bg-surface border text-text-primary placeholder:text-text-secondary/50 focus-ring-target transition-colors ${
-      hasError ? 'border-red-600 dark:border-red-400 focus:border-red-600 dark:border-red-400' : 'border-border'
+      hasError ? 'border-red-600 dark:border-red-400 focus:border-red-600 dark:focus:border-red-400' : 'border-border'
     }`;
 
   return (

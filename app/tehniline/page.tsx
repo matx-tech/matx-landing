@@ -79,89 +79,92 @@ function SectionHeading({
 }
 
 // Target-state security controls. Statuses reflect TODAY's real deployment,
-// not the end-state. Public-facing notes avoid disclosing disabled controls,
-// incomplete implementations, or internal branch names.
+// not the end-state. Items locked to the compliance branch are marked
+// Kavandatud until merged — see the notes and the sources section.
 const SECURITY_CONTROLS: StatusRow[] = [
   {
     title: 'Post-kvantum allkirjad (ML-DSA-65)',
     detail: 'EATF-i tõendite ja BKT hetktõmmiste allkirjastamine.',
     status: 'Piloodis',
-    note: 'Testimisel valitud koolidega.',
+    note: 'Allkirjastamisteekonnad on piloodis kasutusel.',
   },
   {
     title: 'Sessioonid PostgreSQL-is (PgStore)',
     detail: 'httpOnly, sameSite=strict, IP+UA sõrmejälg, CSRF double-submit konstantaegse võrdlusega.',
     status: 'Kavandatud',
-    note: 'Täismahus sessioonihaldus on sihtseisus.',
+    note: 'Sessioonihaldus on testimisel eraldi turbearendusharus; ühendamine põhiharuga enne piloodi laiendamist.',
   },
   {
     title: 'Sessiooni absoluutne eluiga rollide kaupa',
     detail: 'Õpilane 8h, õpetaja/admin 12h + idle timeout; sõrmejälje lahknevus lõpetab sessiooni.',
     status: 'Kavandatud',
-    note: 'Rollipõhine sessioonihaldus on sihtseisus.',
+    note: 'Piirid on osaliselt testimisel turbearendusharus; täismahus kehtestamine on kavandatud.',
   },
   {
     title: 'Rollipõhine juurdepääs (requireRole)',
     detail: 'Rollid: õpilane, õpetaja, admin, DPO. Iga lõpp-punkt kontrollib rolli.',
     status: 'Kavandatud',
-    note: 'Rollimudel ja DPO-tegevused on sihtseisus.',
+    note: 'Rollimudel ja DPO/DSR-teekonnad on testimisel turbearendusharus; ühendamine on kavandatud.',
   },
   {
     title: 'Pseudonüümimine (HMAC-lüüs)',
     detail: 'Õpilase isikustatud ID-d pseudonüümitakse käitumistabelites; DSR puhul de-pseudonüümimine.',
     status: 'Kavandatud',
-    note: 'Identiteedilüüs on sihtseisus.',
+    note: 'Pseudonüümimislüüs on testimisel turbearendusharus; ühendamine on kavandatud.',
   },
   {
     title: 'Egress-lüüs kogu väljuvale liiklusele',
     detail: 'Üks väljuv kontrollpunkt (AI, OCR, analüütika, veebihaagid), deny-by-default, DNS-rebindingi kaitse.',
     status: 'Kavandatud',
-    note: 'Täismahus väljuva liikluse kontrolli katmine on sihtseisus.',
+    note: 'Katab praegu AI- ja OCR-teekondi; laiendamine kogu väljuvale liiklusele on kavandatud.',
   },
   {
     title: 'Per-endpoint rate limiting (Redis)',
     detail: 'Sisselogimine, AI lõpp-punktid, DSR ekspordid, /api/graph — piirid Redis-poes.',
     status: 'Kavandatud',
-    note: 'Täismahus rate limiting on sihtseisus.',
+    note: 'Limiiter on testimisel turbearendusharus; põhiharuga ühendamine on kavandatud.',
   },
   {
     title: 'MFA õpetajale/adminile (Smart-ID/Mobiil-ID)',
     detail: 'Privilegeeritud rollidele mitmikautentimine Eesti ID-vahenditega.',
     status: 'Kavandatud',
+    note: 'Kasutuselevõtt on kavandatud enne piloodi laiendamist.',
   },
   {
     title: 'HarID/TAAT OIDC + PKCE',
     detail: 'Koolide identiteediföderatsioon; joiner/mover/leaver elutsükli käsitlus.',
     status: 'Kavandatud',
+    note: 'Pole veel kasutusele võetud.',
   },
   {
     title: 'Tarneahela turve',
     detail: 'pnpm audit + Dependabot CI-lüüsid, SBOM, submodule kinnitatud releasile, avalikustamispoliitika.',
     status: 'Kavandatud',
-    note: 'Tarneahela turve on sihtseisus.',
+    note: 'SIEM-i ja tarneahela lüüsid on kavandatud; SBOM ja avalikustamispoliitika on koostamisel.',
   },
   {
     title: 'Sandbox-isolatsioon',
     detail: 'Mitte-root kasutaja, seccomp, no-new-privileges, pids-limit, image digesti kinnitus.',
     status: 'Kavandatud',
-    note: 'Täismahus sandbox-isolatsioon on sihtseisus.',
+    note: 'Täismahus sandbox (mitte-root, seccomp, pids-piirangud, image digesti kinnitus) on kavandatud.',
   },
   {
     title: 'Varukoopiad ja taaste',
     detail: 'PostgreSQL PITR + krüpteeritud väljaspoole varukoopiad, RPO ≤ 24h / RTO ≤ 4h, kvartaalne taastetest.',
     status: 'Kavandatud',
+    note: 'Varukoopia- ja taasteprogramm on kavandatud, pole veel paigas.',
   },
   {
     title: 'Logid ja SIEM',
     detail: 'Logid ainult metaandmetega (mitte vastuste kehad), SIEM-sissekanne, 72h intsidentide tähtaeg.',
     status: 'Kavandatud',
-    note: 'Täismahus SIEM-integratsioon on sihtseisus.',
+    note: 'Logide maht kitsendatakse metaandmetele; parandus on kavandatud.',
   },
   {
     title: 'Helmet, CSP, HSTS',
     detail: 'Turvapäised, sisu turvapoliitika, HSTS preload.',
     status: 'Kavandatud',
-    note: 'Täismahus turvapoliitika on sihtseisus.',
+    note: 'Põhiharul kommenteeritud välja; taastamine kavandatud.',
   },
   {
     title: 'Puhkeoleku krüpteerimine',
@@ -202,7 +205,7 @@ const COMPLIANCE_ROWS: StatusRow[] = [
   },
   {
     title: 'GDPR (2016/679)',
-    detail: 'Kohaldub. Vastutav töötleja on kool/omavalitsus, volitatud töötleja MATx. Art. 8 alaealiste erikaitse: 13+ ja vanema nõusoleku nõue kohalduvad vaid siis, kui infotehnoloogiateenust pakutakse lapsele otse nõusolekul (Art. 6(1)(a)).',
+    detail: 'Kohaldub. Vastutav töötleja on kool/omavalitsus, volitatud töötleja MATx. Art. 8 alaealiste erikaitse (vanusepiir 13+, vanema nõusolek).',
     status: 'Kavandatud',
     note: 'Alaealiste andmete kaitse on pilootfaasi põhirõhk; täismahus vastavus sihtseisus.',
   },
@@ -272,8 +275,8 @@ const INTEGRATION_ROWS: StatusRow[] = [
 const PROCUREMENT_ROUTES = [
   {
     band: 'Kuni 30 000 € (kuni 31.10.2026) / kuni 50 000 € (alates 01.11.2026)',
-    route: 'Riigihangete seadus ei kohaldu — ost organisatsiooni siseste hankekorra reeglite ja hankeõiguse põhimõtete järgi.',
-    note: 'Väärtuse hindamisel arvesse võtta prognoositavad lisavajadused või pikendused. Enamik ühe kooli tarkvaralitsentside oste jääb sellesse klassi ja ei jõua riigihangete registrisse.',
+    route: 'Otsetellimine — riigihangete seadus ei kohaldu; ost hankekorra järgi.',
+    note: 'Enamik ühe kooli tarkvaralitsentside oste jääb sellesse klassi ja ei jõua riigihangete registrisse.',
   },
   {
     band: '30 000–60 000 € (kuni 31.10.2026) / 50 000–140 000 € (riik) või 216 000 € (omavalitsus) (alates 01.11.2026)',
@@ -299,10 +302,10 @@ const PRICE_BENCHMARKS = [
   { label: 'Haridus- ja koolitusteenused (CPV 80*)', median: '~46 000 €', mean: '~98 000 €', note: 'n=105' },
   { label: 'Tarkvarapaketid (CPV 48900000)', median: '~59 000 €', mean: '~279 000 €', note: 'n=70' },
   {
-    label: 'Õpikeskkonna hinnaankur: Opiq koolipakett 2025/26',
+    label: 'Õpikeskkonna hinnaankur: Opiq koolipakett 2026/27',
     median: '3–5 €/õp/kuu',
     mean: '≈30–50 €/õp/aastas',
-    note: '299 õppekomplekti; soodushind alates 50% õpilastest, vähemalt 9 kuud',
+    note: 'Soodushind alates 50% õpilastest, vähemalt 9 kuud',
   },
 ];
 
@@ -313,11 +316,11 @@ const CONTRACT_NORMS = [
   },
   {
     title: 'Maksetähtaeg',
-    detail: 'Tavaliselt kuni 30 kalendripäeva, kuni 60 päeva vaid juhul, kui see on sõnaselgelt kokku lepitud ja objektiivselt põhjendatud (hilinenud maksete direktiiv 2011/7/EL); hankelepingutes kasutusel standardina.',
+    detail: 'Vähemalt 30 kalendripäeva (hilinenud maksete direktiiv 2011/7/EL); hankelepingutes kasutusel standardina.',
   },
   {
     title: 'Garantii ja leppetrahv',
-    detail: 'Õiguskaitsevahendid — leppetrahv, hinna alandamine, taganemine, ülesütlemine (RHS § 124), kahju hüvitamine (VÕS või lepingu õiguskaitsesätted). Määrad on lepinguvabadus ja määratakse hanke alusdokumentides.',
+    detail: 'Õiguskaitsevahendid — leppetrahv, hinna alandamine, taganemine, ülesütlemine (RHS § 95 lg 4). Määrad on lepinguvabadus ja määratakse hanke alusdokumentides.',
   },
   {
     title: 'Intellektuaalomand',
@@ -336,7 +339,7 @@ const TENDER_TECH_REQUIREMENTS = [
   },
   {
     title: 'Andmekaitse',
-    detail: 'GDPR kohaldub. Kool on üldjuhul vastutav töötleja, MATx volitatud töötleja, kui tegutseb dokumenteeritud juhiste alusel; muudel juhtudel võib olla iseseisev või ühine vastutav töötleja. GDPR art 8: 13+ ja vanema nõusolek vaid nõusolekupõhise (Art. 6(1)(a)) infotehnoloogiateenuse puhul, mida pakutakse lapsele otse. IKS. Andmete asukohariik avaldatakse enne pilootlepinguid.',
+    detail: 'GDPR art 8 (nõusolek alates 13. eluaastast) ja IKS; kool on vastutav töötleja, MATx volitatud töötleja. Andmete asukohariik avaldatakse enne pilootlepinguid.',
   },
   {
     title: 'Identiteet ja integratsioonid',
@@ -344,7 +347,7 @@ const TENDER_TECH_REQUIREMENTS = [
   },
   {
     title: 'AI-komponent',
-    detail: 'Kohanduv õpimootor (BKT) — kasutus hariduses. EU AI Act 2024/1689 Annex III punkt 3 käsitleb hariduse AI-süsteeme teatud tingimustel; Art. 6(3) erand võib kohalduda. Riskihinnangu tulemus dokumenteeritakse. Õpetaja kontroll säilib — staatus vastavuse tabelis.',
+    detail: 'Kohanduv õpimootor (BKT) — EU AI Act 2024/1689 III lisa § 3 haridusvaldkonna riskiklass; enesehindamine pooleli, õpetaja kontroll säilib — staatus vastavuse tabelis.',
   },
   {
     title: 'Turve',
@@ -530,8 +533,8 @@ export default function TechnicalOverviewPage() {
           <p className="text-lg text-text-secondary leading-relaxed">
             MATx-i arhitektuur, turvameetmed ja vastavusstaatus IT- ja hanketiimidele.
             Kõik väited on märgistatud staatusega ja allikapõhised — mitte lubadused.
-            Väited põhinevad platvormi avalikul lähtekoodil; haruviited osutavad platvormi
-            repositooriumile. Ajakohastatud: {LAST_UPDATED}.
+            Väited põhinevad platvormi avalikul lähtekoodil, mis on kontrollitav
+            repositooriumis. Ajakohastatud: {LAST_UPDATED}.
           </p>
           <div className="flex flex-wrap items-center gap-3 mt-6">
             <a
@@ -559,10 +562,6 @@ export default function TechnicalOverviewPage() {
                 { heading: 'Vastavus', rows: COMPLIANCE_ROWS },
                 { heading: 'Integratsioonid', rows: INTEGRATION_ROWS },
               ]}
-              procurementRoutes={PROCUREMENT_ROUTES}
-              priceBenchmarks={PRICE_BENCHMARKS}
-              contractNorms={CONTRACT_NORMS}
-              tenderTechRequirements={TENDER_TECH_REQUIREMENTS}
               glossary={GLOSSARY}
             />
           </div>
@@ -884,7 +883,7 @@ export default function TechnicalOverviewPage() {
               <div>
                 <dt className="font-medium text-text-primary">Õpikeskkonna hinnaankur</dt>
                 <dd className="mt-0.5">
-                  Opiq koolipakett 2025/26 (299 õppekomplekti; opiq.ee); soodushind alates 50% õpilastest vähemalt
+                  Opiq koolipakett 2026/27 (opiq.ee); soodushind alates 50% õpilastest vähemalt
                   9 kuuks.
                 </dd>
               </div>
@@ -968,7 +967,7 @@ export default function TechnicalOverviewPage() {
         </section>
 
         {/* Security & procurement contact */}
-        <section aria-labelledby="kontakt-heading" className="mb-12">
+        <section id="kontakt" aria-labelledby="kontakt-heading" className="scroll-mt-24 mb-12">
           <h2 id="kontakt-heading" className="text-2xl font-semibold text-text-primary mb-4">
             Kontakt
           </h2>

@@ -11,9 +11,16 @@ import { FileDown } from 'lucide-react';
 import { CopyButton } from '@/components/ui/copy-button';
 import type { StatusRow } from './status-card';
 
+interface ExportRow {
+  title: string;
+  detail: string;
+  note?: string;
+  status?: string;
+}
+
 interface ExportSection {
   heading: string;
-  rows: StatusRow[];
+  rows: ExportRow[];
 }
 
 interface ProcurementRoute {
@@ -68,7 +75,7 @@ function toMarkdown(
   for (const { heading, rows } of sections) {
     lines.push(`## ${heading}`, '');
     for (const row of rows) {
-      const prefix = STATUS_PREFIX[row.status] ?? '';
+      const prefix = STATUS_PREFIX[row.status ?? ''] ?? '';
       lines.push(`- ${prefix} **${row.title}** — ${row.detail}`);
       if (row.note) lines.push(`  - Märkus: ${row.note}`);
     }

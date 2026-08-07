@@ -31,7 +31,7 @@ export function TechText({ text }: { text: string }) {
         TECH_MATCH.test(part) ? (
           <code
             key={index}
-            className="font-mono text-[0.85em] not-italic whitespace-nowrap"
+            className="font-mono text-[0.85em] not-italic break-words"
           >
             {part}
           </code>

@@ -255,6 +255,8 @@
      as "Tehnili-ne üle-vaade" in a narrow column) */
   h1, h2, h3, h4, h5 {
     hyphens: manual;
+    /* body sets overflow-wrap: break-word (inherited) — reset it so a long
+       non-hyphenated heading cannot split inside a word either */
     overflow-wrap: normal;
   }
 

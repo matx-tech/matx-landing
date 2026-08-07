@@ -3,9 +3,10 @@
 /**
  * Copy-to-clipboard button. Falls back to a temporary textarea when the
  * async Clipboard API is unavailable (insecure context, older browsers).
+ * Success state is set only when a copy path actually succeeded.
  */
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Check, Copy } from 'lucide-react';
 
 interface CopyButtonProps {
@@ -24,12 +25,17 @@ export function CopyButton({
   children,
 }: CopyButtonProps) {
   const [copied, setCopied] = useState(false);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const timerRef = useRef<number | undefined>(undefined);
+
+  // Clear any pending success-reset timer on unmount.
+  useEffect(() => () => window.clearTimeout(timerRef.current), []);
 
   const handleCopy = async () => {
-    let success = false;
+    let ok = false;
     try {
       await navigator.clipboard.writeText(value);
-      success = true;
+      ok = true;
     } catch {
       const el = document.createElement('textarea');
       el.value = value;
@@ -37,22 +43,25 @@ export function CopyButton({
       el.style.opacity = '0';
       document.body.appendChild(el);
       el.select();
-      // Deprecated in TS DOM lib but the only fallback that works in
-      // non-secure contexts where the async Clipboard API is absent.
       try {
-        success = (document as unknown as { execCommand: (cmd: string) => boolean }).execCommand('copy');
+        // Deprecated in TS DOM lib but the only fallback that works in
+        // non-secure contexts where the async Clipboard API is absent.
+        ok = (document as unknown as { execCommand: (cmd: string) => boolean }).execCommand('copy');
       } finally {
         document.body.removeChild(el);
+        // el.select() moved focus into the textarea — hand it back.
+        buttonRef.current?.focus();
       }
     }
-    if (success) {
-      setCopied(true);
-      window.setTimeout(() => setCopied(false), 2000);
-    }
+    if (!ok) return;
+    setCopied(true);
+    window.clearTimeout(timerRef.current);
+    timerRef.current = window.setTimeout(() => setCopied(false), 2000);
   };
 
   return (
     <button
+      ref={buttonRef}
       type="button"
       onClick={handleCopy}
       aria-label={copied ? copiedLabel : label}

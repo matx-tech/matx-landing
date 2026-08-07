@@ -65,7 +65,10 @@ export function StatusFilterSection({
           above it — suppress them, keep them in the mixed "Kõik" view. */}
       {active.length > 0 && <StatusList rows={active} showBadge={filter === 'Kõik'} />}
       {planned.length > 0 && (
-        <details open={filter === 'Kavandatud'} className="group mt-4 rounded-xl border border-border bg-elevated">
+        <details
+          open={filter === 'Kavandatud'}
+          className="group mt-4 rounded-xl border border-border bg-elevated"
+        >
           <summary className="flex items-center justify-between gap-4 cursor-pointer px-5 py-4 text-sm font-medium text-text-primary hover:bg-surface transition-colors focus-ring-target rounded-xl list-none [&::-webkit-details-marker]:hidden">
             <span className="flex items-center gap-2.5">
               <ChevronDown
