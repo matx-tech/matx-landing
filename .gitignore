@@ -45,3 +45,11 @@ yarn-error.log*
 next-env.d.ts
 # Added by code-review-graph
 .code-review-graph/
+
+# local agent tooling
+.claude/
+.serena/
+.mcp.json
+
+# review scratch dumps
+gh-pr-comments.md
