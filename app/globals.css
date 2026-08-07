@@ -227,7 +227,10 @@
     --heatmap-level-5: var(--color-accent);
   }
 
-  /* --- Dark Theme Mapping --- */
+  /* --- Dark Theme Mapping ---
+     DORMANT: no toggle or auto-detection ships yet; these tokens exist so a
+     future theme switch maps correctly. Delete or wire up when the product
+     decides on a dark mode. */
   [data-theme="dark"] {
     --color-bg-canvas: var(--color-ink-900);
     --color-bg-surface: var(--color-ink-800);

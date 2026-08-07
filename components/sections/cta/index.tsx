@@ -5,6 +5,7 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ScrambleTextPlugin } from 'gsap/ScrambleTextPlugin';
 import { GraduationCap, Users } from 'lucide-react';
+import { CALENDLY_URL } from '@/lib/content/landing-copy';
 import { usePrefersReducedMotion } from '@/lib/hooks/use-prefers-reduced-motion';
 import { useRegistration } from '@/components/providers/registration-provider';
 import { motionTokens, gsapEase, staggers } from '@/lib/motion-tokens';
@@ -270,7 +271,7 @@ export function CTASection() {
               Demostreerime platvormi ja vastame küsimustele.
             </p>
             <a
-              href="https://calendly.com/matx-ee/15min"
+              href={CALENDLY_URL}
               target="_blank"
               rel="noopener noreferrer"
               className="block w-full px-6 py-3 text-base rounded-xl bg-secondary text-text-inverse font-semibold hover:bg-secondary/90 transition-all focus-ring-target min-h-[44px]"

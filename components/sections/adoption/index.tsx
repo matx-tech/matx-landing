@@ -91,10 +91,10 @@ export function AdoptionSection() {
       <div className="relative z-10 container mx-auto px-4 md:px-8 lg:px-16">
         {/* Section header */}
         <div className="max-w-3xl mx-auto text-center mb-16">
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-4">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-text-primary mb-4">
             Kuidas alustada
           </h2>
-          <p className="text-lg text-muted-foreground">
+          <p className="text-lg text-text-secondary">
             Vali oma rolliga sobiv marsruut
           </p>
         </div>
@@ -120,12 +120,12 @@ export function AdoptionSection() {
                 </div>
 
                 {/* Title */}
-                <h3 className="text-xl font-semibold text-foreground mb-3">
+                <h3 className="text-xl font-semibold text-text-primary mb-3">
                   {route.title}
                 </h3>
 
                 {/* Description */}
-                <p className="text-sm text-muted-foreground mb-6">
+                <p className="text-sm text-text-secondary mb-6">
                   {route.description}
                 </p>
 
@@ -145,7 +145,7 @@ export function AdoptionSection() {
 
         {/* Additional note */}
         <div className="max-w-2xl mx-auto text-center mt-12">
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-text-secondary">
             Kõik marsruudid algavad vestlusega, et hinnata MATx-i sobivust teie vajaduste jaoks.
             Piloodi käigus kogume tagasisidet ja täiendame funktsionaalsust.
           </p>

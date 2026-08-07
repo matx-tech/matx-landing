@@ -68,10 +68,10 @@ export function StudentSection() {
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Left: Content */}
           <div>
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-6">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-text-primary mb-6">
               {STUDENT_STORY.heading}
             </h2>
-            <p className="text-lg text-muted-foreground mb-8">
+            <p className="text-lg text-text-secondary mb-8">
               {STUDENT_STORY.description}
             </p>
 
@@ -89,8 +89,8 @@ export function StudentSection() {
                     {step.badge}
                   </div>
                   <div>
-                    <h3 className="font-semibold text-foreground mb-1">{step.title}</h3>
-                    <p className="text-sm text-muted-foreground">{step.description}</p>
+                    <h3 className="font-semibold text-text-primary mb-1">{step.title}</h3>
+                    <p className="text-sm text-text-secondary">{step.description}</p>
                   </div>
                 </li>
               ))}
@@ -99,15 +99,15 @@ export function StudentSection() {
 
           {/* Right: Example visualization */}
           <div className="bg-card rounded-2xl p-8 shadow-lg border border-border">
-            <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-4">
+            <div className="text-xs font-medium text-text-secondary uppercase tracking-wider mb-4">
               {PRODUCT_FIXTURE.label}
             </div>
 
             {/* Original task */}
             <div className="mb-6">
-              <div className="text-sm font-semibold text-foreground mb-2">Ülesanne</div>
+              <div className="text-sm font-semibold text-text-primary mb-2">Ülesanne</div>
               <div className="p-4 bg-surface rounded-lg border border-border">
-                <div className="text-base font-medium text-foreground">
+                <div className="text-base font-medium text-text-primary">
                   <InlineFractionalExpression expression={PRODUCT_FIXTURE.task.question} />
                 </div>
               </div>
@@ -115,7 +115,7 @@ export function StudentSection() {
 
             {/* Student response */}
             <div className="mb-6">
-              <div className="text-sm font-semibold text-foreground mb-2">Õpilase vastus</div>
+              <div className="text-sm font-semibold text-text-primary mb-2">Õpilase vastus</div>
               <div className="p-4 bg-red-50 rounded-lg border border-red-200">
                 <div className="text-base font-mono text-red-700">
                   <InlineFractionalExpression expression={PRODUCT_FIXTURE.answer.submitted} />
@@ -125,7 +125,7 @@ export function StudentSection() {
 
             {/* Feedback — from fixture */}
             <div className="mb-6">
-              <div className="text-sm font-semibold text-foreground mb-2">Tagasiside</div>
+              <div className="text-sm font-semibold text-text-primary mb-2">Tagasiside</div>
               <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
                 <p className="text-sm text-blue-900">
                   {PRODUCT_FIXTURE.feedback.text}
@@ -135,7 +135,7 @@ export function StudentSection() {
 
             {/* Next exercise */}
             <div>
-              <div className="text-sm font-semibold text-foreground mb-2">Järgmine harjutus</div>
+              <div className="text-sm font-semibold text-text-primary mb-2">Järgmine harjutus</div>
               <div className="p-4 bg-green-50 rounded-lg border border-green-200">
                 <div className="text-base font-medium text-green-900">
                   <InlineFractionalExpression expression={PRODUCT_FIXTURE.retry.question} />

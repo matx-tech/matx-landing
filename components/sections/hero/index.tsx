@@ -70,16 +70,23 @@ export function HeroSection() {
         ...Array.from(badgesRef.current?.children ?? []),
       ].filter(Boolean) as (Element | HTMLDivElement)[];
 
-      gsap.set(elements, { opacity: 0, y: motionTokens.distance.md });
-
-      gsap.to(elements, {
-        opacity: 1,
-        y: 0,
-        duration: motionTokens.duration.normal,
-        delay: 2.2,
-        stagger: staggers.card,
-        ease: gsapEase(motionTokens.easing.emphasized),
-      });
+      gsap.fromTo(
+        elements,
+        { opacity: 0, y: motionTokens.distance.md },
+        {
+          opacity: 1,
+          y: 0,
+          duration: motionTokens.duration.normal,
+          delay: 2.2,
+          stagger: staggers.card,
+          ease: gsapEase(motionTokens.easing.emphasized),
+          // Keep CTAs visible until the reveal actually starts (same
+          // immediateRender: false pattern as the headline) — a delayed
+          // gsap.set at mount would leave the primary CTA invisible for
+          // the whole headline animation on slow devices.
+          immediateRender: false,
+        }
+      );
     });
 
     return () => mm.revert();

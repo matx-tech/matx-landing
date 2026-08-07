@@ -1,11 +1,12 @@
 'use client';
 
 import { useRef, useEffect } from 'react';
+import Link from 'next/link';
 import gsap from 'gsap';
 import { Award, GraduationCap, Mail, MessageCircle, Building2, GitBranch } from 'lucide-react';
 import { usePrefersReducedMotion } from '@/lib/hooks/use-prefers-reduced-motion';
 import { motionTokens, gsapEase, staggers } from '@/lib/motion-tokens';
-import { SECTION_IDS } from '@/lib/content/landing-copy';
+import { SECTION_IDS, CALENDLY_URL } from '@/lib/content/landing-copy';
 
 export function FooterSection() {
   const footerRef = useRef<HTMLElement>(null);
@@ -174,7 +175,7 @@ export function FooterSection() {
               </li>
               <li>
                 <a
-                  href="https://calendly.com/matx-ee/15min"
+                  href={CALENDLY_URL}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-text-secondary hover:text-secondary transition-colors text-sm focus-ring-target rounded-md"
@@ -231,15 +232,15 @@ export function FooterSection() {
             © 2026 MATx. Kõik õigused kaitstud. Targa Tuleviku Fondi toetatud.
           </p>
           <div className="flex items-center gap-4 text-xs text-text-secondary">
-            <a href="#" className="hover:text-primary transition-colors focus-ring-target rounded-md" style={{ textDecoration: 'underline' }}>
+            <Link href="/privaatsus" className="hover:text-primary transition-colors focus-ring-target rounded-md" style={{ textDecoration: 'underline' }}>
               Privaatsuspoliitika
-            </a>
-            <a href="#" className="hover:text-primary transition-colors focus-ring-target rounded-md" style={{ textDecoration: 'underline' }}>
+            </Link>
+            <Link href="/tingimused" className="hover:text-primary transition-colors focus-ring-target rounded-md" style={{ textDecoration: 'underline' }}>
               Teenuse tingimused
-            </a>
-            <a href="#" className="hover:text-primary transition-colors focus-ring-target rounded-md" style={{ textDecoration: 'underline' }}>
+            </Link>
+            <Link href="/gdpr" className="hover:text-primary transition-colors focus-ring-target rounded-md" style={{ textDecoration: 'underline' }}>
               GDPR
-            </a>
+            </Link>
           </div>
         </div>
 

@@ -92,10 +92,10 @@ export function EvidenceLoopSection() {
       <div className="container mx-auto px-4 md:px-8 lg:px-16">
         {/* Section header */}
         <div className="max-w-3xl mx-auto text-center mb-16">
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-4">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-text-primary mb-4">
             Kuidas töövoog toimib
           </h2>
-          <p className="text-lg text-muted-foreground">
+          <p className="text-lg text-text-secondary">
             Neli sammu õpilase vastusest õpetaja otsuseni
           </p>
         </div>
@@ -131,10 +131,10 @@ export function EvidenceLoopSection() {
 
                   {/* Stage content */}
                   <div className="flex-1 bg-card rounded-xl p-6 shadow-sm border border-border">
-                    <h3 className="text-xl font-semibold text-foreground mb-2">
+                    <h3 className="text-xl font-semibold text-text-primary mb-2">
                       {stage.title}
                     </h3>
-                    <p className="text-muted-foreground">
+                    <p className="text-text-secondary">
                       {stage.description}
                     </p>
 

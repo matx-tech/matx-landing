@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { X, Check, Loader2, AlertCircle } from 'lucide-react';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { X, Check, AlertCircle } from 'lucide-react';
+import Link from 'next/link';
 import * as Dialog from '@radix-ui/react-dialog';
 import { dialogExitMs } from '@/lib/dialog-timing';
 
@@ -30,6 +31,7 @@ interface FormErrors {
   phone?: string;
   classGroups?: string;
   otherRole?: string;
+  consent?: string;
 }
 
 const STORAGE_KEY = 'matx-registration-draft';
@@ -50,12 +52,13 @@ interface RegistrationFormProps {
 }
 
 export function RegistrationForm({ isOpen, onClose }: RegistrationFormProps) {
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [consent, setConsent] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [formData, setFormData] = useState<FormData>(initialFormData);
   const [errors, setErrors] = useState<FormErrors>({});
   const [touched, setTouched] = useState<Set<string>>(new Set());
   const [announcement, setAnnouncement] = useState('');
+  const formRef = useRef<HTMLFormElement>(null);
 
   // Load draft from localStorage on mount
   useEffect(() => {
@@ -135,9 +138,11 @@ export function RegistrationForm({ isOpen, onClose }: RegistrationFormProps) {
       if (error) newErrors[field as keyof FormErrors] = error;
     });
 
+    if (!consent) newErrors.consent = 'Registreerimiseks on vajalik nõusolek';
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
-  }, [formData, validateField]);
+  }, [formData, validateField, consent]);
 
   const handleBlur = useCallback((name: string) => {
     setTouched((prev) => new Set(prev).add(name));
@@ -154,7 +159,7 @@ export function RegistrationForm({ isOpen, onClose }: RegistrationFormProps) {
     }
   }, [touched, validateField]);
 
-  const handleSubmit = useCallback(async (e: React.FormEvent) => {
+  const handleSubmit = useCallback((e: React.FormEvent) => {
     e.preventDefault();
 
     // Mark all fields as touched
@@ -166,24 +171,29 @@ export function RegistrationForm({ isOpen, onClose }: RegistrationFormProps) {
 
     if (!validateForm()) {
       setAnnouncement('Palun parandage vormi vead enne saatmist');
+      // Move focus to the first invalid field so keyboard/screen-reader
+      // users land on the error instead of hunting for it.
+      formRef.current?.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus();
       return;
     }
 
-    setIsSubmitting(true);
+    // No backend yet (static landing page) — compose a real registration
+    // email in the visitor's mail client instead of faking success. The
+    // visitor sends it; MATx replies with the booking link.
+    const subject = `Piloodi registreerimine: ${formData.schoolName}`;
+    const body = [
+      `Kool: ${formData.schoolName}`,
+      `Kontaktisik: ${formData.contactName}`,
+      `Roll: ${formData.role === 'Muu haridustöötaja' ? `${formData.role} — ${formData.otherRole}` : formData.role}`,
+      `E-post: ${formData.email}`,
+      `Telefon: ${formData.phone}`,
+      `Klassirühmad: ${formData.classGroups}`,
+    ].join('\n');
+    window.location.href = `mailto:andri@matx.ee?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 
-    try {
-      // TODO: Replace with actual API call
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      setIsSuccess(true);
-      clearDraft();
-      setAnnouncement('Registreering edukalt saadetud');
-    } catch {
-      setErrors({ email: 'Saatmine ebaõnnestus. Palun proovige uuesti.' });
-      setAnnouncement('Saatmine ebaõnnestus');
-    } finally {
-      setIsSubmitting(false);
-    }
+    setIsSuccess(true);
+    clearDraft();
+    setAnnouncement('Registreerimise kiri on koostatud');
   }, [formData, validateForm, clearDraft]);
 
   const handleClose = useCallback(() => {
@@ -194,23 +204,11 @@ export function RegistrationForm({ isOpen, onClose }: RegistrationFormProps) {
   }, [onClose]);
 
   const handleOpenChange = useCallback((open: boolean) => {
-    if (!open) {
-      // Check if form is dirty before closing
-      const isDirty = Object.entries(formData).some(([key, value]) => {
-        if (key === 'otherRole' && formData.role !== 'Muu haridustöötaja') return false;
-        return value.trim() !== '';
-      });
-
-      if (isDirty && !isSuccess) {
-        // Form has unsaved data - close and clear
-        setFormData(initialFormData);
-        clearDraft();
-        handleClose();
-      } else {
-        handleClose();
-      }
-    }
-  }, [formData, isSuccess, handleClose, clearDraft]);
+    // Draft is kept in localStorage on purpose — an accidental close (or
+    // refresh) must not lose the visitor's data. Explicit "Sulge" on the
+    // success screen clears it via handleClearAndClose.
+    if (!open) handleClose();
+  }, [handleClose]);
 
   const handleClearAndClose = useCallback(() => {
     setFormData(initialFormData);
@@ -261,10 +259,10 @@ export function RegistrationForm({ isOpen, onClose }: RegistrationFormProps) {
                   <Check className="w-8 h-8 text-secondary" />
                 </div>
                 <h2 className="text-2xl font-display font-bold text-text-primary mb-2">
-                  Registreering kinnitatud!
+                  Registreerimise kiri on koostatud!
                 </h2>
                 <p className="text-text-secondary">
-                  Täname, {formData.schoolName}!
+                  Meilirakendus avati eeltäidetud registreerimiskirjaga. Saatke see ära, et oma koht kinnitada.
                 </p>
               </div>
             )}
@@ -272,7 +270,7 @@ export function RegistrationForm({ isOpen, onClose }: RegistrationFormProps) {
 
           {/* Form or Success */}
           {!isSuccess ? (
-            <form onSubmit={handleSubmit} className="px-8 pb-8 space-y-4" noValidate>
+            <form onSubmit={handleSubmit} ref={formRef} className="px-8 pb-8 space-y-4" noValidate>
               {/* School Name */}
               <div>
                 <label htmlFor="schoolName" className="block text-sm font-medium text-text-primary mb-2">
@@ -464,20 +462,51 @@ export function RegistrationForm({ isOpen, onClose }: RegistrationFormProps) {
                 )}
               </div>
 
+              {/* Consent */}
+              <div>
+                <label htmlFor="consent" className="flex items-start gap-3 text-sm text-text-secondary cursor-pointer">
+                  <input
+                    id="consent"
+                    type="checkbox"
+                    required
+                    checked={consent}
+                    onChange={(e) => {
+                      setConsent(e.target.checked);
+                      // Clear the consent error as soon as the box is checked
+                      if (e.target.checked) setErrors((prev) => ({ ...prev, consent: undefined }));
+                    }}
+                    onBlur={() => setTouched((prev) => new Set(prev).add('consent'))}
+                    className="mt-0.5 h-5 w-5 shrink-0 rounded border-border accent-primary focus-ring-target"
+                    aria-invalid={errors.consent ? 'true' : 'false'}
+                    aria-describedby={errors.consent ? 'consent-error' : undefined}
+                  />
+                  <span>
+                    Olen nõus, et MATx kasutab minu andmeid piloodi registreerimiseks.{' '}
+                    <Link
+                      href="/privaatsus"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-primary underline hover:text-secondary transition-colors focus-ring-target rounded-sm"
+                    >
+                      Privaatsuspoliitika
+                    </Link>
+                    .
+                  </span>
+                </label>
+                {errors.consent && (
+                  <p id="consent-error" className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                    <AlertCircle className="w-4 h-4" />
+                    {errors.consent}
+                  </p>
+                )}
+              </div>
+
               {/* Submit Button */}
               <button
                 type="submit"
-                disabled={isSubmitting}
-                className="w-full py-4 rounded-lg bg-primary text-text-inverse font-semibold hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus-ring-target min-h-[44px] mt-6"
+                className="w-full py-4 rounded-lg bg-primary text-text-inverse font-semibold hover:bg-primary/90 transition-colors focus-ring-target min-h-[44px] mt-2"
               >
-                {isSubmitting ? (
-                  <span className="flex items-center justify-center gap-2">
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                    Saatmine...
-                  </span>
-                ) : (
-                  'Esita registreering'
-                )}
+                Esita registreering
               </button>
 
               <p className="text-center text-xs text-text-secondary">
@@ -491,11 +520,11 @@ export function RegistrationForm({ isOpen, onClose }: RegistrationFormProps) {
                 <ol className="space-y-3 text-sm text-text-secondary">
                   <li className="flex items-start gap-4">
                     <span className="w-6 h-6 rounded-full bg-secondary/20 text-secondary text-sm flex items-center justify-center shrink-0">1</span>
-                    <span>Broneeri 15-minutiline vestlus (link tuleb meilil)</span>
+                    <span>Saada registreerimiskiri meilirakendusest</span>
                   </li>
                   <li className="flex items-start gap-4">
                     <span className="w-6 h-6 rounded-full bg-secondary/20 text-secondary text-sm flex items-center justify-center shrink-0">2</span>
-                    <span>Allkirjasta digitaalne toetuskiri</span>
+                    <span>Vastame 48 tunni jooksul broneerimislingiga</span>
                   </li>
                   <li className="flex items-start gap-4">
                     <span className="w-6 h-6 rounded-full bg-secondary/20 text-secondary text-sm flex items-center justify-center shrink-0">3</span>
