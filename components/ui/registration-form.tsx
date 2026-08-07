@@ -191,10 +191,13 @@ export function RegistrationForm({ isOpen, onClose }: RegistrationFormProps) {
     ].join('\n');
     window.location.href = `mailto:andri@matx.ee?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 
+    // The draft is kept until the visitor explicitly clears it ("Sulge" on
+    // the success screen) — a cancelled or unavailable mail client must not
+    // lose their data. There is no way to detect that the mail was actually
+    // composed/sent, so the success copy below must not claim the app opened.
     setIsSuccess(true);
-    clearDraft();
     setAnnouncement('Registreerimise kiri on koostatud');
-  }, [formData, validateForm, clearDraft]);
+  }, [formData, validateForm]);
 
   const handleClose = useCallback(() => {
     setIsSuccess(false);
@@ -262,7 +265,7 @@ export function RegistrationForm({ isOpen, onClose }: RegistrationFormProps) {
                   Registreerimise kiri on koostatud!
                 </h2>
                 <p className="text-text-secondary">
-                  Meilirakendus avati eeltäidetud registreerimiskirjaga. Saatke see ära, et oma koht kinnitada.
+                  Registreerimiskiri on koostatud. Kui meilirakendus ei avanunud, saatke andmed aadressile andri@matx.ee.
                 </p>
               </div>
             )}
@@ -475,7 +478,6 @@ export function RegistrationForm({ isOpen, onClose }: RegistrationFormProps) {
                       // Clear the consent error as soon as the box is checked
                       if (e.target.checked) setErrors((prev) => ({ ...prev, consent: undefined }));
                     }}
-                    onBlur={() => setTouched((prev) => new Set(prev).add('consent'))}
                     className="mt-0.5 h-5 w-5 shrink-0 rounded border-border accent-primary focus-ring-target"
                     aria-invalid={errors.consent ? 'true' : 'false'}
                     aria-describedby={errors.consent ? 'consent-error' : undefined}
