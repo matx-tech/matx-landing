@@ -23,7 +23,6 @@ export default defineConfig({
   reporter: [
     ['list'],
     ['html', { open: 'never' }],
-    ['junit', { outputFile: 'test-results/junit.xml' }],
   ],
   use: {
     baseURL: process.env.BASE_URL ?? 'http://localhost:3200',
@@ -31,7 +30,6 @@ export default defineConfig({
     navigationTimeout: 30_000,
     trace: 'retain-on-failure-and-retries',
     screenshot: 'only-on-failure',
-    video: 'retain-on-failure',
   },
   projects: [
     {
