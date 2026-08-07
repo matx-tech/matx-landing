@@ -1,5 +1,4 @@
 import { test, expect } from '../support/fixtures';
-import { revealSection } from '../support/helpers/reveal';
 
 test.describe('navigation', () => {
   test('desktop nav: clicking a link scrolls to the section', async ({ openHome, page }) => {
@@ -50,11 +49,11 @@ test.describe('mobile menu', () => {
 
     await expect(page.getByRole('dialog')).not.toBeVisible();
 
-    // While the dialog was open, Radix locks body scroll, so the anchor jump
-    // can't move the page — scroll explicitly now the dialog is closed.
-    // (Lenis also scrolls without setting location.hash, so no URL assertion.)
-    const heading = page.getByRole('heading', { name: /KKK/i }).first();
-    await revealSection(page, 'kkk', heading);
-    await expect(heading).toBeVisible();
+    // Regression guard: the heading must appear WITHOUT any explicit scroll —
+    // only the fix's delayed hash jump (650ms, after the scroll lock releases)
+    // opens the SectionGate. Pre-fix, navigation was cancelled by the dialog
+    // unmount and this assertion timed out. The desktop test above relies on
+    // the native/lenis click path; this one proves the mobile handler works.
+    await expect(page.getByRole('heading', { name: /KKK/i }).first()).toBeVisible();
   });
 });

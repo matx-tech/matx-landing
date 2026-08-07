@@ -41,10 +41,13 @@ export default defineConfig({
       use: { ...devices['Pixel 7'] },
     },
   ],
-  webServer: {
-    command: 'pnpm dev --port 3200',
-    port: 3200,
-    reuseExistingServer: !process.env.CI,
-    timeout: 120_000,
-  },
+  // Preview runs (BASE_URL set) hit a deployed server — don't boot a local one.
+  webServer: process.env.BASE_URL
+    ? undefined
+    : {
+        command: 'pnpm dev --port 3200',
+        port: 3200,
+        reuseExistingServer: !process.env.CI,
+        timeout: 120_000,
+      },
 });

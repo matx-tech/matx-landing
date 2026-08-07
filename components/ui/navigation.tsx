@@ -121,9 +121,9 @@ export function Navigation() {
   }, [isOpen, prefersReducedMotion]);
 
   const handleOpenChange = useCallback((open: boolean) => {
-    // Cancelling the menu (without a link click) must also cancel a pending
-    // hash jump, or the user gets yanked to a section they didn't choose.
-    if (!open && pendingHashTimerRef.current) {
+    // Any menu-state change supersedes a pending hash jump: closing without a
+    // link click, or reopening within the 650ms window before the jump fires.
+    if (pendingHashTimerRef.current) {
       window.clearTimeout(pendingHashTimerRef.current);
       pendingHashTimerRef.current = null;
     }
@@ -157,7 +157,11 @@ export function Navigation() {
         return;
       }
       const href = event.currentTarget.getAttribute('href');
-      const isExternal = href?.startsWith('http');
+      // External = absolute http(s) or protocol-relative (//…); hash anchors
+      // are the only internal menu links. Anything else (mailto:, tel:)
+      // classifies internal and is a no-op hash — acceptable: the menu has
+      // no such links, and window.open can't open them meaningfully either.
+      const isExternal = /^(https?:)?\/\//.test(href ?? '');
       event.preventDefault();
       setIsOpen(false);
 
