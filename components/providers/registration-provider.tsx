@@ -16,13 +16,21 @@ function RegistrationChunkFallback({ error, retry }: DynamicOptionsLoadingProps)
   const cancelButtonRef = useRef<HTMLButtonElement>(null);
   const retryButtonRef = useRef<HTMLButtonElement>(null);
   const restoreFocusRef = useRef(false);
+  // The CTA that opened the dialog — captured once on the fallback's first
+  // mount. Re-reading document.activeElement when `error` flips would capture
+  // whatever the loading→error DOM swap left focused (the unmounted cancel
+  // button or <body>), and closing from the error state would then restore
+  // focus to the wrong element.
+  const openerRef = useRef<HTMLElement | null>(null);
 
   // Modal-shell semantics: focus the primary action on show (retry in the
   // error state, cancel while loading), trap Tab inside the overlay, and
   // hand focus back to the opener when cancel runs.
   useEffect(() => {
-    const previouslyFocused =
-      document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    if (openerRef.current === null) {
+      openerRef.current =
+        document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    }
     if (error) {
       retryButtonRef.current?.focus();
     } else {
@@ -60,7 +68,7 @@ function RegistrationChunkFallback({ error, retry }: DynamicOptionsLoadingProps)
       window.removeEventListener('keydown', onKeyDown);
       // Only steal focus back on cancel — when the chunk loads successfully
       // the Radix dialog takes over focus management.
-      if (restoreFocusRef.current) previouslyFocused?.focus();
+      if (restoreFocusRef.current) openerRef.current?.focus();
     };
   }, [cancel, error]);
 
