@@ -9,7 +9,6 @@
 
 import { FileDown } from 'lucide-react';
 import { CopyButton } from '@/components/ui/copy-button';
-import type { StatusRow } from './status-card';
 
 interface ExportRow {
   title: string;

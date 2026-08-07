@@ -589,6 +589,21 @@ export default function TechnicalOverviewPage() {
                 { heading: 'Turvameetmed', rows: SECURITY_CONTROLS },
                 { heading: 'Vastavus', rows: COMPLIANCE_ROWS },
                 { heading: 'Integratsioonid', rows: INTEGRATION_ROWS },
+                {
+                  heading: 'Ostuteed ja piirmäärad',
+                  rows: PROCUREMENT_ROUTES.map((r) => ({ title: r.band, detail: r.route, note: r.note })),
+                },
+                {
+                  heading: 'Hinnaklassid',
+                  rows: PRICE_BENCHMARKS.map((r) => ({
+                    title: r.label,
+                    detail: `Mediaan: ${r.median} · Keskmine: ${r.mean}`,
+                    note: r.note,
+                  })),
+                },
+                { heading: 'Lepingupraktika', rows: CONTRACT_NORMS },
+                { heading: 'Tehnilised nõuded', rows: TENDER_TECH_REQUIREMENTS },
+                { heading: 'Hankeinfo allikad', rows: HANKE_SOURCES },
               ]}
               glossary={GLOSSARY}
             />
@@ -894,40 +909,14 @@ export default function TechnicalOverviewPage() {
             {/* Structured definition list — one source per row, term + citation,
                 instead of a paragraph wall. Same facts, scannable. */}
             <dl className="space-y-4 text-xs text-text-secondary leading-relaxed">
-              <div>
-                <dt className="font-medium text-text-primary">Piirmäärad ja menetlused</dt>
-                <dd className="mt-0.5">
-                  <TechText text="Riigihangete seadus § 14–15 (RT I, 01.07.2017, 1) ja riigihangete seaduse ja teiste seaduste muutmise seadus (RT I, 03.07.2026, 3; jõustub 01.11.2026); EL piirmäärad 2026–2027: komisjoni delegeeritud määrus (EL) 2025/2152." />
-                </dd>
-              </div>
-              <div>
-                <dt className="font-medium text-text-primary">Hinnaklassid</dt>
-                <dd className="mt-0.5">
-                  Riigihangete registri avaandmed (lepinguteated, 2026. a I poolaasta;
-                  mediaanid ja keskmised arvutatud maksumusega teadetest). Ühe kooli alla 30 000 €
-                  ostud ei kajastu registris.
-                </dd>
-              </div>
-              <div>
-                <dt className="font-medium text-text-primary">Õpikeskkonna hinnaankur</dt>
-                <dd className="mt-0.5">
-                  Opiq koolipakett 2026/27 (opiq.ee); soodushind alates 50% õpilastest vähemalt
-                  9 kuuks.
-                </dd>
-              </div>
-              <div>
-                <dt className="font-medium text-text-primary">Menetluse kestused ja pakkujate arv</dt>
-                <dd className="mt-0.5">
-                  Rahandusministeeriumi riigihangete valdkonna statistika ja kokkuvõte 2025
-                  (fin.ee).
-                </dd>
-              </div>
-              <div>
-                <dt className="font-medium text-text-primary">Juurdepääsetavus ja maksetähtaeg</dt>
-                <dd className="mt-0.5">
-                  <TechText text="Direktiiv (EL) 2016/2102, EN 301 549 V3.2.1; järelevalve TTJA (ttja.ee). Maksetähtaeg: direktiiv 2011/7/EL." />
-                </dd>
-              </div>
+              {HANKE_SOURCES.map(({ title, detail }) => (
+                <div key={title}>
+                  <dt className="font-medium text-text-primary">{title}</dt>
+                  <dd className="mt-0.5">
+                    <TechText text={detail} />
+                  </dd>
+                </div>
+              ))}
             </dl>
           </div>
         </section>
