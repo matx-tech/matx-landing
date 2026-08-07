@@ -82,9 +82,9 @@ export function SectionGate({
   // transient, so only hand off once the mounted section (or the error/retry
   // state) replaces it — which can take seconds on slow connections. Gates
   // without an id can't be found by lookup, so poll the revealed wrapper for
-  // its first heading and fall back to the wrapper itself (tabIndex -1) so
-  // focus never drops to <body>. preventScroll keeps the viewport where the
-  // user is.
+  // its first heading; only once the poll cap is hit does focus fall back to
+  // the wrapper itself (tabIndex -1) so focus never drops to <body>.
+  // preventScroll keeps the viewport where the user is.
   useEffect(() => {
     if (!visible || !openedByButtonRef.current) return;
     let cancelled = false;
@@ -97,8 +97,7 @@ export function SectionGate({
         return el instanceof HTMLElement ? el : null;
       }
       return (
-        revealedRef.current?.querySelector('h1, h2, h3, h4, h5, h6') ??
-        revealedRef.current
+        revealedRef.current?.querySelector('h1, h2, h3, h4, h5, h6') ?? null
       );
     };
 
