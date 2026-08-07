@@ -131,7 +131,11 @@ export function SectionGate({
         // once the retry button unmounts with the error fallback.
         const retry = errorRetryTarget(target);
         if (retry) {
-          retry.focus({ preventScroll: true });
+          // Only grab focus when the retry button doesn't already have it —
+          // tryHandOff runs on every 200ms poll tick while the error fallback
+          // is showing, so re-focusing would yank keyboard focus back from the
+          // user if they tabbed away within the poll window.
+          if (document.activeElement !== retry) retry.focus({ preventScroll: true });
           return false;
         }
         if (!target.hasAttribute('tabindex')) target.setAttribute('tabindex', '-1');
