@@ -61,5 +61,5 @@ export function SectionGate({
 
   if (visible) return <>{children}</>;
 
-  return <div ref={ref} id={id} className={placeholderClassName} aria-hidden="true" />;
+  return <div ref={ref} id={id} className={`${placeholderClassName} scroll-mt-20`} aria-hidden="true" />;
 }
