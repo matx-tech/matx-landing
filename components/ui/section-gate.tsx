@@ -36,6 +36,10 @@ export function SectionGate({
 }: SectionGateProps) {
   const ref = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
+  // Set when the sr-only load button (not a scroll) opened the gate — the
+  // button unmounts with the placeholder, so focus must be handed off to the
+  // section once it exists or keyboard focus would drop to <body>.
+  const openedByButtonRef = useRef(false);
 
   useEffect(() => {
     const el = ref.current;
@@ -74,6 +78,33 @@ export function SectionGate({
     };
   }, [visible]);
 
+  // Focus hand-off when the sr-only load button opened the gate: the button
+  // unmounts with the placeholder, so without this keyboard focus drops to
+  // <body>. Poll for the real section — the loading skeleton also carries
+  // the id but is aria-hidden and transient, so only stop on the mounted
+  // section (or the error/retry state), which can take seconds on slow
+  // connections. preventScroll keeps the viewport where the user is.
+  useEffect(() => {
+    if (!visible || !openedByButtonRef.current || !id) return;
+    let cancelled = false;
+    const poll = (remaining: number) => {
+      const el = document.getElementById(id);
+      if (el instanceof HTMLElement && el.getAttribute('aria-hidden') !== 'true') {
+        if (!el.hasAttribute('tabindex')) el.setAttribute('tabindex', '-1');
+        el.focus({ preventScroll: true });
+        return;
+      }
+      if (remaining <= 0) return;
+      setTimeout(() => {
+        if (!cancelled) poll(remaining - 1);
+      }, 200);
+    };
+    poll(25); // ~5s cap — covers a slow chunk fetch, then gives up quietly
+    return () => {
+      cancelled = true;
+    };
+  }, [visible, id]);
+
   // The mounted section is taller/shorter than the placeholder; refresh
   // scroll math (ScrollTrigger triggers, Lenis limit) once the frame
   // settles and again after a typical chunk fetch.
@@ -97,7 +128,10 @@ export function SectionGate({
     <div ref={ref} id={id} className={`relative ${placeholderClassName} scroll-mt-20`}>
       <button
         type="button"
-        onClick={() => setVisible(true)}
+        onClick={() => {
+          openedByButtonRef.current = true;
+          setVisible(true);
+        }}
         className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 rounded-lg bg-surface px-4 py-2 text-sm font-semibold text-text-primary shadow-card focus-ring-target"
       >
         Laadi sisu
