@@ -109,6 +109,36 @@ export function LenisProvider({ children }: { children: React.ReactNode }) {
         ? target
         : null;
 
+    // Focus the section heading after the scroll settles (default on) —
+    // shared by the Lenis and native-fallback paths so both behave the same
+    // for direct consumers (adoption route cards, nav links).
+    const focusHeading = () => {
+      if (options?.focusHeading === false) return;
+      if (focusTimerRef.current) clearTimeout(focusTimerRef.current);
+      focusTimerRef.current = setTimeout(() => {
+        // SectionGate swaps its id-bearing placeholder for the mounted
+        // section while we scroll, detaching the element captured above.
+        // Re-resolve the selector so the heading lives in the real section.
+        const liveTarget =
+          typeof target === 'string'
+            ? document.querySelector(target)
+            : targetElement?.isConnected
+              ? targetElement
+              : null;
+
+        const heading = liveTarget?.querySelector('h2, h1');
+
+        if (heading instanceof HTMLElement) {
+          // Ensure heading can receive focus
+          if (!heading.hasAttribute('tabindex')) {
+            heading.setAttribute('tabindex', '-1');
+          }
+          heading.focus({ preventScroll: true });
+        }
+        focusTimerRef.current = null;
+      }, reducedMotionRef.current ? 0 : 1400); // Slightly longer than scroll duration
+    };
+
     // Lenis is a progressive enhancement: while the lazy chunk is still
     // loading (or if it failed — the .catch above never retries), fall back
     // to native scrolling so direct scrollTo() consumers (adoption route
@@ -119,6 +149,7 @@ export function LenisProvider({ children }: { children: React.ReactNode }) {
         // Same fixed-nav offset as the Lenis path (-80).
         const top = targetElement.getBoundingClientRect().top + window.scrollY - 80;
         window.scrollTo({ top: Math.max(top, 0), behavior });
+        focusHeading();
       } else if (typeof target === 'number') {
         window.scrollTo({ top: target, behavior });
       }
@@ -131,32 +162,7 @@ export function LenisProvider({ children }: { children: React.ReactNode }) {
         duration: reducedMotionRef.current ? 0 : 1.2,
       });
 
-      // Focus the section heading after scroll animation completes
-      if (options?.focusHeading !== false) {
-        if (focusTimerRef.current) clearTimeout(focusTimerRef.current);
-        focusTimerRef.current = setTimeout(() => {
-          // SectionGate swaps its id-bearing placeholder for the mounted
-          // section while we scroll, detaching the element captured above.
-          // Re-resolve the selector so the heading lives in the real section.
-          const liveTarget =
-            typeof target === 'string'
-              ? document.querySelector(target)
-              : targetElement.isConnected
-                ? targetElement
-                : null;
-
-          const heading = liveTarget?.querySelector('h2, h1');
-
-          if (heading instanceof HTMLElement) {
-            // Ensure heading can receive focus
-            if (!heading.hasAttribute('tabindex')) {
-              heading.setAttribute('tabindex', '-1');
-            }
-            heading.focus({ preventScroll: true });
-          }
-          focusTimerRef.current = null;
-        }, reducedMotionRef.current ? 0 : 1400); // Slightly longer than scroll duration
-      }
+      focusHeading();
     } else if (typeof target === 'number') {
       lenisRef.current.scrollTo(target);
     }
