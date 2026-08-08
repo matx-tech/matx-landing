@@ -1,7 +1,6 @@
 'use client';
 
 import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { AlertTriangle, Clock, TrendingUp } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { CapabilityStatusBadge } from '@/components/ui/capability-status';
@@ -9,10 +8,6 @@ import { SECTION_IDS, TEACHER_STORY } from '@/lib/content/landing-copy';
 import { PRODUCT_FIXTURE } from '@/lib/content/landing-evidence';
 import { usePrefersReducedMotion } from '@/lib/hooks/use-prefers-reduced-motion';
 import { gsapEase, motionTokens, staggers } from '@/lib/motion-tokens';
-
-if (typeof window !== 'undefined') {
-  gsap.registerPlugin(ScrollTrigger);
-}
 
 // Skill names matching the heatmap columns
 const SKILL_NAMES = [
@@ -57,7 +52,6 @@ const heatmapLevelLabels = ['Madal', 'Alla keskmise', 'Keskmine', 'Üle keskmise
  */
 export function TeacherSection() {
   const sectionRef = useRef<HTMLElement>(null);
-  const heatmapRef = useRef<HTMLDivElement>(null);
   const signalCardsRef = useRef<HTMLDivElement[]>([]);
   const gradientOverlayRef = useRef<HTMLDivElement>(null);
   const cellRefs = useRef<(HTMLButtonElement | null)[][]>([]);
@@ -191,18 +185,6 @@ export function TeacherSection() {
           },
         );
       });
-
-      // Pin the heatmap while signal cards scroll into view underneath
-      if (heatmapRef.current) {
-        ScrollTrigger.create({
-          trigger: heatmapRef.current,
-          start: 'top 80%',
-          end: '+=800',
-          pin: true,
-          pinSpacing: true,
-          markers: false,
-        });
-      }
     }, sectionRef);
 
     return () => ctx.revert();
@@ -218,7 +200,7 @@ export function TeacherSection() {
 
       <div className='relative z-10 container mx-auto px-4 md:px-8 lg:px-16'>
         {/* Section Title */}
-        <div className='section-title text-center mb-16'>
+        <div className='section-title text-center mb-10'>
           <span className='inline-block text-secondary text-sm uppercase tracking-widest mb-4 font-mono'>
             Õpetajatele
           </span>
@@ -231,7 +213,7 @@ export function TeacherSection() {
         </div>
 
         {/* Interactive Heatmap */}
-        <div ref={heatmapRef} className='mb-16'>
+        <div className='mb-16'>
           <div className='relative mx-auto max-w-4xl bg-elevated rounded-xl p-3 sm:p-6 border border-border overflow-hidden'>
             <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4'>
               <div className='flex flex-wrap items-center gap-2'>
@@ -253,11 +235,13 @@ export function TeacherSection() {
                 {/* Skill names row */}
                 <div className='mb-2 text-xs text-text-secondary'>
                   <div
-                    className='grid gap-1'
+                    className='grid gap-1 justify-items-center'
                     style={{ gridTemplateColumns: `repeat(${skills}, minmax(0, 1fr))` }}
                   >
                     {SKILL_NAMES.map((name) => (
-                      <span key={name}>{name}</span>
+                      <span key={name} className='text-center'>
+                        {name}
+                      </span>
                     ))}
                   </div>
                 </div>
@@ -282,12 +266,12 @@ export function TeacherSection() {
                     }
                   }}
                 >
-                  <tbody>
+                  <tbody className='flex flex-col gap-0.5'>
                     {Array.from({ length: students }).map((_, row) => (
                       <tr
                         // biome-ignore lint/suspicious/noArrayIndexKey: generated heatmap rows — row index is the only identity, list never reorders
                         key={`row-${row}`}
-                        className='grid gap-1'
+                        className='grid gap-0.5 justify-items-center'
                         style={{ gridTemplateColumns: `repeat(${skills}, minmax(0, 1fr))` }}
                       >
                         {Array.from({ length: skills }).map((_, col) => {
@@ -308,7 +292,7 @@ export function TeacherSection() {
                                   setActiveRow(row);
                                   setActiveCol(col);
                                 }}
-                                className={`aspect-square w-full rounded-sm transition-[opacity,transform] duration-150 focus:outline-none heatmap-cell-${level} opacity-60 hover:opacity-100 hover:[transform:scale(1.3)] focus-visible:opacity-100 focus-visible:[transform:scale(1.3)]`}
+                                className={`size-6 block rounded-sm transition-[opacity,transform] duration-150 focus:outline-none heatmap-cell-${level} opacity-60 hover:opacity-100 hover:[transform:scale(1.3)] focus-visible:opacity-100 focus-visible:[transform:scale(1.3)]`}
                                 aria-label={`Õpilane ${row + 1}, ${SKILL_NAMES[col]}: ${heatmapLevelLabels[level - 1]}`}
                               />
                             </td>
