@@ -1,3 +1,5 @@
+import { createHash } from 'node:crypto';
+
 const REQUIRED_FIELDS = [
   'schoolName',
   'contactName',
@@ -107,15 +109,12 @@ const MAX_DELIVERY_ENTRIES = 10_000;
 const deliveryState = new Map<string, { status: 'pending' | 'completed'; at: number }>();
 let lastDeliveryPrune = 0;
 
-// FNV-1a — stable, dependency-free hash for the dedupe key.
+// SHA-256 digest of the canonical JSON payload — a collision-resistant dedupe
+// key. JSON.stringify of the normalized string array is injective (every
+// string is quoted and escaped), so distinct payloads — including ones with
+// NUL bytes or separator characters — can never share a key.
 function submissionKey(fields: readonly string[]): string {
-  const canonical = fields.join('\u0000');
-  let hash = 0x811c9dc5;
-  for (let i = 0; i < canonical.length; i++) {
-    hash ^= canonical.charCodeAt(i);
-    hash = Math.imul(hash, 0x01000193);
-  }
-  return (hash >>> 0).toString(16);
+  return createHash('sha256').update(JSON.stringify(fields)).digest('hex');
 }
 
 function pruneDeliveries(now: number): void {
