@@ -22,29 +22,6 @@ interface ExportSection {
   rows: ExportRow[];
 }
 
-interface ProcurementRoute {
-  band: string;
-  route: string;
-  note: string;
-}
-
-interface PriceBenchmark {
-  label: string;
-  median: string;
-  mean: string;
-  note: string;
-}
-
-interface ContractNorm {
-  title: string;
-  detail: string;
-}
-
-interface TenderTechRequirement {
-  title: string;
-  detail: string;
-}
-
 const STATUS_PREFIX: Record<string, string> = {
   Saadaval: '[Saadaval]',
   Piloodis: '[Piloodis]',
@@ -55,10 +32,6 @@ function toMarkdown(
   lastUpdated: string,
   githubUrl: string,
   sections: ExportSection[],
-  procurementRoutes?: ProcurementRoute[],
-  priceBenchmarks?: PriceBenchmark[],
-  contractNorms?: ContractNorm[],
-  tenderTechRequirements?: TenderTechRequirement[],
   glossary?: { term: string; definition: string }[],
 ): string {
   const lines: string[] = [
@@ -81,40 +54,6 @@ function toMarkdown(
     lines.push('');
   }
 
-  if (procurementRoutes && procurementRoutes.length > 0) {
-    lines.push('## Hankeinfo: Ostuteed ja piirmäärad', '');
-    for (const route of procurementRoutes) {
-      lines.push(`- **${route.band}**: ${route.route}`);
-      lines.push(`  - ${route.note}`);
-    }
-    lines.push('');
-  }
-
-  if (priceBenchmarks && priceBenchmarks.length > 0) {
-    lines.push('## Hankeinfo: Hinnaklassid', '');
-    for (const benchmark of priceBenchmarks) {
-      lines.push(`- **${benchmark.label}**: Mediaan ${benchmark.median}, Keskmine ${benchmark.mean}`);
-      lines.push(`  - ${benchmark.note}`);
-    }
-    lines.push('');
-  }
-
-  if (contractNorms && contractNorms.length > 0) {
-    lines.push('## Hankeinfo: Lepingupraktika', '');
-    for (const norm of contractNorms) {
-      lines.push(`- **${norm.title}**: ${norm.detail}`);
-    }
-    lines.push('');
-  }
-
-  if (tenderTechRequirements && tenderTechRequirements.length > 0) {
-    lines.push('## Hankeinfo: Tehnilised nõuded', '');
-    for (const req of tenderTechRequirements) {
-      lines.push(`- **${req.title}**: ${req.detail}`);
-    }
-    lines.push('');
-  }
-
   if (glossary && glossary.length > 0) {
     lines.push('## Glossar', '');
     for (const { term, definition } of glossary) {
@@ -129,31 +68,14 @@ export function ExportMarkdown({
   lastUpdated,
   githubUrl,
   sections,
-  procurementRoutes,
-  priceBenchmarks,
-  contractNorms,
-  tenderTechRequirements,
   glossary,
 }: {
   lastUpdated: string;
   githubUrl: string;
   sections: ExportSection[];
-  procurementRoutes?: ProcurementRoute[];
-  priceBenchmarks?: PriceBenchmark[];
-  contractNorms?: ContractNorm[];
-  tenderTechRequirements?: TenderTechRequirement[];
   glossary?: { term: string; definition: string }[];
 }) {
-  const markdown = toMarkdown(
-    lastUpdated,
-    githubUrl,
-    sections,
-    procurementRoutes,
-    priceBenchmarks,
-    contractNorms,
-    tenderTechRequirements,
-    glossary,
-  );
+  const markdown = toMarkdown(lastUpdated, githubUrl, sections, glossary);
 
   return (
     <CopyButton

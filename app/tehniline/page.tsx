@@ -295,7 +295,13 @@ const PROCUREMENT_ROUTES = [
   },
 ];
 
-const PRICE_BENCHMARKS = [
+const PRICE_BENCHMARKS: {
+  label: string;
+  median: string;
+  mean: string;
+  note: string;
+  anchor?: boolean;
+}[] = [
   { label: 'Kõik lepingud', median: '~67 000 €', mean: '~401 000 €', note: 'n≈4 000 lepinguteadet' },
   { label: 'Tarkvara (CPV 48*)', median: '~68 000 €', mean: '~246 000 €', note: 'n=134' },
   { label: 'IT-teenused (CPV 72*)', median: '~121 000 €', mean: '~349 000 €', note: 'n=181' },
@@ -304,8 +310,9 @@ const PRICE_BENCHMARKS = [
   {
     label: 'Õpikeskkonna hinnaankur: Opiq koolipakett 2026/27',
     median: '3–5 €/õp/kuu',
-    mean: '≈30–50 €/õp/aastas',
-    note: 'Soodushind alates 50% õpilastest, vähemalt 9 kuud',
+    mean: '≈30–50 €/õp',
+    note: 'Avalik hinnakiri, mitte registristatistika. Soodushind alates 50% õpilastest, vähemalt 9 kuud',
+    anchor: true,
   },
 ];
 
@@ -597,7 +604,9 @@ export default function TechnicalOverviewPage() {
                   heading: 'Hinnaklassid',
                   rows: PRICE_BENCHMARKS.map((r) => ({
                     title: r.label,
-                    detail: `Mediaan: ${r.median} · Keskmine: ${r.mean}`,
+                    detail: r.anchor
+                      ? `Hind: ${r.median} · Aastas: ${r.mean}`
+                      : `Mediaan: ${r.median} · Keskmine: ${r.mean}`,
                     note: r.note,
                   })),
                 },
@@ -859,10 +868,10 @@ export default function TechnicalOverviewPage() {
                   <tr key={row.label} className="border-b border-border last:border-0 odd:bg-canvas">
                     <td className="px-5 py-3 text-text-primary">{row.label}</td>
                     <td className="px-5 py-3 text-text-secondary tabular-nums whitespace-nowrap text-right">
-                      {row.median}
+                      {row.anchor ? `Hind: ${row.median}` : row.median}
                     </td>
                     <td className="px-5 py-3 text-text-secondary tabular-nums whitespace-nowrap text-right">
-                      {row.mean}
+                      {row.anchor ? `Aastas: ${row.mean}` : row.mean}
                     </td>
                     <td className="px-5 py-3 text-text-secondary text-xs leading-relaxed">{row.note}</td>
                   </tr>
