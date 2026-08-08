@@ -6,14 +6,10 @@ import { EVENTS, track } from '@/lib/analytics';
 const STORAGE_KEY = 'matx-theme';
 
 /**
- * Dark/light toggle. The icon follows the active theme purely via the `dark:`
- * variant (wired to [data-theme=dark] in globals.css) — no JS state, so no
- * hydration mismatch and no icon flash. Persists the explicit choice to the
- * same localStorage key the layout bootstrap script reads, so the next load
- * honors it instead of falling back to prefers-color-scheme.
+ * Renders a button that switches the document between light and dark themes.
  *
- * ponytail: binary light/dark only; add a three-state (system/light/dark)
- * if users ask to follow the OS after having chosen once.
+ * @param className - Additional CSS classes for the button.
+ * @returns A theme toggle button.
  */
 export function ThemeToggle({ className = '' }: { className?: string }) {
   const toggle = () => {

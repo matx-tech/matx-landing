@@ -80,7 +80,7 @@ export const metadata: Metadata = {
 };
 
 /**
- * Defines the root document structure and wraps page content with the site's scrolling provider.
+ * Defines the site's root document and provides analytics and scrolling behavior for page content.
  *
  * @returns The root HTML document containing page content and MATx metadata.
  */

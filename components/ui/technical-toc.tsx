@@ -13,6 +13,11 @@ interface TocItem {
   readonly label: string;
 }
 
+/**
+ * Renders a sticky table of contents that highlights the section currently visible in the document.
+ *
+ * @param items - The sections to display as navigable links.
+ */
 export function TechnicalTOC({ items }: { items: readonly TocItem[] }) {
   const [activeId, setActiveId] = useState<string>(items[0]?.id ?? '');
 

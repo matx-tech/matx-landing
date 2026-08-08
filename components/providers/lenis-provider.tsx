@@ -34,7 +34,7 @@ const LenisContext = createContext<LenisContextValue>({
 export const useLenis = () => useContext(LenisContext);
 
 /**
- * Provides application-wide scrolling through Lenis with native scrolling fallback.
+ * Provides application-wide smooth scrolling with native scrolling fallback.
  *
  * @param children - The content rendered within the provider.
  */
@@ -66,6 +66,12 @@ export function LenisProvider({ children }: { children: React.ReactNode }) {
       .then(({ default: LenisClass }) => {
         if (disposed) return;
 
+        /**
+         * Creates a Lenis instance configured for the user's motion preference.
+         *
+         * @param rm - Whether reduced motion is preferred
+         * @returns A configured Lenis instance
+         */
         function createLenis(rm: boolean) {
           return new LenisClass({
             lerp: rm ? 0 : 0.1,
@@ -82,6 +88,11 @@ export function LenisProvider({ children }: { children: React.ReactNode }) {
         lenisInstance = createLenis(prefersReducedMotion);
         lenisRef.current = lenisInstance;
 
+        /**
+         * Registers the Lenis animation frame callback with GSAP's ticker.
+         *
+         * @param instance - The Lenis instance to advance on each ticker update
+         */
         function registerRaf(instance: Lenis) {
           // Remove previous callback first so we never double-register
           if (tickerCbRef.current) gsap.ticker.remove(tickerCbRef.current);

@@ -13,6 +13,9 @@ import { FAQ_ENTRIES, SECTION_IDS } from '@/lib/content/landing-copy';
 import { usePrefersReducedMotion } from '@/lib/hooks/use-prefers-reduced-motion';
 import { gsapEase, motionTokens, staggers } from '@/lib/motion-tokens';
 
+/**
+ * Renders an animated, accessible FAQ accordion with an email contact link.
+ */
 export function FAQSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const itemsRef = useRef<HTMLDivElement[]>([]);

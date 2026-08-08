@@ -20,12 +20,9 @@ const early: Array<{ event: string; props?: Record<string, string> }> = [];
 const MAX_EARLY_EVENTS = 50;
 
 /**
- * Initializes the Plausible tracker (client-only). Drains events that were
- * queued before initialization. Idempotent.
+ * Enables analytics and sends events recorded before initialization.
  *
- * The tracker package is imported dynamically on purpose: its module body
- * references browser globals (`location`), so a static import would crash
- * SSR. The dynamic import also keeps the tracker out of the main bundle.
+ * @param config - Plausible tracker configuration
  */
 export async function enableAnalytics(config: PlausibleConfig): Promise<void> {
   if (initialized) return;
@@ -38,8 +35,12 @@ export async function enableAnalytics(config: PlausibleConfig): Promise<void> {
 }
 
 /**
- * Fires a Plausible custom event. Safe to call before init (buffered), on the
- * server (no-op), and when analytics is disabled (never initialized).
+ * Sends a custom analytics event when tracking is enabled.
+ *
+ * Events triggered before initialization are buffered, while server-side calls are ignored.
+ *
+ * @param event - The name of the event to track
+ * @param props - Optional properties associated with the event
  */
 export function track(event: string, props?: Record<string, string>): void {
   if (typeof window === 'undefined') return;

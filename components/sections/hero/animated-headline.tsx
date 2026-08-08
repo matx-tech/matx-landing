@@ -62,9 +62,9 @@ function scheduleIdle(cb: () => void): () => void {
 /**
  * Reveals heading text one word at a time with configurable timing.
  *
- * @param stagger - The delay between successive word animations.
- * @param delay - The delay before the reveal begins.
- * @returns The animated heading element.
+ * @param stagger - The interval between successive word animations.
+ * @param delay - The time before the reveal begins.
+ * @returns The rendered heading container.
  */
 export function AnimatedWordReveal({
   children,

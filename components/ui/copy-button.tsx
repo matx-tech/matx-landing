@@ -17,6 +17,14 @@ interface CopyButtonProps {
   children?: React.ReactNode;
 }
 
+/**
+ * Renders a button that copies text to the clipboard and indicates successful copying.
+ *
+ * @param value - The text to copy
+ * @param label - The button's label before copying
+ * @param copiedLabel - The button's label after a successful copy
+ * @returns A clipboard copy button
+ */
 export function CopyButton({
   value,
   label,

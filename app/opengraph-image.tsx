@@ -6,7 +6,11 @@ export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
 // Static OG card, generated at build time. Colors echo the dark theme
-// tokens from globals.css (ink-900 canvas, blue-400 primary, teal-400 accent).
+/**
+ * Generates the MATx-branded Open Graph image.
+ *
+ * @returns The rendered Open Graph image response.
+ */
 export default function OpengraphImage() {
   return new ImageResponse(
     <div

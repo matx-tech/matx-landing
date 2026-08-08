@@ -14,7 +14,7 @@ if (typeof window !== 'undefined') {
 }
 
 /**
- * Renders the MATx landing page footer with branding, navigation, contact links, legal links, and responsive entrance animations.
+ * Renders the MATx landing-page footer with branding, navigation, contact and social links, legal links, and motion-aware entrance animations.
  */
 export function FooterSection() {
   const footerRef = useRef<HTMLElement>(null);

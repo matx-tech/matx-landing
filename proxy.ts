@@ -22,6 +22,11 @@ const analyticsEnabled = Boolean(process.env.PLAUSIBLE_SCRIPT_URL);
 
 const PLAUSIBLE_API_URL = 'https://plausible.io/api/event';
 
+/**
+ * Forwards a Plausible analytics event request and relays the upstream response.
+ *
+ * @returns The upstream response, or a `502` response if forwarding fails.
+ */
 async function proxyPlausibleEvent(request: NextRequest): Promise<NextResponse> {
   // Forward only what Plausible needs: User-Agent, Content-Type and the
   // client IP. Never forward the request headers wholesale — cookies and
@@ -59,6 +64,14 @@ async function proxyPlausibleEvent(request: NextRequest): Promise<NextResponse> 
   }
 }
 
+/**
+ * Applies a per-request Content Security Policy and propagates its nonce through the request and response.
+ *
+ * Analytics event requests are forwarded to Plausible when analytics is enabled.
+ *
+ * @param request - The incoming request to process
+ * @returns The resulting response with CSP headers and nonce propagation
+ */
 export async function proxy(request: NextRequest) {
   if (analyticsEnabled && request.nextUrl.pathname === '/api/event') {
     return proxyPlausibleEvent(request);

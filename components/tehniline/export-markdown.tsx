@@ -30,6 +30,15 @@ const STATUS_PREFIX: Record<CapabilityStatus, string> = {
   Kavandatud: '[Kavandatud]',
 };
 
+/**
+ * Builds a Markdown technical overview from metadata, sections, and an optional glossary.
+ *
+ * @param lastUpdated - The date or text identifying when the overview was updated
+ * @param githubUrl - The source URL for the overview's claims
+ * @param sections - The headings and rows to include in the overview
+ * @param glossary - Optional glossary terms and definitions
+ * @returns The generated Markdown document
+ */
 function toMarkdown(
   lastUpdated: string,
   githubUrl: string,
@@ -66,6 +75,15 @@ function toMarkdown(
   return lines.join('\n');
 }
 
+/**
+ * Provides a control for copying the supplied technical overview as Markdown.
+ *
+ * @param lastUpdated - The date shown in the exported document
+ * @param githubUrl - The source repository URL shown in the exported document
+ * @param sections - The overview sections and rows included in the export
+ * @param glossary - Optional glossary entries included in the export
+ * @returns A copy control containing the generated Markdown
+ */
 export function ExportMarkdown({
   lastUpdated,
   githubUrl,

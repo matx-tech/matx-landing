@@ -14,6 +14,12 @@ interface LegalDocumentProps {
   sections: readonly LegalSection[];
 }
 
+/**
+ * Converts email addresses and URLs in text into clickable links.
+ *
+ * @param text - The text containing email addresses or URLs
+ * @returns Rendered text and links, or the original text when no links are found
+ */
 function linkifyContent(text: string): React.ReactNode {
   const emailRegex = /([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/g;
   const urlRegex = /((?:https?:\/\/)?(?:www\.)?[a-zA-Z0-9-]+\.[a-zA-Z]{2,}(?:\/[^\s]*)?)/g;
@@ -84,8 +90,9 @@ function linkifyContent(text: string): React.ReactNode {
 }
 
 /**
- * Clause list — explicit replacement for the old (a)/(b)/(c) regex parser.
- * Item text still runs through linkifyContent so emails/URLs stay clickable.
+ * Renders clauses as an unordered list with labeled items.
+ *
+ * @param items - Clause labels and their corresponding text.
  */
 export function ClauseList({
   items,
@@ -103,6 +110,13 @@ export function ClauseList({
   );
 }
 
+/**
+ * Renders a legal document with section navigation and responsive table of contents.
+ *
+ * @param title - The document title
+ * @param updated - The document update text
+ * @param sections - The document sections and their content
+ */
 export function LegalDocument({ title, updated, sections }: LegalDocumentProps) {
   const [activeSection, setActiveSection] = useState<string>('');
   const [tocOpen, setTocOpen] = useState(false);

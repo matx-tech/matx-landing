@@ -24,6 +24,11 @@ if (prohibited) {
   throw new Error(`llms.txt contains prohibited phrase: ${prohibited}`);
 }
 
+/**
+ * Serves the generated `llms.txt` content as UTF-8 plain text.
+ *
+ * @returns An HTTP response containing `LLMS_TXT`
+ */
 export function GET() {
   return new Response(LLMS_TXT, {
     headers: { 'Content-Type': 'text/plain; charset=utf-8' },

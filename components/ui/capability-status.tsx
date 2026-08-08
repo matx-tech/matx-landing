@@ -35,6 +35,11 @@ const STATUS_LIVE_DOT: Record<CapabilityStatus, boolean> = {
   Kavandatud: false,
 };
 
+/**
+ * Displays a capability status as an accessible badge with status-specific styling and an icon.
+ *
+ * @returns A status badge containing the capability status text and corresponding visual indicators.
+ */
 export function CapabilityStatusBadge({ status, className = '' }: CapabilityStatusProps) {
   const Icon = STATUS_ICONS[status];
   return (

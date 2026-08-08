@@ -1,8 +1,12 @@
 'use client';
 
 /**
- * Fraction component — renders numerator over denominator with a horizontal bar.
- * Use inline for body text; standalone for answer blocks.
+ * Renders a numerator above a denominator with a horizontal bar.
+ *
+ * @param num - The fraction's numerator
+ * @param den - The fraction's denominator
+ * @param className - An optional CSS class applied to the fraction
+ * @returns An accessible fraction element labeled as `num/den`
  */
 export function Fraction({
   num,
@@ -26,11 +30,11 @@ export function Fraction({
 }
 
 /**
- * Renders a simple inline math expression with fractions.
- * Supports operators + − × ÷ between fractions or integers.
- * Recognises patterns like "3/4", "1/2" and renders them as vertical fractions.
- * Operators are vertically centred on the fraction bar (vinculum), not
- * baseline-aligned with the numerator.
+ * Renders an inline mathematical expression with numeric fractions.
+ *
+ * @param expression - The expression to render, including fractions, numbers, operators, and whitespace
+ * @param className - An optional CSS class for the container
+ * @returns An inline container displaying the formatted expression
  */
 export function InlineFractionalExpression({
   expression,

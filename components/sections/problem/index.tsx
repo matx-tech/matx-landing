@@ -73,6 +73,11 @@ const comparisonRows = [
   { beat: storyBeats[3], stages: [EVIDENCE_STAGES[3]] },
 ] as const;
 
+/**
+ * Renders a problem-story card with its associated visual evidence.
+ *
+ * @param beat - The problem-story beat and visual content to display.
+ */
 function BeatCard({ beat }: { beat: Beat }) {
   return (
     <div className='bg-card rounded-xl border border-border p-6 md:p-8 flex flex-col h-full'>
@@ -167,6 +172,11 @@ function BeatCard({ beat }: { beat: Beat }) {
   );
 }
 
+/**
+ * Renders an evidence-loop stage card with its descriptive content, visual evidence, and optional caveat.
+ *
+ * @param stage - The evidence-loop stage to display.
+ */
 function StageCard({ stage }: { stage: Stage }) {
   return (
     <div className='bg-card rounded-xl border border-border p-6 md:p-8 flex flex-col h-full'>
@@ -232,8 +242,9 @@ function StageCard({ stage }: { stage: Stage }) {
 }
 
 /**
- * Shows the problem story next to the MATx evidence loop in paired rows —
- * each problem beat aligns horizontally with the stage(s) that answer it.
+ * Renders the problem story alongside the MATx evidence loop in four paired rows.
+ *
+ * @returns The problem and evidence section.
  */
 export function ProblemSection() {
   const sectionRef = useRef<HTMLElement>(null);

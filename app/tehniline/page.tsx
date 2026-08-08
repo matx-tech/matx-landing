@@ -63,6 +63,13 @@ const STATUS_BAR_FILL: Record<StatusRow['status'], string> = {
   Kavandatud: 'bg-borderStrong',
 };
 
+/**
+ * Renders a section heading with an optional introductory description.
+ *
+ * @param id - The anchor identifier for the section
+ * @param title - The section heading text
+ * @param lead - Optional introductory description
+ */
 function SectionHeading({ id, title, lead }: { id: string; title: string; lead?: string }) {
   return (
     <div id={id} className='scroll-mt-24 mb-6'>
@@ -346,6 +353,12 @@ if (Date.now() > new Date('2026-11-01T00:00:00+02:00').getTime()) {
   );
 }
 
+/**
+ * Renders procurement routes in an accessible, horizontally scrollable table.
+ *
+ * @param rows - Procurement routes to display.
+ * @param ariaLabel - Accessible label for the table region.
+ */
 function RouteTable({ rows, ariaLabel }: { rows: ProcurementRoute[]; ariaLabel: string }) {
   return (
     <section
@@ -649,9 +662,9 @@ const AT_A_GLANCE_IDS: readonly ArchId[] = [
 ];
 
 /**
- * Static layered architecture diagram built from ARCHITECTURE_ROWS —
- * spatial map for readers who think in systems, not prose. No invented
- * relationships: layers and side components come from the data arrays.
+ * Renders the layered system architecture with deployment and side components.
+ *
+ * Omits architecture entries that are not defined in the source data.
  */
 function ArchitectureDiagram() {
   const layerIds: readonly ArchId[] = ['esikiht', 'tagakiht', 'andmebaas'];
@@ -730,6 +743,9 @@ function ArchitectureDiagram() {
   );
 }
 
+/**
+ * Renders the MATx technical overview, including its architecture, security, compliance, integrations, procurement information, and contact details.
+ */
 export default function TechnicalOverviewPage() {
   return (
     <main id='main' className='min-h-screen bg-canvas'>

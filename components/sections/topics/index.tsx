@@ -25,7 +25,9 @@ import { gsapEase, motionTokens } from '@/lib/motion-tokens';
 const TOPIC_ICONS = [Plus, Minus, X, Divide, Plus, Minus];
 
 /**
- * Renders a localized capabilities section with an interactive topics carousel.
+ * Renders a localized capabilities section with status filtering and an interactive topics carousel.
+ *
+ * @returns The capabilities section UI.
  */
 export function TopicsSection() {
   const sectionRef = useRef<HTMLElement>(null);

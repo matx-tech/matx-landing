@@ -9,6 +9,11 @@ if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
 }
 
+/**
+ * Displays a progress bar that tracks the document's scroll position.
+ *
+ * @returns The rendered scroll progress bar
+ */
 export function ScrollProgress() {
   const progressRef = useRef<HTMLDivElement>(null);
   const prefersReducedMotion = usePrefersReducedMotion();

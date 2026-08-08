@@ -5,9 +5,7 @@ import { useEffect } from 'react';
 import { EVENTS, track } from '@/lib/analytics';
 
 /**
- * Root 404 page. The 404 event fires through the shared queue: this effect
- * runs before the layout's AnalyticsProvider init, so track() buffers the
- * event until the tracker is ready (docs: error-pages-tracking-404).
+ * Renders the root 404 page and records the not-found analytics event.
  */
 export default function NotFound() {
   useEffect(() => {

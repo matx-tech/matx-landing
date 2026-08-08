@@ -24,6 +24,12 @@ const TECH_SPLIT =
 const TECH_MATCH =
   /^(?:server\/[\w./-]+\.ts\b|release\/[\w.-]+|ML-DSA-65|CPV \d+\*|RHS § \d+|[\w.-]+@[\w.-]+\.[a-z]{2,})$/i;
 
+/**
+ * Renders technical tokens in monospace styling within the supplied text.
+ *
+ * @param text - The text to split and render
+ * @returns The rendered text with recognized technical tokens wrapped in code elements
+ */
 export function TechText({ text }: { text: string }) {
   return (
     <>
@@ -81,6 +87,12 @@ export function StatusCard({
   );
 }
 
+/**
+ * Renders status rows as a responsive two-column list.
+ *
+ * @param rows - The status rows to display
+ * @param showBadge - Whether to display capability status badges
+ */
 export function StatusList({ rows, showBadge = true }: { rows: StatusRow[]; showBadge?: boolean }) {
   return (
     <ul className='grid gap-3 lg:grid-cols-2'>

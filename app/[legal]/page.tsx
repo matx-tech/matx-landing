@@ -441,12 +441,23 @@ const LEGAL_DOCS = {
 
 type LegalSlug = keyof typeof LEGAL_DOCS;
 
+/**
+ * Generates the static route parameters for all available legal documents.
+ *
+ * @returns An array of route parameter objects containing each legal document slug.
+ */
 export function generateStaticParams() {
   return Object.keys(LEGAL_DOCS).map((legal) => ({ legal }));
 }
 
 export const dynamicParams = false;
 
+/**
+ * Builds page metadata for the requested legal document.
+ *
+ * @param params - The route parameters containing the legal document identifier
+ * @returns Metadata for the legal document page
+ */
 export async function generateMetadata({
   params,
 }: {
@@ -473,6 +484,12 @@ export async function generateMetadata({
   };
 }
 
+/**
+ * Renders the requested legal document page.
+ *
+ * @param params - Route parameters containing the legal document slug
+ * @returns The rendered legal document
+ */
 export default async function LegalPage({ params }: { params: Promise<{ legal: string }> }) {
   const { legal } = await params;
   const doc = LEGAL_DOCS[legal as LegalSlug];

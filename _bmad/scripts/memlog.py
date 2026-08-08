@@ -79,19 +79,40 @@ MEMLOG = ".memlog.md"
 
 
 def now() -> str:
+    """
+    Return the current local date and time formatted as `YYYY-MM-DDTHH:MM`.
+    
+    Returns:
+    	str: The current local timestamp.
+    """
     return datetime.now().strftime("%Y-%m-%dT%H:%M")
 
 
 def resolve(args) -> Path:
-    """The memlog file, from either addressing mode: {workspace}/.memlog.md or an explicit --path."""
+    """
+    Resolve the memory log path from an explicit path or workspace directory.
+    
+    Parameters:
+    	args: Command-line arguments containing either `path` or `workspace`.
+    
+    Returns:
+    	Path: The resolved memory log path.
+    """
     return Path(args.path) if args.path else Path(args.workspace) / MEMLOG
 
 
 def split(text: str) -> tuple[dict, str]:
-    """Return (frontmatter dict in source order, body str). Frontmatter is plain key: value.
-
-    The closing fence is the first line that is *exactly* `---`, so a `---` inside a
-    field value (topic/goal are free user text) never truncates the frontmatter.
+    """
+    Parse frontmatter metadata and the body from a memory log.
+    
+    Parameters:
+        text (str): Memory log content with `---`-delimited frontmatter.
+    
+    Returns:
+        tuple[dict, str]: The frontmatter fields and the log body.
+    
+    Raises:
+        ValueError: If frontmatter is missing or not terminated.
     """
     lines = text.splitlines()
     if not lines or lines[0] != "---":
@@ -109,6 +130,15 @@ def split(text: str) -> tuple[dict, str]:
 
 def render(meta: dict, body: str) -> str:
     # Neutralize newlines in values so a multi-line field can't break the fence on re-read.
+    """Serialize metadata and body as a Markdown document with frontmatter.
+    
+    Parameters:
+        meta (dict): Frontmatter fields and their values.
+        body (str): Markdown content following the frontmatter.
+    
+    Returns:
+        str: The serialized document with newline characters in metadata values replaced by spaces.
+    """
     fm = "\n".join(f"{k}: {' '.join(str(v).splitlines())}" for k, v in meta.items())
     return "---\n" + fm + "\n---\n\n" + body.rstrip("\n") + "\n"
 
@@ -120,7 +150,13 @@ def touch(meta: dict) -> None:
 
 
 def write_atomic(path: Path, text: str) -> None:
-    """Temp + flush + fsync + atomic rename, so a crash never half-writes an entry."""
+    """
+    Write text to a file by atomically replacing its existing contents.
+    
+    Parameters:
+        path (Path): Destination file path.
+        text (str): Content to write.
+    """
     tmp = path.with_suffix(path.suffix + ".tmp")
     with open(tmp, "w", encoding="utf-8") as f:
         f.write(text)
@@ -130,11 +166,19 @@ def write_atomic(path: Path, text: str) -> None:
 
 
 def entry_count(body: str) -> int:
+    """Count body lines that begin with "- ".
+    
+    Parameters:
+    	body (str): The log body to inspect.
+    
+    Returns:
+    	int: The number of entry lines.
+    """
     return sum(1 for ln in body.splitlines() if ln.startswith("- "))
 
 
 def ack(path: Path, body: str) -> None:
-    """Echo new state so the caller never re-reads the file to know where it stands."""
+    """Print a JSON acknowledgment containing the log path and entry count."""
     print(json.dumps({
         "ok": True,
         "memlog": str(path),
@@ -143,6 +187,15 @@ def ack(path: Path, body: str) -> None:
 
 
 def cmd_init(args) -> int:
+    """
+    Create a new memory log with the specified frontmatter fields.
+    
+    Parameters:
+    	args: Command-line arguments containing the target location and optional `key=value` fields.
+    
+    Returns:
+    	int: `0` if the log is created successfully, `2` if the target exists or a field is malformed.
+    """
     path = resolve(args)
     if path.exists():
         print(f"error: {path} already exists; use append/set to update it", file=sys.stderr)
@@ -162,6 +215,15 @@ def cmd_init(args) -> int:
 
 
 def cmd_append(args) -> int:
+    """
+    Append a one-line entry to an existing memory log.
+    
+    Parameters:
+    	args: Command-line arguments containing the log target, entry text, and optional type or attribution.
+    
+    Returns:
+    	0 after the entry is written and acknowledged.
+    """
     path = resolve(args)
     meta, body = split(path.read_text(encoding="utf-8"))
     text = " ".join(args.text.split())  # collapse newlines/runs → one-line entry, no prose bloat
@@ -178,6 +240,14 @@ def cmd_append(args) -> int:
 
 
 def cmd_set(args) -> int:
+    """Set a frontmatter field in an existing memory log.
+    
+    Parameters:
+    	args: Command-line arguments containing the log target, field name, and value.
+    
+    Returns:
+    	int: `0` after the field is updated and the log is acknowledged.
+    """
     path = resolve(args)
     meta, body = split(path.read_text(encoding="utf-8"))
     meta[args.key] = args.value
@@ -188,13 +258,22 @@ def cmd_set(args) -> int:
 
 
 def add_target(sp) -> None:
-    """Every command addresses the memlog the same way: a run folder or an explicit path."""
+    """Add mutually exclusive options for selecting a workspace or explicit memlog path."""
     g = sp.add_mutually_exclusive_group(required=True)
     g.add_argument("--workspace", help="run folder; the memlog is {workspace}/.memlog.md")
     g.add_argument("--path", help="explicit memlog file path (alternative to --workspace)")
 
 
 def main(argv: list[str] | None = None) -> int:
+    """
+    Run the memlog command-line interface and dispatch the selected subcommand.
+    
+    Parameters:
+    	argv (list[str] | None): Command-line arguments to parse, or `None` to use the process arguments.
+    
+    Returns:
+    	int: `0` for a successful command, `2` when command execution reports an error.
+    """
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = p.add_subparsers(dest="cmd", required=True)
 

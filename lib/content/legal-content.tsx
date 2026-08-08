@@ -1,3 +1,6 @@
+/**
+ * Renders the subprocessors used by the processor and the applicable notification and objection terms.
+ */
 export function SubprocessorTable() {
   return (
     <>
@@ -103,6 +106,11 @@ export function SubprocessorTable() {
   );
 }
 
+/**
+ * Renders the GDPR Article 32 security measures section.
+ *
+ * @returns The security measures section with audit rights and security incident notification details.
+ */
 export function SecurityMeasuresSection() {
   return (
     <>

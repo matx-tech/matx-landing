@@ -68,7 +68,7 @@ const PRIMARY_CTA_CLASS =
   'btn-primary min-w-[240px] sm:min-w-[280px] px-8 py-4 text-lg rounded-xl font-semibold focus-ring-target min-h-[44px]';
 
 /**
- * Renders the landing page hero section with animated branding, introductory content, registration and workflow CTAs, achievement badges, and a product preview.
+ * Renders the landing page hero section with animated branding, persona-specific primary actions, workflow navigation, achievement badges, and a product preview.
  */
 export function HeroSection() {
   const ctasRef = useRef<HTMLDivElement>(null);

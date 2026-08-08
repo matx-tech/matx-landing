@@ -17,6 +17,12 @@ interface ScrollIndicatorProps {
   hideLabel?: boolean;
 }
 
+/**
+ * Renders an animated scroll indicator with an optional text label.
+ *
+ * @param hideLabel - Whether to hide the scroll indicator text label
+ * @returns The scroll indicator element
+ */
 export function ScrollIndicator({ hideLabel = false }: ScrollIndicatorProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mouseRef = useRef<HTMLDivElement>(null);

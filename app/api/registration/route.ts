@@ -19,7 +19,12 @@ interface Registration {
 }
 
 // Pilot registration → Slack. One-way fire-and-forget; if Slack is down the
-// signup is lost, so the client keeps its draft and asks for a retry.
+/**
+ * Submits a pilot registration to Slack after validating the request data and consent.
+ *
+ * @param request - The request containing the registration details as JSON.
+ * @returns A success response when Slack accepts the registration, or an error response for invalid input, missing configuration, or Slack delivery failures.
+ */
 export async function POST(request: Request) {
   const webhookUrl = process.env.SLACK_WEBHOOK_URL;
   if (!webhookUrl) {

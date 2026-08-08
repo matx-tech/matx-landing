@@ -25,6 +25,15 @@ _MISSING = object()
 
 
 def find_project_root(start: Path) -> Path | None:
+    """
+    Find the nearest project root at or above the given path.
+    
+    Parameters:
+        start (Path): Path from which to begin the upward search.
+    
+    Returns:
+        Path | None: The nearest directory containing `_bmad` or `.git`, or `None` if no project root is found.
+    """
     current = start.resolve()
     while True:
         if (current / "_bmad").exists() or (current / ".git").exists():
@@ -35,6 +44,16 @@ def find_project_root(start: Path) -> Path | None:
 
 
 def extract_key(data, dotted_key: str):
+    """
+    Retrieve a value from nested mapping data using a dot-separated key path.
+    
+    Parameters:
+    	data: The mapping to traverse.
+    	dotted_key (str): The dot-separated path to the requested value.
+    
+    Returns:
+    	The value at the specified path, or the `_MISSING` sentinel when the path does not exist.
+    """
     current = data
     for part in dotted_key.split("."):
         if isinstance(current, dict) and part in current:
@@ -45,6 +64,7 @@ def extract_key(data, dotted_key: str):
 
 
 def write_json_stdout(output) -> None:
+    """Write a JSON representation of the output to standard output using UTF-8 encoding."""
     reconfigure = getattr(sys.stdout, "reconfigure", None)
     if reconfigure is not None:
         reconfigure(encoding="utf-8")
@@ -52,6 +72,12 @@ def write_json_stdout(output) -> None:
 
 
 def main() -> int:
+    """
+    Resolve skill customization and write the merged configuration or selected fields as JSON.
+    
+    Returns:
+    	int: 0 on success, or 1 when customization loading fails.
+    """
     parser = argparse.ArgumentParser(
         description="Resolve skill customization using three-layer TOML merge."
     )

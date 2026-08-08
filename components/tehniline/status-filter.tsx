@@ -20,6 +20,12 @@ const FILTER_ACTIVE = 'bg-primary text-text-inverse border-primary shadow-sm';
 const FILTER_IDLE =
   'bg-surface text-text-secondary border-border hover:border-borderStrong hover:text-text-primary';
 
+/**
+ * Displays capability rows with filter controls for all statuses and a collapsible section for planned items.
+ *
+ * @param rows - The capability rows to filter and display
+ * @param plannedLabel - The label for the planned-items section
+ */
 export function StatusFilterSection({
   rows,
   plannedLabel,
