@@ -9,7 +9,7 @@ import { NextRequest, NextResponse } from 'next/server';
 //    caching for routes under this middleware.
 const isDev = process.env.NODE_ENV === 'development';
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const nonce = btoa(crypto.randomUUID());
 
   const csp = [
