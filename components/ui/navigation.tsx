@@ -20,6 +20,10 @@ const navItems = LANDING_NAV_ITEMS;
 
 const PILOT_HREF = `#${SECTION_IDS.pilot}`;
 
+// Mobile menu exit animation duration (ms) — single source so the close
+// delay (below) can never drift from the animation it waits on.
+const MOBILE_MENU_EXIT_MS = 500;
+
 /**
  * Renders responsive navigation with desktop links, mobile menu controls, and calls to action.
  */
@@ -155,8 +159,8 @@ export function Navigation() {
    * - external links open immediately, while the click is still a user
    *   gesture (window.open in a timeout would be popup-blocked).
    *
-   * ponytail: fixed 650ms delay tuned to the 0.5s exit animation; replace
-   * with an onOpenChange(false)-driven scroll if it ever flakes.
+   * ponytail: fixed delay tuned to the exit animation; replace with an
+   * onOpenChange(false)-driven scroll if it ever flakes.
    */
   const handleMenuLinkClick = useCallback((event: React.MouseEvent<HTMLAnchorElement>) => {
     // Modified clicks (ctrl/cmd/shift/alt/middle) keep native browser
@@ -186,7 +190,7 @@ export function Navigation() {
     pendingHashTimerRef.current = window.setTimeout(() => {
       pendingHashTimerRef.current = null;
       if (href) window.location.hash = href;
-    }, 650);
+    }, MOBILE_MENU_EXIT_MS + 150);
   }, []);
 
   return (
@@ -237,6 +241,7 @@ export function Navigation() {
               className='btn-primary px-4 xl:px-6 py-2 rounded-lg text-sm font-medium focus-ring-target min-h-[44px] whitespace-nowrap'
             >
               Broneeri vestlus
+              <span className='sr-only'> (avaneb uues aknas)</span>
             </a>
             <ThemeToggle />
           </div>
@@ -263,7 +268,7 @@ export function Navigation() {
         <Dialog.Overlay className='fixed inset-0 bg-canvas/95 z-40 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0' />
         <Dialog.Content
           className='fixed inset-0 z-50 flex flex-col items-start justify-center h-full px-8 md:px-16 focus:outline-none data-[state=closed]:animate-out data-[state=closed]:fade-out-0'
-          style={{ animationDuration: '0.5s' }}
+          style={{ animationDuration: `${MOBILE_MENU_EXIT_MS}ms` }}
         >
           <Dialog.Title className='sr-only'>Navigatsioonimenüü</Dialog.Title>
           <Dialog.Description className='sr-only'>
@@ -309,6 +314,7 @@ export function Navigation() {
               className='px-6 py-3 rounded-lg border border-border text-text-primary font-semibold hover:bg-surface transition-colors text-center focus-ring-target min-h-[44px]'
             >
               Broneeri vestlus
+              <span className='sr-only'> (avaneb uues aknas)</span>
             </a>
             <ThemeToggle className='self-start' />
           </div>
