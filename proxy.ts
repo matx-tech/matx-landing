@@ -6,7 +6,7 @@ import { NextRequest, NextResponse } from 'next/server';
 //  - reading x-nonce in the root layout forces dynamic rendering (no ISR);
 //  - responses must not be cached — a cached document would carry a stale
 //    nonce and inline scripts would be blocked. Do not add CDN/ISR HTML
-//    caching for routes under this middleware.
+//    caching for routes under this proxy.
 const isDev = process.env.NODE_ENV === 'development';
 
 export function proxy(request: NextRequest) {
