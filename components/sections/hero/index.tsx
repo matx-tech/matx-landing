@@ -4,9 +4,10 @@ import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { Award, GraduationCap } from 'lucide-react';
 import dynamic from 'next/dynamic';
-import { useRef } from 'react';
+import Link from 'next/link';
+import { useRef, useState } from 'react';
 import { useRegistration } from '@/components/providers/registration-provider';
-import { HERO_COPY, SECTION_IDS } from '@/lib/content/landing-copy';
+import { CALENDLY_URL, HERO_COPY, SECTION_IDS, TECH_OVERVIEW } from '@/lib/content/landing-copy';
 import { gsapEase, motionTokens, staggers } from '@/lib/motion-tokens';
 import {
   AnimatedCharacterReveal,
@@ -53,6 +54,19 @@ const ScrollIndicator = dynamic(
   },
 );
 
+// Persona picker — the primary CTA adapts to who is reading. Labels mirror
+// the ADOPTION_ROUTES vocabulary on the landing page.
+const PERSONA_OPTIONS = [
+  { id: 'teacher', label: 'Õpetaja' },
+  { id: 'principal', label: 'Koolijuht' },
+  { id: 'procurement', label: 'Hankija/IT' },
+] as const;
+
+type PersonaId = (typeof PERSONA_OPTIONS)[number]['id'];
+
+const PRIMARY_CTA_CLASS =
+  'btn-primary min-w-[240px] sm:min-w-[280px] px-8 py-4 text-lg rounded-xl font-semibold focus-ring-target min-h-[44px]';
+
 /**
  * Renders the landing page hero section with animated branding, introductory content, registration and workflow CTAs, achievement badges, and a product preview.
  */
@@ -61,6 +75,7 @@ export function HeroSection() {
   const trustRef = useRef<HTMLParagraphElement>(null);
   const badgesRef = useRef<HTMLDivElement>(null);
   const { openRegistration } = useRegistration();
+  const [persona, setPersona] = useState<PersonaId>('teacher');
 
   useGSAP(
     () => {
@@ -136,27 +151,63 @@ export function HeroSection() {
               </AnimatedCharacterReveal>
             </div>
 
-            <div
-              ref={ctasRef}
-              className='flex flex-col sm:flex-row items-center lg:items-start lg:justify-start justify-center gap-4 mb-8'
-            >
-              <button
-                type='button'
-                onClick={openRegistration}
-                className='btn-primary min-w-[240px] sm:min-w-[280px] px-8 py-4 text-lg rounded-xl font-semibold focus-ring-target min-h-[44px]'
-              >
-                {HERO_COPY.primaryCTA}
-              </button>
+            <div ref={ctasRef} className='flex flex-col gap-4 mb-8'>
+              {/* Persona picker — personalize the primary CTA */}
+              <div className='flex flex-wrap items-center justify-center lg:justify-start gap-2'>
+                <span className='text-sm text-text-secondary mr-1'>Ma olen:</span>
+                {PERSONA_OPTIONS.map((option) => (
+                  <button
+                    key={option.id}
+                    type='button'
+                    onClick={() => setPersona(option.id)}
+                    aria-pressed={persona === option.id}
+                    className={`px-4 py-2 rounded-full text-sm font-medium border transition-colors focus-ring-target min-h-[44px] ${
+                      persona === option.id
+                        ? 'bg-primary text-text-inverse border-primary'
+                        : 'bg-surface text-text-secondary border-border hover:border-primary'
+                    }`}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
 
-              <a
-                href={`#${SECTION_IDS.workflow}`}
-                className='btn-secondary min-w-[240px] sm:min-w-[280px] px-8 py-4 text-lg rounded-xl font-semibold group focus-ring-target min-h-[44px]'
-              >
-                {HERO_COPY.secondaryCTA}
-                <span className='ml-2 inline-block transition-transform group-hover:translate-y-1'>
-                  ↓
-                </span>
-              </a>
+              <div className='flex flex-col sm:flex-row items-center lg:items-start lg:justify-start justify-center gap-4'>
+                {persona === 'teacher' && (
+                  <button type='button' onClick={openRegistration} className={PRIMARY_CTA_CLASS}>
+                    {HERO_COPY.primaryCTA}
+                  </button>
+                )}
+                {persona === 'principal' && (
+                  <a
+                    href={CALENDLY_URL}
+                    target='_blank'
+                    rel='noopener noreferrer'
+                    className={PRIMARY_CTA_CLASS}
+                  >
+                    Broneeri demokõne
+                    <span className='sr-only'> (avaneb uues aknas)</span>
+                  </a>
+                )}
+                {persona === 'procurement' && (
+                  <Link href={TECH_OVERVIEW.href} className={PRIMARY_CTA_CLASS}>
+                    Vaata tehnilist ülevaadet
+                  </Link>
+                )}
+
+                <a
+                  href={`#${SECTION_IDS.workflow}`}
+                  className='btn-secondary min-w-[240px] sm:min-w-[280px] px-8 py-4 text-lg rounded-xl font-semibold group focus-ring-target min-h-[44px]'
+                >
+                  {HERO_COPY.secondaryCTA}
+                  <span
+                    aria-hidden='true'
+                    className='ml-2 inline-block transition-transform group-hover:translate-y-1'
+                  >
+                    ↓
+                  </span>
+                </a>
+              </div>
             </div>
 
             <p ref={trustRef} className='text-sm text-text-secondary/80 italic mb-8'>
