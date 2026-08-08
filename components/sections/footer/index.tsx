@@ -7,7 +7,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Award, GraduationCap, Mail, MessageCircle, Building2, GitBranch } from 'lucide-react';
 import { usePrefersReducedMotion } from '@/lib/hooks/use-prefers-reduced-motion';
 import { motionTokens, gsapEase, staggers } from '@/lib/motion-tokens';
-import { SECTION_IDS, CALENDLY_URL } from '@/lib/content/landing-copy';
+import { SECTION_IDS, CALENDLY_URL, TECH_OVERVIEW } from '@/lib/content/landing-copy';
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
@@ -166,8 +166,8 @@ export function FooterSection() {
                 </a>
               </li>
               <li>
-                <Link href="/tehniline" className="text-text-secondary hover:text-primary transition-colors text-sm focus-ring-target rounded-md" style={{ textDecoration: 'underline' }}>
-                  Tehniline ülevaade
+                <Link href={TECH_OVERVIEW.href} className="text-text-secondary hover:text-primary transition-colors text-sm focus-ring-target rounded-md" style={{ textDecoration: 'underline' }}>
+                  {TECH_OVERVIEW.label}
                 </Link>
               </li>
             </ul>

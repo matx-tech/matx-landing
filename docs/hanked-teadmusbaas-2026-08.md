@@ -89,7 +89,8 @@ maksumusega teated. Mediaan/keskmine/P25/P75 arvutatud neist. Päringud tehtud
 
 - **Opiq koolipakett 2026/27** (kõik õppeained, 444 õppekomplekti): 5,10 €/õpilane/kuu;
   soodushind 4,10 €/kuu (≥50% kooli õpilastest, ≥9 kuud); algklassid 3,10 €/kuu.
-  Aastas ≈ 31–51 €/õpilane (10 arvelduskuu põhjal). Allikas: https://opiq.ee/Packages/Details?packageKey=StudentPackage2025ForSchool.
+  Aastas ≈ 31–51 €/õpilane (10 arvelduskuu põhjal). Allikas: https://opiq.ee/Packages/Details?packageKey=StudentPackage2025ForSchool
+  (vaadatud 08.08.2026).
 - eKool: avalikku koolihinnakirja ei avaldata (vanema premium-tasud kuni ~3,45 €/kuu
   funktsiooni kohta — https://lounapostimees.postimees.ee/4016835).
 - Stuudium: tasuta põhifunktsioonid, premium-tasuline; avalikku hinnakirja ei avaldata.
@@ -134,7 +135,7 @@ Haridus- ja Teadusministeerium / Haridus- ja Noorteamet / Kiviõli Riigikool).
    sätestatud tingimuse; profileerivate süsteemide puhul erand ei kohaldu ja need jäävad
    kõrge riski klassi. Riskijuhtimine, läbipaistvus, inimese järelevalve. MATx-i BKT
    enesehindamine on pooleli — tulemus dokumenteeritakse enne piloodi laiendamist.
-5. **Turve**: E-ITS/ISKE baastase (ühilduv ISO 27001), NIS2 hea tava, CSP/HSTS, pseudonüümimine.
+5. **Turve**: E-ITS baastase (ühilduv ISO 27001), NIS2 hea tava, CSP/HSTS, pseudonüümimine.
 6. **Hankedokumentide formaat**: tehniline kirjeldus RHS § 87–88 järgi; kvalifitseerimine
    majandusliku ja finantssuutlikkuse põhjal (RHS § 100 — käibekapital) ning tehnilise ja
    kutsealase suutlikkuse põhjal (RHS § 101 — sarnased litsentsiprojektid).
@@ -180,17 +181,27 @@ Haridus- ja Teadusministeerium / Haridus- ja Noorteamet / Kiviõli Riigikool).
 1. Riigihangete seadus (konsolideeritud) — https://riigiteataja.ee/akt/112072025026
 2. Riigihangete seaduse ja teiste seaduste muutmise seadus — https://riigiteataja.ee/et/akt/103072026003
 3. Eelnõu seletuskiri (79 lk) — https://cms.advokatuur.ee/app/uploads/2025/09/RHS-SK.pdf
-4. Kaubanduskoja ülevaade eelnõust — https://koda.ee (24.09.2025)
+4. Kaubanduskoja ülevaade eelnõust —
+   https://www.koda.ee/et/meie-moju/hetkel-kasil/mida-arvad-riigihangete-seaduse-lihtsustamise-eelnoust
+   (24.09.2025; vaadatud 08.08.2026)
 5. Valitsuse teade — https://valitsus.ee/uudised/riik-lihtsustab-riigihangete-reegleid; https://err.ee/1609904110
 6. RTK KKK (menetluste tähtajad) — https://rtk.ee/korduma-kippuvad-kusimused-riigihangete-teemal
 7. Rahandusministeerium: Riigihangete valdkonna statistika ja kokkuvõte 2025 (08.05.2026) —
-   https://fin.ee; sama 2024 (05.06.2025)
+   https://fin.ee/sites/default/files/documents/2026-05/2025.a%20riigihangete%20valdkonna%20statistika%20ja%20kokkuv%C3%B5te_.pdf
+   (allalaetud 08.08.2026); sama 2024 (05.06.2025)
 8. Riigihangete registri avaandmed (lepinguteated 2026 veebruar–juuli) —
    https://riigihanked.riik.ee/rhr/api/public/v1/opendata/notice_award/2026/month/2/xml (kuud 2–7)
-9. TenderGlass: HTM hankijaprofiil — https://tenderglass.com (registri koondandmed)
-10. Opiq koolipakett 2026/27 hinnad — https://opiq.ee
+9. TenderGlass: HTM hankijaprofiil (registri koondandmed) —
+   https://tenderglass.com/en/estonia-country-ee (vaadatud 08.08.2026)
+10. Opiq koolipakett 2026/27 hinnad —
+    https://opiq.ee/Packages/Details?packageKey=StudentPackage2025ForSchool (vaadatud 08.08.2026)
 11. TTJA digiligipääsetavus — https://ttja.ee/avaliku-sektori-digiligipaasetavus
-12. EN 301 549 V3.2.1 — https://etsi.org; EU Web Accessibility Directive 2016/2102
-13. Komisjoni delegeeritud määrus (EL) 2025/2152 (piirmäärad 2026–2027) — https://eur-lex.europa.eu
+12. EN 301 549 V3.2.1 —
+    https://www.etsi.org/deliver/etsi_en/301500_301599/301549/03.02.01_60/en_301549v030201p.pdf;
+    direktiiv (EL) 2016/2102 — https://eur-lex.europa.eu/eli/dir/2016/2102/oj (vaadatud 08.08.2026)
+13. Komisjoni delegeeritud määrus (EL) 2025/2152 (piirmäärad 2026–2027) —
+    https://eur-lex.europa.eu/eli/reg_del/2025/2152/oj/eng (vaadatud 08.08.2026)
 14. Direktiiv 2011/7/EL (hilinenud maksete direktiiv)
-15. RaM juhend: hankelepingute muutmine kriisiolukorras (04/2026) — https://fin.ee (leppetrahvi praktika)
+15. RaM juhend: hankelepingute muutmine kriisiolukorras (04/2026) —
+    https://fin.ee/riigihanked-riigiabi-osalused/riigihanked/kasulik-teave-oigusaktid
+    (leppetrahvi praktika; vaadatud 08.08.2026)

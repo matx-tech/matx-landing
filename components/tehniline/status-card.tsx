@@ -43,6 +43,9 @@ export function TechText({ text }: { text: string }) {
   );
 }
 
+/**
+ * Status row card. Renders an <li> root — must be used inside a <ul> or <ol>.
+ */
 export function StatusCard({ title, detail, note, status, showBadge = true }: StatusRow & { showBadge?: boolean }) {
   const muted = status === 'Kavandatud';
   return (

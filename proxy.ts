@@ -18,7 +18,9 @@ export function proxy(request: NextRequest) {
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' data: blob: https:",
     "font-src 'self' data:",
-    `connect-src 'self' https: wss:${isDev ? ' ws:' : ''}`,
+    // No client fetch/WebSocket/EventSource/sendBeacon destinations today —
+    // 'self' suffices; dev keeps ws: for HMR.
+    `connect-src 'self'${isDev ? ' ws:' : ''}`,
     "object-src 'none'",
     "frame-ancestors 'none'",
     "base-uri 'self'",

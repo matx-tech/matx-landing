@@ -36,6 +36,9 @@ export const REGISTRATION_COPY = {
 // Shared URLs
 export const CALENDLY_URL = 'https://calendly.com/matx-ee/15min' as const;
 
+// Technical overview page — single source for its URL and navigation label
+export const TECH_OVERVIEW = { href: '/tehniline', label: 'Tehniline ülevaade' } as const;
+
 // Site metadata — single source for OG/Twitter/JSON-LD
 export const SITE_META = {
   title: 'MATx — Õpilase harjutamine ja õpetaja otsus ühes töövoos',
@@ -214,11 +217,13 @@ export const ADOPTION_ROUTES = [
     audience: 'Hankele',
     audienceId: 'procurement' as const,
     title: 'Hankeinfo',
+    // Enne avalikustamist kontrolli piirmäärad ja tingimused hankepartneriga —
+    // RHS muudatused jõustuvad 01.11.2026.
     description:
-      'Kuni 30 000 € (alates 01.11.2026 kuni 50 000 €) jäävad ostud alla riigihangete seaduse piirmäära ja on tehtavad hankekorra järgi ilma riigihangeta. Hinnakiri (õpilasepõhine aastahind), lepingutingimused ja tehnilised nõuded on koostamisel ja avaldatakse siin.',
+      'Alla 30 000 € ostud (alates 01.11.2026 alla 50 000 €) jäävad riigihangete seaduse kohaldamisalast välja ja on tehtavad hankekorra järgi; 30 000–59 999 € ostud (alates 01.11.2026 50 000–139 999 € riigiasutustel ja 50 000–215 999 € omavalitsustel) kuuluvad lihthankesse. Hinnakiri (õpilasepõhine aastahind), lepingutingimused ja tehnilised nõuded on koostamisel ja avaldatakse siin.',
     cta: 'Vaata alustamise võimalusi',
     ctaAction: 'procurement',
-    ctaRoute: null as string | null,
+    ctaRoute: TECH_OVERVIEW.href,
   },
   {
     audience: 'IT-le',
@@ -227,7 +232,7 @@ export const ADOPTION_ROUTES = [
     description: 'Arhitektuur, turvameetmed ja vastavusstaatus ühel lehel: identiteet ja sessioonid, pseudonüümimine, integratsioonid ja hankeinfo.',
     cta: 'Vaata tehnilist ülevaadet',
     ctaAction: 'technical',
-    ctaRoute: '/tehniline',
+    ctaRoute: TECH_OVERVIEW.href,
   },
 ] as const;
 

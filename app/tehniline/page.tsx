@@ -309,9 +309,9 @@ const PRICE_BENCHMARKS: {
   { label: 'Tarkvarapaketid (CPV 48900000)', median: '~59 000 €', mean: '~279 000 €', note: 'n=70' },
   {
     label: 'Õpikeskkonna hinnaankur: Opiq koolipakett 2026/27',
-    median: '3–5 €/õp/kuu',
-    mean: '≈30–50 €/õp',
-    note: 'Avalik hinnakiri, mitte registristatistika. Soodushind alates 50% õpilastest, vähemalt 9 kuud',
+    median: '5,10 €/õpilane/kuu',
+    mean: '≈31–51 €/õpilane',
+    note: 'Avalik hinnakiri (opiq.ee), mitte registristatistika. Soodushind 4,10 €/kuu (≥50% õpilastest, ≥9 kuud); algklassid 3,10 €/kuu. Aastas 10 arvelduskuud.',
     anchor: true,
   },
 ];
@@ -358,7 +358,7 @@ const TENDER_TECH_REQUIREMENTS = [
   },
   {
     title: 'Turve',
-    detail: 'E-ITS/ISKE baastase, NIS2 hea tava, turvapäised (CSP/HSTS), pseudonüümimine — staatused turvameetmete tabelis.',
+    detail: 'E-ITS baastase, NIS2 hea tava, turvapäised (CSP/HSTS), pseudonüümimine — staatused turvameetmete tabelis.',
   },
 ];
 
@@ -391,26 +391,30 @@ const HANKE_SOURCES: { title: string; detail: string }[] = [
 ];
 
 // Architecture facts that are true today (verified against the repo).
-const ARCHITECTURE_ROWS: StatusRow[] = [
+const ARCHITECTURE_ROWS: (StatusRow & { id: string })[] = [
   {
+    id: 'esikiht',
     title: 'Esikiht',
     detail: 'React 18, TypeScript, Tailwind; landing-leht Next.js, platvormi klient Vite.',
     status: 'Saadaval',
   },
-  { title: 'Tagakiht', detail: 'Express, TypeScript, Drizzle ORM', status: 'Saadaval' },
+  { id: 'tagakiht', title: 'Tagakiht', detail: 'Express, TypeScript, Drizzle ORM', status: 'Saadaval' },
   {
+    id: 'andmebaas',
     title: 'Andmebaas',
     detail: 'PostgreSQL (relatsiooniline), Redis (järjekorrad; limiidid).',
     status: 'Saadaval',
   },
-  { title: 'Kohanduv õpimootor', detail: 'BKT valdamismudel, reeglipõhine ja selgitatav — soovitus, mitte diagnoos', status: 'Piloodis' },
-  { title: 'Koodigraaf', detail: 'ts-morph indekseerija, SQLite, BullMQ, Docker-sandbox', status: 'Piloodis' },
+  { id: 'oppimootor', title: 'Kohanduv õpimootor', detail: 'BKT valdamismudel, reeglipõhine ja selgitatav — soovitus, mitte diagnoos', status: 'Piloodis' },
+  { id: 'koodigraaf', title: 'Koodigraaf', detail: 'ts-morph indekseerija, SQLite, BullMQ, Docker-sandbox', status: 'Piloodis' },
   {
+    id: 'paigaldus',
     title: 'Paigaldus',
     detail: 'Docker Compose + Caddy (isemajutatud, HTTPS); hallatud pilv on avatud otsus',
     status: 'Piloodis',
   },
   {
+    id: 'andmete-asukoht',
     title: 'Andmete asukoht',
     detail: 'Isemajutatud paigaldus; andmete asukohariik avalikustatakse enne pilootlepinguid.',
     status: 'Kavandatud',
@@ -455,13 +459,13 @@ const GITHUB_URL = 'https://github.com/matx-ee';
 
 // Subset of architecture rows promoted to the "At a glance" metric grid in
 // the summary. Same data source as the full list — no duplication.
-const AT_A_GLANCE_TITLES = [
-  'Esikiht',
-  'Tagakiht',
-  'Andmebaas',
-  'Kohanduv õpimootor',
-  'Paigaldus',
-  'Andmete asukoht',
+const AT_A_GLANCE_IDS = [
+  'esikiht',
+  'tagakiht',
+  'andmebaas',
+  'oppimootor',
+  'paigaldus',
+  'andmete-asukoht',
 ];
 
 /**
@@ -470,16 +474,16 @@ const AT_A_GLANCE_TITLES = [
  * relationships: layers and side components come from the data arrays.
  */
 function ArchitectureDiagram() {
-  const layerTitles = ['Esikiht', 'Tagakiht', 'Andmebaas'];
-  const sideTitles = ['Kohanduv õpimootor', 'Koodigraaf'];
+  const layerIds = ['esikiht', 'tagakiht', 'andmebaas'];
+  const sideIds = ['oppimootor', 'koodigraaf'];
 
-  const layers = layerTitles
-    .map((title) => ARCHITECTURE_ROWS.find((row) => row.title === title))
-    .filter((row): row is StatusRow => row !== undefined);
-  const sides = sideTitles
-    .map((title) => ARCHITECTURE_ROWS.find((row) => row.title === title))
-    .filter((row): row is StatusRow => row !== undefined);
-  const deploy = ARCHITECTURE_ROWS.find((row) => row.title === 'Paigaldus');
+  const layers = layerIds
+    .map((id) => ARCHITECTURE_ROWS.find((row) => row.id === id))
+    .filter((row): row is (StatusRow & { id: string }) => row !== undefined);
+  const sides = sideIds
+    .map((id) => ARCHITECTURE_ROWS.find((row) => row.id === id))
+    .filter((row): row is (StatusRow & { id: string }) => row !== undefined);
+  const deploy = ARCHITECTURE_ROWS.find((row) => row.id === 'paigaldus');
 
   return (
     <div className="rounded-xl border border-border bg-elevated p-6">
@@ -509,7 +513,7 @@ function ArchitectureDiagram() {
             <div className="rounded-lg border border-dashed border-border bg-surface p-4 mt-1.5">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <h3 className="text-sm font-semibold text-text-primary">Paigaldus</h3>
+                  <h3 className="text-sm font-semibold text-text-primary">{deploy.title}</h3>
                   <p className="text-xs text-text-secondary mt-0.5 leading-relaxed">
                     <TechText text={deploy.detail} />
                   </p>
@@ -625,7 +629,7 @@ export default function TechnicalOverviewPage() {
           aria-label="Sisukord"
           className="xl:hidden sticky top-0 z-40 -mx-4 px-4 py-3 mb-12 bg-canvas/90 backdrop-blur-sm"
         >
-          <h2 className="text-sm font-semibold text-text-primary mb-2">Selles lehes</h2>
+          <h2 className="text-sm font-semibold text-text-primary mb-2">Sellel lehel</h2>
           <ul className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {SECTIONS.map(({ id, label }) => (
               <li key={id}>
@@ -711,7 +715,7 @@ export default function TechnicalOverviewPage() {
             {/* At a glance — key facts as scannable metrics, same data as the full list */}
             <h3 className="text-sm font-semibold text-text-primary mt-6 mb-3">Ühe pilguga</h3>
             <dl className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-              {ARCHITECTURE_ROWS.filter((row) => AT_A_GLANCE_TITLES.includes(row.title)).map((row) => (
+              {ARCHITECTURE_ROWS.filter((row) => AT_A_GLANCE_IDS.includes(row.id)).map((row) => (
                 <div key={row.title} className="rounded-lg border border-border bg-surface p-4">
                   <div className="flex items-center justify-between gap-2 mb-1.5">
                     <dt className="text-sm font-semibold text-text-primary">{row.title}</dt>
@@ -868,10 +872,16 @@ export default function TechnicalOverviewPage() {
                 {PRICE_BENCHMARKS.map((row) => (
                   <tr key={row.label} className="border-b border-border last:border-0 odd:bg-canvas">
                     <td className="px-5 py-3 text-text-primary">{row.label}</td>
-                    <td className="px-5 py-3 text-text-secondary tabular-nums whitespace-nowrap text-right">
+                    <td
+                      className="px-5 py-3 text-text-secondary tabular-nums whitespace-nowrap text-right"
+                      aria-label={row.anchor ? `Hind: ${row.median}` : undefined}
+                    >
                       {row.anchor ? `Hind: ${row.median}` : row.median}
                     </td>
-                    <td className="px-5 py-3 text-text-secondary tabular-nums whitespace-nowrap text-right">
+                    <td
+                      className="px-5 py-3 text-text-secondary tabular-nums whitespace-nowrap text-right"
+                      aria-label={row.anchor ? `Aastas: ${row.mean}` : undefined}
+                    >
                       {row.anchor ? `Aastas: ${row.mean}` : row.mean}
                     </td>
                     <td className="px-5 py-3 text-text-secondary text-xs leading-relaxed">{row.note}</td>

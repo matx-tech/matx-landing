@@ -19,7 +19,7 @@ const STATUS_STYLES: Record<CapabilityStatus, string> = {
   Saadaval:
     'bg-success-surface border-success-border text-success-strong',
   Piloodis:
-    'bg-amber-100 border-amber-200 text-amber-700 dark:bg-surface dark:border-amber-400/40 dark:text-amber-400',
+    'bg-warning-surface border-warning-border text-warning-strong',
   Kavandatud:
     'bg-transparent border-border text-text-secondary',
 };
@@ -44,9 +44,10 @@ export function CapabilityStatusBadge({ status, className = '' }: CapabilityStat
     <span
       className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium border ${STATUS_STYLES[status]} ${className}`}
       aria-label={`Staatus: ${status}`}
+      role="img"
     >
       {STATUS_LIVE_DOT[status] && (
-        <span className="h-1.5 w-1.5 rounded-full bg-current animate-pulse" aria-hidden="true" />
+        <span className="h-1.5 w-1.5 rounded-full bg-current animate-pulse motion-reduce:animate-none" aria-hidden="true" />
       )}
       <Icon className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
       {status}
