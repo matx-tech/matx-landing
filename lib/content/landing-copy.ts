@@ -69,26 +69,33 @@ export const EVIDENCE_STAGES = [
     title: 'Õpilane vastab',
     description:
       'Õpilane lahendab ülesande digitaalselt või paberil. Vastus registreeritakse süsteemis.',
+    eyebrow: 'Registreeritud',
+    visual: 'answer' as const,
   },
   {
     number: 2,
     title: 'Vastust tõlgendatakse',
-    description:
-      'Süsteem tuvastab võimaliku veamustri. Signaal on kontrollitav, mitte lõplik diagnoos.',
+    description: 'Süsteem tuvastab võimaliku veamustri õpilase vastuses.',
     caveat: 'Signaal on võimalik veamuster, mitte lõplik diagnoos',
     tone: 'info' as const,
+    eyebrow: 'Kontrollitav signaal',
+    visual: 'signal' as const,
   },
   {
     number: 3,
     title: 'Harjutus sihitakse',
     description: 'Õpilasele pakutakse järgmine harjutus, mis aitab veamustrit täpsustada.',
+    eyebrow: 'Järgmine samm',
+    visual: 'retry' as const,
   },
   {
     number: 4,
     title: 'Õpetaja otsustab',
-    description: 'Õpetaja vaatab soovituse üle ja võib selle vastu võtta, muuta või eirata.',
+    description: 'Õpetaja vaatab soovituse üle koos tõendusmaterjaliga.',
     caveat: 'Õpetaja võib soovituse vastu võtta, muuta või eirata',
     tone: 'success' as const,
+    eyebrow: 'Õpetaja otsus',
+    visual: 'decision' as const,
   },
 ] as const;
 
