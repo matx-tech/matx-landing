@@ -8,6 +8,7 @@
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useEffect, useRef } from 'react';
+import { CAVEAT_STYLES } from '@/lib/caveat-styles';
 import { EVIDENCE_STAGES, SECTION_IDS } from '@/lib/content/landing-copy';
 import { usePrefersReducedMotion } from '@/lib/hooks/use-prefers-reduced-motion';
 import { gsapEase, motionTokens } from '@/lib/motion-tokens';
@@ -81,12 +82,6 @@ export function EvidenceLoopSection() {
     return () => ctx.revert();
   }, [prefersReducedMotion]);
 
-  const caveatStyles: Record<string, string> = {
-    info: 'text-blue-600 bg-blue-50 border-blue-200 dark:text-blue-400 dark:bg-surface dark:border-blue-400/40',
-    success:
-      'text-green-800 bg-green-50 border-green-200 dark:text-success-strong dark:bg-surface dark:border-success-border',
-  };
-
   return (
     <section
       ref={sectionRef}
@@ -141,7 +136,7 @@ export function EvidenceLoopSection() {
                     {/* Caveat (from centralized data) */}
                     {'caveat' in stage && (
                       <div
-                        className={`mt-3 text-sm px-3 py-2 rounded border ${caveatStyles[stage.tone] ?? caveatStyles.info}`}
+                        className={`mt-3 text-sm px-3 py-2 rounded border ${CAVEAT_STYLES[stage.tone] ?? CAVEAT_STYLES.info}`}
                       >
                         {stage.caveat}
                       </div>
