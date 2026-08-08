@@ -357,9 +357,15 @@ function RouteTable({ rows, ariaLabel }: { rows: ProcurementRoute[]; ariaLabel: 
       <table className='w-full min-w-[680px] text-sm'>
         <thead>
           <tr className='border-b border-border text-left text-text-primary'>
-            <th className='px-5 py-3 font-semibold'>Piirmäär</th>
-            <th className='px-5 py-3 font-semibold'>Menetlus</th>
-            <th className='px-5 py-3 font-semibold'>Märkus</th>
+            <th scope='col' className='px-5 py-3 font-semibold'>
+              Piirmäär
+            </th>
+            <th scope='col' className='px-5 py-3 font-semibold'>
+              Menetlus
+            </th>
+            <th scope='col' className='px-5 py-3 font-semibold'>
+              Märkus
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -1080,10 +1086,18 @@ export default function TechnicalOverviewPage() {
                 <table className='w-full min-w-[680px] text-sm'>
                   <thead>
                     <tr className='border-b border-border text-left text-text-primary'>
-                      <th className='px-5 py-3 font-semibold'>Kategooria</th>
-                      <th className='px-5 py-3 font-semibold text-right'>Mediaan</th>
-                      <th className='px-5 py-3 font-semibold text-right'>Keskmine</th>
-                      <th className='px-5 py-3 font-semibold'>Märkus</th>
+                      <th scope='col' className='px-5 py-3 font-semibold'>
+                        Kategooria
+                      </th>
+                      <th scope='col' className='px-5 py-3 font-semibold text-right'>
+                        Mediaan
+                      </th>
+                      <th scope='col' className='px-5 py-3 font-semibold text-right'>
+                        Keskmine
+                      </th>
+                      <th scope='col' className='px-5 py-3 font-semibold'>
+                        Märkus
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
