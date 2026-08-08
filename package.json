@@ -14,6 +14,7 @@
     "start": "next start",
     "lint": "oxlint .",
     "typecheck": "tsc --noEmit",
+    "test": "node --experimental-strip-types --test \"tests/unit/**/*.test.ts\"",
     "test:e2e": "playwright test",
     "audit:mobile": "mkdir -p .audits && lighthouse http://localhost:3000 --preset=perf --throttling-method=simulate --throttling.rttMs=150 --throttling.throughputKbps=1638.4 --throttling.uploadThroughputKbps=750 --throttling.cpuSlowdownMultiplier=4 --output-path=.audits/mobile-$(date +%Y%m%d-%H%M%S).report.html --save-assets=false",
     "audit:desktop": "mkdir -p .audits && lighthouse http://localhost:3000 --preset=desktop --output-path=.audits/desktop-$(date +%Y%m%d-%H%M%S).report.html --save-assets=false"
