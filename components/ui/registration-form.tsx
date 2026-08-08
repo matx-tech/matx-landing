@@ -65,6 +65,7 @@ export function RegistrationForm({ isOpen, onClose }: RegistrationFormProps) {
   const [errors, setErrors] = useState<FormErrors>({});
   const [touched, setTouched] = useState<Set<string>>(new Set());
   const [announcement, setAnnouncement] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
 
   // Load draft from localStorage on mount
@@ -176,7 +177,7 @@ export function RegistrationForm({ isOpen, onClose }: RegistrationFormProps) {
   );
 
   const handleSubmit = useCallback(
-    (e: React.FormEvent) => {
+    async (e: React.FormEvent) => {
       e.preventDefault();
 
       // Mark all fields as touched
@@ -194,29 +195,27 @@ export function RegistrationForm({ isOpen, onClose }: RegistrationFormProps) {
         return;
       }
 
-      // No backend yet (static landing page) — compose a real registration
-      // email in the visitor's mail client instead of faking success. The
-      // visitor sends it; MATx replies with the booking link.
-      const subject = `Piloodi registreerimine: ${formData.schoolName}`;
-      const body = [
-        `Kool: ${formData.schoolName}`,
-        `Kontaktisik: ${formData.contactName}`,
-        `Roll: ${formData.role === 'Muu haridustöötaja' ? `${formData.role} — ${formData.otherRole}` : formData.role}`,
-        `E-post: ${formData.email}`,
-        `Telefon: ${formData.phone}`,
-        `Klassirühmad: ${formData.classGroups}`,
-      ].join('\n');
-      window.location.href = `mailto:andri@matx.ee?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-
-      // The draft is kept until the visitor explicitly clears it ("Sulge" on
-      // the success screen) — a cancelled or unavailable mail client must not
-      // lose their data. There is no way to detect that the mail was actually
-      // composed/sent, so the success copy below must not claim the app opened.
-      setIsSuccess(true);
-      track(EVENTS.pilotSignup, { role: formData.role });
-      setAnnouncement('Registreerimise kiri on koostatud');
+      if (isSubmitting) return;
+      setIsSubmitting(true);
+      try {
+        const res = await fetch('/api/registration', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData),
+        });
+        if (!res.ok) throw new Error(`registration failed: ${res.status}`);
+        clearDraft();
+        setIsSuccess(true);
+        track(EVENTS.pilotSignup, { role: formData.role });
+        setAnnouncement('Registreerimine on edastatud');
+      } catch {
+        // Draft stays in localStorage, so a retry never loses the visitor's data.
+        setAnnouncement('Registreerimise saatmine ebaõnnestus. Proovige uuesti.');
+      } finally {
+        setIsSubmitting(false);
+      }
     },
-    [formData, validateForm],
+    [formData, validateForm, isSubmitting, clearDraft],
   );
 
   const handleClose = useCallback(() => {
@@ -583,9 +582,10 @@ export function RegistrationForm({ isOpen, onClose }: RegistrationFormProps) {
                 {/* Submit Button */}
                 <button
                   type='submit'
-                  className='w-full py-4 rounded-lg bg-primary text-text-inverse font-semibold hover:bg-primary/90 transition-colors focus-ring-target min-h-[44px] mt-2'
+                  disabled={isSubmitting}
+                  className='w-full py-4 rounded-lg bg-primary text-text-inverse font-semibold hover:bg-primary/90 transition-colors focus-ring-target min-h-[44px] mt-2 disabled:opacity-60'
                 >
-                  Esita registreering
+                  {isSubmitting ? 'Saadetakse…' : 'Esita registreering'}
                 </button>
 
                 <p className='text-center text-xs text-text-secondary'>
@@ -601,7 +601,7 @@ export function RegistrationForm({ isOpen, onClose }: RegistrationFormProps) {
                       <span className='w-6 h-6 rounded-full bg-secondary/20 text-secondary text-sm flex items-center justify-center shrink-0'>
                         1
                       </span>
-                      <span>Saada registreerimiskiri meilirakendusest</span>
+                      <span>Registreerimine on edastatud MATx meeskonnale</span>
                     </li>
                     <li className='flex items-start gap-4'>
                       <span className='w-6 h-6 rounded-full bg-secondary/20 text-secondary text-sm flex items-center justify-center shrink-0'>
