@@ -393,7 +393,7 @@ const ARCHITECTURE_ROWS: StatusRow[] = [
   { title: 'Tagakiht', detail: 'Express, TypeScript, Drizzle ORM', status: 'Saadaval' },
   {
     title: 'Andmebaas',
-    detail: 'PostgreSQL (relatsiooniline), Redis (järjekorrad; limiidid turbeharul).',
+    detail: 'PostgreSQL (relatsiooniline), Redis (järjekorrad; limiidid).',
     status: 'Saadaval',
   },
   { title: 'Kohanduv õpimootor', detail: 'BKT valdamismudel, reeglipõhine ja selgitatav — soovitus, mitte diagnoos', status: 'Piloodis' },
@@ -738,11 +738,10 @@ export default function TechnicalOverviewPage() {
               Sihtseis, mitte hetkeseis
             </h2>
             <p className="text-sm text-text-secondary leading-relaxed">
-              MATx on pilootfaasis. Osa allpool kirjeldatud turvameetmetest on välja
-              arendatud ja testimisel eraldi turbeharul, kuid pole veel põhiharule
-              ühendatud. „Kavandatud&ldquo; tähendab sihtseisu, mitte lubadust, et
-              meede on täna kasutuses. Turvameetmete ühendamine põhiharuga on
-              prioriteet enne piloodi laiendamist.
+              MATx on pilootfaasis. Osa allpool kirjeldatud turvameetmetest on veel
+              väljatöötamisel ja testimisel. „Kavandatud&ldquo; tähendab sihtseisu,
+              mitte lubadust, et meede on täna kasutuses. Kõik kavandatud meetmed
+              viiakse kasutusse enne piloodi laiendamist.
             </p>
           </div>
         </section>
