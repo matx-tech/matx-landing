@@ -333,6 +333,30 @@ export const SECTION_IDS = {
   faq: 'kkk',
 } as const;
 
+// llms.txt — LLM-friendly site index, served at /llms.txt via
+// app/llms.txt/route.ts. Single source of truth; route validates that every
+// internal URL is a sitemap route and no PROHIBITED_PHRASES token appears.
+export const LLMS_TXT = `# MATx
+
+> MATx (${SITE_META.url}) on Eesti põhikooli matemaatikaõpetajatele ja õpilastele mõeldud veebitoode, mis seob õpilase harjutamise, arusaadava tagasiside ja õpetaja tegevussoovituse üheks jälgitavaks töövooks: iga vastus aitab leida järgmise sammu.
+
+MATx on pilootfaasis valitud koolidega. Töövoog põhineb tõendusloogil: õpilase vastus → kontrollitav veamustri signaal (hüpotees, mitte lõplik diagnoos) → sihitud järgmine harjutus → õpetaja otsus (soovituse vastuvõtmine, muutmine või eiramine). Õpetaja kontroll säilib alati.
+
+Igal võimekusel on avalik staatus — Saadaval, Piloodis või Kavandatud — ja allikas. Avalikult on keelatud väljamõeldud statistika, garantiid ja ülepaisutatud vastavusväited. Piloodiga liitumine toimub registreerimisvormi kaudu; 15-minutiline tutvustuskõne on broneeritav Calendlys.
+
+## Lehed
+
+- [Esileht](${SITE_META.url}/): Toote tutvustus — tõendusloogi etapid, probleem ja lahendus ning piloodiga liitumise vorm.
+- [Tehniline ülevaade](${SITE_META.url}/tehniline): Arhitektuur, turvalisus, andmekaitse, vastavus, hanked ja võimekuste staatused hankijatele ning kooli IT-le.
+
+## Optional
+
+- [Privaatsuspoliitika](${SITE_META.url}/privaatsus): Isikuandmete töötlemise kirjeldus.
+- [Teenuse tingimused](${SITE_META.url}/tingimused): MATx-i kasutustingimused.
+- [GDPR](${SITE_META.url}/gdpr): Andmekaitse teave õpilaste ja õpetajate andmete kohta.
+- [Demo broneerimine](https://calendly.com/matx-ee/15min): 15-minutiline tutvustuskõne MATx-i meeskonnaga.
+`;
+
 export const LANDING_NAV_ITEMS = [
   { label: 'Kuidas töötab', href: `#${SECTION_IDS.workflow}` },
   { label: 'Õpilasele', href: `#${SECTION_IDS.student}` },
