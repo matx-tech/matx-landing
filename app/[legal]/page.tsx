@@ -110,11 +110,11 @@ const LEGAL_DOCS = {
       },
       {
         heading: '14. Kontaktandmed andmekaitse küsimuste jaoks',
-        body: 'Andmekaitse küsimused ja õiguste kasutamine: andri@matx.ee. Vastame 30 päeva jooksul (GDPR artikkel 12(3)).',
+        body: 'Andmekaitse küsimused ja õiguste kasutamine: dpo@matx.ee. Vastame 30 päeva jooksul (GDPR artikkel 12(3)).',
       },
       {
         heading: '15. Andmekaitsespetsialist (DPO)',
-        body: 'MATX DEVELOPMENT OÜ ei ole kohustatud määrama andmekaitsespetsialisti (GDPR artikkel 37) — pilootfaasis ei toimu ulatuslikku regulaarset süstemaatilist isikuandmete töötlemist ega eriliiki andmete (terviseandmed, biomed andmed) töötlemist. Kui kohustus tekib (piloodi laiendamisel), määrame DPO ja avaldame kontakti siin.',
+        body: 'MATX DEVELOPMENT OÜ on määranud andmekaitsespetsialisti (DPO): Anton Sokolov, kes on läbinud TalTechi Ülikooli DPO-koolituse. DPO ülesanne on jälgida isikuandmete töötlemise vastavust GDPR-ile. Andmekaitse küsimuste ja õiguste kasutamisega saab pöörduda e-posti aadressil dpo@matx.ee.',
       },
     ],
   },
