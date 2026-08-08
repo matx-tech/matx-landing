@@ -37,8 +37,17 @@ function linkifyContent(text: string): React.ReactNode {
 
   match = urlRegex.exec(text);
   while (match !== null) {
-    if (!allMatches.some((m) => m.index === match?.index)) {
-      allMatches.push({ index: match.index, text: match[0], type: 'url' });
+    // Skip a URL match that overlaps an email match (e.g. "andri@matx.ee"
+    // also matches the bare domain "matx.ee" a few characters in) — the
+    // email link already covers that range and rendering both duplicates
+    // visible text.
+    const start = match.index;
+    const end = start + match[0].length;
+    const overlapsEmail = allMatches.some(
+      (m) => m.type === 'email' && start < m.index + m.text.length && end > m.index,
+    );
+    if (!overlapsEmail) {
+      allMatches.push({ index: start, text: match[0], type: 'url' });
     }
     match = urlRegex.exec(text);
   }
@@ -188,7 +197,6 @@ export function LegalDocument({ title, updated, sections }: LegalDocumentProps) 
                 viewBox='0 0 24 24'
                 aria-hidden='true'
               >
-                <title>Toggle</title>
                 <path
                   strokeLinecap='round'
                   strokeLinejoin='round'

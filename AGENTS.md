@@ -25,7 +25,7 @@ Next.js 16 (App Router; request interception lives in `proxy.ts`, the Next 16 re
 
 ## Verify before committing
 
-```
+```sh
 pnpm lint && pnpm typecheck && pnpm build
 ```
 

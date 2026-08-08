@@ -31,6 +31,25 @@ function isValidEmail(value: string | undefined): boolean {
   return dot > 0 && dot < domain.length - 1;
 }
 
+// In-memory fixed-window rate limit for the public Slack endpoint: suppresses
+// naive bot floods without infra. Not a security boundary — the client key is
+// the first X-Forwarded-For hop, which a direct client can spoof — so treat it
+// as noise suppression, not authentication. The window resets on restart.
+const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
+const RATE_LIMIT_MAX = 5;
+const submissionLog = new Map<string, { count: number; windowStart: number }>();
+
+function isRateLimited(clientKey: string): boolean {
+  const now = Date.now();
+  const entry = submissionLog.get(clientKey);
+  if (!entry || now - entry.windowStart >= RATE_LIMIT_WINDOW_MS) {
+    submissionLog.set(clientKey, { count: 1, windowStart: now });
+    return false;
+  }
+  entry.count += 1;
+  return entry.count > RATE_LIMIT_MAX;
+}
+
 // Pilot registration → Slack. One-way fire-and-forget; if Slack is down the
 /**
  * Submits a pilot registration to Slack after validating the request data and consent.
@@ -51,12 +70,27 @@ export async function POST(request: Request) {
     return Response.json({ error: 'Invalid JSON body' }, { status: 400 });
   }
 
-  const missing = REQUIRED_FIELDS.filter((field) => !data[field]?.trim());
+  // Reject non-string fields before any .trim() — Partial<Registration> is
+  // only a TS assertion, a JSON body like { "email": {} } must not 500.
+  const missing = REQUIRED_FIELDS.filter(
+    (field) => typeof data[field] !== 'string' || data[field].trim().length === 0,
+  );
   if (missing.length > 0 || !isValidEmail(data.email)) {
     return Response.json({ error: 'Missing or invalid fields' }, { status: 400 });
   }
   if (data.consent !== true) {
     return Response.json({ error: 'Consent required' }, { status: 400 });
+  }
+
+  // First X-Forwarded-For hop (or Cloudflare's header) identifies the caller
+  // behind a trusted proxy; on a direct VPS the value is client-supplied and
+  // all requests share one bucket — still bounds floods from a single source.
+  const clientKey =
+    request.headers.get('cf-connecting-ip') ??
+    request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ??
+    'anonymous';
+  if (isRateLimited(clientKey)) {
+    return Response.json({ error: 'Too many requests, try again later' }, { status: 429 });
   }
 
   const role =

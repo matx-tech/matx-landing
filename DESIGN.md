@@ -163,13 +163,16 @@ Two surfaces share this system: the landing page (Persuade — present the proof
 A cool, trustworthy palette: a confident blue leads, a fjord teal supports, and a restrained status family (green/amber/red/info) carries the verdicts — always paired with an icon so color is never the only channel.
 
 ### Primary
+
 - **Baltic Blue** (#1e5a8a): the action color — primary buttons, links, the "MAT" in the logo, focus rings, nav underline. Deeper steps handle interaction (hover #184e78, active #12324d); the sky step (#63a0d6) takes over as the action color in dark mode.
 - **Baltic Blue Mist** (#e7f0f8): hover wash for secondary buttons and subtle primary-tinted fills.
 
 ### Secondary
+
 - **Fjord Teal** (#0e6f68): the supporting accent — the "x" in the logo, teal variant buttons, secondary icons, topic color for percentages. Lightens to #3fa69d on hover and in dark mode; **Fjord Teal Mist** (#e7f2f1) is its fill.
 
 ### Status
+
 - **Meadow Green** (#18794e) + **Mist** (#e6f4ed): Saadaval — live and working, with a pulsing dot.
 - **Amber** (#b45309) + **Mist** (#fffbeb): Piloodis — in pilot, in testing.
 - **Clay Red** (#b42318): errors, danger actions, exercise error signals.
@@ -177,10 +180,12 @@ A cool, trustworthy palette: a confident blue leads, a fjord teal supports, and 
 - **Status Mist + Light Border + Strong Text** triads (e.g. #e6f4ed / #3fb07a / #18794e) are the fixed recipe for status badges — never mixed across statuses.
 
 ### Neutral
+
 - **Paper** (light theme): canvas #f8fafc, surface #ffffff, border #d9e2ec, primary text #111827, muted text #374151.
 - **Ink** (dark theme): canvas #0b1220, surface #131c2b, elevated #1b2740, border #26324a, primary text #e6ebf2, muted text #97a4ba. Dark mode is selected by the saved `matx-theme` preference or system preference; tokens remap, not duplicate.
 
 ### Named Rules
+
 **The Three-Status Rule.** Green, amber, and neutral mean Saadaval, Piloodis, and Kavandatud — everywhere, on every surface. No fourth status color exists; a capability that doesn't fit one of the three is not shown as a capability.
 
 **The Colorblind-Safe Status Rule.** No status is carried by color alone. Saadaval has a pulsing dot and a check icon, Piloodis a rocket, Kavandatud a clock; the heatmap uses stripe and dot patterns per level. Color is the garnish, never the message.
@@ -194,6 +199,7 @@ A cool, trustworthy palette: a confident blue leads, a fjord teal supports, and 
 **Character:** An engineered pairing — Public Sans' open geometrics give display sizes a confident, modern presence; Inter carries dense prose and doc text without fatigue; IBM Plex Mono is a first-class detail, reserved for technical tokens (file paths, standards like ML-DSA-65, RHS § references, emails) so they read as code, never as prose.
 
 ### Hierarchy
+
 - **Display** (Public Sans 700, 4.5rem top, 1.2 line-height): hero logo and headline only — the one moment of presence on the page.
 - **Headline** (Public Sans 600, 3–3.75rem, 1.2): section-leading statements and mobile menu items (3xl at 3rem).
 - **Title** (Public Sans 600, 2.25rem, 1.2): section headings on both surfaces, card titles.
@@ -204,6 +210,7 @@ A cool, trustworthy palette: a confident blue leads, a fjord teal supports, and 
 The scale is remapped marketing-large: `text-xs` is 1rem and `text-base` is 1.25rem — captions read as captions, not as shrunken text. Body copy hyphenates with Estonian rules (hyphens auto, 7-3-3 limits); doc pages use a stricter 8-3-3 via `.prose-et`.
 
 ### Named Rules
+
 **The Unbroken Heading Rule.** Headings never hyphenate and never wrap mid-word (hyphens manual, overflow-wrap normal). An Estonian heading like "Tehniline ülevaade" must never render as "Tehnili-ne üle-vaade" — long words are the norm, and the type scale is sized for them.
 
 **The Scale-Is-Deliberate Rule.** The remapped type scale is load-bearing across both surfaces. Do not "fix" text-xs back to 0.75rem or text-base back to 1rem — the large scale is the system.
@@ -223,12 +230,14 @@ Density is generous where the reader works — cards use 20px padding, status li
 Depth is **flat-first**: surfaces separate by color (paper vs canvas, ink vs elevated) and by the section fades, and cards sit flat at rest. Shadows are ambient — they exist to say "this is yours to click," never to stack surfaces. A card lifts gently under the cursor; a floating dialog detaches with a soft drop shadow; everything else stays flat.
 
 ### Shadow Vocabulary
+
 - **Card at rest** (`0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04)`): barely-there grounding on interactive cards.
 - **Card hover** (`0 4px 12px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04)`): the lift that says "this one is yours to click."
 - **Elevated / dialog** (`0 8px 24px rgba(0,0,0,0.12)`): detached layers — dialogs, modals.
 - **Dropdown** (`0 4px 16px rgba(0,0,0,0.1)`): menus and floating controls.
 
 ### Named Rules
+
 **The Flat-First Rule.** Cards rest flat. Depth comes from tone and fades; shadows only mark interaction (hover lift) or detachment (floating layers). A shadow that stacks two static surfaces is a bug, not a feature.
 
 ## Shapes
@@ -240,6 +249,7 @@ The heatmap is the one patterned shape in the system: level cells are squares (f
 ## Components
 
 ### Buttons
+
 - **Shape:** crisp, gently curved edges (12px radius); hero CTAs step up to 16px at text-lg.
 - **Primary:** Baltic Blue fill, white text, Inter 500–600, padding 8px 24px (hero: 16px 32px), 200ms background transition on the standard ease. Hover deepens to #184e78, active to #12324d; disabled turns neutral border-gray with muted text and not-allowed.
 - **Hover / Focus:** color transitions only (200ms); focus shows the surface-gapped ring (2px surface + 4px Baltic Blue, inverted on brand surfaces).
@@ -248,32 +258,39 @@ The heatmap is the one patterned shape in the system: level cells are squares (f
 - **Danger:** Clay Red fill, hover #8f1d14 — reserved for destructive actions.
 
 ### Chips
+
 - **Style:** pill or 8px-radius chip on surface with 1px border and muted-to-primary text; the FELLIN HÄKK award chip carries an amber icon.
 - **Status badges:** the three-status system — success mist fill + green border + green strong text with pulsing dot and check (Saadaval); amber mist + amber border + amber text with rocket (Piloodis); transparent fill + neutral border + muted text with clock (Kavandatud). Fixed recipe, never remixed.
 
 ### Cards / Containers
+
 - **Corner Style:** 16px radius.
 - **Background:** surface (white / ink-800); interactive cards lift with the card-hover shadow, static ones stay flat.
 - **Border:** 1px border token; planned-state cards ("Kavandatud") deliberately mute the whole card — muted text, flat shadow — so the ledger reads at a glance.
 - **Internal Padding:** 20px (p-5), 24px for feature panels.
 
 ### Inputs / Fields
+
 - **Style:** surface fill, 1px border stroke, gently curved edges (12px), padding 12px 16px, placeholder at muted/50%.
 - **Focus:** the surface-gapped 4px ring in Baltic Blue; error state swaps stroke and ring to Clay Red with an inline AlertCircle message.
 - **Disabled / Draft:** registration form drafts persist to localStorage and restore on reopen — fields are never blank on a returning teacher.
 
 ### Navigation
+
 Fixed bar on surface with a 1px bottom border. Desktop links are muted text with an animated 2px Baltic Blue underline (grows on hover, 300ms); CTAs sit right. On scroll-down the whole bar retreats 100px and fades to 50% (180ms quickTo), returning on scroll-up. Mobile collapses into a full-screen Radix dialog: 3xl display links staggered in at 60ms, exit at 40ms, overlay canvas/95. The logo is "MAT" in Baltic Blue + "x" in Fjord Teal — the whole brand in one wordmark.
 
 ### Signature Component: Status Card (the ledger row)
+
 The /tehniline building block: a rounded-xl bordered card (16px) with title, one-line detail, optional "Märkus" note, and a status badge — rendered as a list in two columns. Planned-state cards mute entirely. Technical tokens inside any text are auto-wrapped in IBM Plex Mono via TechText (file paths, ML-DSA-65, RHS § refs, emails), and every claim carries a source. This is the Read-mode surface of the Proof Notebook: claims you can verify.
 
 ### Signature Component: Product Fixture
+
 The recurring animated workflow — student answer → verifiable signal → targeted retry → teacher action — reused across hero, evidence, student, and teacher sections. Four panels stagger in at 300ms with the smooth ease, labeled "Näidisandmed": a demo of the evidence loop, never a claim of real results.
 
 ## Do's and Don'ts
 
 ### Do:
+
 - **Do** use the three-status colors with their fixed icons and badges (Saadaval green+dot+check, Piloodis amber+rocket, Kavandatud neutral+clock) — on both surfaces, every time.
 - **Do** alternate canvas and surface section backgrounds with the 6rem fade utilities.
 - **Do** keep cards flat at rest; use the card-hover shadow only for interactive lift.
@@ -285,6 +302,7 @@ The recurring animated workflow — student answer → verifiable signal → tar
 - **Do** label fixture data "Näidisandmed" whenever the workflow panels render.
 
 ### Don't:
+
 - **Don't** invent a fourth status color, restyle the badges, or carry status by color alone.
 - **Don't** add structural shadows to stack surfaces — flat at rest, ambient on hover, soft on detached layers only.
 - **Don't** use text sizes outside the remapped scale (xs 1rem → 5xl 4.5rem) or reintroduce Tailwind defaults.

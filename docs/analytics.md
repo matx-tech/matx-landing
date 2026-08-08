@@ -1,8 +1,9 @@
 # Analüütika (Plausible)
 
-Leht kasutab [Plausible](https://plausible.io) — küpsiseta, isikuandmeteta veebianalüütikat
-(privaatsussõbralik, GDPR-sõbralik, nõusolekubännerit ei vaja). Juhend põhineb
-[plausible.io/docs](https://plausible.io/docs) (GitHubi peegel: github.com/plausible/docs).
+Leht kasutab [Plausible](https://plausible.io) — küpsiseta veebianalüütikat, mis töötleb
+ainult IP-aadressist tuletatud liiklus- ja asukohaandmeid (isikuid ei tuvastata; nõusolekubännerit
+ei vaja). Juhend põhineb [plausible.io/docs](https://plausible.io/docs) (GitHubi peegel:
+github.com/plausible/docs).
 
 ## Aktiveerimine
 

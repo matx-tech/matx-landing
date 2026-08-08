@@ -5,9 +5,12 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Award, Building2, GitBranch, GraduationCap, Mail, MessageCircle } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useRef } from 'react';
-import { CALENDLY_URL, SECTION_IDS, TECH_OVERVIEW } from '@/lib/content/landing-copy';
+import { CALENDLY_URL, FOOTER_COPY, SECTION_IDS, TECH_OVERVIEW } from '@/lib/content/landing-copy';
 import { usePrefersReducedMotion } from '@/lib/hooks/use-prefers-reduced-motion';
 import { gsapEase, motionTokens, staggers } from '@/lib/motion-tokens';
+
+// Icon per social entry — order mirrors FOOTER_COPY.social.
+const SOCIAL_ICONS = [MessageCircle, Building2, GitBranch, Mail] as const;
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
@@ -121,18 +124,15 @@ export function FooterSection() {
                 <span className='text-secondary'>x</span>
               </span>
             </div>
-            <p className='text-text-secondary text-sm max-w-md mb-4'>
-              Adaptiivne matemaatikaõpikeskkond Eesti põhikoolidele. Andmepõhine õpitee, teaduslikel
-              alustel.
-            </p>
+            <p className='text-text-secondary text-sm max-w-md mb-4'>{FOOTER_COPY.description}</p>
             <div className='flex flex-wrap gap-4'>
               <div className='inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-elevated border border-border'>
                 <Award className='w-3 h-3 text-warning' />
-                <span className='text-xs text-text-secondary'>FELLIN HÄKK 2026</span>
+                <span className='text-xs text-text-secondary'>{FOOTER_COPY.awardPrimary}</span>
               </div>
               <div className='inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-elevated border border-border'>
                 <GraduationCap className='w-3 h-3 text-secondary' />
-                <span className='text-xs text-text-secondary'>Presidendi Häkaton</span>
+                <span className='text-xs text-text-secondary'>{FOOTER_COPY.awardSecondary}</span>
               </div>
             </div>
           </div>
@@ -144,7 +144,7 @@ export function FooterSection() {
             }}
           >
             <h3 className='text-text-primary font-display font-semibold mb-4 text-sm'>
-              Navigatsioon
+              {FOOTER_COPY.navHeading}
             </h3>
             <ul className='space-y-2'>
               <li>
@@ -212,14 +212,16 @@ export function FooterSection() {
               sectionsRef.current[2] = el;
             }}
           >
-            <h3 className='text-text-primary font-display font-semibold mb-4 text-sm'>Kontakt</h3>
+            <h3 className='text-text-primary font-display font-semibold mb-4 text-sm'>
+              {FOOTER_COPY.contactHeading}
+            </h3>
             <ul className='space-y-2'>
               <li>
                 <a
-                  href='mailto:andri@matx.ee'
+                  href={`mailto:${FOOTER_COPY.contactEmail}`}
                   className='text-text-secondary hover:text-primary transition-colors text-sm focus-ring-target rounded-md underline'
                 >
-                  andri@matx.ee
+                  {FOOTER_COPY.contactEmail}
                 </a>
               </li>
               <li>
@@ -229,7 +231,7 @@ export function FooterSection() {
                   rel='noopener noreferrer'
                   className='text-text-secondary hover:text-secondary transition-colors text-sm focus-ring-target rounded-md underline'
                 >
-                  Broneeri vestlus
+                  {FOOTER_COPY.calendlyLabel}
                   <span className='sr-only'> (avaneb uues aknas)</span>
                 </a>
               </li>
@@ -237,40 +239,21 @@ export function FooterSection() {
 
             {/* Social Links */}
             <div className='flex gap-4 mt-4'>
-              <a
-                href='https://twitter.com/matx_ee'
-                target='_blank'
-                rel='noopener noreferrer'
-                className='w-11 h-11 rounded-lg bg-elevated border border-border flex items-center justify-center hover:bg-surface transition-colors focus-ring-target'
-                aria-label='MATx Twitter'
-              >
-                <MessageCircle className='w-4 h-4 text-text-secondary' />
-              </a>
-              <a
-                href='https://linkedin.com/company/matx-ee'
-                target='_blank'
-                rel='noopener noreferrer'
-                className='w-11 h-11 rounded-lg bg-elevated border border-border flex items-center justify-center hover:bg-surface transition-colors focus-ring-target'
-                aria-label='MATx LinkedIn'
-              >
-                <Building2 className='w-4 h-4 text-text-secondary' />
-              </a>
-              <a
-                href='https://github.com/matx-ee'
-                target='_blank'
-                rel='noopener noreferrer'
-                className='w-11 h-11 rounded-lg bg-elevated border border-border flex items-center justify-center hover:bg-surface transition-colors focus-ring-target'
-                aria-label='MATx GitHub'
-              >
-                <GitBranch className='w-4 h-4 text-text-secondary' />
-              </a>
-              <a
-                href='mailto:andri@matx.ee'
-                className='w-11 h-11 rounded-lg bg-elevated border border-border flex items-center justify-center hover:bg-surface transition-colors focus-ring-target'
-                aria-label='MATx meil'
-              >
-                <Mail className='w-4 h-4 text-text-secondary' />
-              </a>
+              {FOOTER_COPY.social.map((social, index) => {
+                const Icon = SOCIAL_ICONS[index];
+                return (
+                  <a
+                    key={social.label}
+                    href={social.href}
+                    target={social.href.startsWith('http') ? '_blank' : undefined}
+                    rel={social.href.startsWith('http') ? 'noopener noreferrer' : undefined}
+                    className='w-11 h-11 rounded-lg bg-elevated border border-border flex items-center justify-center hover:bg-surface transition-colors focus-ring-target'
+                    aria-label={social.label}
+                  >
+                    <Icon className='w-4 h-4 text-text-secondary' />
+                  </a>
+                );
+              })}
             </div>
           </div>
         </div>

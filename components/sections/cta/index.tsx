@@ -6,7 +6,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { GraduationCap, Users } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 import { useRegistration } from '@/components/providers/registration-provider';
-import { CALENDLY_URL } from '@/lib/content/landing-copy';
+import { CALENDLY_URL, CTA_COPY } from '@/lib/content/landing-copy';
 import { usePrefersReducedMotion } from '@/lib/hooks/use-prefers-reduced-motion';
 import { gsapEase, motionTokens, staggers } from '@/lib/motion-tokens';
 
@@ -114,12 +114,12 @@ export function CTASection() {
       const statValues: { element: HTMLDivElement | null; target: string; chars: string }[] = [
         {
           element: statsRef.current[0],
-          target: statsRef.current[0]?.textContent ?? '150+',
+          target: statsRef.current[0]?.textContent ?? CTA_COPY.stats[0].value,
           chars: '0123456789+',
         },
         {
           element: statsRef.current[1],
-          target: statsRef.current[1]?.textContent ?? '10',
+          target: statsRef.current[1]?.textContent ?? CTA_COPY.stats[1].value,
           chars: '0123456789',
         },
       ];
@@ -262,17 +262,15 @@ export function CTASection() {
           >
             <GraduationCap className='w-10 h-10 text-primary mx-auto mb-4' />
             <h3 className='text-xl font-display font-semibold text-text-primary mb-2'>
-              Koolide registreerimine
+              {CTA_COPY.cardTitle}
             </h3>
-            <p className='text-text-secondary text-sm mb-6'>
-              Liitu 10 pilootkooliga. Sügisesed klassid 7.-9. klassini.
-            </p>
+            <p className='text-text-secondary text-sm mb-6'>{CTA_COPY.cardBody}</p>
             <button
               type='button'
               onClick={openRegistration}
               className='w-full px-6 py-3 text-base rounded-xl bg-primary text-text-inverse font-semibold hover:bg-primary/90 transition-all focus-ring-target min-h-[44px]'
             >
-              Registreeri kool
+              {CTA_COPY.registerCta}
             </button>
             <div className='mt-4 flex justify-center gap-4 text-xs text-text-secondary'>
               <span>Tasuta</span>
@@ -323,8 +321,10 @@ export function CTASection() {
             <path id='ctaPath' d='M 100 15 Q 300 5 500 15' fill='none' stroke='none' />
             <text fontSize='12' fill='var(--color-text-secondary)'>
               <textPath href='#ctaPath'>
-                Alusta tasuta · Õpi mõistvalt · Säästa aega · 150+ ülesannet · Alusta tasuta · Õpi
-                mõistvalt · Säästa aega · 150+ ülesannet ·
+                {[...CTA_COPY.marqueeItems, `${CTA_COPY.stats[0].value} ülesannet`]
+                  .join(' · ')
+                  .concat(' · ')
+                  .repeat(2)}
               </textPath>
             </text>
             <circle
@@ -340,28 +340,21 @@ export function CTASection() {
 
         {/* Stats */}
         <div className='flex flex-wrap justify-center gap-8 mt-12'>
-          <div className='text-center'>
-            <div
-              ref={(el) => {
-                statsRef.current[0] = el;
-              }}
-              className='text-3xl md:text-4xl font-display font-bold text-primary'
-            >
-              150+
+          {CTA_COPY.stats.map((stat, index) => (
+            <div key={stat.value} className='text-center'>
+              <div
+                ref={(el) => {
+                  statsRef.current[index] = el;
+                }}
+                className={`text-3xl md:text-4xl font-display font-bold ${
+                  index === 0 ? 'text-primary' : 'text-secondary'
+                }`}
+              >
+                {stat.value}
+              </div>
+              <div className='text-text-secondary text-sm'>{stat.label}</div>
             </div>
-            <div className='text-text-secondary text-sm'>ülesannet (Saadaval)</div>
-          </div>
-          <div className='text-center'>
-            <div
-              ref={(el) => {
-                statsRef.current[1] = el;
-              }}
-              className='text-3xl md:text-4xl font-display font-bold text-secondary'
-            >
-              10
-            </div>
-            <div className='text-text-secondary text-sm'>kooli (Piloodis)</div>
-          </div>
+          ))}
         </div>
 
         {/* Grant info */}

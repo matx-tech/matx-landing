@@ -115,7 +115,9 @@ def _toml_chain(project_root: Path):
         try:
             with f.open("rb") as fh:
                 layer = tomllib.load(fh)
-        except (tomllib.TOMLDecodeError, OSError):
+        except (tomllib.TOMLDecodeError, OSError) as exc:
+            print(f"[bmad] warning: skipping unreadable config layer {rel}: {exc}",
+                  file=sys.stderr)
             continue
         merged.update({k: v for k, v in layer.items() if isinstance(v, (str, int, bool))})
     return merged
@@ -238,7 +240,12 @@ def load_entries(root: Path):
     for f in sorted(root.glob("*.md")):
         if f.name in ("kernel.md", "index.md"):
             continue
-        fields, err, body = parse_frontmatter(f.read_text(encoding="utf-8"))
+        try:
+            raw = f.read_text(encoding="utf-8")
+        except UnicodeDecodeError as exc:
+            print(f"[bmad] warning: skipping non-UTF-8 file {f}: {exc}", file=sys.stderr)
+            continue
+        fields, err, body = parse_frontmatter(raw)
         if fields is None and err is None:
             continue  # foreign file: no frontmatter
         if fields is not None and "type" not in fields and "title" not in fields:
@@ -261,7 +268,12 @@ def load_compasses(root: Path):
     if not cdir.is_dir():
         return out
     for f in sorted(cdir.glob("*.md")):
-        fields, err, body = parse_frontmatter(f.read_text(encoding="utf-8"))
+        try:
+            raw = f.read_text(encoding="utf-8")
+        except UnicodeDecodeError as exc:
+            print(f"[bmad] warning: skipping non-UTF-8 file {f}: {exc}", file=sys.stderr)
+            continue
+        fields, err, body = parse_frontmatter(raw)
         out.append((f, fields or {}, err, body))
     return out
 
@@ -418,6 +430,7 @@ def cmd_index(args, project_root, cfg, as_json):
     	None.
     """
     root = bundle_root(project_root, args.root, cfg)
+    root.mkdir(parents=True, exist_ok=True)  # first index run in a fresh project
     idx = root / "index.md"
     first_line = (idx.read_text(encoding="utf-8").splitlines() or [""])[0] if idx.exists() else ""
     if first_line and INDEX_MARKER not in first_line:
@@ -670,12 +683,14 @@ def sparse_fetch(project: str, record: dict):
             the second contains the failure reason.
     """
     remote, branch = record["remote"], record.get("branch", "main")
+    if remote.startswith("-") or branch.startswith("-"):
+        return None, "invalid registry value: remote/branch must not start with '-'"
     context_root = record.get("context_root", DEFAULT_KNOWLEDGE)
     with tempfile.TemporaryDirectory() as tmp:
         clone = Path(tmp) / "clone"
         proc = subprocess.run(
             ["git", "clone", "-q", "--depth", "1", "--filter=blob:none", "--sparse",
-             "--branch", branch, remote, str(clone)],
+             "--branch", branch, "--", remote, str(clone)],
             capture_output=True, text=True)
         if proc.returncode != 0:
             return None, proc.stderr.strip()

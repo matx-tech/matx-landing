@@ -20,9 +20,10 @@ const navItems = LANDING_NAV_ITEMS;
 
 const PILOT_HREF = `#${SECTION_IDS.pilot}`;
 
-// Mobile menu exit animation duration (ms) — single source so the close
-// delay (below) can never drift from the animation it waits on.
-const MOBILE_MENU_EXIT_MS = 500;
+// Mobile menu exit animation duration (ms) — derived from the motion token
+// (0.5 s) so the close delay (below) can never drift from the animation it
+// waits on.
+const MOBILE_MENU_EXIT_MS = motionTokens.duration.slow * 1_000;
 
 /**
  * Renders responsive navigation with desktop links, mobile menu controls, and calls to action.
@@ -54,7 +55,7 @@ export function Navigation() {
         y: 0,
         opacity: 1,
         duration: motionTokens.duration.normal,
-        delay: 0.5,
+        delay: motionTokens.duration.slow,
         ease: gsapEase(motionTokens.easing.emphasized),
       });
 

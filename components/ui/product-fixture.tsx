@@ -50,9 +50,9 @@ export function ProductFixture({
   const actionRef = useRef<HTMLDivElement>(null);
   const prefersReducedMotion = usePrefersReducedMotion();
 
-  // Derive initial style opacity: always hidden (0) when animated and NOT reduced motion
-  const panelInitialOpacity = animated && !prefersReducedMotion ? 0 : undefined;
-
+  // Panels render fully visible (SSR/no-JS safe) — the hidden initial state is
+  // applied by GSAP just before animation in the effect below, never in the
+  // server HTML, so content can't get stuck invisible if JS fails.
   useGSAP(
     () => {
       if (!animated || !containerRef.current) return;
@@ -133,11 +133,7 @@ export function ProductFixture({
       </h2>
 
       {/* Student answer */}
-      <div
-        ref={answerRef}
-        className='p-4 bg-card rounded-lg border border-border'
-        style={panelInitialOpacity !== undefined ? { opacity: panelInitialOpacity } : undefined}
-      >
+      <div ref={answerRef} className='p-4 bg-card rounded-lg border border-border'>
         <div className='text-sm font-medium text-text-primary mb-2'>
           <InlineFractionalExpression expression={PRODUCT_FIXTURE.task.question} />
         </div>
@@ -151,11 +147,7 @@ export function ProductFixture({
       </div>
 
       {/* Signal detection */}
-      <div
-        ref={signalRef}
-        className='p-4 bg-info-surface rounded-lg border border-info-border'
-        style={panelInitialOpacity !== undefined ? { opacity: panelInitialOpacity } : undefined}
-      >
+      <div ref={signalRef} className='p-4 bg-info-surface rounded-lg border border-info-border'>
         <div className='flex items-center justify-between mb-2'>
           <span className='text-xs font-medium text-info uppercase tracking-wider'>
             {PRODUCT_FIXTURE.signal.label}
@@ -166,11 +158,7 @@ export function ProductFixture({
       </div>
 
       {/* Targeted retry */}
-      <div
-        ref={retryRef}
-        className='p-4 bg-card rounded-lg border border-border'
-        style={panelInitialOpacity !== undefined ? { opacity: panelInitialOpacity } : undefined}
-      >
+      <div ref={retryRef} className='p-4 bg-card rounded-lg border border-border'>
         <div className='text-xs font-medium text-text-secondary uppercase tracking-wider mb-2'>
           Järgmine harjutus
         </div>
@@ -184,7 +172,6 @@ export function ProductFixture({
       <div
         ref={actionRef}
         className='p-4 bg-success-surface rounded-lg border border-success-border'
-        style={panelInitialOpacity !== undefined ? { opacity: panelInitialOpacity } : undefined}
       >
         <div className='text-xs font-medium text-success uppercase tracking-wider mb-2'>
           Õpetaja otsustab
@@ -201,7 +188,7 @@ export function ProductFixture({
               key={option.action}
               className='px-3 py-1.5 text-xs font-medium rounded border border-success-border bg-surface text-success-strong opacity-60 cursor-default'
               type='button'
-              disabled
+              aria-disabled='true'
               title='Näidisandmed — tegevus ei ole selles vaates aktiivne'
             >
               {option.label}

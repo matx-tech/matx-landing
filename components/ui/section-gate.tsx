@@ -1,8 +1,15 @@
 'use client';
 
+import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { type ReactNode, useEffect, useRef, useState } from 'react';
 import { EVENTS, track } from '@/lib/analytics';
+
+// SectionGate calls ScrollTrigger.refresh() below, so register the plugin
+// locally instead of depending on LenisProvider's initialization.
+if (typeof window !== 'undefined') {
+  gsap.registerPlugin(ScrollTrigger);
+}
 
 interface SectionGateProps {
   children: ReactNode;

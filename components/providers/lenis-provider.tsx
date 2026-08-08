@@ -43,6 +43,9 @@ export function LenisProvider({ children }: { children: React.ReactNode }) {
   const reducedMotionRef = useRef(false);
   const tickerCbRef = useRef<((time: number) => void) | null>(null);
   const focusTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Pending selector-poll timeout — cleared on unmount and before each new
+  // poll so a stale callback can never scroll/focus after the provider is gone.
+  const selectorPollTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const prefersReducedMotion = usePrefersReducedMotion();
 
   // Mirror the render-time preference before paint — the effect-driven ref
@@ -111,6 +114,10 @@ export function LenisProvider({ children }: { children: React.ReactNode }) {
     return () => {
       disposed = true;
       if (focusTimerRef.current) clearTimeout(focusTimerRef.current);
+      if (selectorPollTimerRef.current !== null) {
+        window.clearTimeout(selectorPollTimerRef.current);
+        selectorPollTimerRef.current = null;
+      }
       if (tickerCbRef.current) gsap.ticker.remove(tickerCbRef.current);
       lenisInstance?.destroy();
       lenisRef.current = null;
@@ -223,7 +230,9 @@ export function LenisProvider({ children }: { children: React.ReactNode }) {
             return;
           }
           if (remaining <= 0) return;
-          setTimeout(() => poll(remaining - 1), 200);
+          if (selectorPollTimerRef.current !== null)
+            window.clearTimeout(selectorPollTimerRef.current);
+          selectorPollTimerRef.current = setTimeout(() => poll(remaining - 1), 200);
         };
         poll(15);
       }

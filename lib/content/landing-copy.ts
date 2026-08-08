@@ -33,6 +33,19 @@ export const REGISTRATION_COPY = {
   close: 'Sulge',
   loading: 'Laadime registreerimisvormi…',
   cancel: 'Tühista',
+  dialogTitle: 'Registreeri kool pilootkatsetusele',
+  dialogHeading: 'Registreeri oma kool pilootkatsetusele',
+  dialogSubtitle: 'Targa Tuleviku Fondi toetusel. Tasuta. Kohustusteta.',
+  submit: 'Esita registreering',
+  submitting: 'Saadetakse…',
+  contactNote: 'Võtame ühendust 48 tunni jooksul',
+  contactEmail: 'andri@matx.ee',
+  successTitle: 'Registreerimine on edastatud!',
+  successBody: 'Täname! Võtame teiega ühendust 48 tunni jooksul.',
+  nextStepsHeading: 'Järgmised sammud:',
+  nextStep1: 'Registreerimine on edastatud MATx meeskonnale',
+  nextStep2: 'Vastame 48 tunni jooksul broneerimislingiga',
+  announcementSuccess: 'Registreerimine on edastatud',
 } as const;
 
 // Shared URLs
@@ -60,6 +73,47 @@ export const HERO_COPY = {
   primaryCTA: 'Liitu kooli piloodiga',
   secondaryCTA: 'Vaata töövoogu',
   trustLine: 'Soovitused toetavad õpetaja otsust. Õpetaja kontroll säilib.',
+  // Persona picker — labels mirror the ADOPTION_ROUTES vocabulary.
+  personaPrompt: 'Ma olen:',
+  personas: [
+    { id: 'teacher', label: 'Õpetaja' },
+    { id: 'principal', label: 'Koolijuht' },
+    { id: 'procurement', label: 'Hankija/IT' },
+  ] as const,
+  principalCTA: 'Broneeri demokõne',
+  procurementCTA: 'Vaata tehnilist ülevaadet',
+} as const;
+
+// CTA section — statistics, marquee highlights and card copy rendered from
+// one contract so display and animation fallbacks cannot drift.
+export const CTA_COPY = {
+  cardTitle: 'Koolide registreerimine',
+  cardBody: 'Liitu 10 pilootkooliga. Sügisesed klassid 7.-9. klassini.',
+  registerCta: 'Registreeri kool',
+  stats: [
+    { value: '150+', label: 'ülesannet (Saadaval)' },
+    { value: '10', label: 'kooli (Piloodis)' },
+  ] as const,
+  marqueeItems: ['Alusta tasuta', 'Õpi mõistvalt', 'Säästa aega'] as const,
+} as const;
+
+// Footer — public description, awards, contact and social links from one
+// contract; matches the JSON-LD sameAs list in app/layout.tsx.
+export const FOOTER_COPY = {
+  description:
+    'Adaptiivne matemaatikaõpikeskkond Eesti põhikoolidele. Andmepõhine õpitee, teaduslikel alustel.',
+  awardPrimary: 'FELLIN HÄKK 2026',
+  awardSecondary: 'Presidendi Häkaton',
+  navHeading: 'Navigatsioon',
+  contactHeading: 'Kontakt',
+  contactEmail: 'andri@matx.ee',
+  calendlyLabel: 'Broneeri vestlus',
+  social: [
+    { href: 'https://twitter.com/matx_ee', label: 'MATx Twitter' },
+    { href: 'https://linkedin.com/company/matx-ee', label: 'MATx LinkedIn' },
+    { href: 'https://github.com/matx-ee', label: 'MATx GitHub' },
+    { href: 'mailto:andri@matx.ee', label: 'MATx meil' },
+  ] as const,
 } as const;
 
 // Evidence loop stages
@@ -283,7 +337,7 @@ export const FAQ_ENTRIES: readonly FAQEntry[] = [
   {
     question: 'Mis on Saadaval, Piloodis ja Kavandatud?',
     answer:
-      'Saadaval tähendab, et funktsioon on kasutamiseks valmis. Piloodis tähendab, et funktsioon on kasutusel valitud koolidega testimiseks. Kavandatud tähendab, et funktsioon on plaanis, kuid pole veel arendatud.',
+      'Saadaval tähendab, et funktsioon on kasutamiseks valmis. Piloodis tähendab, et funktsioon on kasutusel valitud koolidega testimiseks. Kavandatud tähendab sihtseisu, mitte lubadust: meede on planeeritud ja osalt välja arendatud, kuid pole veel põhiharul kasutusele võetud.',
   },
   {
     question: 'Kuidas andmeid kasutatakse?',

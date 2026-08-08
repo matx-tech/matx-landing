@@ -8,7 +8,7 @@ const LEGAL_DOCS = {
     title: 'Privaatsuspoliitika',
     description:
       'Kuidas MATx käsitleb isikuandmeid vastavalt isikuandmete kaitse üldmäärusele (GDPR).',
-    updated: 'Kehtib alates: 8. august 2024. Viimati uuendatud: 8. august 2024.',
+    updated: 'Kehtib alates: 8. august 2026. Viimati uuendatud: 8. august 2026.',
     sections: [
       {
         heading: '1. Vastutav töötleja',
@@ -45,7 +45,7 @@ const LEGAL_DOCS = {
                 ['b', 'parandamine — parandada ebatäpseid andmeid (artikkel 16)'],
                 [
                   'c',
-                  'kustutamine — nõuda andmete kustutamist ("õigus olla unustatud", artikkel 17)',
+                  'kustutamine — nõuda andmete kustutamist („õigus olla unustatud“, artikkel 17)',
                 ],
                 ['d', 'töötlemise piirang — peatada töötlemine teatud juhtudel (artikkel 18)'],
                 [
@@ -81,7 +81,7 @@ const LEGAL_DOCS = {
               items={[
                 [
                   'a',
-                  'hädavajalikud küpsised — teema eelistus (tume/hele), vormi täitmise salvestamine brauseri localStorage-s (õiguslik alus: legitiimne huvi, GDPR artikkel 6(1)(f)). Salvestatud andmed: teema valik (matx-theme), registreerimisvormi mustand (matx-registration-draft). Andmed ei lahku brauserist ega ole serveri poolel kättesaadavad. Säilib ka pärast brauseri sulgemist kuni manuaalse kustutamiseni. Puhastamiseks: brauseri seaded → localStorage kustutamine või vormi "Sulge" nupp (kustutab registreerimismustand).',
+                  'hädavajalikud küpsised — teema eelistus (tume/hele), vormi täitmise salvestamine brauseri localStorage-s (õiguslik alus: legitiimne huvi, GDPR artikkel 6(1)(f)). Salvestatud andmed: teema valik (matx-theme), registreerimisvormi mustand (matx-registration-draft). Andmed ei lahku brauserist ega ole serveri poolel kättesaadavad. Säilib ka pärast brauseri sulgemist kuni manuaalse kustutamiseni. Puhastamiseks: brauseri seaded → localStorage kustutamine või vormi „Sulge“ nupp (kustutab registreerimismustand).',
                 ],
                 [
                   'b',
@@ -106,7 +106,7 @@ const LEGAL_DOCS = {
       },
       {
         heading: '13. Muudatused privaatsuspoliitikas',
-        body: 'Võime privaatsuspoliitikat ajakohastada. Oluliste muudatuste korral teavitame registreeritud kontaktisikuid e-posti teel 30 päeva ette. Uusim versioon on alati kättesaadav aadressil matx.ee/privaatsus. Viimane uuendus: 8. august 2024.',
+        body: 'Võime privaatsuspoliitikat ajakohastada. Oluliste muudatuste korral teavitame registreeritud kontaktisikuid e-posti teel 30 päeva ette. Uusim versioon on alati kättesaadav aadressil matx.ee/privaatsus. Viimane uuendus: 8. august 2026.',
       },
       {
         heading: '14. Kontaktandmed andmekaitse küsimuste jaoks',
@@ -121,11 +121,11 @@ const LEGAL_DOCS = {
   tingimused: {
     title: 'Teenuse tingimused',
     description: 'MATx-i kasutustingimused piloodi- ja lepingufaasis.',
-    updated: 'Kehtib alates: 8. august 2024. Viimati uuendatud: 8. august 2024.',
+    updated: 'Kehtib alates: 8. august 2026. Viimati uuendatud: 8. august 2026.',
     sections: [
       {
         heading: '1. Lepingu pooled ja kohaldatavus',
-        body: 'Need tingimused reguleerivad MATX DEVELOPMENT OÜ (edaspidi "MATx", registrikood 17549351, Kesk 13, 10144 Tallinn) ja MATx-i platvormi kasutava haridusasutuse (edaspidi "Kool") vahelist suhet. Tingimused kehtivad piloodi registreerimisest alates. Pilootfaasis osalemine on tasuta; kommertsleping sõlmitakse eraldi pärast piloodi lõppu.',
+        body: 'Need tingimused reguleerivad MATX DEVELOPMENT OÜ (edaspidi „MATx“, registrikood 17549351, Kesk 13, 10144 Tallinn) ja MATx-i platvormi kasutava haridusasutuse (edaspidi „Kool“) vahelist suhet. Tingimused kehtivad piloodi registreerimisest alates. Pilootfaasis osalemine on tasuta; kommertsleping sõlmitakse eraldi pärast piloodi lõppu.',
       },
       {
         heading: '2. Teenuse kirjeldus ja kättesaadavus',
@@ -227,11 +227,11 @@ const LEGAL_DOCS = {
     title: 'Andmetöötlusleping (DPA)',
     description:
       'GDPR artikkel 28 kohane leping koolide jaoks, kus kool on vastutav töötleja ja MATx töötleja.',
-    updated: 'Kehtib alates: 8. august 2024. Viimati uuendatud: 8. august 2024.',
+    updated: 'Kehtib alates: 8. august 2026. Viimati uuendatud: 8. august 2026.',
     sections: [
       {
         heading: '1. Lepingu eesmärk ja kohaldamine',
-        body: 'See andmetöötlusleping (Data Processing Agreement, DPA) täpsustab MATX DEVELOPMENT OÜ (edaspidi "Töötleja", MATx, registrikood 17549351, Kesk 13, 10144 Tallinn) kohustusi haridusasutuse (edaspidi "Vastutav töötleja", Kool) isikuandmete töötlemisel vastavalt GDPR artiklile 28. Leping kehtib pilootlepingu allkirjastamisest alates ja katab õpilaste isikuandmete (nimi, klassirühm, vastused, edusammud) töötlemist MATx platformis.',
+        body: 'See andmetöötlusleping (Data Processing Agreement, DPA) täpsustab MATX DEVELOPMENT OÜ (edaspidi „Töötleja“, MATx, registrikood 17549351, Kesk 13, 10144 Tallinn) kohustusi haridusasutuse (edaspidi „Vastutav töötleja“, Kool) isikuandmete töötlemisel vastavalt GDPR artiklile 28. Leping kehtib pilootlepingu allkirjastamisest alates ja katab õpilaste isikuandmete (nimi, klassirühm, vastused, edusammud) töötlemist MATx platformis.',
       },
       {
         heading: '2. Töötlemise ese, kestus ja iseloom',
@@ -354,7 +354,7 @@ const LEGAL_DOCS = {
                 ],
                 [
                   'd',
-                  'piirang (artikkel 18): peatab õpilase andmete töötlemise (märgistab "külmutatud") 7 päeva jooksul',
+                  'piirang (artikkel 18): peatab õpilase andmete töötlemise (märgistab „külmutatud“) 7 päeva jooksul',
                 ],
                 [
                   'e',

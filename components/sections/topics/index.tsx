@@ -101,7 +101,10 @@ export function TopicsSection() {
       Draggable.create(track, {
         type: 'x',
         bounds: {
-          minX: -track.scrollWidth + trackParent.clientWidth,
+          // When the filtered track fits the viewport, the natural range is
+          // positive — clamp to 0 so Draggable never gets an inverted range
+          // and the carousel respects the no-travel case.
+          minX: Math.min(-track.scrollWidth + trackParent.clientWidth, 0),
           maxX: 0,
         },
         inertia: !prefersReducedMotion,

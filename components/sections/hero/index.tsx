@@ -54,15 +54,9 @@ const ScrollIndicator = dynamic(
   },
 );
 
-// Persona picker — the primary CTA adapts to who is reading. Labels mirror
-// the ADOPTION_ROUTES vocabulary on the landing page.
-const PERSONA_OPTIONS = [
-  { id: 'teacher', label: 'Õpetaja' },
-  { id: 'principal', label: 'Koolijuht' },
-  { id: 'procurement', label: 'Hankija/IT' },
-] as const;
-
-type PersonaId = (typeof PERSONA_OPTIONS)[number]['id'];
+// Persona picker — the primary CTA adapts to who is reading. Labels come
+// from HERO_COPY.personas in the landing content contract.
+type PersonaId = (typeof HERO_COPY.personas)[number]['id'];
 
 const PRIMARY_CTA_CLASS =
   'btn-primary min-w-[240px] sm:min-w-[280px] px-8 py-4 text-lg rounded-xl font-semibold focus-ring-target min-h-[44px]';
@@ -154,8 +148,8 @@ export function HeroSection() {
             <div ref={ctasRef} className='flex flex-col gap-4 mb-8'>
               {/* Persona picker — personalize the primary CTA */}
               <div className='flex flex-wrap items-center justify-center lg:justify-start gap-2'>
-                <span className='text-sm text-text-secondary mr-1'>Ma olen:</span>
-                {PERSONA_OPTIONS.map((option) => (
+                <span className='text-sm text-text-secondary mr-1'>{HERO_COPY.personaPrompt}</span>
+                {HERO_COPY.personas.map((option) => (
                   <button
                     key={option.id}
                     type='button'
@@ -185,13 +179,13 @@ export function HeroSection() {
                     rel='noopener noreferrer'
                     className={PRIMARY_CTA_CLASS}
                   >
-                    Broneeri demokõne
+                    {HERO_COPY.principalCTA}
                     <span className='sr-only'> (avaneb uues aknas)</span>
                   </a>
                 )}
                 {persona === 'procurement' && (
                   <Link href={TECH_OVERVIEW.href} className={PRIMARY_CTA_CLASS}>
-                    Vaata tehnilist ülevaadet
+                    {HERO_COPY.procurementCTA}
                   </Link>
                 )}
 

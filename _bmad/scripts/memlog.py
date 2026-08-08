@@ -143,6 +143,27 @@ def render(meta: dict, body: str) -> str:
     return "---\n" + fm + "\n---\n\n" + body.rstrip("\n") + "\n"
 
 
+def read_memlog(path: Path) -> tuple[dict, str]:
+    """Read and parse an existing memory log, or exit with code 2 on failure.
+
+    Mirrors cmd_init's error handling: a missing or malformed log is a
+    user-facing error, not a traceback.
+    """
+    try:
+        raw = path.read_text(encoding="utf-8")
+    except FileNotFoundError:
+        print(f"error: memory log not found at {path} — run 'init' first", file=sys.stderr)
+        sys.exit(2)
+    except OSError as exc:
+        print(f"error: cannot read memory log at {path}: {exc}", file=sys.stderr)
+        sys.exit(2)
+    try:
+        return split(raw)
+    except ValueError as exc:
+        print(f"error: malformed memory log at {path}: {exc}", file=sys.stderr)
+        sys.exit(2)
+
+
 def touch(meta: dict) -> None:
     """Stamp `updated` and keep it last so the field order stays predictable."""
     meta.pop("updated", None)
@@ -225,7 +246,7 @@ def cmd_append(args) -> int:
     	0 after the entry is written and acknowledged.
     """
     path = resolve(args)
-    meta, body = split(path.read_text(encoding="utf-8"))
+    meta, body = read_memlog(path)
     text = " ".join(args.text.split())  # collapse newlines/runs → one-line entry, no prose bloat
     label = args.type or ""
     if args.by:
@@ -249,7 +270,7 @@ def cmd_set(args) -> int:
     	int: `0` after the field is updated and the log is acknowledged.
     """
     path = resolve(args)
-    meta, body = split(path.read_text(encoding="utf-8"))
+    meta, body = read_memlog(path)
     meta[args.key] = args.value
     touch(meta)
     write_atomic(path, render(meta, body))

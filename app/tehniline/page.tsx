@@ -27,13 +27,13 @@ export const metadata: Metadata = {
 const LAST_UPDATED = '08.08.2026';
 
 // Status legend used across the page. Stated plainly, not as a promise.
-// Typed against the shared CapabilityStatus union so a renamed status is
-// a compile error here, not a dead legend entry.
-const LEGEND: { status: CapabilityStatus; meaning: string }[] = [
-  { status: 'Saadaval', meaning: 'on praegu kasutusel' },
-  { status: 'Piloodis', meaning: 'kasutusel valitud koolidega testimiseks' },
-  { status: 'Kavandatud', meaning: 'sihtseis — plaanis, pole veel kasutusele võetud' },
-];
+// Keyed by the shared CapabilityStatus union so a renamed OR added status is
+// a compile error here, not a dead or silently-missing legend entry.
+const LEGEND: Record<CapabilityStatus, string> = {
+  Saadaval: 'on praegu kasutusel',
+  Piloodis: 'kasutusel valitud koolidega testimiseks',
+  Kavandatud: 'sihtseis — plaanis, pole veel kasutusele võetud',
+};
 
 // Section anchors — also used by the on-page table of contents.
 const SECTIONS = [
@@ -343,15 +343,11 @@ const PROCUREMENT_ROUTES_NEW: ProcurementRoute[] = [
 const PROCUREMENT_SPLIT_RULE =
   'Hankelepingut ei või piirmäärast allapoole jäämise eesmärgil osadeks jagada (RHS § 28 lg 2); eeldatavasse maksumusse arvestatakse ka lepingu uuendamine ja tulevased kohustused (RHS § 23 lg 2 p 1).';
 
-// Build-time staleness guard for the comment above: this page is statically
-// prerendered, so once a build runs after the expiry date the build fails
-// until the old-regime data is deleted — a loud error instead of stale
-// procurement rules staying live.
-if (Date.now() > new Date('2026-11-01T00:00:00+02:00').getTime()) {
-  throw new Error(
-    'Old-regime procurement data expired — delete PROCUREMENT_ROUTES, its RouteTable usage and the "Kehtib kuni 31.10.2026" header.',
-  );
-}
+// Old-regime procurement data (PROCUREMENT_ROUTES and its "Kehtib kuni
+// 31.10.2026" header) must be deleted when the RHS amendment takes effect on
+// 2026-11-01 (see lib/procurement-expiry.ts). Enforced by
+// tests/e2e/procurement-expiry.spec.ts, not by a runtime throw — a stale
+// deployment must keep serving, not 500 the route.
 
 /**
  * Renders procurement routes in an accessible, horizontally scrollable table.
@@ -581,7 +577,7 @@ const ALL_ROWS = [
   ...INTEGRATION_ROWS,
 ];
 
-const STATUS_COUNTS = LEGEND.map(({ status }) => ({
+const STATUS_COUNTS = (Object.keys(LEGEND) as CapabilityStatus[]).map((status) => ({
   status,
   count: ALL_ROWS.filter((row) => row.status === status).length,
 }));
@@ -881,7 +877,7 @@ export default function TechnicalOverviewPage() {
                 </h3>
                 <dl className='grid grid-cols-1 sm:grid-cols-3 gap-3 mb-8'>
                   {STATUS_COUNTS.map(({ status, count }) => {
-                    const meaning = LEGEND.find((item) => item.status === status)?.meaning ?? '';
+                    const meaning = LEGEND[status];
                     return (
                       <div key={status} className='rounded-lg border border-border bg-surface p-4'>
                         <dt className='flex items-center justify-between gap-2'>
@@ -970,10 +966,10 @@ export default function TechnicalOverviewPage() {
             <section aria-label='Staatuste legend' className='mb-12'>
               <h2 className='text-xl font-semibold text-text-primary mb-4'>Staatuste tähendus</h2>
               <ul className='space-y-2'>
-                {LEGEND.map((item) => (
-                  <li key={item.status} className='flex items-center gap-3'>
-                    <CapabilityStatusBadge status={item.status} />
-                    <span className='text-sm text-text-secondary'>{item.meaning}</span>
+                {(Object.keys(LEGEND) as CapabilityStatus[]).map((status) => (
+                  <li key={status} className='flex items-center gap-3'>
+                    <CapabilityStatusBadge status={status} />
+                    <span className='text-sm text-text-secondary'>{LEGEND[status]}</span>
                   </li>
                 ))}
               </ul>

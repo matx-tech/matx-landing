@@ -18,7 +18,14 @@ const isDev = process.env.NODE_ENV === 'development';
 // drops every event (docs: events-api.md). Next 16 seeds the header from the
 // socket when nothing upstream set it (base-server.js), so this works bare on
 // a VPS, behind nginx/Caddy/Cloudflare, or on serverless.
+//
+// Client-IP trust: only honor proxy-set headers (cf-connecting-ip /
+// x-forwarded-for) when the site runs behind a trusted reverse proxy that
+// strips and re-creates them — set PLAUSIBLE_TRUST_PROXY=true then. On a
+// direct VPS a client can forge these headers and corrupt visitor/bot data,
+// so they are ignored unless the flag is set.
 const analyticsEnabled = Boolean(process.env.PLAUSIBLE_SCRIPT_URL);
+const trustProxyHeaders = process.env.PLAUSIBLE_TRUST_PROXY === 'true';
 
 const PLAUSIBLE_API_URL = 'https://plausible.io/api/event';
 
@@ -36,13 +43,14 @@ async function proxyPlausibleEvent(request: NextRequest): Promise<NextResponse> 
   if (userAgent) headers.set('user-agent', userAgent);
   const contentType = request.headers.get('content-type');
   if (contentType) headers.set('content-type', contentType);
-  // Trust CF-Connecting-IP when behind Cloudflare (set by the CDN, not
-  // spoofable by the client). Otherwise take the first hop of the chain —
-  // Next 16 seeds it from the socket when nothing upstream set it, so the
-  // first entry is the real visitor either way.
-  const clientIp =
-    request.headers.get('cf-connecting-ip') ??
-    request.headers.get('x-forwarded-for')?.split(',')[0]?.trim();
+  // Trust CF-Connecting-IP / X-Forwarded-For only behind a trusted proxy
+  // (set by the CDN, not spoofable by the client). Without the flag the
+  // client IP is omitted — Plausible then counts the request without a
+  // reliable visitor IP rather than accepting a forged one.
+  const clientIp = trustProxyHeaders
+    ? (request.headers.get('cf-connecting-ip') ??
+      request.headers.get('x-forwarded-for')?.split(',')[0]?.trim())
+    : null;
   if (clientIp) headers.set('x-forwarded-for', clientIp);
 
   try {

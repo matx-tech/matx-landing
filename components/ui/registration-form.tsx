@@ -5,6 +5,7 @@ import { AlertCircle, Check, X } from 'lucide-react';
 import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { EVENTS, track } from '@/lib/analytics';
+import { REGISTRATION_COPY } from '@/lib/content/landing-copy';
 import { dialogExitMs } from '@/lib/dialog-timing';
 
 const roles = [
@@ -73,6 +74,10 @@ export function RegistrationForm({ isOpen, onClose }: RegistrationFormProps) {
   const [touched, setTouched] = useState<Set<string>>(new Set());
   const [announcement, setAnnouncement] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  // Draft initialization gate: the save effect must not run against the empty
+  // initial state before the load effect has rehydrated the stored draft,
+  // or it would delete the draft it is about to load.
+  const [hasLoadedDraft, setHasLoadedDraft] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
 
   // Load draft from localStorage on mount
@@ -90,19 +95,21 @@ export function RegistrationForm({ isOpen, onClose }: RegistrationFormProps) {
         }
       }
     }
+    setHasLoadedDraft(true);
   }, []);
 
   // Save draft to localStorage on form data change. Save only when the user
   // has typed something; clearing the last field removes the draft instead of
   // writing an empty one (a new object ref makes a ref comparison useless).
+  // Skipped until the stored draft has been loaded (see hasLoadedDraft).
   useEffect(() => {
-    if (typeof window === 'undefined') return;
+    if (typeof window === 'undefined' || !hasLoadedDraft) return;
     if (Object.values(formData).some((value) => value !== '')) {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(formData));
     } else {
       localStorage.removeItem(STORAGE_KEY);
     }
-  }, [formData]);
+  }, [formData, hasLoadedDraft]);
 
   // Clear draft from localStorage
   const clearDraft = useCallback(() => {
@@ -218,7 +225,7 @@ export function RegistrationForm({ isOpen, onClose }: RegistrationFormProps) {
         clearDraft();
         setIsSuccess(true);
         track(EVENTS.pilotSignup, { role: formData.role });
-        setAnnouncement('Registreerimine on edastatud');
+        setAnnouncement(REGISTRATION_COPY.announcementSuccess);
       } catch {
         // Draft stays in localStorage, so a retry never loses the visitor's data.
         setAnnouncement('Registreerimise saatmine ebaõnnestus. Proovige uuesti.');
@@ -267,7 +274,7 @@ export function RegistrationForm({ isOpen, onClose }: RegistrationFormProps) {
           className='fixed inset-0 z-50 bg-canvas/95 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0'
         />
         <Dialog.Content className='fixed left-[50%] top-[50%] z-50 w-full max-w-lg translate-x-[-50%] translate-y-[-50%] bg-elevated rounded-xl border border-border shadow-elevated overflow-hidden max-h-[90vh] flex flex-col focus:outline-none data-[state=closed]:animate-out data-[state=closed]:fade-out-0'>
-          <Dialog.Title className='sr-only'>Registreeri kool pilootkatsetusele</Dialog.Title>
+          <Dialog.Title className='sr-only'>{REGISTRATION_COPY.dialogTitle}</Dialog.Title>
 
           {/* Live region for announcements */}
           <div role='status' aria-live='polite' className='sr-only'>
@@ -281,11 +288,9 @@ export function RegistrationForm({ isOpen, onClose }: RegistrationFormProps) {
               {!isSuccess ? (
                 <>
                   <h2 className='text-2xl font-display font-bold text-text-primary mb-2'>
-                    Registreeri oma kool pilootkatsetusele
+                    {REGISTRATION_COPY.dialogHeading}
                   </h2>
-                  <p className='text-text-secondary text-sm'>
-                    Targa Tuleviku Fondi toetusel. Tasuta. Kohustusteta.
-                  </p>
+                  <p className='text-text-secondary text-sm'>{REGISTRATION_COPY.dialogSubtitle}</p>
                 </>
               ) : (
                 <div className='text-center py-6'>
@@ -293,11 +298,9 @@ export function RegistrationForm({ isOpen, onClose }: RegistrationFormProps) {
                     <Check className='w-8 h-8 text-secondary' />
                   </div>
                   <h2 className='text-2xl font-display font-bold text-text-primary mb-2'>
-                    Registreerimine on edastatud!
+                    {REGISTRATION_COPY.successTitle}
                   </h2>
-                  <p className='text-text-secondary'>
-                    Täname! Võtame teiega ühendust 48 tunni jooksul.
-                  </p>
+                  <p className='text-text-secondary'>{REGISTRATION_COPY.successBody}</p>
                 </div>
               )}
             </div>
@@ -595,29 +598,31 @@ export function RegistrationForm({ isOpen, onClose }: RegistrationFormProps) {
                   disabled={isSubmitting}
                   className='w-full py-4 rounded-lg bg-primary text-text-inverse font-semibold hover:bg-primary/90 transition-colors focus-ring-target min-h-[44px] mt-2 disabled:opacity-60'
                 >
-                  {isSubmitting ? 'Saadetakse…' : 'Esita registreering'}
+                  {isSubmitting ? REGISTRATION_COPY.submitting : REGISTRATION_COPY.submit}
                 </button>
 
                 <p className='text-center text-xs text-text-secondary'>
-                  Võtame ühendust 48 tunni jooksul
+                  {REGISTRATION_COPY.contactNote}
                 </p>
               </form>
             ) : (
               <div className='px-8 pb-8 text-center'>
                 <div className='bg-secondary/10 rounded-xl p-6 mb-6 text-left'>
-                  <h3 className='font-semibold text-text-primary mb-3'>Järgmised sammud:</h3>
+                  <h3 className='font-semibold text-text-primary mb-3'>
+                    {REGISTRATION_COPY.nextStepsHeading}
+                  </h3>
                   <ol className='space-y-3 text-sm text-text-secondary'>
                     <li className='flex items-start gap-4'>
                       <span className='w-6 h-6 rounded-full bg-secondary/20 text-secondary text-sm flex items-center justify-center shrink-0'>
                         1
                       </span>
-                      <span>Registreerimine on edastatud MATx meeskonnale</span>
+                      <span>{REGISTRATION_COPY.nextStep1}</span>
                     </li>
                     <li className='flex items-start gap-4'>
                       <span className='w-6 h-6 rounded-full bg-secondary/20 text-secondary text-sm flex items-center justify-center shrink-0'>
                         2
                       </span>
-                      <span>Vastame 48 tunni jooksul broneerimislingiga</span>
+                      <span>{REGISTRATION_COPY.nextStep2}</span>
                     </li>
                     <li className='flex items-start gap-4'>
                       <span className='w-6 h-6 rounded-full bg-secondary/20 text-secondary text-sm flex items-center justify-center shrink-0'>
@@ -630,10 +635,10 @@ export function RegistrationForm({ isOpen, onClose }: RegistrationFormProps) {
 
                 <p className='text-text-secondary text-sm mb-4'>Küsimused?</p>
                 <a
-                  href='mailto:andri@matx.ee'
+                  href={`mailto:${REGISTRATION_COPY.contactEmail}`}
                   className='text-primary hover:text-secondary transition-colors text-sm focus-ring-target rounded-md underline'
                 >
-                  andri@matx.ee
+                  {REGISTRATION_COPY.contactEmail}
                 </a>
 
                 <button
