@@ -165,8 +165,10 @@ Haridus- ja Teadusministeerium / Haridus- ja Noorteamet / Kiviõli Riigikool).
 2. **Ostutee**: näitena — alla piirmäära (< 30 000 €; alates 01.11.2026 < 50 000 €) võib ost
    olla otsetellimus, kuid see peab järgima organisatsiooni sisemist hankekorda ja
    riigihangete üldpõhimõtteid (RHS § 3); hankeväärtuse hinnangusse tuleb arvata ka
-   ettenähtavad lisanõuded ja pikendused. Omavalitsustele soovita lihthanget — mitte
-   „avatud hankemenetlust“.
+   ettenähtavad lisanõuded ja pikendused. Kui eeldatav hankeväärtus jääb lihthange
+   vahemikku (30 000–59 999 € kuni 31.10.2026; alates 01.11.2026 50 000–139 999 €
+   riigiasutusel või 50 000–215 999 € omavalitsusel), soovita lihthanget — mitte
+   „avatud hankemenetlust“; suurema väärtuse korral on avatud menetlus kohustuslik.
 3. **Leping**: 12–36 kuud, maksetähtaeg 30 päeva, mõistlik leppetrahv, IP jääb MATx-ile,
    andmete eksport lepingu lõppedes.
 4. **Tehniline dokumentatsioon**: valmista juurdepääsetavuse seisukoht (EN 301 549) —

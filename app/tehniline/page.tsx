@@ -24,7 +24,7 @@ export const metadata: Metadata = {
 };
 
 // Freshness anchor — updated whenever claims on this page change.
-const LAST_UPDATED = '07.08.2026';
+const LAST_UPDATED = '08.08.2026';
 
 // Status legend used across the page. Stated plainly, not as a promise.
 const LEGEND = [
@@ -205,7 +205,7 @@ const COMPLIANCE_ROWS: StatusRow[] = [
   },
   {
     title: 'GDPR (2016/679)',
-    detail: 'Kohaldub. Rollid sõltuvad töötlustegevusest ja fikseeritakse andmetöötluslepingus: kool/omavalitsus on vastutav töötleja, MATx volitatud töötleja juhiste alusel töötlemisel. Art. 8 alaealiste erikaitse (Eestis vanusepiir 13+, vanema nõusolek) kehtib juhul, kui õiguslikuks aluseks on nõusolek (art 6 lg 1 p a) infoühiskonna teenuse puhul, mida pakutakse otse lapsele.',
+    detail: 'Kohaldub. Rollid sõltuvad iga töötlustegevuse sisust: kool/omavalitsus on vastutav töötleja; MATx on volitatud töötleja dokumenteeritud juhiste alusel töötlemisel, muidu sõltumatu või kaasvastutav töötleja. Rollimaatriks tegevuse kaupa ja andmetöötluslepingu kooskõlastamine enne pilootlepinguid. Art. 8 alaealiste erikaitse (Eestis vanusepiir 13+, vanema nõusolek) kehtib juhul, kui õiguslikuks aluseks on nõusolek (art 6 lg 1 p a) infoühiskonna teenuse puhul, mida pakutakse otse lapsele.',
     status: 'Kavandatud',
     note: 'Alaealiste andmete kaitse on pilootfaasi põhirõhk; täismahus vastavus sihtseisus.',
   },
@@ -346,7 +346,7 @@ const TENDER_TECH_REQUIREMENTS = [
   },
   {
     title: 'Andmekaitse',
-    detail: 'GDPR art 8 (nõusolek alates 13. eluaastast, kui õiguslikuks aluseks on nõusolek infoühiskonna teenuse puhul, mida pakutakse otse lapsele) ja IKS; vastutava ja volitatud töötleja rollid fikseeritakse andmetöötluslepingus. Andmete asukohariik avaldatakse enne pilootlepinguid.',
+    detail: 'GDPR art 8 (nõusolek alates 13. eluaastast, kui õiguslikuks aluseks on nõusolek infoühiskonna teenuse puhul, mida pakutakse otse lapsele) ja IKS; vastutava, volitatud ja kaasvastutava töötleja rollid hinnatakse töötlustegevuse kaupa ja dokumenteeritakse andmetöötluslepingus. Andmete asukohariik avaldatakse enne pilootlepinguid.',
   },
   {
     title: 'Identiteet ja integratsioonid',
@@ -749,8 +749,9 @@ export default function TechnicalOverviewPage() {
             <p className="text-sm text-text-secondary leading-relaxed">
               MATx on pilootfaasis. Osa allpool kirjeldatud turvameetmetest on veel
               väljatöötamisel ja testimisel. „Kavandatud&ldquo; tähendab sihtseisu,
-              mitte lubadust, et meede on täna kasutuses. Piloodi laiendamine
-              eeldab kõigi kavandatud meetmete kasutuselevõttu.
+              mitte lubadust, et meede on täna kasutuses. Piloodi laiendamine saab
+              toimuda alles pärast kohalduvate kavandatud meetmete kasutuselevõttu —
+              sihtseisu tingimus, mitte lubadust, et kõik meetmed valmivad.
             </p>
           </div>
         </section>
@@ -783,7 +784,7 @@ export default function TechnicalOverviewPage() {
           <SectionHeading
             id="vastavus"
             title="Vastavus"
-            lead="NIS2 ja DORA ei ole haridussektorile kohalduvad nõuded — seda öeldakse välja, mitte ei väideta vastavust. GDPR kohaldub: rollid sõltuvad töötlustegevusest ja fikseeritakse andmetöötluslepingus."
+            lead="NIS2 ja DORA ei ole haridussektorile kohalduvad nõuded — seda öeldakse välja, mitte ei väideta vastavust. GDPR kohaldub: rollid sõltuvad töötlustegevusest ja dokumenteeritakse andmetöötluslepingus."
           />
           <StatusFilterSection rows={COMPLIANCE_ROWS} plannedLabel="Kavandatud vastavustegevused" />
         </section>
