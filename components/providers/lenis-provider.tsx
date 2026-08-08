@@ -35,6 +35,7 @@ export function LenisProvider({ children }: { children: React.ReactNode }) {
   const reducedMotionRef = useRef(false);
   const tickerCbRef = useRef<((time: number) => void) | null>(null);
   const focusTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const selectorPollTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const prefersReducedMotion = usePrefersReducedMotion();
 
   // Mirror the render-time preference before paint — the effect-driven ref
@@ -91,6 +92,7 @@ export function LenisProvider({ children }: { children: React.ReactNode }) {
     return () => {
       disposed = true;
       if (focusTimerRef.current) clearTimeout(focusTimerRef.current);
+      if (selectorPollTimerRef.current) clearTimeout(selectorPollTimerRef.current);
       if (tickerCbRef.current) gsap.ticker.remove(tickerCbRef.current);
       lenisInstance?.destroy();
       lenisRef.current = null;
@@ -114,6 +116,18 @@ export function LenisProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const scrollTo = useCallback((target: string | number | HTMLElement, options?: { focusHeading?: boolean }) => {
+    // A new navigation supersedes any pending work from a previous one:
+    // cancel the pending heading-focus timer and any in-flight selector
+    // poll so stale callbacks can't fire after the user moved on.
+    if (focusTimerRef.current) {
+      clearTimeout(focusTimerRef.current);
+      focusTimerRef.current = null;
+    }
+    if (selectorPollTimerRef.current) {
+      clearTimeout(selectorPollTimerRef.current);
+      selectorPollTimerRef.current = null;
+    }
+
     const targetElement = typeof target === 'string'
       ? document.querySelector(target)
       : target instanceof HTMLElement
@@ -184,6 +198,7 @@ export function LenisProvider({ children }: { children: React.ReactNode }) {
       const poll = (remaining: number) => {
         const el = document.querySelector(target);
         if (el instanceof HTMLElement) {
+          selectorPollTimerRef.current = null;
           if (!lenisRef.current) {
             const behavior: ScrollBehavior = reducedMotionRef.current ? 'auto' : 'smooth';
             const top = el.getBoundingClientRect().top + window.scrollY - 80;
@@ -197,8 +212,11 @@ export function LenisProvider({ children }: { children: React.ReactNode }) {
           focusHeading();
           return;
         }
-        if (remaining <= 0) return;
-        setTimeout(() => poll(remaining - 1), 200);
+        if (remaining <= 0) {
+          selectorPollTimerRef.current = null;
+          return;
+        }
+        selectorPollTimerRef.current = setTimeout(() => poll(remaining - 1), 200);
       };
       poll(15);
     }
