@@ -1,7 +1,9 @@
 allowBuilds:
+  core-js: true
   lefthook: true
   unrs-resolver: true
 minimumReleaseAgeExclude:
   - lucide-react@1.29.0
   - postcss@8.5.26
   - npm-check-updates@23.0.2
+  - '@types/node@26.2.0'

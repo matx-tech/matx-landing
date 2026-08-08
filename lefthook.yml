@@ -1,0 +1,26 @@
+# Lefthook pre-commit setup — see https://github.com/evilmartians/lefthook
+# Toolchain: biome (format + safe fixes) + oxlint (lint + tsgolint type-check).
+pre-commit:
+  parallel: true
+  commands:
+    biome-format:
+      glob: "*.{js,ts,jsx,tsx,json,css}"
+      stage_fixed: true
+      run: pnpm exec biome check --write --no-errors-on-unmatched {staged_files}
+
+    oxlint-lint:
+      glob: "*.{js,ts,jsx,tsx}"
+      run: pnpm exec oxlint {staged_files}
+
+    # Type-aware linting via tsgolint (oxlint's TS-compiler-backed checker)
+    oxlint-types:
+      glob: "*.{ts,tsx}"
+      run: pnpm exec oxlint --type-aware --type-check
+
+    # Pre-existing hook from code-review-graph MCP, migrated into lefthook
+    code-review-graph:
+      run: |
+        if command -v code-review-graph >/dev/null 2>&1; then
+          code-review-graph update || true
+          code-review-graph detect-changes --brief || true
+        fi
