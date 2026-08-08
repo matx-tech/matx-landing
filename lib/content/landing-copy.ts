@@ -3,8 +3,10 @@
  * Single source of truth for all public-facing copy
  */
 
-// Capability maturity status
-export type CapabilityStatus = 'Saadaval' | 'Piloodis' | 'Kavandatud';
+// Capability maturity status — single source of truth for the status
+// vocabulary used across the landing page and the technical overview.
+export const CAPABILITY_STATUSES = ['Saadaval', 'Piloodis', 'Kavandatud'] as const;
+export type CapabilityStatus = (typeof CAPABILITY_STATUSES)[number];
 
 // Prohibited phrases that must not appear in public copy
 export const PROHIBITED_PHRASES = [

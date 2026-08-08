@@ -8,20 +8,23 @@
  */
 
 import { CopyButton } from '@/components/ui/copy-button';
+import type { CapabilityStatus } from '@/lib/content/landing-copy';
 
 interface ExportRow {
   title: string;
   detail: string;
   note?: string;
-  status?: string;
+  status?: CapabilityStatus;
 }
 
 interface ExportSection {
   heading: string;
-  rows: ExportRow[];
+  rows: readonly ExportRow[];
 }
 
-const STATUS_PREFIX: Record<string, string> = {
+// Keyed on the shared status union so a renamed status is a compile
+// error, not a silently dropped badge in the export.
+const STATUS_PREFIX: Record<CapabilityStatus, string> = {
   Saadaval: '[Saadaval]',
   Piloodis: '[Piloodis]',
   Kavandatud: '[Kavandatud]',
@@ -46,7 +49,7 @@ function toMarkdown(
   for (const { heading, rows } of sections) {
     lines.push(`## ${heading}`, '');
     for (const row of rows) {
-      const prefix = STATUS_PREFIX[row.status ?? ''] ?? '';
+      const prefix = row.status ? STATUS_PREFIX[row.status] : '';
       lines.push(`- ${prefix} **${row.title}** — ${row.detail}`);
       if (row.note) lines.push(`  - Märkus: ${row.note}`);
     }

@@ -807,7 +807,7 @@ export default function TechnicalOverviewPage() {
                       rows: PRICE_BENCHMARKS.map((r) => ({
                         title: r.label,
                         detail: r.anchor
-                          ? `Hind: ${r.median} · Aastas: ${r.mean}`
+                          ? `Hind: ${r.median} · Aastahind: ${r.mean}`
                           : `Mediaan: ${r.median} · Keskmine: ${r.mean}`,
                         note: r.note,
                       })),
@@ -1059,6 +1059,15 @@ export default function TechnicalOverviewPage() {
               </p>
 
               <h3 className='text-lg font-semibold text-text-primary mb-3'>Hinnaklassid</h3>
+              {/* Registry-coverage caveat up front: the table's small-n rows
+              are the second caveat, this one shapes how the whole table is
+              read. The same warning stays in the row notes so the Markdown
+              export remains self-contained. */}
+              <div className='rounded-lg border border-warning-border bg-warning-surface px-4 py-3 text-xs text-text-secondary leading-relaxed mb-4'>
+                Riigihangete registri avaandmed kajastavad peamiselt üle piirmäära jäävaid oste —
+                ühe kooli tarkvaralitsentside ostud jäävad tihti alla piirmäära ega kajastu
+                registris, mistõttu täpset jaotust registriandmetest hinnata ei saa.
+              </div>
               {/* Horizontal scroll on narrow viewports: the table keeps its
               column widths (min-w) and scrolls instead of crushing text —
               no column gets clipped by the card boundary. */}
@@ -1112,7 +1121,7 @@ export default function TechnicalOverviewPage() {
                 >
                   <h4 className='font-semibold text-text-primary'>{row.label}</h4>
                   <p className='text-sm text-text-secondary mt-1 leading-relaxed'>
-                    Kuuhind: {row.median} · aastas {row.mean}. {row.note}
+                    Kuuhind: {row.median} · Aastahind: {row.mean}. {row.note}
                   </p>
                 </div>
               ))}

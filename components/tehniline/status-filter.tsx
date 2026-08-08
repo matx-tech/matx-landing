@@ -9,12 +9,12 @@
 
 import { ChevronDown, Clock } from 'lucide-react';
 import { useState } from 'react';
-import type { CapabilityStatus } from '@/lib/content/landing-copy';
+import { CAPABILITY_STATUSES, type CapabilityStatus } from '@/lib/content/landing-copy';
 import { StatusList, type StatusRow } from './status-card';
 
 type Filter = 'Kõik' | CapabilityStatus;
 
-const FILTERS: readonly Filter[] = ['Kõik', 'Saadaval', 'Piloodis', 'Kavandatud'];
+const FILTERS: readonly Filter[] = ['Kõik', ...CAPABILITY_STATUSES];
 
 const FILTER_ACTIVE = 'bg-primary text-text-inverse border-primary shadow-sm';
 const FILTER_IDLE =
