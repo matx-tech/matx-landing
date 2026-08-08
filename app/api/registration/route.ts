@@ -89,7 +89,58 @@ function isRateLimited(clientKey: string): boolean {
   return entry.count > RATE_LIMIT_MAX;
 }
 
-// Pilot registration → Slack. One-way fire-and-forget; if Slack is down the
+// Slack mrkdwn parses &, < and > as markup — escape user-provided values so
+// their displayed content is preserved and a raw <...> can't become link
+// syntax (or worse) in the notification.
+function escapeMrkdwn(value: string): string {
+  return value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+// Durable delivery idempotency: an identical registration (same normalized
+// payload) must reach Slack at most once. State is in-memory — like the rate
+// limiter, bounded by a hard cap and periodic pruning — so a timeout/network
+// failure keeps the pending marker until it ages out and a retry answers from
+// state instead of double-delivering.
+const DELIVERY_RETENTION_MS = 24 * 60 * 60 * 1000; // completed results
+const PENDING_RETENTION_MS = 5 * 60 * 1000; // in-flight / ambiguous outcomes
+const MAX_DELIVERY_ENTRIES = 10_000;
+const deliveryState = new Map<string, { status: 'pending' | 'completed'; at: number }>();
+let lastDeliveryPrune = 0;
+
+// FNV-1a — stable, dependency-free hash for the dedupe key.
+function submissionKey(fields: readonly string[]): string {
+  const canonical = fields.join('\u0000');
+  let hash = 0x811c9dc5;
+  for (let i = 0; i < canonical.length; i++) {
+    hash ^= canonical.charCodeAt(i);
+    hash = Math.imul(hash, 0x01000193);
+  }
+  return (hash >>> 0).toString(16);
+}
+
+function pruneDeliveries(now: number): void {
+  if (now - lastDeliveryPrune < PENDING_RETENTION_MS) return;
+  lastDeliveryPrune = now;
+  for (const [key, entry] of deliveryState) {
+    const retention = entry.status === 'pending' ? PENDING_RETENTION_MS : DELIVERY_RETENTION_MS;
+    if (now - entry.at >= retention) deliveryState.delete(key);
+  }
+}
+
+// Slack section fields cap at 2,000 characters and the label prefixes /
+// mrkdwn escaping count against it. Fields are composed below and validated
+// by their final rendered length, so a hostile value can't truncate or reject
+// the notification after it's queued.
+const SLACK_SECTION_FIELD_LIMIT = 2_000;
+const FIELD_LABELS = {
+  schoolName: '🏫 *Kool*\n',
+  contactName: '👤 *Kontaktisik*\n',
+  role: '💼 *Roll*\n',
+  email: '📧 *E-post*\n',
+  phone: '📞 *Telefon*\n',
+  classGroups: '👥 *Klassirühmad*\n',
+} as const;
+
 /**
  * Submits a pilot registration to Slack after validating the request data and consent.
  *
@@ -102,12 +153,18 @@ export async function POST(request: Request) {
     return Response.json({ error: 'SLACK_WEBHOOK_URL not configured' }, { status: 503 });
   }
 
-  let data: Partial<Registration>;
+  // Parse as unknown and reject null / arrays / primitives — a bare cast of
+  // e.g. `null` would crash on the first field access below.
+  let body: unknown;
   try {
-    data = (await request.json()) as Partial<Registration>;
+    body = await request.json();
   } catch {
     return Response.json({ error: 'Invalid JSON body' }, { status: 400 });
   }
+  if (typeof body !== 'object' || body === null || Array.isArray(body)) {
+    return Response.json({ error: 'Invalid JSON body' }, { status: 400 });
+  }
+  const data = body as Partial<Registration>;
 
   // Reject non-string fields before any .trim() — Partial<Registration> is
   // only a TS assertion, a JSON body like { "email": {} } must not 500.
@@ -119,6 +176,59 @@ export async function POST(request: Request) {
   }
   if (data.consent !== true) {
     return Response.json({ error: 'Consent required' }, { status: 400 });
+  }
+  if (data.otherRole !== undefined && typeof data.otherRole !== 'string') {
+    return Response.json({ error: 'Missing or invalid fields' }, { status: 400 });
+  }
+
+  // Normalize once after validation: the payload (and the dedupe key below)
+  // must never carry padding whitespace. The checks above guarantee every
+  // REQUIRED_FIELDS entry is a non-empty string and email is valid, so the
+  // casts are safe.
+  const email = (data.email as string).trim();
+  const schoolName = (data.schoolName as string).trim();
+  const contactName = (data.contactName as string).trim();
+  const roleValue = (data.role as string).trim();
+  const otherRole = data.otherRole?.trim() ?? '';
+  const phone = (data.phone as string).trim();
+  const classGroups = (data.classGroups as string).trim();
+  const role =
+    roleValue === 'Muu haridustöötaja' && otherRole ? `${roleValue} — ${otherRole}` : roleValue;
+
+  // Escape user input for mrkdwn and compose the section fields. The email
+  // link reuses the normalized value for both the mailto target and the link
+  // text — no re-parsing of the original input.
+  const emailEsc = escapeMrkdwn(email);
+  const sectionFields = [
+    { type: 'mrkdwn' as const, text: `${FIELD_LABELS.schoolName}${escapeMrkdwn(schoolName)}` },
+    { type: 'mrkdwn' as const, text: `${FIELD_LABELS.contactName}${escapeMrkdwn(contactName)}` },
+    { type: 'mrkdwn' as const, text: `${FIELD_LABELS.role}${escapeMrkdwn(role)}` },
+    {
+      type: 'mrkdwn' as const,
+      text: `${FIELD_LABELS.email}<mailto:${emailEsc}|${emailEsc}>`,
+    },
+    { type: 'mrkdwn' as const, text: `${FIELD_LABELS.phone}${escapeMrkdwn(phone)}` },
+    { type: 'mrkdwn' as const, text: `${FIELD_LABELS.classGroups}${escapeMrkdwn(classGroups)}` },
+  ];
+  // Measured on the final composed markup (label + escaping included) so a
+  // long value — including the conditional otherRole inside `role` — cannot
+  // exceed Slack's 2,000-character section-field limit.
+  if (sectionFields.some((field) => field.text.length > SLACK_SECTION_FIELD_LIMIT)) {
+    return Response.json({ error: 'Field too long' }, { status: 400 });
+  }
+
+  // Idempotent delivery: identical submissions deliver to Slack at most once.
+  // Checked before the rate limit so a retry after a timeout is answered from
+  // state instead of being throttled or double-posted.
+  const key = submissionKey([schoolName, contactName, role, email, phone, classGroups]);
+  const now = Date.now();
+  pruneDeliveries(now);
+  const existing = deliveryState.get(key);
+  if (existing?.status === 'completed') {
+    return Response.json({ ok: true, deduplicated: true });
+  }
+  if (existing?.status === 'pending') {
+    return Response.json({ ok: true, status: 'pending' }, { status: 202 });
   }
 
   // Client identity for rate limiting mirrors proxy.ts: forwarded-IP headers
@@ -136,19 +246,14 @@ export async function POST(request: Request) {
     return Response.json({ error: 'Too many requests, try again later' }, { status: 429 });
   }
 
-  const role =
-    data.role === 'Muu haridustöötaja' && data.otherRole
-      ? `${data.role} — ${data.otherRole}`
-      : data.role;
-
   const lines = [
     'Uus piloodi registreerimine',
-    `Kool: ${data.schoolName}`,
-    `Kontaktisik: ${data.contactName}`,
+    `Kool: ${schoolName}`,
+    `Kontaktisik: ${contactName}`,
     `Roll: ${role}`,
-    `E-post: ${data.email}`,
-    `Telefon: ${data.phone}`,
-    `Klassirühmad: ${data.classGroups}`,
+    `E-post: ${email}`,
+    `Telefon: ${phone}`,
+    `Klassirühmad: ${classGroups}`,
   ].join('\n');
 
   const payload = {
@@ -158,19 +263,18 @@ export async function POST(request: Request) {
         type: 'header',
         text: { type: 'plain_text', text: '📋 Uus piloodi registreerimine' },
       },
-      {
-        type: 'section',
-        fields: [
-          { type: 'mrkdwn', text: `🏫 *Kool*\n${data.schoolName}` },
-          { type: 'mrkdwn', text: `👤 *Kontaktisik*\n${data.contactName}` },
-          { type: 'mrkdwn', text: `💼 *Roll*\n${role}` },
-          { type: 'mrkdwn', text: `📧 *E-post*\n<mailto:${data.email}|${data.email}>` },
-          { type: 'mrkdwn', text: `📞 *Telefon*\n${data.phone}` },
-          { type: 'mrkdwn', text: `👥 *Klassirühmad*\n${data.classGroups}` },
-        ],
-      },
+      { type: 'section', fields: sectionFields },
     ],
   };
+
+  // Record pending before the network call: a timeout or network failure
+  // leaves an ambiguous outcome, and retaining the marker keeps a retry from
+  // queuing a second delivery until it ages out (PENDING_RETENTION_MS).
+  deliveryState.set(key, { status: 'pending', at: now });
+  if (deliveryState.size > MAX_DELIVERY_ENTRIES) {
+    const oldest = deliveryState.keys().next().value;
+    if (oldest !== undefined) deliveryState.delete(oldest);
+  }
 
   try {
     const res = await fetch(webhookUrl, {
@@ -181,10 +285,16 @@ export async function POST(request: Request) {
     });
 
     if (!res.ok) {
+      // Release the Undici response stream before returning the error.
+      await res.body?.cancel();
       return Response.json({ error: 'Slack webhook failed' }, { status: 502 });
     }
+    // Drain/cancel the response body so the connection is released.
+    await res.body?.cancel();
+    deliveryState.set(key, { status: 'completed', at: Date.now() });
     return Response.json({ ok: true });
   } catch {
+    // Ambiguous outcome — keep the pending marker (see PENDING_RETENTION_MS).
     return Response.json({ error: 'Slack webhook failed' }, { status: 502 });
   }
 }
