@@ -5,8 +5,8 @@
  * tweens and CSS transitions MUST come from this module.  Inline numeric
  * durations and magic-string easings are banned.
  *
- * This is consumed by `motion-config` (runtime gates) and by every animated
- * component.  It replaces ~40 hardcoded values spread across 15 files.
+ * This is consumed by every animated component. It replaces ~40 hardcoded
+ * values spread across 15 files.
  */
 
 export const motionTokens = {

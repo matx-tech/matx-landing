@@ -636,23 +636,6 @@
     backface-visibility: hidden;
   }
 
-  @keyframes ripple {
-    to {
-      transform: scale(4);
-      opacity: 0;
-    }
-  }
-
-  .animate-ripple {
-    animation: ripple 0.6s linear;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .animate-ripple {
-      animation: none;
-    }
-  }
-
   .scrollbar-hide {
     -ms-overflow-style: none;
     scrollbar-width: none;

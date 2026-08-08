@@ -88,27 +88,24 @@ bug. Anything reading window/matchMedia/device size needs SSR-safe defaults
 - Lenis context value is memoized (useMemo with scrollTo as the dependency) —
   scrollTo is stable via useCallback, so the value object is created once and
   consumers re-render only if scrollTo changes.
-- Blur placeholders come from `scripts/generate-thumbhash.mjs`; changes must
-  keep the source-screenshot existence check and clear error message.
 - .browserslistrc intentionally uses rolling "last 2 versions"; comments
   there must keep matching reality (rolling releases are NOT Baseline Widely
   Available).
 
 ### 6. Dependencies
 
-- next / react / react-dom / eslint-config-next move together on a supported
+- next / react / react-dom move together on a supported
   release line (Next.js 14 is EOL — never regress to it). Keep Node engines
   >= 20.9 declared.
-- Build-only tools (thumbhash) belong in devDependencies, not dependencies.
+- Build-only tools belong in devDependencies, not dependencies.
 - Keep Dependabot `insecure-external-code-execution` at deny.
 
-### 7. ESLint / TypeScript discipline
+### 7. Lint / TypeScript discipline
 
 - Rule overrides are scoped to specific files with an explanatory comment
-  (see eslint.config.mjs `matx/intentional-react-hooks-patterns`). No
-  repository-wide rule disables.
+  (biome-ignore / eslint-disable). No repository-wide rule disables.
 - Satisfy exhaustive-deps: capture ref values, include live hook values.
-- Use Estonian quotes „…" in JSX text (project convention — no ESLint rule
+- Use Estonian quotes „…" in JSX text (project convention — no lint rule
   currently enforces this).
 
 ## Severity calibration
@@ -121,11 +118,10 @@ bug. Anything reading window/matchMedia/device size needs SSR-safe defaults
   values that duplicate the content contract.
 - SUGGESTION: perf micro-optimizations, memoization, comment accuracy.
 - DO NOT FLAG: formatting (lint/prettier enforces), generated files
-  (pnpm-lock.yaml, thumbhash-strings.json, blur-placeholder-data.ts,
-  .next/**, out/**), missing docstrings or unit tests on presentational
-  components (marketing site; visual + Lighthouse verification applies),
-  the rolling browserslist policy itself, build artifacts in the repo root
-  (lighthouse-*.html, screenshots).
+  (pnpm-lock.yaml, .next/**, out/**), missing docstrings or unit tests on
+  presentational components (marketing site; visual + Lighthouse verification
+  applies), the rolling browserslist policy itself, build artifacts in the
+  repo root (lighthouse-*.html, screenshots).
 
 ## Verification expectations
 
@@ -134,7 +130,5 @@ bug. Anything reading window/matchMedia/device size needs SSR-safe defaults
   mobile viewport, verify the animation triggers when scrolled into view.
 - Content changes: check PROHIBITED_PHRASES; confirm strings come from the
   content contract unless intentionally new.
-- Script changes (generate-thumbhash): run the script, confirm it regenerates
-  without crashing.
 - Commit style: conventional commits (fix(scope): …, refactor: …, perf: …).
   PR body: what was broken / what was done / what to know.
