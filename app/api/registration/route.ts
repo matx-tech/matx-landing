@@ -25,7 +25,10 @@ interface Registration {
 // caps addresses at 254 chars — reject anything longer outright.
 function isValidEmail(value: string | undefined): boolean {
   const email = (value ?? '').trim();
-  if (email.length === 0 || email.length > 254 || /\s/.test(email)) return false;
+  // Reject `|` outright: a pipe inside the composed `<mailto:...|...>` Slack
+  // mrkdwn link would terminate the URL portion at the first `|`.
+  if (email.length === 0 || email.length > 254 || /\s/.test(email) || email.includes('|'))
+    return false;
   const at = email.indexOf('@');
   if (at <= 0) return false;
   const domain = email.slice(at + 1);
@@ -196,15 +199,18 @@ export async function POST(request: Request) {
 
   // Escape user input for mrkdwn and compose the section fields. The email
   // link reuses the normalized value for both the mailto target and the link
-  // text — no re-parsing of the original input.
+  // text — no re-parsing of the original input. The target additionally
+  // percent-encodes `|` (%7C): even though isValidEmail rejects it, a pipe in
+  // the target would otherwise terminate the `<mailto:...|...>` syntax early.
   const emailEsc = escapeMrkdwn(email);
+  const emailMailto = emailEsc.replace(/\|/g, '%7C');
   const sectionFields = [
     { type: 'mrkdwn' as const, text: `${FIELD_LABELS.schoolName}${escapeMrkdwn(schoolName)}` },
     { type: 'mrkdwn' as const, text: `${FIELD_LABELS.contactName}${escapeMrkdwn(contactName)}` },
     { type: 'mrkdwn' as const, text: `${FIELD_LABELS.role}${escapeMrkdwn(role)}` },
     {
       type: 'mrkdwn' as const,
-      text: `${FIELD_LABELS.email}<mailto:${emailEsc}|${emailEsc}>`,
+      text: `${FIELD_LABELS.email}<mailto:${emailMailto}|${emailEsc}>`,
     },
     { type: 'mrkdwn' as const, text: `${FIELD_LABELS.phone}${escapeMrkdwn(phone)}` },
     { type: 'mrkdwn' as const, text: `${FIELD_LABELS.classGroups}${escapeMrkdwn(classGroups)}` },

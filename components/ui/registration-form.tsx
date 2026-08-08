@@ -139,7 +139,8 @@ export function RegistrationForm({ isOpen, onClose }: RegistrationFormProps) {
           break;
         case 'email':
           if (!value.trim()) return 'E-post on kohustuslik';
-          if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) return 'Sisestage kehtiv e-posti aadress';
+          if (!/^[^\s@|]+@[^\s@|]+\.[^\s@|]+$/.test(value))
+            return 'Sisestage kehtiv e-posti aadress';
           break;
         case 'phone':
           if (!value.trim()) return 'Telefoninumber on kohustuslik';

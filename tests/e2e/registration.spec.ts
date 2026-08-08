@@ -45,6 +45,30 @@ test.describe('registration dialog', () => {
     await expect(dialog.getByText(/nõusolek/i)).toBeVisible();
   });
 
+  test('rejects an email containing a pipe', async ({ openHome, page }) => {
+    await openHome();
+
+    const trigger = page.getByRole('button', { name: 'Registreeru piloodile' });
+    await revealSection(page, 'piloot', trigger);
+    await trigger.click();
+
+    const dialog = page.getByRole('dialog');
+    await expect(dialog).toBeVisible();
+
+    // Fill required fields
+    await dialog.getByLabel(/kooli nimi/i).fill('Test Gümnaasium');
+    await dialog.getByLabel(/kontaktisiku nimi/i).fill('Mari Tamm');
+    await dialog.getByLabel(/roll/i).selectOption('Matemaatikaõpetaja');
+    await dialog.getByLabel(/asutuse e-post/i).fill('mari|tamm@testkooli.ee');
+    await dialog.getByLabel(/telefon/i).fill('5551234');
+    await dialog.getByLabel(/klassirühmad/i).fill('7.-9. klass (3 rühma)');
+    await dialog.getByRole('checkbox').check();
+
+    await dialog.getByRole('button', { name: /esita registreering/i }).click();
+
+    await expect(dialog.getByText(/kehtiv e-posti aadress/i)).toBeVisible();
+  });
+
   test('accepts submission with consent when webhook configured', async ({ openHome, page }) => {
     await openHome();
 
