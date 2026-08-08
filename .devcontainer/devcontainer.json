@@ -1,0 +1,10 @@
+{
+  "name": "matx-landing",
+  "image": "mcr.microsoft.com/devcontainers/typescript-node:24",
+  "postCreateCommand": "npm install -g pnpm@11.18.0 && pnpm install",
+  "customizations": {
+    "vscode": {
+      "extensions": ["dbaeumer.vscode-eslint"]
+    }
+  }
+}
