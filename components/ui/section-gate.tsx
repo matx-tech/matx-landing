@@ -2,6 +2,7 @@
 
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { type ReactNode, useEffect, useRef, useState } from 'react';
+import { EVENTS, track } from '@/lib/analytics';
 
 interface SectionGateProps {
   children: ReactNode;
@@ -55,6 +56,7 @@ export function SectionGate({
       // Open when the placeholder's top is at/below the reveal line
       // (viewport bottom + lookahead) — i.e. near, visible, or scrolled past.
       if (rect.top <= window.innerHeight + REVEAL_MARGIN_PX) {
+        track(EVENTS.sectionReveal, { section: id ?? 'unnamed' });
         setVisible(true);
       }
     };
@@ -78,7 +80,9 @@ export function SectionGate({
       window.removeEventListener('resize', scheduleCheck);
       if (rafId !== null) cancelAnimationFrame(rafId);
     };
-  }, [visible]);
+    // id is a stable prop per gate, but the reveal path reads it for the
+    // analytics event — declare it so the effect resubscribes if it moves.
+  }, [visible, id]);
 
   // Focus hand-off when the sr-only load button opened the gate: the button
   // unmounts with the placeholder, so without this keyboard focus drops to
@@ -262,6 +266,7 @@ export function SectionGate({
           type='button'
           onClick={() => {
             openedByButtonRef.current = true;
+            track(EVENTS.sectionReveal, { section: id ?? 'unnamed' });
             setVisible(true);
           }}
           className='sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 rounded-lg bg-surface px-4 py-2 text-sm font-semibold text-text-primary shadow-card focus-ring-target'

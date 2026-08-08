@@ -4,6 +4,7 @@ import * as Dialog from '@radix-ui/react-dialog';
 import { AlertCircle, Check, X } from 'lucide-react';
 import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { EVENTS, track } from '@/lib/analytics';
 import { dialogExitMs } from '@/lib/dialog-timing';
 
 const roles = [
@@ -212,6 +213,7 @@ export function RegistrationForm({ isOpen, onClose }: RegistrationFormProps) {
       // lose their data. There is no way to detect that the mail was actually
       // composed/sent, so the success copy below must not claim the app opened.
       setIsSuccess(true);
+      track(EVENTS.pilotSignup, { role: formData.role });
       setAnnouncement('Registreerimise kiri on koostatud');
     },
     [formData, validateForm],

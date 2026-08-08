@@ -10,6 +10,7 @@ import {
   useRef,
   useState,
 } from 'react';
+import { EVENTS, track } from '@/lib/analytics';
 import { REGISTRATION_COPY } from '@/lib/content/landing-copy';
 import { dialogCloseDelayMs } from '@/lib/dialog-timing';
 
@@ -209,6 +210,7 @@ export function RegistrationProvider({ children }: { children: React.ReactNode }
     }
     setIsRegistrationClosing(false);
     setIsRegistrationOpen(true);
+    track(EVENTS.dialogOpen);
   }, []);
 
   const handleCloseRegistration = useCallback(() => {

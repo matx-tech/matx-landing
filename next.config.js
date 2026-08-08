@@ -4,6 +4,12 @@ const withBundleAnalyzer =
       require('@next/bundle-analyzer')({ enabled: true })
     : (config) => config;
 
+// Plausible analytics proxy target — the site's personalized script URL from
+// the Plausible dashboard (Site Installation → snippet → the
+// https://plausible.io/js/pa-XXXXX.js part). Unset = analytics fully disabled
+// (no rewrites, no script tag rendered).
+const plausibleScriptUrl = process.env.PLAUSIBLE_SCRIPT_URL;
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // Modern image formats for all browsers (Baseline 2024)
@@ -25,6 +31,19 @@ const nextConfig = {
           { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
         ],
       },
+    ];
+  },
+  // Plausible first-party proxy (docs: proxy/guides/vercel | netlify).
+  // Serving the tracker and the event endpoint from our own origin bypasses
+  // adblockers (docs: 5–25% of visits otherwise) and keeps the strict CSP in
+  // proxy.ts untouched — script-src 'self' and connect-src 'self' still cover
+  // both. Paths are the doc-recommended neutral names; the docs warn against
+  // 'analytics'/'stats'/'plausible' in paths.
+  async rewrites() {
+    if (!plausibleScriptUrl) return [];
+    return [
+      { source: '/js/script.js', destination: plausibleScriptUrl },
+      { source: '/api/event', destination: 'https://plausible.io/api/event' },
     ];
   },
   // Disable source maps in production — saves ~40% JS transfer size

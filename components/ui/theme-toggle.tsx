@@ -1,6 +1,7 @@
 'use client';
 
 import { Moon, Sun } from 'lucide-react';
+import { EVENTS, track } from '@/lib/analytics';
 
 const STORAGE_KEY = 'matx-theme';
 
@@ -18,6 +19,7 @@ export function ThemeToggle({ className = '' }: { className?: string }) {
   const toggle = () => {
     const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
     document.documentElement.setAttribute('data-theme', next);
+    track(EVENTS.themeToggle, { theme: next });
     try {
       localStorage.setItem(STORAGE_KEY, next);
     } catch {
