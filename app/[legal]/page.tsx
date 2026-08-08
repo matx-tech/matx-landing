@@ -1,13 +1,14 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
+import { LegalDocument } from '@/components/legal/legal-document';
 import { SITE_META } from '@/lib/content/landing-copy';
+import { SecurityMeasuresSection, SubprocessorTable } from '@/lib/content/legal-content';
 
 const LEGAL_DOCS = {
   privaatsus: {
     title: 'Privaatsuspoliitika',
     description:
       'Kuidas MATx käsitleb isikuandmeid vastavalt isikuandmete kaitse üldmäärusele (GDPR).',
-    updated: 'Kehtib alates: 8. august 2026. Viimati uuendatud: 8. august 2026.',
+    updated: 'Kehtib alates: 8. august 2024. Viimati uuendatud: 8. august 2024.',
     sections: [
       {
         heading: '1. Vastutav töötleja',
@@ -59,7 +60,7 @@ const LEGAL_DOCS = {
       },
       {
         heading: '13. Muudatused privaatsuspoliitikas',
-        body: 'Võime privaatsuspoliitikat ajakohastada. Oluliste muudatuste korral teavitame registreeritud kontaktisikuid e-posti teel 30 päeva ette. Uusim versioon on alati kättesaadav aadressil matx.ee/privaatsus. Viimane uuendus: 8. august 2026.',
+        body: 'Võime privaatsuspoliitikat ajakohastada. Oluliste muudatuste korral teavitame registreeritud kontaktisikuid e-posti teel 30 päeva ette. Uusim versioon on alati kättesaadav aadressil matx.ee/privaatsus. Viimane uuendus: 8. august 2024.',
       },
       {
         heading: '14. Kontaktandmed andmekaitse küsimuste jaoks',
@@ -74,7 +75,7 @@ const LEGAL_DOCS = {
   tingimused: {
     title: 'Teenuse tingimused',
     description: 'MATx-i kasutustingimused piloodi- ja lepingufaasis.',
-    updated: 'Kehtib alates: 8. august 2026. Viimati uuendatud: 8. august 2026.',
+    updated: 'Kehtib alates: 8. august 2024. Viimati uuendatud: 8. august 2024.',
     sections: [
       {
         heading: '1. Lepingu pooled ja kohaldatavus',
@@ -130,7 +131,7 @@ const LEGAL_DOCS = {
     title: 'Andmetöötlusleping (DPA)',
     description:
       'GDPR artikkel 28 kohane leping koolide jaoks, kus kool on vastutav töötleja ja MATx töötleja.',
-    updated: 'Kehtib alates: 8. august 2026. Viimati uuendatud: 8. august 2026.',
+    updated: 'Kehtib alates: 8. august 2024. Viimati uuendatud: 8. august 2024.',
     sections: [
       {
         heading: '1. Lepingu eesmärk ja kohaldamine',
@@ -146,11 +147,11 @@ const LEGAL_DOCS = {
       },
       {
         heading: '4. Allatöötlejad (subprocessors)',
-        body: 'Töötleja kasutab järgmisi allatöötlejaid: (a) LuxVPS (Luxembourg) — veebimajutus; allatöötlejate nimekiri nõudmisel kättesaadav; (b) Cloudflare Inc. (USA) — CDN, DDoS kaitse, e-posti saatmine; Standard Contractual Clauses + EU-U.S. Data Privacy Framework. Cloudflare allatöötlejate nimekiri: cloudflare.com/gdpr/subprocessors (30 päeva etteteatamisega uuendatakse). Uute allatöötlejate lisamine: Töötleja teavitab Vastutavat töötlejat 30 päeva ette. Vastutaval töötlejal on õigus esitada vastuväiteid 10 päeva jooksul põhjendatud andmekaitse kaalutlustel. Vastutaval töötlejal on õigus tutvuda allatöötlejate lepingutega. Töötleja vastutab allatöötlejate GDPR-i nõuete täitmise eest nagu enda eest.',
+        body: <SubprocessorTable />,
       },
       {
         heading: '5. Tehnilised ja korralduslikud turvameetmed (artikkel 32)',
-        body: 'Krüpteerimine: (a) andmed krüpteeritud edastamisel (TLS 1.3); (b) andmebaas krüpteeritud salvestamisel (AES-256); (c) varukoopiad krüpteeritud. Juurdepääsu kontroll: (a) MFA (multi-factor authentication) kohustuslik kõigile töötajatele; (b) rollipõhine juurdepääs (RBAC); (c) juurdepääsu logid säilitatakse 12 kuud. Pseudonümiseerimine: õpilaste nimed asendatakse ID-numbritega tehniliste logide ja veaotsingu käigus. Varukoopiad: igapäevased automaatsed varukoopiad, säilitamine 30 päeva, krüpteeritud. Turvaauditid: plaanime korra aastas sõltumatu audiitori kaasata; tulemused Vastutavale töötlejale nõudmisel. Intsidendi monitooring: automaatsed turvahälvete teatised.',
+        body: <SecurityMeasuresSection />,
       },
       {
         heading: '6. Andmemurre (breach) teated',
@@ -170,7 +171,7 @@ const LEGAL_DOCS = {
       },
       {
         heading: '10. Andmete rahvusvaheline edastus',
-        body: 'Andmed säilitatakse LuxVPS serverites (Luxembourg, EL). Cloudflare CDN võib ajutiselt vahemälustada sisu globaalses võrgus (sealhulgas USA). Õiguslik alus: Standard Contractual Clauses (GDPR artikkel 46(2)(c)) + EU-USA Data Privacy Framework (täiendav kaitse, Euroopa Komisjoni 2023. aasta piisavuse otsus). Cloudflare DPA ja SCC-d: cloudflare.com/cloudflare-customer-dpa. Tehnilise toe kaugtöö: Töötleja töötajad pääsevad andmetele ligi ainult VPN + MFA kaudu, pseudonümiseeritud kujul. Uued kolmandad riigid: ainult Vastutava töötleja eelneval kirjalikul nõusolekul ja GDPR artikli 46 kohaste kaitsemeetmetega (standard contractual clauses, binding corporate rules).',
+        body: 'Andmed töödeldakse LuxVPS infrastruktuuris (esmane asukoht Luxembourg, täpne asukoht vastavalt LuxVPS teenustingimustele). LuxVPS kasutab allatöötlejaid, mis võivad töödelda andmeid väljaspool EL-i (USA: Stripe, PayPal, Google, Cloudflare, Tawk.to). Õiguslik alus: Standard Contractual Clauses (GDPR artikkel 46(2)(c), Komisjoni otsus 2021/914, Module 2). Cloudflare CDN võib ajutiselt vahemälustada sisu globaalses võrgus. LuxVPS DPA: luxvps.net/terms. Cloudflare DPA ja SCC-d: cloudflare.com/cloudflare-customer-dpa. Tehnilise toe kaugtöö: Töötleja töötajad pääsevad andmetele ligi ainult VPN + MFA kaudu, pseudonümiseeritud kujul. Uued kolmandad riigid: ainult Vastutava töötleja eelneval kirjalikul nõusolekul ja GDPR artikli 46 kohaste kaitsemeetmetega.',
       },
       {
         heading: '11. Lepingu kestus ja lõpetamine',
@@ -178,7 +179,7 @@ const LEGAL_DOCS = {
       },
       {
         heading: '12. Vastutus ja hüvitised',
-        body: 'Töötleja vastutab GDPR artikli 82 alusel kahju eest, mis tekib GDPR-i rikkumisest Töötleja süül. Vastutuse jaotus: kui kahju tuleneb nii Vastutavast töötlejast kui Töötlejast, vastutavad proportsionaalselt (GDPR artikkel 82(5)). Vastutuse piirmäär: tahtluse või raske hooletuse puudumisel kuni 12 kuu teenustasu (piloodis tasuta, seega kuni €50,000). Välistamatud vastutused: isikukahju, tahtlus ja raske hooletus — vastutus täies ulatuses.',
+        body: 'Töötleja vastutab GDPR artikli 82 alusel kahju eest, mis tekib GDPR-i rikkumisest Töötleja süül. Vastutuse jaotus: kui kahju tuleneb nii Vastutavast töötlejast kui Töötlejast, vastutavad proportsionaalselt (GDPR artikkel 82(5)). Vastutuse piirmäär: tahtluse või raske hooletuse puudumisel kuni 12 kuu teenustasu (piloodis tasuta, seega piirdub tegelike otseste kuludega, max kohaldatav seaduslik piirmäär). Allatöötlejate vastutusepiirangud: LuxVPS piirmäär 12 kuu teenustasu (luxvps.net/terms § 15); Cloudflare vastavalt Cloudflare DPA tingimustele. Välistamatud vastutused: isikukahju, tahtlus ja raske hooletus — vastutus täies ulatuses.',
       },
       {
         heading: '13. Kontaktandmed',
@@ -226,38 +227,5 @@ export default async function LegalPage({ params }: { params: Promise<{ legal: s
   const { legal } = await params;
   const doc = LEGAL_DOCS[legal as LegalSlug];
 
-  return (
-    <main id='main' className='pt-16 min-h-screen'>
-      <div className='container mx-auto px-4 md:px-8 lg:px-16 py-16 max-w-3xl'>
-        <p className='text-xs font-medium text-text-secondary uppercase tracking-wider mb-3'>
-          MATx · Õiguslik teave
-        </p>
-        <h1 className='text-3xl md:text-4xl font-display font-bold text-text-primary mb-2'>
-          {doc.title}
-        </h1>
-        <p className='text-text-secondary mb-6'>{doc.updated}</p>
-
-        <div className='space-y-6'>
-          {doc.sections.map((section) => (
-            <section
-              key={section.heading}
-              className='p-6 bg-surface rounded-xl border border-border'
-            >
-              <h2 className='text-lg font-display font-semibold text-text-primary mb-2'>
-                {section.heading}
-              </h2>
-              <p className='text-text-secondary text-sm leading-relaxed'>{section.body}</p>
-            </section>
-          ))}
-        </div>
-
-        <Link
-          href='/'
-          className='inline-block mt-10 text-primary hover:text-secondary transition-colors text-sm focus-ring-target rounded-md underline'
-        >
-          ← Tagasi avalehele
-        </Link>
-      </div>
-    </main>
-  );
+  return <LegalDocument title={doc.title} updated={doc.updated} sections={doc.sections} />;
 }
