@@ -43,24 +43,32 @@ export async function POST(request: Request) {
       : data.role;
 
   const lines = [
-    `*Kool*\n${data.schoolName}`,
-    `*Kontaktisik*\n${data.contactName}`,
-    `*Roll*\n${role}`,
-    `*E-post*\n<mailto:${data.email}|${data.email}>`,
-    `*Telefon*\n${data.phone}`,
-    `*Klassirühmad*\n${data.classGroups}`,
-  ].join('\n\n');
+    'Uus piloodi registreerimine',
+    `Kool: ${data.schoolName}`,
+    `Kontaktisik: ${data.contactName}`,
+    `Roll: ${role}`,
+    `E-post: ${data.email}`,
+    `Telefon: ${data.phone}`,
+    `Klassirühmad: ${data.classGroups}`,
+  ].join('\n');
 
   const payload = {
-    text: lines.replace(/\*([^*]+)\*/g, '$1').replace(/<mailto:[^|]+\|([^>]+)>/g, '$1'),
+    text: lines, // fallback for push notifications and plain-text clients
     blocks: [
       {
         type: 'header',
-        text: { type: 'plain_text', text: 'Uus piloodi registreerimine' },
+        text: { type: 'plain_text', text: '📋 Uus piloodi registreerimine' },
       },
       {
         type: 'section',
-        text: { type: 'mrkdwn', text: lines },
+        fields: [
+          { type: 'mrkdwn', text: `🏫 *Kool*\n${data.schoolName}` },
+          { type: 'mrkdwn', text: `👤 *Kontaktisik*\n${data.contactName}` },
+          { type: 'mrkdwn', text: `💼 *Roll*\n${role}` },
+          { type: 'mrkdwn', text: `📧 *E-post*\n<mailto:${data.email}|${data.email}>` },
+          { type: 'mrkdwn', text: `📞 *Telefon*\n${data.phone}` },
+          { type: 'mrkdwn', text: `👥 *Klassirühmad*\n${data.classGroups}` },
+        ],
       },
     ],
   };
