@@ -1,4 +1,4 @@
-import { test, expect } from '../support/fixtures';
+import { expect, test } from '../support/fixtures';
 import { revealSection } from '../support/helpers/reveal';
 
 test.describe('registration dialog', () => {

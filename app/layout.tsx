@@ -1,7 +1,7 @@
 import './globals.css';
 import type { Metadata } from 'next';
+import { IBM_Plex_Mono, Inter, Public_Sans } from 'next/font/google';
 import { headers } from 'next/headers';
-import { Public_Sans, Inter, IBM_Plex_Mono } from 'next/font/google';
 import { LenisProvider } from '@/components/providers/lenis-provider';
 import { SITE_META } from '@/lib/content/landing-copy';
 
@@ -82,18 +82,20 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const nonce = (await headers()).get('x-nonce') ?? '';
 
   return (
-    <html lang="et" className={`${publicSans.variable} ${inter.variable} ${ibmPlexMono.variable}`}>
+    <html lang='et' className={`${publicSans.variable} ${inter.variable} ${ibmPlexMono.variable}`}>
       <head>
         {/* Structural data for search engines */}
         <script
           nonce={nonce}
+          // biome-ignore lint/security/noDangerouslySetInnerHtml: inline theme bootstrap, must run before React hydrates
           dangerouslySetInnerHTML={{
             __html: `(function(){try{var t=localStorage.getItem('matx-theme');if(!t){t=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){}})();`,
           }}
         />
         <script
-          type="application/ld+json"
+          type='application/ld+json'
           nonce={nonce}
+          // biome-ignore lint/security/noDangerouslySetInnerHtml: JSON-LD structured data, static schema.org content
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               '@context': 'https://schema.org',
@@ -122,7 +124,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         />
       </head>
       <body className={`${inter.className} antialiased`}>
-        <a href="#main" className="skip-link">
+        <a href='#main' className='skip-link'>
           Jäta navigatsioon vahele
         </a>
         <LenisProvider>{children}</LenisProvider>

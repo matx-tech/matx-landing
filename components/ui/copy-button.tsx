@@ -6,8 +6,8 @@
  * Success state is set only when a copy path actually succeeded.
  */
 
-import { useEffect, useRef, useState } from 'react';
 import { Check, Copy } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 
 interface CopyButtonProps {
   value: string;
@@ -62,16 +62,16 @@ export function CopyButton({
   return (
     <button
       ref={buttonRef}
-      type="button"
+      type='button'
       onClick={handleCopy}
       aria-label={copied ? copiedLabel : label}
       title={copied ? copiedLabel : label}
       className={className}
     >
       {copied ? (
-        <Check className="w-4 h-4 shrink-0" aria-hidden="true" />
+        <Check className='w-4 h-4 shrink-0' aria-hidden='true' />
       ) : (
-        <Copy className="w-4 h-4 shrink-0" aria-hidden="true" />
+        <Copy className='w-4 h-4 shrink-0' aria-hidden='true' />
       )}
       {children}
     </button>

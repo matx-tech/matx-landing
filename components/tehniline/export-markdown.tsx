@@ -79,9 +79,9 @@ export function ExportMarkdown({
   return (
     <CopyButton
       value={markdown}
-      label="Kopeeri Markdown (LLM- ja auditeksport)"
-      copiedLabel="Markdown kopeeritud!"
-      className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-4 py-2 text-sm font-medium text-text-secondary hover:border-borderStrong hover:text-text-primary transition-colors focus-ring-target"
+      label='Kopeeri Markdown (LLM- ja auditeksport)'
+      copiedLabel='Markdown kopeeritud!'
+      className='inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-4 py-2 text-sm font-medium text-text-secondary hover:border-borderStrong hover:text-text-primary transition-colors focus-ring-target'
     >
       Kopeeri Markdown
     </CopyButton>

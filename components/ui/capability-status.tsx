@@ -6,8 +6,8 @@
  * tokens so they remap automatically in dark mode.
  */
 
-import { Check, Clock, Rocket } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
+import { Check, Clock, Rocket } from 'lucide-react';
 import type { CapabilityStatus } from '@/lib/content/landing-copy';
 
 interface CapabilityStatusProps {
@@ -16,12 +16,9 @@ interface CapabilityStatusProps {
 }
 
 const STATUS_STYLES: Record<CapabilityStatus, string> = {
-  Saadaval:
-    'bg-success-surface border-success-border text-success-strong',
-  Piloodis:
-    'bg-warning-surface border-warning-border text-warning-strong',
-  Kavandatud:
-    'bg-transparent border-border text-text-secondary',
+  Saadaval: 'bg-success-surface border-success-border text-success-strong',
+  Piloodis: 'bg-warning-surface border-warning-border text-warning-strong',
+  Kavandatud: 'bg-transparent border-border text-text-secondary',
 };
 
 const STATUS_ICONS: Record<CapabilityStatus, LucideIcon> = {
@@ -42,14 +39,17 @@ export function CapabilityStatusBadge({ status, className = '' }: CapabilityStat
   const Icon = STATUS_ICONS[status];
   return (
     <span
-      className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium border ${STATUS_STYLES[status]} ${className}`}
+      className={`inline-flex shrink-0 whitespace-nowrap items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium border ${STATUS_STYLES[status]} ${className}`}
       aria-label={`Staatus: ${status}`}
-      role="img"
+      role='img'
     >
       {STATUS_LIVE_DOT[status] && (
-        <span className="h-1.5 w-1.5 rounded-full bg-current animate-pulse motion-reduce:animate-none" aria-hidden="true" />
+        <span
+          className='h-1.5 w-1.5 rounded-full bg-current animate-pulse motion-reduce:animate-none'
+          aria-hidden='true'
+        />
       )}
-      <Icon className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
+      <Icon className='w-3.5 h-3.5 shrink-0' aria-hidden='true' />
       {status}
     </span>
   );

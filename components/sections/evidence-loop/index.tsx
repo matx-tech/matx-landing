@@ -5,12 +5,12 @@
 
 'use client';
 
-import { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useEffect, useRef } from 'react';
 import { EVIDENCE_STAGES, SECTION_IDS } from '@/lib/content/landing-copy';
 import { usePrefersReducedMotion } from '@/lib/hooks/use-prefers-reduced-motion';
-import { motionTokens, gsapEase } from '@/lib/motion-tokens';
+import { gsapEase, motionTokens } from '@/lib/motion-tokens';
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
@@ -54,7 +54,7 @@ export function EvidenceLoopSection() {
               start: 'top 80%',
               toggleActions: 'play none none reverse',
             },
-          }
+          },
         );
       });
 
@@ -73,7 +73,7 @@ export function EvidenceLoopSection() {
               end: 'bottom 40%',
               scrub: 1,
             },
-          }
+          },
         );
       }
     }, sectionRef);
@@ -91,60 +91,58 @@ export function EvidenceLoopSection() {
     <section
       ref={sectionRef}
       id={SECTION_IDS.workflow}
-      className="py-24 md:py-32 lg:py-40 bg-canvas relative"
+      className='py-24 md:py-32 lg:py-40 bg-canvas relative'
     >
-      <div className="container mx-auto px-4 md:px-8 lg:px-16">
+      <div className='container mx-auto px-4 md:px-8 lg:px-16'>
         {/* Section header */}
-        <div className="max-w-3xl mx-auto text-center mb-16">
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-text-primary mb-4">
+        <div className='max-w-3xl mx-auto text-center mb-16'>
+          <h2 className='text-3xl md:text-4xl lg:text-5xl font-bold text-text-primary mb-4'>
             Kuidas töövoog toimib
           </h2>
-          <p className="text-lg text-text-secondary">
+          <p className='text-lg text-text-secondary'>
             Neli sammu õpilase vastusest õpetaja otsuseni
           </p>
         </div>
 
         {/* Evidence stages */}
-        <div className="max-w-4xl mx-auto relative">
+        <div className='max-w-4xl mx-auto relative'>
           {/* Connector line */}
           <div
             ref={connectorRef}
-            className="absolute left-8 top-8 bottom-8 w-0.5 bg-gradient-to-b from-blue-200 via-blue-400 to-green-400 origin-top hidden md:block"
-            aria-hidden="true"
+            className='absolute left-8 top-8 bottom-8 w-0.5 bg-gradient-to-b from-blue-200 via-blue-400 to-green-400 origin-top hidden md:block'
+            aria-hidden='true'
             style={{ transformOrigin: 'top' }}
           />
 
           {/* Stages list */}
-          <ol className="space-y-8 relative">
+          <ol className='space-y-8 relative'>
             {EVIDENCE_STAGES.map((stage, index) => (
               <li
                 key={stage.number}
                 ref={(el) => {
                   stagesRef.current[index] = el;
                 }}
-                className="relative"
+                className='relative'
               >
-                <div className="flex gap-6 items-start">
+                <div className='flex gap-6 items-start'>
                   {/* Stage number */}
                   <div
-                    className="flex-shrink-0 w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-green-500 flex items-center justify-center text-white font-bold text-xl shadow-lg relative z-10"
-                    aria-hidden="true"
+                    className='flex-shrink-0 w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-green-500 flex items-center justify-center text-white font-bold text-xl shadow-lg relative z-10'
+                    aria-hidden='true'
                   >
                     {stage.number}
                   </div>
 
                   {/* Stage content */}
-                  <div className="flex-1 bg-card rounded-xl p-6 shadow-sm border border-border">
-                    <h3 className="text-xl font-semibold text-text-primary mb-2">
-                      {stage.title}
-                    </h3>
-                    <p className="text-text-secondary">
-                      {stage.description}
-                    </p>
+                  <div className='flex-1 bg-card rounded-xl p-6 shadow-sm border border-border'>
+                    <h3 className='text-xl font-semibold text-text-primary mb-2'>{stage.title}</h3>
+                    <p className='text-text-secondary'>{stage.description}</p>
 
                     {/* Caveat (from centralized data) */}
                     {'caveat' in stage && (
-                      <div className={`mt-3 text-sm px-3 py-2 rounded border ${caveatStyles[stage.tone] ?? caveatStyles.info}`}>
+                      <div
+                        className={`mt-3 text-sm px-3 py-2 rounded border ${caveatStyles[stage.tone] ?? caveatStyles.info}`}
+                      >
                         {stage.caveat}
                       </div>
                     )}

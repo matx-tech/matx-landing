@@ -1,9 +1,17 @@
 'use client';
 
-import { useState, useRef, useCallback, useEffect, useContext, useMemo, createContext } from 'react';
 import dynamic, { type DynamicOptionsLoadingProps } from 'next/dynamic';
-import { dialogCloseDelayMs } from '@/lib/dialog-timing';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { REGISTRATION_COPY } from '@/lib/content/landing-copy';
+import { dialogCloseDelayMs } from '@/lib/dialog-timing';
 
 // Cancel channel for the chunk-loading fallback: next/dynamic renders the
 // `loading` fallback inside the page tree, so it can ask the provider to
@@ -53,8 +61,8 @@ function RegistrationChunkFallback({ error, retry }: DynamicOptionsLoadingProps)
 
       const focusables = Array.from(
         overlayRef.current.querySelectorAll<HTMLElement>(
-          'button:not([disabled]), [href], [tabindex]:not([tabindex="-1"])'
-        )
+          'button:not([disabled]), [href], [tabindex]:not([tabindex="-1"])',
+        ),
       ).filter((el) => el.offsetParent !== null);
 
       if (focusables.length === 0) return;
@@ -94,54 +102,59 @@ function RegistrationChunkFallback({ error, retry }: DynamicOptionsLoadingProps)
   }, []);
 
   return (
+    // biome-ignore lint/a11y/useKeyWithClickEvents: Escape cancels via the window keydown listener in the effect above
     <div
       ref={overlayRef}
-      role="dialog"
-      aria-modal="true"
+      role='dialog'
+      aria-modal='true'
       aria-label={error ? REGISTRATION_COPY.error : REGISTRATION_COPY.loading}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-canvas/95 touch-none"
+      className='fixed inset-0 z-50 flex items-center justify-center bg-canvas/95 touch-none'
       onClick={handleCancel}
     >
       {error ? (
+        // biome-ignore lint/a11y/useKeyWithClickEvents: passive click-blocker, keeps panel clicks off the backdrop handler
+        // biome-ignore lint/a11y/noStaticElementInteractions: passive click-blocker, not an interactive control
         <div
-          className="flex flex-col items-center gap-4 px-6 text-center"
+          className='flex flex-col items-center gap-4 px-6 text-center'
           onClick={(event) => event.stopPropagation()}
         >
-          <p className="text-text-primary">{REGISTRATION_COPY.error}</p>
-          <div className="flex gap-3">
+          <p className='text-text-primary'>{REGISTRATION_COPY.error}</p>
+          <div className='flex gap-3'>
             <button
-              type="button"
+              type='button'
               ref={retryButtonRef}
               onClick={retry}
-              className="rounded-lg bg-primary px-6 py-3 font-semibold text-text-inverse transition-colors hover:bg-primary/90 focus-ring-target min-h-[44px]"
+              className='rounded-lg bg-primary px-6 py-3 font-semibold text-text-inverse transition-colors hover:bg-primary/90 focus-ring-target min-h-[44px]'
             >
               {REGISTRATION_COPY.retry}
             </button>
             <button
-              type="button"
+              type='button'
               ref={cancelButtonRef}
               onClick={handleCancel}
-              className="rounded-lg border border-border px-6 py-3 font-semibold text-text-primary transition-colors hover:bg-surface focus-ring-target min-h-[44px]"
+              className='rounded-lg border border-border px-6 py-3 font-semibold text-text-primary transition-colors hover:bg-surface focus-ring-target min-h-[44px]'
             >
               {REGISTRATION_COPY.close}
             </button>
           </div>
         </div>
       ) : (
+        // biome-ignore lint/a11y/useKeyWithClickEvents: passive click-blocker, keeps panel clicks off the backdrop handler
+        // biome-ignore lint/a11y/noStaticElementInteractions: passive click-blocker, not an interactive control
         <div
-          className="flex flex-col items-center gap-6"
+          className='flex flex-col items-center gap-6'
           onClick={(event) => event.stopPropagation()}
         >
           <div
-            aria-hidden="true"
-            className="h-10 w-10 animate-spin rounded-full border-2 border-primary border-t-transparent"
+            aria-hidden='true'
+            className='h-10 w-10 animate-spin rounded-full border-2 border-primary border-t-transparent'
           />
-          <span className="sr-only">{REGISTRATION_COPY.loading}</span>
+          <span className='sr-only'>{REGISTRATION_COPY.loading}</span>
           <button
-            type="button"
+            type='button'
             ref={cancelButtonRef}
             onClick={handleCancel}
-            className="rounded-lg border border-border px-6 py-3 font-semibold text-text-primary transition-colors hover:bg-surface focus-ring-target min-h-[44px]"
+            className='rounded-lg border border-border px-6 py-3 font-semibold text-text-primary transition-colors hover:bg-surface focus-ring-target min-h-[44px]'
           >
             {REGISTRATION_COPY.cancel}
           </button>
@@ -161,7 +174,7 @@ const RegistrationForm = dynamic(
     // subscription, so the page doesn't blank), letting the overlay degrade
     // to a visible retry state instead of a dead click.
     loading: (loadingProps) => <RegistrationChunkFallback {...loadingProps} />,
-  }
+  },
 );
 
 const RegistrationContext = createContext<{ openRegistration: () => void }>({
@@ -225,19 +238,19 @@ export function RegistrationProvider({ children }: { children: React.ReactNode }
 
   const registrationChunkContextValue = useMemo(
     () => ({ cancel: handleCancelPendingOpen }),
-    [handleCancelPendingOpen]
+    [handleCancelPendingOpen],
   );
 
   const registrationContextValue = useMemo(
     () => ({ openRegistration: handleOpenRegistration }),
-    [handleOpenRegistration]
+    [handleOpenRegistration],
   );
 
   useEffect(
     () => () => {
       if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
     },
-    []
+    [],
   );
 
   return (

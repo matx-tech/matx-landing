@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 
 // Nonce-based CSP, chosen over static hashes: Next.js emits multiple inline
 // scripts per page (theme bootstrap, RSC flight payload) and any edit to them

@@ -117,39 +117,38 @@ export async function generateMetadata({
  *
  * @param params - The route parameters containing the legal document slug.
  */
-export default async function LegalPage({
-  params,
-}: {
-  params: Promise<{ legal: string }>;
-}) {
+export default async function LegalPage({ params }: { params: Promise<{ legal: string }> }) {
   const { legal } = await params;
   const doc = LEGAL_DOCS[legal as LegalSlug];
 
   return (
-    <main id="main" className="pt-16 min-h-screen">
-      <div className="container mx-auto px-4 md:px-8 lg:px-16 py-16 max-w-3xl">
-        <p className="text-xs font-medium text-text-secondary uppercase tracking-wider mb-3">
+    <main id='main' className='pt-16 min-h-screen'>
+      <div className='container mx-auto px-4 md:px-8 lg:px-16 py-16 max-w-3xl'>
+        <p className='text-xs font-medium text-text-secondary uppercase tracking-wider mb-3'>
           MATx · Õiguslik teave
         </p>
-        <h1 className="text-3xl md:text-4xl font-display font-bold text-text-primary mb-2">
+        <h1 className='text-3xl md:text-4xl font-display font-bold text-text-primary mb-2'>
           {doc.title}
         </h1>
-        <p className="text-text-secondary mb-6">{doc.updated}</p>
+        <p className='text-text-secondary mb-6'>{doc.updated}</p>
 
-        <div className="space-y-6">
+        <div className='space-y-6'>
           {doc.sections.map((section) => (
-            <section key={section.heading} className="p-6 bg-surface rounded-xl border border-border">
-              <h2 className="text-lg font-display font-semibold text-text-primary mb-2">
+            <section
+              key={section.heading}
+              className='p-6 bg-surface rounded-xl border border-border'
+            >
+              <h2 className='text-lg font-display font-semibold text-text-primary mb-2'>
                 {section.heading}
               </h2>
-              <p className="text-text-secondary text-sm leading-relaxed">{section.body}</p>
+              <p className='text-text-secondary text-sm leading-relaxed'>{section.body}</p>
             </section>
           ))}
         </div>
 
         <Link
-          href="/"
-          className="inline-block mt-10 text-primary hover:text-secondary transition-colors text-sm focus-ring-target rounded-md"
+          href='/'
+          className='inline-block mt-10 text-primary hover:text-secondary transition-colors text-sm focus-ring-target rounded-md'
           style={{ textDecoration: 'underline' }}
         >
           ← Tagasi avalehele

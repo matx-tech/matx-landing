@@ -1,4 +1,4 @@
-import { test, expect } from '../support/fixtures';
+import { expect, test } from '../support/fixtures';
 
 test.describe('homepage', () => {
   test('hero renders with title and primary CTA', async ({ openHome, page }) => {
@@ -18,9 +18,7 @@ test.describe('homepage', () => {
 
     const links = page.locator('nav a[href^="#"]');
     const hrefs = await links.evaluateAll((els) =>
-      els
-        .map((el) => el.getAttribute('href'))
-        .filter((href): href is string => Boolean(href)),
+      els.map((el) => el.getAttribute('href')).filter((href): href is string => Boolean(href)),
     );
 
     expect(hrefs.length).toBeGreaterThan(0);

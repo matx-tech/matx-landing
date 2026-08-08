@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { type ReactNode, useEffect, useRef, useState } from 'react';
 
 interface SectionGateProps {
   children: ReactNode;
@@ -103,20 +103,17 @@ export function SectionGate({
         const el = document.getElementById(id);
         return el instanceof HTMLElement ? el : null;
       }
-      return (
-        revealedRef.current?.querySelector('h1, h2, h3, h4, h5, h6') ?? null
-      );
+      return revealedRef.current?.querySelector('h1, h2, h3, h4, h5, h6') ?? null;
     };
 
     // The failed-chunk fallback section (or its wrapper, for id-less gates)
     // isn't the final hand-off target — return its retry control so focus
     // lands on the actionable element without committing the hand-off.
     const errorRetryTarget = (target: HTMLElement): HTMLButtonElement | null =>
-      (target.closest('[data-gate-state="error"]') ??
-        target.querySelector('[data-gate-state="error"]'))?.querySelector<HTMLButtonElement>(
-        'button'
-      ) ??
-      null;
+      (
+        target.closest('[data-gate-state="error"]') ??
+        target.querySelector('[data-gate-state="error"]')
+      )?.querySelector<HTMLButtonElement>('button') ?? null;
 
     // Park focus on the retry control only when focus was actually lost —
     // i.e. it dropped to <body> because the previous retry button unmounted
@@ -193,7 +190,8 @@ export function SectionGate({
           const wrapper = revealedRef.current;
           const retry = wrapper ? errorRetryTarget(wrapper) : null;
           if (retry) focusRetry(retry);
-          else if (document.activeElement === document.body) wrapper?.focus({ preventScroll: true });
+          else if (document.activeElement === document.body)
+            wrapper?.focus({ preventScroll: true });
         }
         return; // slow path below keeps watching
       }
@@ -261,12 +259,12 @@ export function SectionGate({
     <div ref={containerRef}>
       <div ref={ref} id={id} className={`relative ${placeholderClassName} scroll-mt-20`}>
         <button
-          type="button"
+          type='button'
           onClick={() => {
             openedByButtonRef.current = true;
             setVisible(true);
           }}
-          className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 rounded-lg bg-surface px-4 py-2 text-sm font-semibold text-text-primary shadow-card focus-ring-target"
+          className='sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 rounded-lg bg-surface px-4 py-2 text-sm font-semibold text-text-primary shadow-card focus-ring-target'
         >
           Laadi sisu
         </button>

@@ -1,13 +1,13 @@
 'use client';
 
-import { useRef, useEffect } from 'react';
-import Link from 'next/link';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { Award, GraduationCap, Mail, MessageCircle, Building2, GitBranch } from 'lucide-react';
+import { Award, Building2, GitBranch, GraduationCap, Mail, MessageCircle } from 'lucide-react';
+import Link from 'next/link';
+import { useEffect, useRef } from 'react';
+import { CALENDLY_URL, SECTION_IDS, TECH_OVERVIEW } from '@/lib/content/landing-copy';
 import { usePrefersReducedMotion } from '@/lib/hooks/use-prefers-reduced-motion';
-import { motionTokens, gsapEase, staggers } from '@/lib/motion-tokens';
-import { SECTION_IDS, CALENDLY_URL, TECH_OVERVIEW } from '@/lib/content/landing-copy';
+import { gsapEase, motionTokens, staggers } from '@/lib/motion-tokens';
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
@@ -55,7 +55,7 @@ export function FooterSection() {
               start: 'top 85%',
               toggleActions: 'play none none reverse',
             },
-          }
+          },
         );
       }
 
@@ -74,7 +74,7 @@ export function FooterSection() {
               start: 'top 85%',
               toggleActions: 'play none none reverse',
             },
-          }
+          },
         );
       }
 
@@ -93,7 +93,7 @@ export function FooterSection() {
               end: 'bottom bottom',
               scrub: 0.5,
             },
-          }
+          },
         );
       }
     }, footerRef);
@@ -102,71 +102,111 @@ export function FooterSection() {
   }, [prefersReducedMotion]);
 
   return (
-    <footer ref={footerRef} className="relative bg-canvas border-t border-border section-fade-from-surface">
-      <div className="container mx-auto px-4 md:px-8 lg:px-16 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
+    <footer
+      ref={footerRef}
+      className='relative bg-canvas border-t border-border section-fade-from-surface'
+    >
+      <div className='container mx-auto px-4 md:px-8 lg:px-16 py-16'>
+        <div className='grid grid-cols-1 md:grid-cols-4 gap-8 mb-12'>
           {/* Logo & Description */}
           <div
-            ref={(el) => { sectionsRef.current[0] = el; }}
-            className="md:col-span-2"
+            ref={(el) => {
+              sectionsRef.current[0] = el;
+            }}
+            className='md:col-span-2'
           >
-            <div className="flex items-center gap-2 mb-4">
-              <span className="text-2xl font-display font-bold">
-                <span className="text-primary">MAT</span>
-                <span className="text-secondary">x</span>
+            <div className='flex items-center gap-2 mb-4'>
+              <span className='text-2xl font-display font-bold'>
+                <span className='text-primary'>MAT</span>
+                <span className='text-secondary'>x</span>
               </span>
             </div>
-            <p className="text-text-secondary text-sm max-w-md mb-4">
-              Adaptiivne matemaatikaõpikeskkond Eesti põhikoolidele. Andmepõhine õpitee, teaduslikel alustel.
+            <p className='text-text-secondary text-sm max-w-md mb-4'>
+              Adaptiivne matemaatikaõpikeskkond Eesti põhikoolidele. Andmepõhine õpitee, teaduslikel
+              alustel.
             </p>
-            <div className="flex flex-wrap gap-4">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-elevated border border-border">
-                <Award className="w-3 h-3 text-warning" />
-                <span className="text-xs text-text-secondary">FELLIN HÄKK 2026</span>
+            <div className='flex flex-wrap gap-4'>
+              <div className='inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-elevated border border-border'>
+                <Award className='w-3 h-3 text-warning' />
+                <span className='text-xs text-text-secondary'>FELLIN HÄKK 2026</span>
               </div>
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-elevated border border-border">
-                <GraduationCap className="w-3 h-3 text-secondary" />
-                <span className="text-xs text-text-secondary">Presidendi Häkaton</span>
+              <div className='inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-elevated border border-border'>
+                <GraduationCap className='w-3 h-3 text-secondary' />
+                <span className='text-xs text-text-secondary'>Presidendi Häkaton</span>
               </div>
             </div>
           </div>
 
           {/* Links */}
-          <div ref={(el) => { sectionsRef.current[1] = el; }}>
-            <h3 className="text-text-primary font-display font-semibold mb-4 text-sm">Navigatsioon</h3>
-            <ul className="space-y-2">
+          <div
+            ref={(el) => {
+              sectionsRef.current[1] = el;
+            }}
+          >
+            <h3 className='text-text-primary font-display font-semibold mb-4 text-sm'>
+              Navigatsioon
+            </h3>
+            <ul className='space-y-2'>
               <li>
-                <a href={`#${SECTION_IDS.problem}`} className="text-text-secondary hover:text-primary transition-colors text-sm focus-ring-target rounded-md" style={{ textDecoration: 'underline' }}>
+                <a
+                  href={`#${SECTION_IDS.problem}`}
+                  className='text-text-secondary hover:text-primary transition-colors text-sm focus-ring-target rounded-md'
+                  style={{ textDecoration: 'underline' }}
+                >
                   Probleem
                 </a>
               </li>
               <li>
-                <a href={`#${SECTION_IDS.workflow}`} className="text-text-secondary hover:text-primary transition-colors text-sm focus-ring-target rounded-md" style={{ textDecoration: 'underline' }}>
+                <a
+                  href={`#${SECTION_IDS.workflow}`}
+                  className='text-text-secondary hover:text-primary transition-colors text-sm focus-ring-target rounded-md'
+                  style={{ textDecoration: 'underline' }}
+                >
                   Töövoog
                 </a>
               </li>
               <li>
-                <a href={`#${SECTION_IDS.capabilities}`} className="text-text-secondary hover:text-primary transition-colors text-sm focus-ring-target rounded-md" style={{ textDecoration: 'underline' }}>
+                <a
+                  href={`#${SECTION_IDS.capabilities}`}
+                  className='text-text-secondary hover:text-primary transition-colors text-sm focus-ring-target rounded-md'
+                  style={{ textDecoration: 'underline' }}
+                >
                   Teemad
                 </a>
               </li>
               <li>
-                <a href={`#${SECTION_IDS.student}`} className="text-text-secondary hover:text-primary transition-colors text-sm focus-ring-target rounded-md" style={{ textDecoration: 'underline' }}>
+                <a
+                  href={`#${SECTION_IDS.student}`}
+                  className='text-text-secondary hover:text-primary transition-colors text-sm focus-ring-target rounded-md'
+                  style={{ textDecoration: 'underline' }}
+                >
                   Õpitee
                 </a>
               </li>
               <li>
-                <a href={`#${SECTION_IDS.teacher}`} className="text-text-secondary hover:text-primary transition-colors text-sm focus-ring-target rounded-md" style={{ textDecoration: 'underline' }}>
+                <a
+                  href={`#${SECTION_IDS.teacher}`}
+                  className='text-text-secondary hover:text-primary transition-colors text-sm focus-ring-target rounded-md'
+                  style={{ textDecoration: 'underline' }}
+                >
                   Õpetajale
                 </a>
               </li>
               <li>
-                <a href={`#${SECTION_IDS.faq}`} className="text-text-secondary hover:text-primary transition-colors text-sm focus-ring-target rounded-md" style={{ textDecoration: 'underline' }}>
+                <a
+                  href={`#${SECTION_IDS.faq}`}
+                  className='text-text-secondary hover:text-primary transition-colors text-sm focus-ring-target rounded-md'
+                  style={{ textDecoration: 'underline' }}
+                >
                   KKK
                 </a>
               </li>
               <li>
-                <Link href={TECH_OVERVIEW.href} className="text-text-secondary hover:text-primary transition-colors text-sm focus-ring-target rounded-md" style={{ textDecoration: 'underline' }}>
+                <Link
+                  href={TECH_OVERVIEW.href}
+                  className='text-text-secondary hover:text-primary transition-colors text-sm focus-ring-target rounded-md'
+                  style={{ textDecoration: 'underline' }}
+                >
                   {TECH_OVERVIEW.label}
                 </Link>
               </li>
@@ -174,13 +214,17 @@ export function FooterSection() {
           </div>
 
           {/* Contact */}
-          <div ref={(el) => { sectionsRef.current[2] = el; }}>
-            <h3 className="text-text-primary font-display font-semibold mb-4 text-sm">Kontakt</h3>
-            <ul className="space-y-2">
+          <div
+            ref={(el) => {
+              sectionsRef.current[2] = el;
+            }}
+          >
+            <h3 className='text-text-primary font-display font-semibold mb-4 text-sm'>Kontakt</h3>
+            <ul className='space-y-2'>
               <li>
                 <a
-                  href="mailto:andri@matx.ee"
-                  className="text-text-secondary hover:text-primary transition-colors text-sm focus-ring-target rounded-md"
+                  href='mailto:andri@matx.ee'
+                  className='text-text-secondary hover:text-primary transition-colors text-sm focus-ring-target rounded-md'
                   style={{ textDecoration: 'underline' }}
                 >
                   andri@matx.ee
@@ -189,9 +233,9 @@ export function FooterSection() {
               <li>
                 <a
                   href={CALENDLY_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-text-secondary hover:text-secondary transition-colors text-sm focus-ring-target rounded-md"
+                  target='_blank'
+                  rel='noopener noreferrer'
+                  className='text-text-secondary hover:text-secondary transition-colors text-sm focus-ring-target rounded-md'
                   style={{ textDecoration: 'underline' }}
                 >
                   Broneeri vestlus
@@ -200,65 +244,84 @@ export function FooterSection() {
             </ul>
 
             {/* Social Links */}
-            <div className="flex gap-4 mt-4">
+            <div className='flex gap-4 mt-4'>
               <a
-                href="https://twitter.com/matx_ee"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-11 h-11 rounded-lg bg-elevated border border-border flex items-center justify-center hover:bg-surface transition-colors focus-ring-target"
-                aria-label="MATx Twitter"
+                href='https://twitter.com/matx_ee'
+                target='_blank'
+                rel='noopener noreferrer'
+                className='w-11 h-11 rounded-lg bg-elevated border border-border flex items-center justify-center hover:bg-surface transition-colors focus-ring-target'
+                aria-label='MATx Twitter'
               >
-                <MessageCircle className="w-4 h-4 text-text-secondary" />
+                <MessageCircle className='w-4 h-4 text-text-secondary' />
               </a>
               <a
-                href="https://linkedin.com/company/matx-ee"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-11 h-11 rounded-lg bg-elevated border border-border flex items-center justify-center hover:bg-surface transition-colors focus-ring-target"
-                aria-label="MATx LinkedIn"
+                href='https://linkedin.com/company/matx-ee'
+                target='_blank'
+                rel='noopener noreferrer'
+                className='w-11 h-11 rounded-lg bg-elevated border border-border flex items-center justify-center hover:bg-surface transition-colors focus-ring-target'
+                aria-label='MATx LinkedIn'
               >
-                <Building2 className="w-4 h-4 text-text-secondary" />
+                <Building2 className='w-4 h-4 text-text-secondary' />
               </a>
               <a
-                href="https://github.com/matx-ee"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-11 h-11 rounded-lg bg-elevated border border-border flex items-center justify-center hover:bg-surface transition-colors focus-ring-target"
-                aria-label="MATx GitHub"
+                href='https://github.com/matx-ee'
+                target='_blank'
+                rel='noopener noreferrer'
+                className='w-11 h-11 rounded-lg bg-elevated border border-border flex items-center justify-center hover:bg-surface transition-colors focus-ring-target'
+                aria-label='MATx GitHub'
               >
-                <GitBranch className="w-4 h-4 text-text-secondary" />
+                <GitBranch className='w-4 h-4 text-text-secondary' />
               </a>
               <a
-                href="mailto:andri@matx.ee"
-                className="w-11 h-11 rounded-lg bg-elevated border border-border flex items-center justify-center hover:bg-surface transition-colors focus-ring-target"
-                aria-label="MATx meil"
+                href='mailto:andri@matx.ee'
+                className='w-11 h-11 rounded-lg bg-elevated border border-border flex items-center justify-center hover:bg-surface transition-colors focus-ring-target'
+                aria-label='MATx meil'
               >
-                <Mail className="w-4 h-4 text-text-secondary" />
+                <Mail className='w-4 h-4 text-text-secondary' />
               </a>
             </div>
           </div>
         </div>
 
         {/* Bottom Bar */}
-        <div ref={bottomRef} className="pt-8 border-t border-border flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-text-secondary text-xs">
+        <div
+          ref={bottomRef}
+          className='pt-8 border-t border-border flex flex-col md:flex-row items-center justify-between gap-4'
+        >
+          <p className='text-text-secondary text-xs'>
             © 2026 MATx. Kõik õigused kaitstud. Targa Tuleviku Fondi toetatud.
           </p>
-          <div className="flex items-center gap-4 text-xs text-text-secondary">
-            <Link href="/privaatsus" className="hover:text-primary transition-colors focus-ring-target rounded-md" style={{ textDecoration: 'underline' }}>
+          <div className='flex items-center gap-4 text-xs text-text-secondary'>
+            <Link
+              href='/privaatsus'
+              className='hover:text-primary transition-colors focus-ring-target rounded-md'
+              style={{ textDecoration: 'underline' }}
+            >
               Privaatsuspoliitika
             </Link>
-            <Link href="/tingimused" className="hover:text-primary transition-colors focus-ring-target rounded-md" style={{ textDecoration: 'underline' }}>
+            <Link
+              href='/tingimused'
+              className='hover:text-primary transition-colors focus-ring-target rounded-md'
+              style={{ textDecoration: 'underline' }}
+            >
               Teenuse tingimused
             </Link>
-            <Link href="/gdpr" className="hover:text-primary transition-colors focus-ring-target rounded-md" style={{ textDecoration: 'underline' }}>
+            <Link
+              href='/gdpr'
+              className='hover:text-primary transition-colors focus-ring-target rounded-md'
+              style={{ textDecoration: 'underline' }}
+            >
               GDPR
             </Link>
           </div>
         </div>
 
         {/* Brand gradient line */}
-        <div ref={gradientRef} className="mt-8 h-1 bg-gradient-brand rounded-full opacity-30" style={{ transformOrigin: 'left' }} />
+        <div
+          ref={gradientRef}
+          className='mt-8 h-1 bg-gradient-brand rounded-full opacity-30'
+          style={{ transformOrigin: 'left' }}
+        />
       </div>
     </footer>
   );

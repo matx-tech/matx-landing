@@ -5,21 +5,29 @@
 
 'use client';
 
-import { useEffect, useRef } from 'react';
-import { useRouter } from 'next/navigation';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { ADOPTION_ROUTES, SECTION_IDS, CALENDLY_URL, type AudienceId } from '@/lib/content/landing-copy';
-import { BookOpen, School, FileText, Server } from 'lucide-react';
+import { BookOpen, FileText, School, Server } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useEffect, useRef } from 'react';
 import { useRegistration } from '@/components/providers/registration-provider';
+import {
+  ADOPTION_ROUTES,
+  type AudienceId,
+  CALENDLY_URL,
+  SECTION_IDS,
+} from '@/lib/content/landing-copy';
 import { usePrefersReducedMotion } from '@/lib/hooks/use-prefers-reduced-motion';
-import { motionTokens, gsapEase, staggers } from '@/lib/motion-tokens';
+import { gsapEase, motionTokens, staggers } from '@/lib/motion-tokens';
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
 }
 
-const AUDIENCE_ICONS: Record<AudienceId, typeof BookOpen | typeof School | typeof FileText | typeof Server> = {
+const AUDIENCE_ICONS: Record<
+  AudienceId,
+  typeof BookOpen | typeof School | typeof FileText | typeof Server
+> = {
   teacher: BookOpen,
   principal: School,
   procurement: FileText,
@@ -59,7 +67,7 @@ export function AdoptionSection() {
               duration: motionTokens.duration.slow,
               stagger: staggers.card,
               ease: gsapEase(motionTokens.easing.smooth),
-            }
+            },
           );
         },
         onLeaveBack: (elements) => {
@@ -96,54 +104,48 @@ export function AdoptionSection() {
     <section
       ref={sectionRef}
       id={SECTION_IDS.pilot}
-      className="py-24 md:py-32 lg:py-40 bg-canvas section-fade-from-surface"
+      className='py-24 md:py-32 lg:py-40 bg-canvas section-fade-from-surface'
     >
-      <div className="relative z-10 container mx-auto px-4 md:px-8 lg:px-16">
+      <div className='relative z-10 container mx-auto px-4 md:px-8 lg:px-16'>
         {/* Section header */}
-        <div className="max-w-3xl mx-auto text-center mb-16">
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-text-primary mb-4">
+        <div className='max-w-3xl mx-auto text-center mb-16'>
+          <h2 className='text-3xl md:text-4xl lg:text-5xl font-bold text-text-primary mb-4'>
             Kuidas alustada
           </h2>
-          <p className="text-lg text-text-secondary">
-            Vali oma rolliga sobiv marsruut
-          </p>
+          <p className='text-lg text-text-secondary'>Vali oma rolliga sobiv marsruut</p>
         </div>
 
         {/* Adoption route cards */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
+        <div className='grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto'>
           {ADOPTION_ROUTES.map((route) => {
             const Icon = AUDIENCE_ICONS[route.audienceId];
 
             return (
               <div
                 key={route.audience}
-                className="adoption-card bg-card rounded-xl p-6 shadow-sm border border-border hover:shadow-md transition-shadow"
+                className='adoption-card bg-card rounded-xl p-6 shadow-sm border border-border hover:shadow-md transition-shadow'
               >
                 {/* Icon */}
-                <div className="w-12 h-12 rounded-lg bg-primary/10 text-primary flex items-center justify-center mb-4">
-                  {Icon && <Icon className="w-6 h-6" />}
+                <div className='w-12 h-12 rounded-lg bg-primary/10 text-primary flex items-center justify-center mb-4'>
+                  {Icon && <Icon className='w-6 h-6' />}
                 </div>
 
                 {/* Audience label */}
-                <div className="text-xs font-semibold text-primary uppercase tracking-wider mb-2">
+                <div className='text-xs font-semibold text-primary uppercase tracking-wider mb-2'>
                   {route.audience}
                 </div>
 
                 {/* Title */}
-                <h3 className="text-xl font-semibold text-text-primary mb-3">
-                  {route.title}
-                </h3>
+                <h3 className='text-xl font-semibold text-text-primary mb-3'>{route.title}</h3>
 
                 {/* Description */}
-                <p className="text-sm text-text-secondary mb-6">
-                  {route.description}
-                </p>
+                <p className='text-sm text-text-secondary mb-6'>{route.description}</p>
 
                 {/* CTA */}
                 <button
-                  type="button"
+                  type='button'
                   onClick={() => handleCTAClick(route.ctaAction)}
-                  className="w-full px-4 py-2.5 text-sm font-medium rounded-lg bg-primary text-text-inverse hover:bg-primary/90 transition-colors focus-ring-target min-h-[44px]"
+                  className='w-full px-4 py-2.5 text-sm font-medium rounded-lg bg-primary text-text-inverse hover:bg-primary/90 transition-colors focus-ring-target min-h-[44px]'
                   aria-label={`${route.cta} - ${route.audience}`}
                 >
                   {route.cta}
@@ -154,8 +156,8 @@ export function AdoptionSection() {
         </div>
 
         {/* Additional note */}
-        <div className="max-w-2xl mx-auto text-center mt-12">
-          <p className="text-sm text-text-secondary">
+        <div className='max-w-2xl mx-auto text-center mt-12'>
+          <p className='text-sm text-text-secondary'>
             Kõik marsruudid algavad vestlusega, et hinnata MATx-i sobivust teie vajaduste jaoks.
             Piloodi käigus kogume tagasisidet ja täiendame funktsionaalsust.
           </p>

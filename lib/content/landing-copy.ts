@@ -42,8 +42,10 @@ export const TECH_OVERVIEW = { href: '/tehniline', label: 'Tehniline ülevaade' 
 // Site metadata — single source for OG/Twitter/JSON-LD
 export const SITE_META = {
   title: 'MATx — Õpilase harjutamine ja õpetaja otsus ühes töövoos',
-  shortDescription: 'Seob õpilase vastused, jälgitavad signaalid ja õpetaja tegevussoovituse üheks läbipaistvaks töövooks.',
-  longDescription: 'Seob õpilase harjutamise, arusaadava tagasiside ja õpetaja tegevussoovituse üheks jälgitavaks töövooks',
+  shortDescription:
+    'Seob õpilase vastused, jälgitavad signaalid ja õpetaja tegevussoovituse üheks läbipaistvaks töövooks.',
+  longDescription:
+    'Seob õpilase harjutamise, arusaadava tagasiside ja õpetaja tegevussoovituse üheks jälgitavaks töövooks',
   url: 'https://matx.ee',
   locale: 'et_EE' as const,
 } as const;
@@ -51,7 +53,8 @@ export const SITE_META = {
 // Locked narrative strings
 export const HERO_COPY = {
   headline: 'Iga vastus aitab leida järgmise sammu.',
-  support: 'matx.ee seob õpilase harjutamise, arusaadava tagasiside ja õpetaja tegevussoovituse üheks jälgitavaks töövooks.',
+  support:
+    'matx.ee seob õpilase harjutamise, arusaadava tagasiside ja õpetaja tegevussoovituse üheks jälgitavaks töövooks.',
   primaryCTA: 'Liitu kooli piloodiga',
   secondaryCTA: 'Vaata töövoogu',
   trustLine: 'Soovitused toetavad õpetaja otsust. Õpetaja kontroll säilib.',
@@ -62,12 +65,14 @@ export const EVIDENCE_STAGES = [
   {
     number: 1,
     title: 'Õpilane vastab',
-    description: 'Õpilane lahendab ülesande digitaalselt või paberil. Vastus registreeritakse süsteemis.',
+    description:
+      'Õpilane lahendab ülesande digitaalselt või paberil. Vastus registreeritakse süsteemis.',
   },
   {
     number: 2,
     title: 'Vastust tõlgendatakse',
-    description: 'Süsteem tuvastab võimaliku veamustri. Signaal on kontrollitav, mitte lõplik diagnoos.',
+    description:
+      'Süsteem tuvastab võimaliku veamustri. Signaal on kontrollitav, mitte lõplik diagnoos.',
     caveat: 'Signaal on võimalik veamuster, mitte lõplik diagnoos',
     tone: 'info' as const,
   },
@@ -104,7 +109,8 @@ export const PROBLEM_BEATS = [
 // Student story
 export const STUDENT_STORY = {
   heading: 'Õpilane näeb, mida järgmisena harjutada.',
-  description: 'Õpilane saab selge tagasiside ja konkreetse järgmise sammu. Üks õige kordus ei tähenda veel valdamist — süsteem jätkab jälgimist.',
+  description:
+    'Õpilane saab selge tagasiside ja konkreetse järgmise sammu. Üks õige kordus ei tähenda veel valdamist — süsteem jätkab jälgimist.',
   steps: [
     {
       title: 'Õpilane lahendab ülesande',
@@ -136,14 +142,16 @@ export const STUDENT_STORY = {
 // Teacher story
 export const TEACHER_STORY = {
   heading: 'Õpetaja vaatab soovituse üle ja otsustab',
-  description: 'Õpetaja näeb õpilaste töid, tuvastatud veamustreid ja süsteemi soovitusi. Õpetaja võib soovituse vastu võtta, muuta või eirata.',
+  description:
+    'Õpetaja näeb õpilaste töid, tuvastatud veamustreid ja süsteemi soovitusi. Õpetaja võib soovituse vastu võtta, muuta või eirata.',
   heatmapLabel: 'Näidisandmed',
 } as const;
 
 // Capability/Topics section
 export const TOPICS_SECTION = {
   heading: 'Mida saab MATx-is harjutada?',
-  description: 'Praegune õppesisu katab valitud põhikooli matemaatika oskusi. Uued teemad lisatakse piloodi käigus.',
+  description:
+    'Praegune õppesisu katab valitud põhikooli matemaatika oskusi. Uued teemad lisatakse piloodi käigus.',
 } as const;
 
 // National context cards
@@ -157,14 +165,16 @@ export const NATIONAL_CONTEXT = [
   },
   {
     title: 'Õpetajate ajakoormus',
-    description: 'Õpetajad raporteerivad suurt halduskoormust ja piiratud aega individuaalseks toetuseks.',
+    description:
+      'Õpetajad raporteerivad suurt halduskoormust ja piiratud aega individuaalseks toetuseks.',
     source: 'Haridus- ja Teadusministeerium, 2023',
     limitation: 'Ainult kontekst. MATx ei ole põhjus ega tagajärg.',
     icon: 'clock' as const,
   },
   {
     title: 'Ebavõrdne juurdepääs toele',
-    description: 'Kõik koolid ei oma võrdset juurdepääsu täiendavatele õppematerjalidele ja tööriistadele.',
+    description:
+      'Kõik koolid ei oma võrdset juurdepääsu täiendavatele õppematerjalidele ja tööriistadele.',
     source: 'Eesti Hariduse Infosüsteem, 2024',
     limitation: 'Ainult kontekst. MATx ei ole põhjus ega tagajärg.',
     icon: 'minus' as const,
@@ -185,7 +195,8 @@ export const TRUST_PILLARS = [
   },
   {
     title: 'Väidete, staatuse ja allika nähtavus',
-    description: 'Iga väide on märgistatud staatusega (Saadaval, Piloodis, Kavandatud) ja allikaga.',
+    description:
+      'Iga väide on märgistatud staatusega (Saadaval, Piloodis, Kavandatud) ja allikaga.',
     icon: 'file-text' as const,
   },
 ] as const;
@@ -229,7 +240,8 @@ export const ADOPTION_ROUTES = [
     audience: 'IT-le',
     audienceId: 'it' as const,
     title: 'Tehniline ülevaade',
-    description: 'Arhitektuur, turvameetmed ja vastavusstaatus ühel lehel: identiteet ja sessioonid, pseudonüümimine, integratsioonid ja hankeinfo.',
+    description:
+      'Arhitektuur, turvameetmed ja vastavusstaatus ühel lehel: identiteet ja sessioonid, pseudonüümimine, integratsioonid ja hankeinfo.',
     cta: 'Vaata tehnilist ülevaadet',
     ctaAction: 'technical',
     ctaRoute: TECH_OVERVIEW.href,
@@ -247,23 +259,28 @@ export interface FAQEntry {
 export const FAQ_ENTRIES: readonly FAQEntry[] = [
   {
     question: 'Kellele MATx on mõeldud?',
-    answer: 'MATx on loodud põhikooli matemaatikaõpetajatele ja õpilastele. Praegu oleme piloodifaasis valitud koolidega.',
+    answer:
+      'MATx on loodud põhikooli matemaatikaõpetajatele ja õpilastele. Praegu oleme piloodifaasis valitud koolidega.',
   },
   {
     question: 'Kuidas õpetaja soovitusi üle vaatab?',
-    answer: 'Õpetaja näeb iga soovituse juures õpilase vastust, tuvastatud veamustrit ja põhjendust. Õpetaja võib soovituse vastu võtta, muuta või eirata.',
+    answer:
+      'Õpetaja näeb iga soovituse juures õpilase vastust, tuvastatud veamustrit ja põhjendust. Õpetaja võib soovituse vastu võtta, muuta või eirata.',
   },
   {
     question: 'Milliseid oskusi saab praegu harjutada?',
-    answer: 'Praegu katame valitud põhikooli matemaatika oskusi: liitmine, lahutamine, korrutamine, jagamine ja murdude põhitehted. Uued teemad lisatakse piloodi käigus.',
+    answer:
+      'Praegu katame valitud põhikooli matemaatika oskusi: liitmine, lahutamine, korrutamine, jagamine ja murdude põhitehted. Uued teemad lisatakse piloodi käigus.',
   },
   {
     question: 'Mis on Saadaval, Piloodis ja Kavandatud?',
-    answer: 'Saadaval tähendab, et funktsioon on kasutamiseks valmis. Piloodis tähendab, et funktsioon on kasutusel valitud koolidega testimiseks. Kavandatud tähendab, et funktsioon on plaanis, kuid pole veel arendatud.',
+    answer:
+      'Saadaval tähendab, et funktsioon on kasutamiseks valmis. Piloodis tähendab, et funktsioon on kasutusel valitud koolidega testimiseks. Kavandatud tähendab, et funktsioon on plaanis, kuid pole veel arendatud.',
   },
   {
     question: 'Kuidas andmeid kasutatakse?',
-    answer: 'Õpilase vastused ja veamustrid jäävad õpetajale nähtavaks. Andmeid kasutatakse soovituste genereerimiseks. Pilootfaasis saad täpse andmekaitse info piloodilepingust.',
+    answer:
+      'Õpilase vastused ja veamustrid jäävad õpetajale nähtavaks. Andmeid kasutatakse soovituste genereerimiseks. Pilootfaasis saad täpse andmekaitse info piloodilepingust.',
   },
   {
     question: 'Kuidas piloodiga liituda?',
@@ -271,7 +288,8 @@ export const FAQ_ENTRIES: readonly FAQEntry[] = [
   },
   {
     question: 'Kas MATx asendab õpetajat?',
-    answer: 'Ei. MATx toetab õpetaja otsust, andes struktuuri õpilase töö jälgimisele ja järgmise sammu soovitamisele. Õpetaja kontroll säilib.',
+    answer:
+      'Ei. MATx toetab õpetaja otsust, andes struktuuri õpilase töö jälgimisele ja järgmise sammu soovitamisele. Õpetaja kontroll säilib.',
   },
 ] as const;
 
