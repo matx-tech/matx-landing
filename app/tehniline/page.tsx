@@ -378,22 +378,22 @@ const PRICE_BENCHMARKS: {
 }[] = [
   {
     label: 'Kõik lepingud',
-    median: '~67 000 €',
-    mean: '~401 000 €',
+    median: '67 000 €',
+    mean: '401 000 €',
     note: 'n≈4 000 lepinguteadet',
   },
-  { label: 'Tarkvara (CPV 48*)', median: '~68 000 €', mean: '~246 000 €', note: 'n=134' },
-  { label: 'IT-teenused (CPV 72*)', median: '~121 000 €', mean: '~349 000 €', note: 'n=181' },
+  { label: 'Tarkvara (CPV 48*)', median: '68 000 €', mean: '246 000 €', note: 'n=134' },
+  { label: 'IT-teenused (CPV 72*)', median: '121 000 €', mean: '349 000 €', note: 'n=181' },
   {
     label: 'Haridus- ja koolitusteenused (CPV 80*)',
-    median: '~46 000 €',
-    mean: '~98 000 €',
+    median: '46 000 €',
+    mean: '98 000 €',
     note: 'n=105',
   },
   {
     label: 'Tarkvarapaketid (CPV 48900000)',
-    median: '~59 000 €',
-    mean: '~279 000 €',
+    median: '59 000 €',
+    mean: '279 000 €',
     note: 'n=70',
   },
   {
@@ -417,14 +417,14 @@ const CONTRACT_NORMS = [
       'Tavaliselt kuni 30 kalendripäeva (hilinenud maksete direktiiv 2011/7/EL); kuni 60 päeva vaid erandina, kui see on sõnaselgelt kokku lepitud ja objektiivselt põhjendatud.',
   },
   {
-    title: 'Garantii ja leppetrahv',
-    detail:
-      'Õiguskaitsevahendid — leppetrahv, hinna alandamine ja kahju hüvitamine VÕS-i ja lepingutingimuste alusel; hankelepingu ülesütlemine ja taganemine RHS § 124 alusel. Määrad on lepinguvabadus ja määratakse hanke alusdokumentides.',
-  },
-  {
     title: 'Intellektuaalomand',
     detail:
       'Alates 01.11.2026 võib hankija IP-korra määrata alusdokumentides (uus RHS § 77 lg 6²). MATx-i puhul jääb platvormi ja õppevara intellektuaalomand MATx-ile, kool saab kasutuslitsentsi.',
+  },
+  {
+    title: 'Garantii ja leppetrahv',
+    detail:
+      'Õiguskaitsevahendid — leppetrahv, hinna alandamine ja kahju hüvitamine VÕS-i ja lepingutingimuste alusel; hankelepingu ülesütlemine ja taganemine RHS § 124 alusel. Määrad on lepinguvabadus ja määratakse hanke alusdokumentides.',
   },
   {
     title: 'Lepingu lõpp',
@@ -437,7 +437,7 @@ const TENDER_TECH_REQUIREMENTS = [
   {
     title: 'Juurdepääsetavus',
     detail:
-      'EN 301 549 / WCAG 2.1 AA — avaliku sektori veebidele ja rakendustele kohustuslik alates 2019 (direktiiv 2016/2102, üle võetud avaliku teabe seadusesse; järelevalve TTJA). Ka lepingu alusel avalikke ülesandeid täitvad eraõiguslikud teenuseosutajad peavad vastama.',
+      'EN 301 549 / WCAG 2.1 AA — avaliku sektori veebidele ja rakendustele kohustuslik alates 2019 (direktiiv 2016/2102, üle võetud avaliku teabe seadusesse; järelevalve TTJA). Ka lepingu alusel avalikke ülesandeid täitvad eraõiguslikud teenuseosutajad peavad vastama. MATx-i enda siht on sama tase; juurdepääsetavuse seisukoht ja auditi kuupäev avaldatakse koos hankepaketiga.',
   },
   {
     title: 'Andmekaitse',
@@ -1077,6 +1077,10 @@ export default function TechnicalOverviewPage() {
                   </tbody>
                 </table>
               </section>
+              <p className='text-xs text-text-secondary leading-relaxed mb-8'>
+                Väikese valimiga read (n&lt;150) on suunavad, mitte täpsed võrdlusarvud — kasuta
+                neid suunana, mitte hinnakirjana.
+              </p>
               {/* Unit-price anchor is not registry statistics — a median/mean
               column would mislead, so it renders as its own card below the
               table. */}
