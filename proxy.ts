@@ -31,10 +31,13 @@ async function proxyPlausibleEvent(request: NextRequest): Promise<NextResponse> 
   if (userAgent) headers.set('user-agent', userAgent);
   const contentType = request.headers.get('content-type');
   if (contentType) headers.set('content-type', contentType);
-  // First valid IP from a comma chain is used by Plausible; passing the chain
-  // through unchanged is correct whether we're bare, behind nginx or behind a
-  // CDN.
-  const clientIp = request.headers.get('x-forwarded-for');
+  // Trust CF-Connecting-IP when behind Cloudflare (set by the CDN, not
+  // spoofable by the client). Otherwise take the first hop of the chain —
+  // Next 16 seeds it from the socket when nothing upstream set it, so the
+  // first entry is the real visitor either way.
+  const clientIp =
+    request.headers.get('cf-connecting-ip') ??
+    request.headers.get('x-forwarded-for')?.split(',')[0]?.trim();
   if (clientIp) headers.set('x-forwarded-for', clientIp);
 
   try {

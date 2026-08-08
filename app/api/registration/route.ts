@@ -15,6 +15,7 @@ interface Registration {
   phone: string;
   classGroups: string;
   otherRole?: string;
+  consent: boolean;
 }
 
 // Pilot registration → Slack. One-way fire-and-forget; if Slack is down the
@@ -35,6 +36,9 @@ export async function POST(request: Request) {
   const missing = REQUIRED_FIELDS.filter((field) => !data[field]?.trim());
   if (missing.length > 0 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email ?? '')) {
     return Response.json({ error: 'Missing or invalid fields' }, { status: 400 });
+  }
+  if (data.consent !== true) {
+    return Response.json({ error: 'Consent required' }, { status: 400 });
   }
 
   const role =
@@ -73,14 +77,19 @@ export async function POST(request: Request) {
     ],
   };
 
-  const res = await fetch(webhookUrl, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
-  });
+  try {
+    const res = await fetch(webhookUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+      signal: AbortSignal.timeout(10_000),
+    });
 
-  if (!res.ok) {
+    if (!res.ok) {
+      return Response.json({ error: 'Slack webhook failed' }, { status: 502 });
+    }
+    return Response.json({ ok: true });
+  } catch {
     return Response.json({ error: 'Slack webhook failed' }, { status: 502 });
   }
-  return Response.json({ ok: true });
 }

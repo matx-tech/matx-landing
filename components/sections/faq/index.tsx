@@ -57,7 +57,8 @@ export function FAQSection() {
     return () => ctx.revert();
   }, [prefersReducedMotion]);
 
-  // Flip animation on accordion toggle
+  // Flip animation on accordion toggle.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: openIndex is a trigger, not a read — the effect must re-run after every toggle so the captured Flip state animates the new layout.
   useLayoutEffect(() => {
     if (!flipStateRef.current || prefersReducedMotion) return;
 
@@ -71,7 +72,7 @@ export function FAQSection() {
     });
 
     flipStateRef.current = null;
-  }, [prefersReducedMotion]);
+  }, [openIndex, prefersReducedMotion]);
 
   const handleToggle = (index: number) => {
     if (prefersReducedMotion) {

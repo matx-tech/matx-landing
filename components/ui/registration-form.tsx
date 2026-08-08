@@ -92,10 +92,15 @@ export function RegistrationForm({ isOpen, onClose }: RegistrationFormProps) {
     }
   }, []);
 
-  // Save draft to localStorage on form data change
+  // Save draft to localStorage on form data change. Save only when the user
+  // has typed something; clearing the last field removes the draft instead of
+  // writing an empty one (a new object ref makes a ref comparison useless).
   useEffect(() => {
-    if (typeof window !== 'undefined' && formData !== initialFormData) {
+    if (typeof window === 'undefined') return;
+    if (Object.values(formData).some((value) => value !== '')) {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(formData));
+    } else {
+      localStorage.removeItem(STORAGE_KEY);
     }
   }, [formData]);
 
@@ -201,7 +206,7 @@ export function RegistrationForm({ isOpen, onClose }: RegistrationFormProps) {
         const res = await fetch('/api/registration', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(formData),
+          body: JSON.stringify({ ...formData, consent }),
         });
         if (!res.ok) throw new Error(`registration failed: ${res.status}`);
         clearDraft();
@@ -215,7 +220,7 @@ export function RegistrationForm({ isOpen, onClose }: RegistrationFormProps) {
         setIsSubmitting(false);
       }
     },
-    [formData, validateForm, isSubmitting, clearDraft],
+    [formData, validateForm, isSubmitting, clearDraft, consent],
   );
 
   const handleClose = useCallback(() => {
@@ -282,11 +287,10 @@ export function RegistrationForm({ isOpen, onClose }: RegistrationFormProps) {
                     <Check className='w-8 h-8 text-secondary' />
                   </div>
                   <h2 className='text-2xl font-display font-bold text-text-primary mb-2'>
-                    Registreerimise kiri on koostatud!
+                    Registreerimine on edastatud!
                   </h2>
                   <p className='text-text-secondary'>
-                    Registreerimiskiri on koostatud. Kui meilirakendus ei avanunud, saatke andmed
-                    aadressile andri@matx.ee.
+                    Täname! Võtame teiega ühendust 48 tunni jooksul.
                   </p>
                 </div>
               )}
@@ -571,7 +575,7 @@ export function RegistrationForm({ isOpen, onClose }: RegistrationFormProps) {
                   {errors.consent && (
                     <p
                       id='consent-error'
-                      className='mt-1 text-sm text-red-600 flex items-center gap-1'
+                      className='mt-1 text-sm text-red-600 dark:text-red-400 flex items-center gap-1'
                     >
                       <AlertCircle className='w-4 h-4' />
                       {errors.consent}

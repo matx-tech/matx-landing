@@ -55,7 +55,10 @@ function linkifyContent(text: string): React.ReactNode {
         </a>,
       );
     } else {
-      const href = m.text.startsWith('http') ? m.text : `https://${m.text}`;
+      // URLs in prose often sit before sentence punctuation — the regex
+      // greedily includes it, so strip it and leave the punctuation as text.
+      const clean = m.text.replace(/[.,;:!?)]+$/, '');
+      const href = clean.startsWith('http') ? clean : `https://${clean}`;
       parts.push(
         <a
           key={`link-${m.index}`}
@@ -64,9 +67,10 @@ function linkifyContent(text: string): React.ReactNode {
           rel='noopener noreferrer'
           className='text-primary hover:text-secondary transition-colors underline'
         >
-          {m.text}
+          {clean}
         </a>,
       );
+      m.text = clean;
     }
 
     lastIndex = m.index + m.text.length;

@@ -14,8 +14,10 @@ export const EVENTS = {
 let initialized = false;
 // ponytail: tiny FIFO for events fired before init() (the 404 page's effect
 // runs before the layout's AnalyticsProvider effect). A real queue lib is
-// overkill; the buffer is drained once on init and never grows in practice.
+// overkill; the buffer is drained once on init. Capped so a session where
+// analytics stays disabled (env unset) can't grow it without bound.
 const early: Array<{ event: string; props?: Record<string, string> }> = [];
+const MAX_EARLY_EVENTS = 50;
 
 /**
  * Initializes the Plausible tracker (client-only). Drains events that were
@@ -42,6 +44,7 @@ export async function enableAnalytics(config: PlausibleConfig): Promise<void> {
 export function track(event: string, props?: Record<string, string>): void {
   if (typeof window === 'undefined') return;
   if (!initialized) {
+    if (early.length >= MAX_EARLY_EVENTS) early.shift();
     early.push({ event, props });
     return;
   }

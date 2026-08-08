@@ -64,12 +64,6 @@ export function SubprocessorTable() {
               <td className='py-3 px-4 text-sm text-text-secondary'>Via LuxVPS</td>
             </tr>
             <tr className='border-b border-border'>
-              <td className='py-3 px-4 text-sm font-medium text-text-primary'>Google Analytics</td>
-              <td className='py-3 px-4 text-sm text-text-secondary'>Veebiliikluse analüütika</td>
-              <td className='py-3 px-4 text-sm text-text-secondary'>USA (EU-U.S. DPF)</td>
-              <td className='py-3 px-4 text-sm text-text-secondary'>Via LuxVPS</td>
-            </tr>
-            <tr className='border-b border-border'>
               <td className='py-3 px-4 text-sm font-medium text-text-primary'>Tawk.to</td>
               <td className='py-3 px-4 text-sm text-text-secondary'>Klienditugi (chat)</td>
               <td className='py-3 px-4 text-sm text-text-secondary'>USA</td>
