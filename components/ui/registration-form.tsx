@@ -60,7 +60,7 @@ interface RegistrationFormProps {
 }
 
 /**
- * Renders a registration dialog for schools joining the pilot program.
+ * Renders a school pilot-program registration dialog with draft persistence, validation, submission, and success feedback.
  *
  * @param isOpen - Whether the dialog is open
  * @param onClose - Called when the dialog closes

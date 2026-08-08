@@ -662,9 +662,9 @@ const AT_A_GLANCE_IDS: readonly ArchId[] = [
 ];
 
 /**
- * Renders the layered system architecture with deployment and side components.
+ * Renders the configured system architecture as layered components with side components and deployment details.
  *
- * Omits architecture entries that are not defined in the source data.
+ * Architecture entries without matching source data are omitted.
  */
 function ArchitectureDiagram() {
   const layerIds: readonly ArchId[] = ['esikiht', 'tagakiht', 'andmebaas'];

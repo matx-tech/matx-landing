@@ -35,7 +35,7 @@ const AUDIENCE_ICONS: Record<
 };
 
 /**
- * Renders audience-specific adoption routes with registration and scheduling actions.
+ * Renders audience-specific adoption routes with registration, navigation, and scheduling actions.
  */
 export function AdoptionSection() {
   const sectionRef = useRef<HTMLElement>(null);

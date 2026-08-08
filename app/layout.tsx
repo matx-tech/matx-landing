@@ -80,9 +80,9 @@ export const metadata: Metadata = {
 };
 
 /**
- * Defines the site's root document and provides analytics and scrolling behavior for page content.
+ * Renders the site's root document with theme initialization, structured metadata, analytics, and smooth scrolling.
  *
- * @returns The root HTML document containing page content and MATx metadata.
+ * @returns The root HTML document containing the page content and MATx metadata.
  */
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const nonce = (await headers()).get('x-nonce') ?? '';

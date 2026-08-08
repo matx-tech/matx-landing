@@ -107,9 +107,9 @@ export function SubprocessorTable() {
 }
 
 /**
- * Renders the GDPR Article 32 security measures section.
+ * Renders the security measures applied under GDPR Article 32.
  *
- * @returns The security measures section with audit rights and security incident notification details.
+ * @returns The rendered security measures content, including security controls, monitoring, and audit provisions.
  */
 export function SecurityMeasuresSection() {
   return (
