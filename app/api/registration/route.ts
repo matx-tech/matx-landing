@@ -43,14 +43,20 @@ function isValidEmail(value: string | undefined): boolean {
 const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
 const RATE_LIMIT_MAX = 5;
 const submissionLog = new Map<string, { count: number; windowStart: number }>();
+let lastPrune = 0;
 
 function isRateLimited(clientKey: string): boolean {
   const now = Date.now();
-  // Prune expired windows on every call so the map cannot grow unbounded on
-  // a long-lived server — even a bot rotating spoofed client keys only keeps
-  // one entry per key, and each expires with its window.
-  for (const [key, entry] of submissionLog) {
-    if (now - entry.windowStart >= RATE_LIMIT_WINDOW_MS) submissionLog.delete(key);
+  // Prune expired windows at most once per window, not per request: a full
+  // sweep on every call would make this hot path O(n) under a flood of
+  // spoofed keys (each new key survives a full window, so the flood would
+  // cost quadratic total work). One sweep per window keeps the map bounded
+  // to roughly a single window of entries and the common case O(1).
+  if (now - lastPrune >= RATE_LIMIT_WINDOW_MS) {
+    for (const [key, entry] of submissionLog) {
+      if (now - entry.windowStart >= RATE_LIMIT_WINDOW_MS) submissionLog.delete(key);
+    }
+    lastPrune = now;
   }
   const entry = submissionLog.get(clientKey);
   if (!entry || now - entry.windowStart >= RATE_LIMIT_WINDOW_MS) {
