@@ -41,13 +41,16 @@ function isValidEmail(value: string | undefined): boolean {
 // IP headers (cf-connecting-ip / x-forwarded-for) are trusted only behind a
 // trusted reverse proxy (PLAUSIBLE_TRUST_PROXY=true); otherwise every request
 // shares one conservative fallback bucket, so a direct client forging headers
-// cannot rotate its way around the limit.
+// cannot rotate its way around the limit. Memory stays bounded both by the
+// window sweep below (entries age out within ~2 windows) and by the
+// MAX_LOG_ENTRIES cap (the map cannot exceed it).
 const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
 const RATE_LIMIT_MAX = 5;
-// Hard cap on tracked client keys: even a sustained flood of spoofed keys
-// (each surviving up to ~2 windows before the next sweep) cannot grow the map
-// past this many entries.
-const RATE_LIMIT_MAX_KEYS = 10_000;
+// Hard cap on tracked entries: no matter how fast a flood of spoofed keys
+// arrives, the map can never exceed this many entries, so memory stays
+// bounded even though a key can linger for up to ~2 windows before the sweep
+// below evicts it.
+const MAX_LOG_ENTRIES = 10_000;
 const submissionLog = new Map<string, { count: number; windowStart: number }>();
 let lastPrune = 0;
 
@@ -56,8 +59,9 @@ function isRateLimited(clientKey: string): boolean {
   // Prune expired windows at most once per window, not per request: a full
   // sweep on every call would make this hot path O(n) under a flood of
   // spoofed keys (each new key survives a full window, so the flood would
-  // cost quadratic total work). One sweep per window keeps the common case
-  // O(1).
+  // cost quadratic total work). One sweep per window bounds entry *age* to
+  // roughly two windows and keeps the common case O(1); the MAX_LOG_ENTRIES
+  // cap below bounds the map *size* regardless of flood rate.
   if (now - lastPrune >= RATE_LIMIT_WINDOW_MS) {
     for (const [key, entry] of submissionLog) {
       if (now - entry.windowStart >= RATE_LIMIT_WINDOW_MS) submissionLog.delete(key);
@@ -66,14 +70,19 @@ function isRateLimited(clientKey: string): boolean {
   }
   const entry = submissionLog.get(clientKey);
   if (!entry || now - entry.windowStart >= RATE_LIMIT_WINDOW_MS) {
-    // Hard cap: evict the oldest entry (Map insertion order) when the map is
-    // full, so memory stays bounded regardless of flood rate. Amortized O(1)
-    // — each request inserts at most one entry, so at most one eviction.
-    if (submissionLog.size >= RATE_LIMIT_MAX_KEYS) {
-      const oldest = submissionLog.keys().next().value;
-      if (oldest !== undefined) submissionLog.delete(oldest);
-    }
+    // Delete before set so a refreshed key moves to the back of the map's
+    // insertion order instead of staying first — and thus first in line for
+    // the cap eviction below — despite its fresh window.
+    submissionLog.delete(clientKey);
     submissionLog.set(clientKey, { count: 1, windowStart: now });
+    // Enforce the hard cap: Map preserves insertion order, so the first key
+    // is always the oldest. Dropping it keeps this O(1) per insertion and the
+    // size at exactly MAX_LOG_ENTRIES under sustained flood.
+    while (submissionLog.size > MAX_LOG_ENTRIES) {
+      const oldestKey = submissionLog.keys().next().value;
+      if (oldestKey === undefined) break;
+      submissionLog.delete(oldestKey);
+    }
     return false;
   }
   entry.count += 1;
