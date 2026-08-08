@@ -18,6 +18,19 @@ interface Registration {
   consent: boolean;
 }
 
+// Linear email check (no regex): indexOf-based, so adversarial input cannot
+// trigger backtracking (CodeQL js/polynomial-redos). RFC 5321 caps addresses
+// at 254 chars — reject anything longer outright.
+function isValidEmail(value: string | undefined): boolean {
+  const email = (value ?? '').trim();
+  if (email.length === 0 || email.length > 254 || /\s/.test(email)) return false;
+  const at = email.indexOf('@');
+  if (at <= 0) return false;
+  const domain = email.slice(at + 1);
+  const dot = domain.lastIndexOf('.');
+  return dot > 0 && dot < domain.length - 1;
+}
+
 // Pilot registration → Slack. One-way fire-and-forget; if Slack is down the
 /**
  * Submits a pilot registration to Slack after validating the request data and consent.
@@ -39,7 +52,7 @@ export async function POST(request: Request) {
   }
 
   const missing = REQUIRED_FIELDS.filter((field) => !data[field]?.trim());
-  if (missing.length > 0 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email ?? '')) {
+  if (missing.length > 0 || !isValidEmail(data.email)) {
     return Response.json({ error: 'Missing or invalid fields' }, { status: 400 });
   }
   if (data.consent !== true) {

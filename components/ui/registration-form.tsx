@@ -149,7 +149,7 @@ export function RegistrationForm({ isOpen, onClose }: RegistrationFormProps) {
     [formData.role],
   );
 
-  const validateForm = useCallback((): boolean => {
+  const validateForm = useCallback((): FormErrors => {
     const newErrors: FormErrors = {};
     const fields = fieldsForRole(formData.role);
 
@@ -161,7 +161,7 @@ export function RegistrationForm({ isOpen, onClose }: RegistrationFormProps) {
     if (!consent) newErrors.consent = 'Registreerimiseks on vajalik nõusolek';
 
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    return newErrors;
   }, [formData, validateField, consent]);
 
   const handleBlur = useCallback(
@@ -192,11 +192,17 @@ export function RegistrationForm({ isOpen, onClose }: RegistrationFormProps) {
       // Mark all fields as touched
       setTouched(new Set(fieldsForRole(formData.role)));
 
-      if (!validateForm()) {
+      const newErrors = validateForm();
+      if (Object.keys(newErrors).length > 0) {
         setAnnouncement('Palun parandage vormi vead enne saatmist');
         // Move focus to the first invalid field so keyboard/screen-reader
-        // users land on the error instead of hunting for it.
-        formRef.current?.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus();
+        // users land on the error instead of hunting for it. Focus from the
+        // freshly computed errors, not from aria-invalid in the DOM — the
+        // error state has not rendered yet on the first submit.
+        const firstInvalid =
+          fieldsForRole(formData.role).find((field) => newErrors[field as keyof FormErrors]) ??
+          'consent';
+        document.getElementById(firstInvalid)?.focus();
         return;
       }
 

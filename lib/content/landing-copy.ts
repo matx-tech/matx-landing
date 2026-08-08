@@ -239,7 +239,7 @@ export const ADOPTION_ROUTES = [
     title: 'Hankeinfo',
     // Enne avalikustamist kontrolli piirmäärad ja tingimused hankepartneriga —
     // RHS muudatused jõustuvad 01.11.2026.
-    description: 'Riigihangete seaduse piirmäärad ja hinnakiri ühel lehel.',
+    description: 'Riigihangete seaduse piirmäärad ja hinnaklassid ühel lehel.',
     cta: 'Vaata hankeinfot',
     ctaAction: 'procurement',
     ctaRoute: TECH_OVERVIEW.href,

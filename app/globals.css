@@ -191,7 +191,7 @@
     --color-bg-success-subtle: #e6f4ed;
     --color-border-success: var(--color-green-400);
     --color-text-success-strong: var(--color-green-700);
-    --color-bg-warning-subtle: var(--color-amber-50);
+    --color-bg-warning-subtle: var(--color-amber-100);
     --color-border-warning: var(--color-amber-400);
     --color-text-warning-strong: var(--color-amber-700);
 

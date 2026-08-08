@@ -296,7 +296,7 @@ type ProcurementRoute = { band: string; route: string; note: string };
 
 const PROCUREMENT_ROUTES: ProcurementRoute[] = [
   {
-    band: 'Kuni 30 000 €',
+    band: 'Alla 30 000 €',
     route: 'Otsetellimine — riigihangete seadus ei kohaldu; ost hankekorra järgi.',
     note: 'Ühe kooli tarkvaralitsentside ostud jäävad tihti alla piirmäära ega kajastu registris; täpset jaotust registriandmetest hinnata ei saa.',
   },
@@ -320,7 +320,7 @@ const PROCUREMENT_ROUTES: ProcurementRoute[] = [
 
 const PROCUREMENT_ROUTES_NEW: ProcurementRoute[] = [
   {
-    band: 'Kuni 50 000 €',
+    band: 'Alla 50 000 €',
     route: 'Otsetellimine — riigihangete seadus ei kohaldu; ost hankekorra järgi.',
     note: 'Ühe kooli tarkvaralitsentside ostud jäävad tihti alla piirmäära ega kajastu registris; täpset jaotust registriandmetest hinnata ei saa.',
   },
@@ -474,7 +474,7 @@ const TENDER_TECH_REQUIREMENTS = [
   {
     title: 'Andmekaitse',
     detail:
-      'GDPR art 8 (nõusolek alates 13. eluaastast, kui õiguslikuks aluseks on nõusolek infoühiskonna teenuse puhul, mida pakutakse otse lapsele) ja IKS; vastutava, volitatud ja kaasvastutava töötleja rollid hinnatakse töötlustegevuse kaupa ja dokumenteeritakse andmetöötluslepingus. Andmete asukohariik avaldatakse enne pilootlepinguid.',
+      'GDPR art 8 (nõusolek alates 13. eluaastast, kui õiguslikuks aluseks on nõusolek infoühiskonna teenuse puhul, mida pakutakse otse lapsele) ja IKS; vastutava, volitatud ja kaasvastutava töötleja rollid hinnatakse töötlustegevuse kaupa: volitatud töötleja töötluse korral sõlmitakse andmetöötlusleping (GDPR art 28), kaasvastutava töötleja korral art 26 kokkulepe. Andmete asukohariik avaldatakse enne pilootlepinguid.',
   },
   {
     title: 'Identiteet ja integratsioonid',
@@ -530,7 +530,7 @@ const ARCHITECTURE_ROWS = [
   {
     id: 'esikiht',
     title: 'Esikiht',
-    detail: 'React 18, TypeScript, Tailwind; landing-leht Next.js, platvormi klient Vite.',
+    detail: 'React 19.2.8, TypeScript, Tailwind; landing-leht Next.js, platvormi klient Vite.',
     status: 'Saadaval',
   },
   {
