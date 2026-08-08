@@ -124,17 +124,20 @@ Haridus- ja Teadusministeerium / Haridus- ja Noorteamet / Kiviõli Riigikool).
    Andmete majutuskoht Eesti/EL on hankija eelistus, mille saab seada hanketingimustes;
    edastus kolmandatesse riikidesse peab vastama GDPR V peatükile.
 3. **Identiteet ja koostalitlus**: HarID/TAAT OIDC (koolide identiteediföderatsioon),
-   EHIS, eKool/Stuudiumi liidestused — MATx-i staatused /tehniline lehel.
-4. **AI-komponent**: EU AI Act (2024/1689) III lisa § 3 — kõrge riski klass hõlmab
+   EHIS — MATx-i staatused /tehniline lehel.
+4. **AI-komponent**: EU AI Act (2024/1689) III lisa punkt 3 — kõrge riski klass hõlmab
    kindlaksmääratud hariduslikke kasutusjuhte (ligipääs/õppele vastuvõtt, õpitulemuste
    hindamine õpiteed mõjutavalt, õppetaseme hindamine, õpilase käitumise jälgimine testide
    ajal), mitte igasugust haridus-AI-d. Art 6(3) erand võib liigitada III lisa süsteemi
-   mittekõrge riskiga klassiks, kui see ei mõjuta oluliselt otsuseid ega profileeri isikuid;
-   riskijuhtimine, läbipaistvus, inimese järelevalve. MATx-i BKT enesehindamine on pooleli —
-   tulemus dokumenteeritakse enne piloodi laiendamist.
+   mittekõrge riskiga klassiks, kui see ei kujuta olulist riski tervisele, ohutusele ega
+   põhiõigustele, otsuseid oluliselt ei mõjuta ja täidab vähemalt ühe punktides a–d
+   sätestatud tingimuse; profileerivate süsteemide puhul erand ei kohaldu ja need jäävad
+   kõrge riski klassi. Riskijuhtimine, läbipaistvus, inimese järelevalve. MATx-i BKT
+   enesehindamine on pooleli — tulemus dokumenteeritakse enne piloodi laiendamist.
 5. **Turve**: E-ITS/ISKE baastase (ühilduv ISO 27001), NIS2 hea tava, CSP/HSTS, pseudonüümimine.
 6. **Hankedokumentide formaat**: tehniline kirjeldus RHS § 87–88 järgi; kvalifitseerimine
-   majandusliku ja kutsealase suutlikkuse põhjal (käibekapital, sarnased litsentsiprojektid).
+   majandusliku ja finantssuutlikkuse põhjal (RHS § 100 — käibekapital) ning tehnilise ja
+   kutsealase suutlikkuse põhjal (RHS § 101 — sarnased litsentsiprojektid).
 
 ## 4. Lepingupraktika (üldtingimused Eesti avalikus sektoris)
 
@@ -148,7 +151,7 @@ Haridus- ja Teadusministeerium / Haridus- ja Noorteamet / Kiviõli Riigikool).
 - **Garantii ja leppetrahv**: leppetrahv, hinna alandamine ja kahju hüvitamine tulenevad
   võlaõigusseadusest (VÕS) ja lepingutingimustest; hankelepingu ülesütlemine ja taganemine
   RHS § 124 alusel. Määrad on lepinguvabadus, seatakse alusdokumentides; RaM juhend rõhutab
-  mõistlikke määrasid. (Õiguslik kontroll enne avalikustamist.)
+  mõistlikke määrasid.
 - **IP**: alates 01.11.2026 hankija võib IP-korra määrata alusdokumentides (uus § 77 lg 6²);
   eelnõu eesmärk: jätta loodud IP vaikimisi ettevõtjale, hankijale ainult vältimatult vajalik.
 - **Andmete väljaviimine**: lepingu lõppedes eksport/kustutamine; DSR-reeglid.
@@ -168,7 +171,7 @@ Haridus- ja Teadusministeerium / Haridus- ja Noorteamet / Kiviõli Riigikool).
    andmete eksport lepingu lõppedes.
 4. **Tehniline dokumentatsioon**: valmista juurdepääsetavuse seisukoht (EN 301 549) —
    hankijad küsivad seda haridustarkvaralt üha enam ja see on MATx-i puhul sihtseis.
-5. **AI**: BKT riskianalüüs (EU AI Act III lisa § 3) — juba /tehniline lehel kajastatud.
+5. **AI**: BKT riskianalüüs (EU AI Act III lisa punkt 3) — juba /tehniline lehel kajastatud.
 
 ## 6. Allikad (täisloend)
 
