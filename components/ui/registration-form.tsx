@@ -37,6 +37,13 @@ interface FormErrors {
 
 const STORAGE_KEY = 'matx-registration-draft';
 
+// Single source for the validated fields — shared by validateForm and handleSubmit.
+const FORM_FIELDS = ['schoolName', 'contactName', 'role', 'email', 'phone', 'classGroups'] as const;
+
+/** Base fields plus the free-text role when 'Muu haridustöötaja' is picked. */
+const fieldsForRole = (role: string) =>
+  role === 'Muu haridustöötaja' ? [...FORM_FIELDS, 'otherRole'] : FORM_FIELDS;
+
 const initialFormData: FormData = {
   schoolName: '',
   contactName: '',
@@ -139,10 +146,7 @@ export function RegistrationForm({ isOpen, onClose }: RegistrationFormProps) {
 
   const validateForm = useCallback((): boolean => {
     const newErrors: FormErrors = {};
-    const fields = ['schoolName', 'contactName', 'role', 'email', 'phone', 'classGroups'];
-    if (formData.role === 'Muu haridustöötaja') {
-      fields.push('otherRole');
-    }
+    const fields = fieldsForRole(formData.role);
 
     fields.forEach((field) => {
       const error = validateField(field, formData[field as keyof FormData]);
@@ -181,11 +185,7 @@ export function RegistrationForm({ isOpen, onClose }: RegistrationFormProps) {
       e.preventDefault();
 
       // Mark all fields as touched
-      const allFields = ['schoolName', 'contactName', 'role', 'email', 'phone', 'classGroups'];
-      if (formData.role === 'Muu haridustöötaja') {
-        allFields.push('otherRole');
-      }
-      setTouched(new Set(allFields));
+      setTouched(new Set(fieldsForRole(formData.role)));
 
       if (!validateForm()) {
         setAnnouncement('Palun parandage vormi vead enne saatmist');
