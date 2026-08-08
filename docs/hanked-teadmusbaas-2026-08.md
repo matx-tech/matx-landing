@@ -54,7 +54,7 @@ Allikad:
 ## 2. Hinnaklassid — registri lepinguteadete arvutatud mediaanid/keskmised
 
 Arvutatud riigihangete registri avaandmetest (lepinguteated, eForms
-ContractAwardNotice), periood 2026. a I poolaasta (kuud 2–7), seisuga 07.08.2026.
+ContractAwardNotice), periood 2026. a veebruar–juuli (kuud 2–7), seisuga 07.08.2026.
 Kirjeldus: iga teate <cbc:TotalAmount currencyID="EUR"> (teatepõhine summa, osadeks
 jagatud teadete puhul osade summa). Kaasa arvatud ainult maksumusega teated.
 
@@ -89,13 +89,13 @@ maksumusega teated. Mediaan/keskmine/P25/P75 arvutatud neist. Päringud tehtud
 
 - **Opiq koolipakett 2026/27** (kõik õppeained, 444 õppekomplekti): 5,10 €/õpilane/kuu;
   soodushind 4,10 €/kuu (≥50% kooli õpilastest, ≥9 kuud); algklassid 3,10 €/kuu.
-  Aastas ≈ 31–51 €/õpilane. Allikas: https://opiq.ee/Packages/Details?packageKey=StudentPackage2025ForSchool.
+  Aastas ≈ 31–51 €/õpilane (10 arvelduskuu põhjal). Allikas: https://opiq.ee/Packages/Details?packageKey=StudentPackage2025ForSchool.
 - eKool: avalikku koolihinnakirja ei avaldata (vanema premium-tasud kuni ~3,45 €/kuu
   funktsiooni kohta — https://lounapostimees.postimees.ee/4016835).
 - Stuudium: tasuta põhifunktsioonid, premium-tasuline; avalikku hinnakirja ei avaldata.
 - Järeldus: õpilasepõhine kuu-/aastatasu on Eesti õpikeskkondade standardmudel.
 
-### Reaalsed haridusvaldkonna IT-hangete väärtused (registrist, TenderGlass koond)
+### Reaalsed haridusvaldkonna hangete väärtused (registrist, TenderGlass koond)
 
 - Eksamite Infosüsteemi (EIS) tehniline audit — 50 000 € (HTM, 01/2026).
 - „Aasta õpetaja gala“ korraldamine 2026 — 120 000 € (HTM, 02/2026).
@@ -110,17 +110,19 @@ Haridus- ja Teadusministeerium / Haridus- ja Noorteamet / Kiviõli Riigikool).
 
 ## 3. Tehnilised nõuded — mida hankijad haridustarkvarale tavapäraselt esitavad
 
-1. **Juurdepääsetavus**: EN 301 549 V3.2.1 / WCAG 2.1 AA. Avaliku sektori veebidele ja
-   rakendustele kohustuslik alates 2019 (direktiiv 2016/2102, üle võetud avaliku teabe
-   seadusesse). Kohustus laieneb ka eraõiguslikele isikutele, kes täidavad lepingu alusel
-   avalikke ülesandeid (sh osutavad avalikke teenuseid). Järelevalve: TTJA.
+1. **Juurdepääsetavus**: EN 301 549 V3.2.1 / WCAG 2.1 AA. Avaliku sektori veebidele
+   kohustuslik alates 23.09.2019, mobiilirakendustele alates 23.06.2021 (direktiiv
+   2016/2102, üle võetud avaliku teabe seadusesse). Kohustus laieneb ka eraõiguslikele
+   isikutele, kes täidavad lepingu alusel avalikke ülesandeid (sh osutavad avalikke
+   teenuseid). Järelevalve: TTJA.
    Allikad: https://ttja.ee/avaliku-sektori-digiligipaasetavus; W3C WAI riigileht.
 2. **Andmekaitse**: GDPR (2016/679) — rollid sõltuvad konkreetsest andmetöötlustoimingust:
    kool/omavalitsus on vastutav töötleja; tarnija on volitatud töötleja vaid siis, kui ta
    töötleb andmeid dokumenteeritud juhiste alusel (andmetöötlusleping), muidu võib ta olla
    sõltumatu või kaasvastutav töötleja. Art 8 alaealiste erikaitse (Eestis 13+) kehtib
-   vaid nõusolekupõhise infoühiskonna teenuse puhul, mida pakutakse otse lapsele; IKS;
-   andmete asukoht Eesti/EL.
+   vaid nõusolekupõhise infoühiskonna teenuse puhul, mida pakutakse otse lapsele; IKS.
+   Andmete majutuskoht Eesti/EL on hankija eelistus, mille saab seada hanketingimustes;
+   edastus kolmandatesse riikidesse peab vastama GDPR V peatükile.
 3. **Identiteet ja koostalitlus**: HarID/TAAT OIDC (koolide identiteediföderatsioon),
    EHIS, eKool/Stuudiumi liidestused — MATx-i staatused /tehniline lehel.
 4. **AI-komponent**: EU AI Act (2024/1689) III lisa § 3 — kõrge riski klass hõlmab
@@ -136,8 +138,9 @@ Haridus- ja Teadusministeerium / Haridus- ja Noorteamet / Kiviõli Riigikool).
 
 ## 4. Lepingupraktika (üldtingimused Eesti avalikus sektoris)
 
-- **Kestus**: RHS ei reguleeri — lepinguvabadus (RaM KKK). Tarkvaralitsentside lepingud
-  tavaliselt 12–36 kuud; raamlepingud kuni 4 aastat (direktiiv 2014/24/EL art 33; näide:
+- **Kestus**: tavapärase hankelepingu kestus on lepinguvabadus (RaM KKK) —
+  tarkvaralitsentside lepingud tavaliselt 12–36 kuud; raamlepingud üldjuhul kuni 4 aastat
+  (RHS § 29 lg 2; direktiiv 2014/24/EL art 33), pikem tähtaeg vajab põhjendust (näide:
   „Juhan“ hooldus-arendus 48 kuud).
 - **Maksetähtaeg**: tavaliselt kuni 30 kalendripäeva (direktiiv 2011/7/EL hilinenud maksete
   vastu); kuni 60 kalendripäeva vaid erandina, kui see on lepingus sõnaselgelt kokku lepitud
@@ -177,7 +180,7 @@ Haridus- ja Teadusministeerium / Haridus- ja Noorteamet / Kiviõli Riigikool).
 6. RTK KKK (menetluste tähtajad) — https://rtk.ee/korduma-kippuvad-kusimused-riigihangete-teemal
 7. Rahandusministeerium: Riigihangete valdkonna statistika ja kokkuvõte 2025 (08.05.2026) —
    https://fin.ee; sama 2024 (05.06.2025)
-8. Riigihangete registri avaandmed (lepinguteated 2026 I poolaasta) —
+8. Riigihangete registri avaandmed (lepinguteated 2026 veebruar–juuli) —
    https://riigihanked.riik.ee/rhr/api/public/v1/opendata/notice_award/2026/month/2/xml (kuud 2–7)
 9. TenderGlass: HTM hankijaprofiil — https://tenderglass.com (registri koondandmed)
 10. Opiq koolipakett 2026/27 hinnad — https://opiq.ee
