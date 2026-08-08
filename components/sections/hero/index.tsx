@@ -7,7 +7,13 @@ import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { useRef, useState } from 'react';
 import { useRegistration } from '@/components/providers/registration-provider';
-import { CALENDLY_URL, HERO_COPY, SECTION_IDS, TECH_OVERVIEW } from '@/lib/content/landing-copy';
+import {
+  AWARDS,
+  CALENDLY_URL,
+  HERO_COPY,
+  SECTION_IDS,
+  TECH_OVERVIEW,
+} from '@/lib/content/landing-copy';
 import { gsapEase, motionTokens, staggers } from '@/lib/motion-tokens';
 import {
   AnimatedCharacterReveal,
@@ -93,17 +99,15 @@ export function HeroSection() {
           ...Array.from(badgesRef.current?.children ?? []),
         ].filter(Boolean) as (Element | HTMLDivElement)[];
 
-        // Set the hidden state at mount, then reveal after the headline
-        // sequence — the previous immediateRender: false version showed the
-        // finished CTAs until 2.2s and then snapped them hidden, a visible
-        // blink on every load. The tradeoff (CTA hidden until the reveal)
-        // matches the headline's own delayed reveal.
+        // Set the hidden state at mount, then reveal immediately — controls
+        // stay visible through SSR/hydration (no inline hiding in the server
+        // HTML) and appear as soon as their animation starts, without the
+        // long 2.2s wait that kept the primary CTA unusable on load.
         gsap.set(elements, { opacity: 0, y: motionTokens.distance.md });
         gsap.to(elements, {
           opacity: 1,
           y: 0,
           duration: motionTokens.duration.normal,
-          delay: 2.2,
           stagger: staggers.card,
           ease: gsapEase(motionTokens.easing.emphasized),
         });
@@ -211,11 +215,11 @@ export function HeroSection() {
             <div ref={badgesRef} className='flex flex-wrap justify-center lg:justify-start gap-3'>
               <div className='inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface border border-border text-xs'>
                 <Award className='w-3.5 h-3.5 text-warning' />
-                <span className='font-medium text-text-primary'>FELLIN HÄKK 2026 — I koht</span>
+                <span className='font-medium text-text-primary'>{AWARDS.fellin}</span>
               </div>
               <div className='inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface border border-border text-xs'>
                 <GraduationCap className='w-3.5 h-3.5 text-secondary' />
-                <span className='font-medium text-text-primary'>Presidendi Häkaton 2026</span>
+                <span className='font-medium text-text-primary'>{AWARDS.presidential}</span>
               </div>
             </div>
           </div>

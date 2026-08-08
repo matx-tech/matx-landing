@@ -142,6 +142,13 @@ export function LenisProvider({ children }: { children: React.ReactNode }) {
 
   const scrollTo = useCallback(
     (target: string | number | HTMLElement, options?: { focusHeading?: boolean }) => {
+      // Cancel any pending selector poll from an earlier navigation: an
+      // obsolete poll must not scroll to or focus a stale target after the
+      // user has navigated somewhere else.
+      if (selectorPollTimerRef.current !== null) {
+        window.clearTimeout(selectorPollTimerRef.current);
+        selectorPollTimerRef.current = null;
+      }
       const targetElement =
         typeof target === 'string'
           ? document.querySelector(target)
@@ -214,6 +221,9 @@ export function LenisProvider({ children }: { children: React.ReactNode }) {
         // the skeleton, which carries the id too). Poll briefly for the real
         // element instead of dropping the scroll entirely.
         const poll = (remaining: number) => {
+          // This tick has begun: the ref no longer refers to a pending timer
+          // (it either fired, or scrollTo's start cleared it).
+          selectorPollTimerRef.current = null;
           const el = document.querySelector(target);
           if (el instanceof HTMLElement) {
             if (!lenisRef.current) {

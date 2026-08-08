@@ -28,7 +28,7 @@ const LEGAL_DOCS = {
       },
       {
         heading: '5. Andmete saajad ja edastamine',
-        body: 'Töötlejad (GDPR artikkel 28): LuxVPS (Luxembourg) — veebimajutus; Cloudflare Inc. (USA) — CDN, DDoS kaitse, e-posti saatmine. Rahvusvahelised edastused (Cloudflare): Standard Contractual Clauses (SCCs, EL-i komisjoni heakskiidetud standardlepingutingimused) + EU-USA Data Privacy Framework (täiendav kaitse). Cloudflare DPA ja allatöötlejate nimekiri: cloudflare.com/cloudflare-customer-dpa ja cloudflare.com/gdpr/subprocessors. Andmeid ei müüda ega edastata turunduseesmärgil kolmandatele isikutele. Õiguslik kohustus: võime avaldada andmeid Eesti õiguskaitseasutustele kohustusliku õigusnormi alusel (GDPR artikkel 6(1)(c)).',
+        body: 'Töötlejad (GDPR artikkel 28): LuxVPS (Luxembourg) — veebimajutus; Cloudflare Inc. (USA) — CDN, DDoS kaitse, e-posti saatmine; Slack Technologies LLC (USA) — pilootregistreerimise teavitused. Registreerimisvormi andmed (kooli nimi, kontaktisiku nimi, roll, e-post, telefon, klassirühmade arv) edastatakse vormi saatmisel Slacki teavitustena (töötleja: Slack Technologies LLC; majutuskoht: USA; rahvusvahelise edastuse alus: Standard Contractual Clauses (SCCs) + EU-USA Data Privacy Framework; säilitusaeg: kuni 12 kuud pärast piloodi lõppu, seejärel kustutatakse; andmetöötlusleping: Slack Customer Data Processing Addendum — slack.com/trust/compliance/privacy). Rahvusvahelised edastused (Cloudflare): Standard Contractual Clauses (SCCs, EL-i komisjoni heakskiidetud standardlepingutingimused) + EU-USA Data Privacy Framework (täiendav kaitse). Cloudflare DPA ja allatöötlejate nimekiri: cloudflare.com/cloudflare-customer-dpa ja cloudflare.com/gdpr/subprocessors. Andmeid ei müüda ega edastata turunduseesmärgil kolmandatele isikutele. Õiguslik kohustus: võime avaldada andmeid Eesti õiguskaitseasutustele kohustusliku õigusnormi alusel (GDPR artikkel 6(1)(c)).',
       },
       {
         heading: '6. Rahvusvahelised andmeedastused',
@@ -98,7 +98,7 @@ const LEGAL_DOCS = {
       },
       {
         heading: '11. Laste andmed',
-        body: 'Registreerimisleht ei kogu alla 16-aastaste laste andmeid. Pilootfaasis õpilaste andmete töötlemisel (pärast lepingu sõlmimist) kohaldame GDPR artiklit 8 — alla 16-aastase lapse nõusolek on kehtiv ainult vanema/hooldaja loal. Koolid on esmane vastutav töötleja õpilaste andmete osas; MATx tegutseb töötlejana (artikkel 28).',
+        body: 'Registreerimisleht ei kogu alla 16-aastaste laste andmeid. Pilootfaasis õpilaste andmete töötlemisel (pärast lepingu sõlmimist) kohaldame GDPR artiklit 8: Eestis on lapse nõusolek kehtiv alates 13. eluaastast, kui nõusolek on õiguslik alus infoühiskonna teenusele, mida pakutakse otse lapsele; alla 13-aastase lapse puhul on vajalik vanema või seadusliku esindaja nõusolek. Artikkel 8 ei ole õpilasandmete üldine töötlemisalus — iga töötlustegevuse õiguslik alus määratakse eraldi. Koolid on esmane vastutav töötleja õpilaste andmete osas; MATx tegutseb töötlejana (artikkel 28).',
       },
       {
         heading: '12. Järelevalveasutus',

@@ -242,8 +242,8 @@ def load_entries(root: Path):
             continue
         try:
             raw = f.read_text(encoding="utf-8")
-        except UnicodeDecodeError as exc:
-            print(f"[bmad] warning: skipping non-UTF-8 file {f}: {exc}", file=sys.stderr)
+        except (UnicodeDecodeError, OSError) as exc:
+            print(f"[bmad] warning: skipping unreadable file {f}: {exc}", file=sys.stderr)
             continue
         fields, err, body = parse_frontmatter(raw)
         if fields is None and err is None:
@@ -270,8 +270,8 @@ def load_compasses(root: Path):
     for f in sorted(cdir.glob("*.md")):
         try:
             raw = f.read_text(encoding="utf-8")
-        except UnicodeDecodeError as exc:
-            print(f"[bmad] warning: skipping non-UTF-8 file {f}: {exc}", file=sys.stderr)
+        except (UnicodeDecodeError, OSError) as exc:
+            print(f"[bmad] warning: skipping unreadable file {f}: {exc}", file=sys.stderr)
             continue
         fields, err, body = parse_frontmatter(raw)
         out.append((f, fields or {}, err, body))
@@ -682,10 +682,12 @@ def sparse_fetch(project: str, record: dict):
             fetch timestamp, and source; otherwise, the first value is `None` and
             the second contains the failure reason.
     """
-    remote, branch = record["remote"], record.get("branch", "main")
-    if remote.startswith("-") or branch.startswith("-"):
-        return None, "invalid registry value: remote/branch must not start with '-'"
+    remote, branch = record.get("remote"), record.get("branch", "main")
     context_root = record.get("context_root", DEFAULT_KNOWLEDGE)
+    if not isinstance(remote, str) or not isinstance(branch, str) or not isinstance(context_root, str):
+        return None, "invalid registry entry: remote, branch and context_root must be strings"
+    if remote.startswith("-") or branch.startswith("-") or context_root.startswith("-"):
+        return None, "invalid registry value: remote/branch/context_root must not start with '-'"
     with tempfile.TemporaryDirectory() as tmp:
         clone = Path(tmp) / "clone"
         proc = subprocess.run(
@@ -694,7 +696,7 @@ def sparse_fetch(project: str, record: dict):
             capture_output=True, text=True)
         if proc.returncode != 0:
             return None, proc.stderr.strip()
-        subprocess.run(["git", "-C", str(clone), "sparse-checkout", "set", context_root],
+        subprocess.run(["git", "-C", str(clone), "sparse-checkout", "set", "--", context_root],
                        capture_output=True, check=False)
         sha = subprocess.run(["git", "-C", str(clone), "rev-parse", "HEAD"],
                              capture_output=True, text=True).stdout.strip()

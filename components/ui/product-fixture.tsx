@@ -60,16 +60,23 @@ export function ProductFixture({
       const elements = [answerRef.current, signalRef.current, retryRef.current, actionRef.current];
 
       if (prefersReducedMotion) {
-        // Set all panels to their final visible state
-        const visibleElements = elements.filter(Boolean);
+        // Content is already visible via the CSS fallback — hand control back
+        // from the !important rule so inline state matches the DOM.
+        const visibleElements = elements.filter((el): el is HTMLDivElement => el !== null);
+        visibleElements.forEach((el) => el.classList.remove('gsap-animate-on-mount'));
         gsap.set(visibleElements, { opacity: 1, y: 0 });
         return;
       }
 
       // Filter out any null refs before passing to GSAP (defensive against
       // React commit-order edge cases where a child ref hasn't attached yet).
-      const validElements = elements.filter(Boolean);
+      const validElements = elements.filter((el): el is HTMLDivElement => el !== null);
       if (validElements.length === 0) return;
+
+      // Strip the CSS fallback before gsap.set — .gsap-animate-on-mount has
+      // opacity: 1 !important which overrides GSAP inline styles (keeps panels
+      // visible through SSR/hydration until the animation takes over).
+      validElements.forEach((el) => el.classList.remove('gsap-animate-on-mount'));
 
       // Set initial state
       gsap.set(validElements, { opacity: 0, y: motionTokens.distance.md });
@@ -133,7 +140,10 @@ export function ProductFixture({
       </h2>
 
       {/* Student answer */}
-      <div ref={answerRef} className='p-4 bg-card rounded-lg border border-border'>
+      <div
+        ref={answerRef}
+        className='gsap-animate-on-mount p-4 bg-card rounded-lg border border-border'
+      >
         <div className='text-sm font-medium text-text-primary mb-2'>
           <InlineFractionalExpression expression={PRODUCT_FIXTURE.task.question} />
         </div>
@@ -147,7 +157,10 @@ export function ProductFixture({
       </div>
 
       {/* Signal detection */}
-      <div ref={signalRef} className='p-4 bg-info-surface rounded-lg border border-info-border'>
+      <div
+        ref={signalRef}
+        className='gsap-animate-on-mount p-4 bg-info-surface rounded-lg border border-info-border'
+      >
         <div className='flex items-center justify-between mb-2'>
           <span className='text-xs font-medium text-info uppercase tracking-wider'>
             {PRODUCT_FIXTURE.signal.label}
@@ -158,7 +171,10 @@ export function ProductFixture({
       </div>
 
       {/* Targeted retry */}
-      <div ref={retryRef} className='p-4 bg-card rounded-lg border border-border'>
+      <div
+        ref={retryRef}
+        className='gsap-animate-on-mount p-4 bg-card rounded-lg border border-border'
+      >
         <div className='text-xs font-medium text-text-secondary uppercase tracking-wider mb-2'>
           Järgmine harjutus
         </div>
@@ -171,7 +187,7 @@ export function ProductFixture({
       {/* Teacher action */}
       <div
         ref={actionRef}
-        className='p-4 bg-success-surface rounded-lg border border-success-border'
+        className='gsap-animate-on-mount p-4 bg-success-surface rounded-lg border border-success-border'
       >
         <div className='text-xs font-medium text-success uppercase tracking-wider mb-2'>
           Õpetaja otsustab

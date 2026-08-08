@@ -111,18 +111,12 @@ export function CTASection() {
       // Timing: when the stats section enters viewport, scramble each number
       // Derive target text from the element's rendered content so it stays in
       // sync with the JSX without duplicating literals.
-      const statValues: { element: HTMLDivElement | null; target: string; chars: string }[] = [
-        {
-          element: statsRef.current[0],
-          target: statsRef.current[0]?.textContent ?? CTA_COPY.stats[0].value,
-          chars: '0123456789+',
-        },
-        {
-          element: statsRef.current[1],
-          target: statsRef.current[1]?.textContent ?? CTA_COPY.stats[1].value,
-          chars: '0123456789',
-        },
-      ];
+      const statValues: { element: HTMLDivElement | null; target: string; chars: string }[] =
+        CTA_COPY.stats.map((stat, index) => ({
+          element: statsRef.current[index],
+          target: statsRef.current[index]?.textContent ?? stat.value,
+          chars: stat.chars,
+        }));
 
       statValues.forEach(({ element, target, chars }) => {
         if (!element) return;
@@ -341,7 +335,7 @@ export function CTASection() {
         {/* Stats */}
         <div className='flex flex-wrap justify-center gap-8 mt-12'>
           {CTA_COPY.stats.map((stat, index) => (
-            <div key={stat.value} className='text-center'>
+            <div key={stat.id} className='text-center'>
               <div
                 ref={(el) => {
                   statsRef.current[index] = el;

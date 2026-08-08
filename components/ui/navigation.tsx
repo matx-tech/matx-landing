@@ -194,6 +194,17 @@ export function Navigation() {
     }, MOBILE_MENU_EXIT_MS + 150);
   }, []);
 
+  // Clear any pending hash jump on unmount — the timeout must not fire
+  // window.location.hash after the navigation component is gone.
+  useEffect(() => {
+    return () => {
+      if (pendingHashTimerRef.current !== null) {
+        window.clearTimeout(pendingHashTimerRef.current);
+        pendingHashTimerRef.current = null;
+      }
+    };
+  }, []);
+
   return (
     <Dialog.Root open={isOpen} onOpenChange={handleOpenChange}>
       <nav

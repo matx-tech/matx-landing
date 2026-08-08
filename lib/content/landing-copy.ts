@@ -91,10 +91,22 @@ export const CTA_COPY = {
   cardBody: 'Liitu 10 pilootkooliga. Sügisesed klassid 7.-9. klassini.',
   registerCta: 'Registreeri kool',
   stats: [
-    { value: '150+', label: 'ülesannet (Saadaval)' },
-    { value: '10', label: 'kooli (Piloodis)' },
+    {
+      id: 'tasks',
+      value: '150+',
+      label: 'ülesannet (Saadaval)',
+      // Scramble alphabet for the CTA number animation.
+      chars: '0123456789+',
+    },
+    { id: 'schools', value: '10', label: 'kooli (Piloodis)', chars: '0123456789' },
   ] as const,
   marqueeItems: ['Alusta tasuta', 'Õpi mõistvalt', 'Säästa aega'] as const,
+} as const;
+
+// Awards — rendered in the hero badge row and the footer from one contract.
+export const AWARDS = {
+  fellin: 'FELLIN HÄKK 2026 — I koht',
+  presidential: 'Presidendi Häkaton 2026',
 } as const;
 
 // Footer — public description, awards, contact and social links from one
@@ -102,8 +114,8 @@ export const CTA_COPY = {
 export const FOOTER_COPY = {
   description:
     'Adaptiivne matemaatikaõpikeskkond Eesti põhikoolidele. Andmepõhine õpitee, teaduslikel alustel.',
-  awardPrimary: 'FELLIN HÄKK 2026',
-  awardSecondary: 'Presidendi Häkaton',
+  awardPrimary: AWARDS.fellin,
+  awardSecondary: AWARDS.presidential,
   navHeading: 'Navigatsioon',
   contactHeading: 'Kontakt',
   contactEmail: 'andri@matx.ee',

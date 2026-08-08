@@ -122,52 +122,65 @@ export const CAPABILITIES: CapabilityRecord[] = [
   },
 ];
 
-// Topic/skill areas with maturity status
-export interface TopicRecord {
-  name: string;
-  status: CapabilityStatus;
-  skillCount: number;
-  grade: string;
-}
-
-export const TOPIC_AREAS: TopicRecord[] = [
+// Topic/skill areas with maturity status. Declared as a literal (as const)
+// so TopicId is a derived union: the icon Record keyed by id in the topics
+// section stays exhaustive at compile time, and a copy edit can never shuffle
+// a topic's icon or key.
+export const TOPIC_AREAS = [
   {
+    id: 'addition-subtraction',
     name: 'Liitmine ja lahutamine',
     status: 'Saadaval',
     skillCount: 24,
     grade: '1.-6. klass',
   },
   {
+    id: 'multiplication-division',
     name: 'Korrutamine ja jagamine',
     status: 'Saadaval',
     skillCount: 18,
     grade: '2.-6. klass',
   },
   {
+    id: 'fractions',
     name: 'Murdarvud',
     status: 'Saadaval',
     skillCount: 16,
     grade: '4.-6. klass',
   },
   {
+    id: 'decimals',
     name: 'Kümnendmurrud',
     status: 'Piloodis',
     skillCount: 12,
     grade: '5.-6. klass',
   },
   {
+    id: 'percentages',
     name: 'Protsendid',
     status: 'Kavandatud',
     skillCount: 8,
     grade: '6.-9. klass',
   },
   {
+    id: 'equations',
     name: 'Võrrandid',
     status: 'Kavandatud',
     skillCount: 14,
     grade: '7.-9. klass',
   },
-];
+] as const;
+
+export type TopicId = (typeof TOPIC_AREAS)[number]['id'];
+
+export interface TopicRecord {
+  /** Stable id — React key and TOPIC_ICONS lookup, stable across copy changes. */
+  id: TopicId;
+  name: string;
+  status: CapabilityStatus;
+  skillCount: number;
+  grade: string;
+}
 
 // Error pattern taxonomy (public wording)
 export const ERROR_PATTERNS = {

@@ -250,7 +250,7 @@ export function FooterSection() {
                 const Icon = SOCIAL_ICONS[social.id];
                 return (
                   <a
-                    key={social.label}
+                    key={social.id}
                     href={social.href}
                     target={social.href.startsWith('http') ? '_blank' : undefined}
                     rel={social.href.startsWith('http') ? 'noopener noreferrer' : undefined}

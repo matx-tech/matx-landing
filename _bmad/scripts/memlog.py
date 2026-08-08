@@ -154,7 +154,7 @@ def read_memlog(path: Path) -> tuple[dict, str]:
     except FileNotFoundError:
         print(f"error: memory log not found at {path} — run 'init' first", file=sys.stderr)
         sys.exit(2)
-    except OSError as exc:
+    except (OSError, UnicodeDecodeError) as exc:
         print(f"error: cannot read memory log at {path}: {exc}", file=sys.stderr)
         sys.exit(2)
     try:

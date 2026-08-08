@@ -22,7 +22,16 @@ import { TOPIC_AREAS } from '@/lib/content/landing-evidence';
 import { usePrefersReducedMotion } from '@/lib/hooks/use-prefers-reduced-motion';
 import { gsapEase, motionTokens } from '@/lib/motion-tokens';
 
-const TOPIC_ICONS = [Plus, Minus, X, Divide, Plus, Minus];
+// Icon per topic, keyed by the stable TopicRecord id — filtering or copy
+// changes can never shuffle which icon a topic gets.
+const TOPIC_ICONS = {
+  'addition-subtraction': Plus,
+  'multiplication-division': Minus,
+  fractions: X,
+  decimals: Divide,
+  percentages: Plus,
+  equations: Minus,
+} as const;
 
 /**
  * Renders a localized capabilities section with status filtering and an interactive topics carousel.
@@ -282,11 +291,11 @@ export function TopicsSection() {
               style={{ width: 'max-content' }}
             >
               {visibleAreas.map((topic, index) => {
-                const Icon = TOPIC_ICONS[index % TOPIC_ICONS.length];
+                const Icon = TOPIC_ICONS[topic.id];
 
                 return (
                   <div
-                    key={topic.name}
+                    key={topic.id}
                     className={`flex-shrink-0 w-[320px] md:w-[400px] group ${
                       index === activeIndex ? 'scale-100' : 'scale-95 opacity-70'
                     } transition-all duration-500`}
