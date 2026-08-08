@@ -51,6 +51,9 @@ const heatmapLevelLabels = [
   'Kõrge',
 ];
 
+/**
+ * Renders an interactive teacher-focused section with class performance insights and intervention information.
+ */
 export function TeacherSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const heatmapRef = useRef<HTMLDivElement>(null);
@@ -222,7 +225,7 @@ export function TeacherSection() {
                 <h3 className="text-lg font-display font-semibold text-text-primary whitespace-nowrap">
                   Klassi soorituskaart
                 </h3>
-                <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                <span className="text-xs font-medium text-text-secondary uppercase tracking-wider">
                   {TEACHER_STORY.heatmapLabel}
                 </span>
               </div>
@@ -233,7 +236,7 @@ export function TeacherSection() {
             <div className="overflow-x-auto">
               <div style={{ minWidth: '620px' }}>
                 {/* Skill names row */}
-                <div className="mb-2 text-xs text-muted-foreground">
+                <div className="mb-2 text-xs text-text-secondary">
                   <div className="grid gap-1" style={{ gridTemplateColumns: `repeat(${skills}, minmax(0, 1fr))` }}>
                     {SKILL_NAMES.map((name) => (
                       <span key={name}>{name}</span>

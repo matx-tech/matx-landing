@@ -11,6 +11,7 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ADOPTION_ROUTES, SECTION_IDS, CALENDLY_URL, type AudienceId } from '@/lib/content/landing-copy';
 import { BookOpen, School, FileText, Server } from 'lucide-react';
+import { useRegistration } from '@/components/providers/registration-provider';
 import { useLenis } from '@/components/providers/lenis-provider';
 import { usePrefersReducedMotion } from '@/lib/hooks/use-prefers-reduced-motion';
 import { motionTokens, gsapEase, staggers } from '@/lib/motion-tokens';
@@ -26,12 +27,12 @@ const AUDIENCE_ICONS: Record<AudienceId, typeof BookOpen | typeof School | typeo
   it: Server,
 };
 
-interface AdoptionRoutesProps {
-  onOpenRegistration?: () => void;
-}
-
-export function AdoptionSection({ onOpenRegistration }: AdoptionRoutesProps) {
+/**
+ * Renders audience-specific adoption routes with registration and scheduling actions.
+ */
+export function AdoptionSection() {
   const sectionRef = useRef<HTMLElement>(null);
+  const { openRegistration } = useRegistration();
   const { scrollTo } = useLenis();
   const router = useRouter();
   const prefersReducedMotion = usePrefersReducedMotion();
@@ -85,8 +86,8 @@ export function AdoptionSection({ onOpenRegistration }: AdoptionRoutesProps) {
       router.push(route);
       return;
     }
-    if (action === 'registration' && onOpenRegistration) {
-      onOpenRegistration();
+    if (action === 'registration') {
+      openRegistration();
     } else if (action === 'calendly') {
       const newWin = window.open(CALENDLY_URL, '_blank', 'noopener,noreferrer');
       if (newWin) newWin.opener = null;
@@ -105,17 +106,17 @@ export function AdoptionSection({ onOpenRegistration }: AdoptionRoutesProps) {
       <div className="relative z-10 container mx-auto px-4 md:px-8 lg:px-16">
         {/* Section header */}
         <div className="max-w-3xl mx-auto text-center mb-16">
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-4">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-text-primary mb-4">
             Kuidas alustada
           </h2>
-          <p className="text-lg text-muted-foreground">
+          <p className="text-lg text-text-secondary">
             Vali oma rolliga sobiv marsruut
           </p>
         </div>
 
         {/* Adoption route cards */}
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
-          {ADOPTION_ROUTES.map((route, index) => {
+          {ADOPTION_ROUTES.map((route) => {
             const Icon = AUDIENCE_ICONS[route.audienceId];
 
             return (
@@ -134,12 +135,12 @@ export function AdoptionSection({ onOpenRegistration }: AdoptionRoutesProps) {
                 </div>
 
                 {/* Title */}
-                <h3 className="text-xl font-semibold text-foreground mb-3">
+                <h3 className="text-xl font-semibold text-text-primary mb-3">
                   {route.title}
                 </h3>
 
                 {/* Description */}
-                <p className="text-sm text-muted-foreground mb-6">
+                <p className="text-sm text-text-secondary mb-6">
                   {route.description}
                 </p>
 
@@ -159,7 +160,7 @@ export function AdoptionSection({ onOpenRegistration }: AdoptionRoutesProps) {
 
         {/* Additional note */}
         <div className="max-w-2xl mx-auto text-center mt-12">
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-text-secondary">
             Kõik marsruudid algavad vestlusega, et hinnata MATx-i sobivust teie vajaduste jaoks.
             Piloodi käigus kogume tagasisidet ja täiendame funktsionaalsust.
           </p>

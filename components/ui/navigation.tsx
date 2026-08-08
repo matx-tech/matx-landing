@@ -1,8 +1,10 @@
 'use client';
 
 import { useRef, useEffect, useState, useCallback } from 'react';
+import Link from 'next/link';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useGSAP } from '@gsap/react';
 import { Menu, X, Award } from 'lucide-react';
 import * as Dialog from '@radix-ui/react-dialog';
 import { LANDING_NAV_ITEMS, SECTION_IDS, CALENDLY_URL } from '@/lib/content/landing-copy';
@@ -10,31 +12,37 @@ import { usePrefersReducedMotion } from '@/lib/hooks/use-prefers-reduced-motion'
 import { motionTokens, gsapEase, staggers } from '@/lib/motion-tokens';
 
 if (typeof window !== 'undefined') {
-  gsap.registerPlugin(ScrollTrigger);
+  gsap.registerPlugin(ScrollTrigger, useGSAP);
 }
 
 const navItems = LANDING_NAV_ITEMS;
 
 const PILOT_HREF = `#${SECTION_IDS.pilot}`;
 
-interface NavigationProps {}
-
-export function Navigation(_props: NavigationProps) {
+/**
+ * Renders responsive navigation with desktop links, mobile menu controls, and calls to action.
+ */
+export function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
   const navRef = useRef<HTMLElement>(null);
   const menuItemsRef = useRef<HTMLDivElement[]>([]);
+  const pendingHashTimerRef = useRef<number | null>(null);
   const prefersReducedMotion = usePrefersReducedMotion();
 
-  useEffect(() => {
+  // Layout-phase (useGSAP) so the entrance state is applied before paint —
+  // a passive useEffect would let the nav flash at its final position.
+  useGSAP(() => {
     const nav = navRef.current;
     if (!nav) return;
 
     if (prefersReducedMotion) {
+      nav.classList.remove('gsap-animate-on-mount');
       gsap.set(nav, { y: 0, opacity: 1 });
       return;
     }
 
-    // Initial entrance
+    // Initial entrance: strip CSS fallback so GSAP inline opacity takes effect.
+    nav.classList.remove('gsap-animate-on-mount');
     gsap.set(nav, { y: -motionTokens.distance.xxl, opacity: 0 });
     gsap.to(nav, {
       y: 0,
@@ -71,7 +79,7 @@ export function Navigation(_props: NavigationProps) {
       st.kill();
       gsap.killTweensOf(nav);
     };
-  }, [prefersReducedMotion]);
+  }, { dependencies: [prefersReducedMotion] });
 
   useEffect(() => {
     const items = menuItemsRef.current.filter(Boolean);
@@ -113,18 +121,77 @@ export function Navigation(_props: NavigationProps) {
   }, [isOpen, prefersReducedMotion]);
 
   const handleOpenChange = useCallback((open: boolean) => {
+    // Any menu-state change supersedes a pending hash jump: closing without a
+    // link click, or reopening within the 650ms window before the jump fires.
+    if (pendingHashTimerRef.current) {
+      window.clearTimeout(pendingHashTimerRef.current);
+      pendingHashTimerRef.current = null;
+    }
     setIsOpen(open);
   }, []);
+
+  /**
+   * Mobile menu links: closing the dialog unmounts the clicked anchor before
+   * the browser follows the hyperlink, which cancels navigation entirely
+   * (spec: following a hyperlink on a disconnected node is a no-op). So the
+   * default action is prevented and navigation is done manually:
+   * - internal anchors scroll after the dialog's exit animation releases the
+   *   body scroll lock;
+   * - external links open immediately, while the click is still a user
+   *   gesture (window.open in a timeout would be popup-blocked).
+   *
+   * ponytail: fixed 650ms delay tuned to the 0.5s exit animation; replace
+   * with an onOpenChange(false)-driven scroll if it ever flakes.
+   */
+  const handleMenuLinkClick = useCallback(
+    (event: React.MouseEvent<HTMLAnchorElement>) => {
+      // Modified clicks (ctrl/cmd/shift/alt/middle) keep native browser
+      // behavior — e.g. ctrl+click opens the link in a new tab.
+      if (
+        event.button !== 0 ||
+        event.metaKey ||
+        event.ctrlKey ||
+        event.shiftKey ||
+        event.altKey
+      ) {
+        return;
+      }
+      const href = event.currentTarget.getAttribute('href');
+      // External = absolute http(s) or protocol-relative (//…); hash anchors
+      // are the only internal menu links. Anything else (mailto:, tel:)
+      // classifies internal and is a no-op hash — acceptable: the menu has
+      // no such links, and window.open can't open them meaningfully either.
+      const isExternal = /^(https?:)?\/\//.test(href ?? '');
+      event.preventDefault();
+      setIsOpen(false);
+
+      // A later click supersedes a pending jump from an earlier one.
+      if (pendingHashTimerRef.current) {
+        window.clearTimeout(pendingHashTimerRef.current);
+        pendingHashTimerRef.current = null;
+      }
+
+      if (isExternal && href) {
+        window.open(href, '_blank', 'noopener,noreferrer');
+        return;
+      }
+      pendingHashTimerRef.current = window.setTimeout(() => {
+        pendingHashTimerRef.current = null;
+        if (href) window.location.hash = href;
+      }, 650);
+    },
+    []
+  );
 
   return (
     <Dialog.Root open={isOpen} onOpenChange={handleOpenChange}>
       <nav
         ref={navRef}
-        className="fixed top-0 left-0 right-0 z-50 px-4 md:px-8 lg:px-12 py-3 bg-surface border-b border-border"
+        className="gsap-animate-on-mount fixed top-0 left-0 right-0 z-50 px-4 md:px-8 lg:px-12 py-3 bg-surface border-b border-border"
       >
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           {/* Logo */}
-          <a href="/" className="inline-flex items-center gap-2 focus-ring-target rounded-md">
+          <Link href="/" className="inline-flex items-center gap-2 focus-ring-target rounded-md">
             <span className="text-2xl font-display font-bold">
               <span className="text-primary">MAT</span>
               <span className="text-secondary">x</span>
@@ -133,7 +200,7 @@ export function Navigation(_props: NavigationProps) {
               <Award className="w-3 h-3 text-warning" />
               <span className="text-xs text-text-secondary">FELLIN HÄKK</span>
             </div>
-          </a>
+          </Link>
 
           {/* Desktop Nav */}
           <div className="hidden xl:flex items-center gap-5 2xl:gap-8">
@@ -205,7 +272,7 @@ export function Navigation(_props: NavigationProps) {
             >
               <a
                 href={item.href}
-                onClick={() => setIsOpen(false)}
+                onClick={handleMenuLinkClick}
                 className="text-3xl md:text-4xl font-display font-bold text-text-primary hover:text-primary transition-colors focus-ring-target rounded-md"
               >
                 {item.label}
@@ -221,7 +288,7 @@ export function Navigation(_props: NavigationProps) {
           >
             <a
               href={PILOT_HREF}
-              onClick={() => setIsOpen(false)}
+              onClick={handleMenuLinkClick}
               className="px-6 py-3 rounded-lg bg-primary text-text-inverse font-semibold focus-ring-target min-h-[44px] text-center"
             >
               Liitu piloodiga
@@ -230,7 +297,7 @@ export function Navigation(_props: NavigationProps) {
               href={CALENDLY_URL}
               target="_blank"
               rel="noopener noreferrer"
-              onClick={() => setIsOpen(false)}
+              onClick={handleMenuLinkClick}
               className="px-6 py-3 rounded-lg border border-border text-text-primary font-semibold hover:bg-surface transition-colors text-center focus-ring-target min-h-[44px]"
             >
               Broneeri vestlus

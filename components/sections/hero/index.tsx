@@ -1,23 +1,59 @@
 'use client';
 
 import { useRef } from 'react';
+import dynamic from 'next/dynamic';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 import { AnimatedWordReveal, AnimatedCharacterReveal, MATxLogoAnimation } from './animated-headline';
-import { ScrollIndicator } from './scroll-indicator';
-import { ProductFixture } from '@/components/ui/product-fixture';
 import { HERO_COPY, SECTION_IDS } from '@/lib/content/landing-copy';
 import { Award, GraduationCap } from 'lucide-react';
+import { useRegistration } from '@/components/providers/registration-provider';
 import { motionTokens, gsapEase, staggers } from '@/lib/motion-tokens';
 
-interface HeroSectionProps {
-  onOpenRegistration: () => void;
-}
+// Lazy-load the product fixture (right column visual) — it's below the fold
+// on mobile and to the right of the hero text on desktop.  Deferring it
+// removes GSAP ScrollTrigger + layout work from the critical path. The
+// fixture is SSR-safe (module-scope guards in product-fixture.tsx), so the
+// above-the-fold visual is present in the server-rendered HTML.
+const ProductFixture = dynamic(
+  () => import('@/components/ui/product-fixture').then((mod) => mod.ProductFixture),
+  {
+    // Match the fixture's real stack geometry (label + 4 panels) at every
+    // breakpoint — the old hidden-on-mobile box reserved nothing, so the
+    // fixture popped in (~400px CLS) when its chunk hydrated.
+    loading: () => (
+      <div className="w-full space-y-4" aria-hidden="true">
+        <div className="h-4 w-24 rounded bg-border/40 animate-pulse motion-reduce:animate-none" />
+        {[0, 1, 2, 3].map((i) => (
+          <div key={i} className="h-24 rounded-lg bg-border/40 animate-pulse motion-reduce:animate-none" />
+        ))}
+      </div>
+    ),
+  }
+);
 
-export function HeroSection({ onOpenRegistration }: HeroSectionProps) {
+// Decorative bounce arrow — not needed for first paint.
+const ScrollIndicator = dynamic(
+  () => import('./scroll-indicator').then((mod) => mod.ScrollIndicator),
+  {
+    // SSR'd so the indicator + its a11y label exist without JS (the chunk
+    // is tiny). The fallback matches the real component's initial state
+    // (opacity 0 until the 3.2s entrance) so the slot never flashes a
+    // visible circle that then disappears.
+    loading: () => (
+      <div aria-hidden="true" className="absolute bottom-8 left-1/2 -translate-x-1/2 opacity-0" />
+    ),
+  }
+);
+
+/**
+ * Renders the landing page hero section with animated branding, introductory content, registration and workflow CTAs, achievement badges, and a product preview.
+ */
+export function HeroSection() {
   const ctasRef = useRef<HTMLDivElement>(null);
   const trustRef = useRef<HTMLParagraphElement>(null);
   const badgesRef = useRef<HTMLDivElement>(null);
+  const { openRegistration } = useRegistration();
 
   useGSAP(() => {
     const mm = gsap.matchMedia();
@@ -40,8 +76,12 @@ export function HeroSection({ onOpenRegistration }: HeroSectionProps) {
         ...Array.from(badgesRef.current?.children ?? []),
       ].filter(Boolean) as (Element | HTMLDivElement)[];
 
+      // Set the hidden state at mount, then reveal after the headline
+      // sequence — the previous immediateRender: false version showed the
+      // finished CTAs until 2.2s and then snapped them hidden, a visible
+      // blink on every load. The tradeoff (CTA hidden until the reveal)
+      // matches the headline's own delayed reveal.
       gsap.set(elements, { opacity: 0, y: motionTokens.distance.md });
-
       gsap.to(elements, {
         opacity: 1,
         y: 0,
@@ -80,7 +120,6 @@ export function HeroSection({ onOpenRegistration }: HeroSectionProps) {
             <div className="mb-10">
               <AnimatedCharacterReveal
                 className="text-lg md:text-xl text-text-secondary leading-relaxed"
-                delay={1.8}
               >
                 {HERO_COPY.support}
               </AnimatedCharacterReveal>
@@ -89,7 +128,7 @@ export function HeroSection({ onOpenRegistration }: HeroSectionProps) {
             <div ref={ctasRef} className="flex flex-col sm:flex-row items-center lg:items-start lg:justify-start justify-center gap-4 mb-8">
               <button
                 type="button"
-                onClick={onOpenRegistration}
+                onClick={openRegistration}
                 className="btn-primary min-w-[240px] sm:min-w-[280px] px-8 py-4 text-lg rounded-xl font-semibold focus-ring-target min-h-[44px]"
               >
                 {HERO_COPY.primaryCTA}

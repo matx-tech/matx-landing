@@ -6,6 +6,10 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Draggable } from 'gsap/Draggable';
 import { Observer } from 'gsap/Observer';
 import { ChevronLeft, ChevronRight, Plus, Minus, X, Divide } from 'lucide-react';
+
+if (typeof window !== 'undefined') {
+  gsap.registerPlugin(ScrollTrigger, Draggable, Observer);
+}
 import { TOPICS_SECTION, SECTION_IDS } from '@/lib/content/landing-copy';
 import { TOPIC_AREAS } from '@/lib/content/landing-evidence';
 import { CapabilityStatusBadge } from '@/components/ui/capability-status';
@@ -14,6 +18,9 @@ import { motionTokens, gsapEase } from '@/lib/motion-tokens';
 
 const TOPIC_ICONS = [Plus, Minus, X, Divide, Plus, Minus];
 
+/**
+ * Renders a localized capabilities section with an interactive topics carousel.
+ */
 export function TopicsSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
@@ -138,7 +145,7 @@ export function TopicsSection() {
     }, viewport);
 
     return () => ctx.revert();
-  }, [prefersReducedMotion]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [prefersReducedMotion]);
 
   const handleDotClick = (index: number) => {
     moveToIndex(index);
@@ -250,7 +257,7 @@ export function TopicsSection() {
                 <span className={`block w-2 h-2 rounded-full transition-all ${
                   index === activeIndex
                     ? 'bg-primary w-6'
-                    : 'bg-border hover:bg-borderStrong'
+                    : 'bg-border hover:bg-border-strong'
                 }`} />
               </button>
             ))}

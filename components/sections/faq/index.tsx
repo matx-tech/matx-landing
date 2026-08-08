@@ -4,6 +4,10 @@ import { useRef, useEffect, useState, useLayoutEffect } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Flip } from 'gsap/Flip';
+
+if (typeof window !== 'undefined') {
+  gsap.registerPlugin(ScrollTrigger, Flip);
+}
 import { FAQ_ENTRIES, SECTION_IDS } from '@/lib/content/landing-copy';
 import { usePrefersReducedMotion } from '@/lib/hooks/use-prefers-reduced-motion';
 import { motionTokens, gsapEase, staggers } from '@/lib/motion-tokens';

@@ -1,7 +1,22 @@
-# Target modern browsers only — all support Baseline 2024 features.
-# Eliminates 11+ KiB of unnecessary polyfills (Array.at, flat, flatMap,
-# Object.fromEntries, String.trimStart/trimEnd).
-Chrome >= 100
-Firefox >= 100
-Safari >= 15.4
-Edge >= 100
+# Target modern browsers only — our audience is Estonian schools
+# using recent Chrome/Edge/Safari/Firefox.  Dropping IE 11 and
+# very old Safari saves ~11 KB of polyfill code (Array.prototype.at,
+# flat, flatMap, Object.fromEntries, etc.) per the Lighthouse audit.
+#
+# We use rolling "last 2 versions" per engine so the build target
+# automatically advances. This selects the latest two releases per
+# engine, NOT Baseline Widely Available (which is derived from
+# compatibility data) — but it is appropriate for a marketing site
+# whose audience runs auto-updating browsers. Keep the Browserslist
+# database updated (caniuse-lite) for the rolling targets to advance.
+
+last 2 Chrome versions
+last 2 Firefox versions
+last 2 Safari versions
+last 2 Edge versions
+
+# Estonia has negligible legacy browser usage.  We explicitly exclude
+# IE 11 and Opera Mini which would otherwise trigger unnecessary
+# transpilation of modern ES2022+ features.
+not dead
+not op_mini all

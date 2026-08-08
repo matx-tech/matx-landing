@@ -18,6 +18,9 @@ const TRUST_ICONS: Record<string, typeof Shield | typeof Eye | typeof FileText> 
   'file-text': FileText,
 };
 
+/**
+ * Presents MATx’s trust principles, recommendation transparency workflow, and adoption guidance.
+ */
 export function TrustSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const prefersReducedMotion = usePrefersReducedMotion();
@@ -94,7 +97,7 @@ export function TrustSection() {
   }, [prefersReducedMotion]);
 
   return (
-    <section ref={sectionRef} id="usaldus" className="relative py-24 md:py-32 lg:py-40 bg-canvas overflow-hidden">
+    <section ref={sectionRef} id={SECTION_IDS.trust} className="relative py-24 md:py-32 lg:py-40 bg-canvas overflow-hidden">
       <div className="absolute inset-0">
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
         <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-secondary/5 rounded-full blur-3xl" />
@@ -145,7 +148,7 @@ export function TrustSection() {
 
             <div className="space-y-4">
               <div className="p-4 bg-card rounded-lg border border-border">
-                <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">
+                <div className="text-xs font-medium text-text-secondary uppercase tracking-wider mb-2">
                   Andmed
                 </div>
                 <div className="text-sm text-text-primary">
@@ -154,7 +157,7 @@ export function TrustSection() {
               </div>
 
               <div className="p-4 bg-card rounded-lg border border-border">
-                <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">
+                <div className="text-xs font-medium text-text-secondary uppercase tracking-wider mb-2">
                   Tuvastatud signaal
                 </div>
                 <div className="text-sm text-text-primary">

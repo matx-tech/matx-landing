@@ -28,6 +28,15 @@ interface ProductFixtureProps {
   className?: string;
 }
 
+/**
+ * Renders an educational workflow showing a student answer, detected signal, targeted retry, and teacher action.
+ *
+ * @param animated - Whether to animate the workflow panels.
+ * @param triggerId - The ID of the element that triggers the panel animation on scroll.
+ * @param delay - The initial delay before revealing the first panel.
+ * @param className - Additional CSS classes for the workflow container.
+ * @returns The rendered educational workflow.
+ */
 export function ProductFixture({
   animated = true,
   triggerId,
@@ -114,13 +123,13 @@ export function ProductFixture({
         className="p-4 bg-card rounded-lg border border-border"
         style={panelInitialOpacity !== undefined ? { opacity: panelInitialOpacity } : undefined}
       >
-        <div className="text-sm font-medium text-foreground mb-2">
+        <div className="text-sm font-medium text-text-primary mb-2">
           <InlineFractionalExpression expression={PRODUCT_FIXTURE.task.question} />
         </div>
-        <div className="text-sm text-muted-foreground mb-1">
-          Õpilase vastus:{' '}<span className="font-mono text-destructive"><InlineFractionalExpression expression={PRODUCT_FIXTURE.answer.submitted} /></span>
+        <div className="text-sm text-text-secondary mb-1">
+          Õpilase vastus:{' '}<span className="font-mono text-alert"><InlineFractionalExpression expression={PRODUCT_FIXTURE.answer.submitted} /></span>
         </div>
-        <div className="text-xs text-muted-foreground">
+        <div className="text-xs text-text-secondary">
           Oskus: {PRODUCT_FIXTURE.task.skill}
         </div>
       </div>
@@ -150,13 +159,13 @@ export function ProductFixture({
         className="p-4 bg-card rounded-lg border border-border"
         style={panelInitialOpacity !== undefined ? { opacity: panelInitialOpacity } : undefined}
       >
-        <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">
+        <div className="text-xs font-medium text-text-secondary uppercase tracking-wider mb-2">
           Järgmine harjutus
         </div>
-        <div className="text-sm font-medium text-foreground mb-2">
+        <div className="text-sm font-medium text-text-primary mb-2">
           <InlineFractionalExpression expression={PRODUCT_FIXTURE.retry.question} />
         </div>
-        <div className="text-xs text-muted-foreground">
+        <div className="text-xs text-text-secondary">
           {PRODUCT_FIXTURE.retry.rationale}
         </div>
       </div>
@@ -183,7 +192,6 @@ export function ProductFixture({
               className="px-3 py-1.5 text-xs font-medium rounded border border-success-border bg-surface text-success-strong opacity-60 cursor-default"
               type="button"
               disabled
-              aria-disabled="true"
               title="Näidisandmed — tegevus ei ole selles vaates aktiivne"
             >
               {option.label}

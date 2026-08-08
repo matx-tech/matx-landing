@@ -3,8 +3,15 @@
 import { useRef } from 'react';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
+import { CustomEase } from 'gsap/CustomEase';
 import { SCROLL_INDICATOR_LABEL } from '@/lib/content/landing-copy';
 import { motionTokens, gsapEase, customEases } from '@/lib/motion-tokens';
+
+// customEases (motion-tokens) need CustomEase registered — this section is
+// the only consumer, so register it here at module scope.
+if (typeof window !== 'undefined') {
+  gsap.registerPlugin(CustomEase);
+}
 
 interface ScrollIndicatorProps {
   hideLabel?: boolean;

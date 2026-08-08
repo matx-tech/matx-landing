@@ -5,7 +5,8 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ScrollIndicator } from '@/components/sections/hero/scroll-indicator';
 import { PRODUCT_FIXTURE } from '@/lib/content/landing-evidence';
-import { Fraction, InlineFractionalExpression } from '@/components/ui/fraction';
+import { SECTION_IDS } from '@/lib/content/landing-copy';
+import { InlineFractionalExpression } from '@/components/ui/fraction';
 import { usePrefersReducedMotion } from '@/lib/hooks/use-prefers-reduced-motion';
 import { motionTokens, gsapEase, staggers } from '@/lib/motion-tokens';
 
@@ -40,6 +41,9 @@ const storyBeats = [
   },
 ];
 
+/**
+ * Presents the problem story beats, illustrating recurring student errors and the need for teacher guidance.
+ */
 export function ProblemSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -113,7 +117,7 @@ export function ProblemSection() {
   }, [prefersReducedMotion]);
 
   return (
-    <section ref={sectionRef} id="probleem" className="relative bg-surface">
+    <section ref={sectionRef} id={SECTION_IDS.problem} className="relative bg-surface">
       <div ref={containerRef}>
         {storyBeats.map((beat, index) => (
           <div
@@ -169,12 +173,12 @@ export function ProblemSection() {
                       {/* Visual content based on beat type */}
                       {beat.visual === 'answer' && (
                         <div className="space-y-4">
-                          <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{PRODUCT_FIXTURE.label}</div>
+                          <div className="text-xs font-medium text-text-secondary uppercase tracking-wider">{PRODUCT_FIXTURE.label}</div>
                           <div className="p-4 bg-card rounded-lg border border-border">
                             <div className="text-sm font-medium mb-2"><InlineFractionalExpression expression={PRODUCT_FIXTURE.task.question} /></div>
-                            <div className="text-sm text-muted-foreground">Õpilase vastus:{' '}<span className="font-mono text-destructive"><InlineFractionalExpression expression={PRODUCT_FIXTURE.answer.submitted} /></span></div>
+                            <div className="text-sm text-text-secondary">Õpilase vastus:{' '}<span className="font-mono text-alert"><InlineFractionalExpression expression={PRODUCT_FIXTURE.answer.submitted} /></span></div>
                           </div>
-                          <div className="text-xs text-muted-foreground italic">
+                          <div className="text-xs text-text-secondary italic">
                             Õpilane ei tea, mida järgmisena harjutada
                           </div>
                         </div>
@@ -182,12 +186,12 @@ export function ProblemSection() {
 
                       {beat.visual === 'pattern' && (
                         <div className="space-y-4">
-                          <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{PRODUCT_FIXTURE.label}</div>
+                          <div className="text-xs font-medium text-text-secondary uppercase tracking-wider">{PRODUCT_FIXTURE.label}</div>
                           <div className="space-y-2">
                             {PRODUCT_FIXTURE.patternExamples.map((example) => (
                               <div key={example.expression} className="p-3 bg-card rounded border border-border text-xs">
-                                <span className="text-muted-foreground"><InlineFractionalExpression expression={example.expression} /> = </span>
-                                <span className="font-mono text-destructive"><InlineFractionalExpression expression={example.wrongAnswer} /></span>
+                                <span className="text-text-secondary"><InlineFractionalExpression expression={example.expression} /> = </span>
+                                <span className="font-mono text-alert"><InlineFractionalExpression expression={example.wrongAnswer} /></span>
                               </div>
                             ))}
                           </div>
@@ -199,16 +203,16 @@ export function ProblemSection() {
 
                       {beat.visual === 'teacher' && (
                         <div className="space-y-4">
-                          <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Õpetaja vaade</div>
+                          <div className="text-xs font-medium text-text-secondary uppercase tracking-wider">Õpetaja vaade</div>
                           <div className="p-4 bg-card rounded-lg border border-border">
                             <div className="text-sm font-medium mb-2">Mis järgmisena?</div>
-                            <div className="text-xs text-muted-foreground space-y-1">
+                            <div className="text-xs text-text-secondary space-y-1">
                               <div>• Kas harjutada ühist nimetajat?</div>
                               <div>• Kas kinnistada lihtsamat näidet?</div>
                               <div>• Kas võrrelda visuaalsete mudeliga?</div>
                             </div>
                           </div>
-                          <div className="text-xs text-muted-foreground italic">
+                          <div className="text-xs text-text-secondary italic">
                             Vajab struktuuri ja aega individuaalseks toetuseks
                           </div>
                         </div>
