@@ -46,7 +46,10 @@
   --color-danger: var(--color-action-danger-bg-hover);
   --color-focus-ring: var(--color-focus-ring);
 
-  /* Typography scale — non-default overrides from the v3 config */
+  /* Typography scale — deliberate "large" marketing scale from the original
+     v3 config, load-bearing across the whole landing (hero through captions).
+     Document pages like /tehniline inherit it; xs/sm read as large captions,
+     not as Tailwind-default small text. */
   --text-xs: 1rem;
   --text-sm: 1.125rem;
   --text-base: 1.25rem;
@@ -238,9 +241,10 @@
   }
 
   /* --- Dark Theme Mapping ---
-     DORMANT: no toggle or auto-detection ships yet; these tokens exist so a
-     future theme switch maps correctly. Delete or wire up when the product
-     decides on a dark mode. */
+     Live via app/layout.tsx: data-theme is set from localStorage
+     ('matx-theme') with a prefers-color-scheme fallback; no toggle in the
+     UI yet. Keep the token names in sync with Tailwind's `dark:` variant
+     (which follows prefers-color-scheme) — both fire together today. */
   [data-theme="dark"] {
     --color-bg-canvas: var(--color-ink-900);
     --color-bg-surface: var(--color-ink-800);

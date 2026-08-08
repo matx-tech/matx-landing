@@ -7,6 +7,7 @@ import { StatusFilterSection } from '@/components/tehniline/status-filter';
 import { CapabilityStatusBadge } from '@/components/ui/capability-status';
 import { CopyButton } from '@/components/ui/copy-button';
 import { TechnicalTOC } from '@/components/ui/technical-toc';
+import type { CapabilityStatus } from '@/lib/content/landing-copy';
 
 export const metadata: Metadata = {
   title: 'Tehniline ülevaade — MATx',
@@ -26,10 +27,12 @@ export const metadata: Metadata = {
 const LAST_UPDATED = '08.08.2026';
 
 // Status legend used across the page. Stated plainly, not as a promise.
-const LEGEND = [
-  { status: 'Saadaval' as const, meaning: 'on praegu kasutusel' },
-  { status: 'Piloodis' as const, meaning: 'kasutusel valitud koolidega testimiseks' },
-  { status: 'Kavandatud' as const, meaning: 'sihtseis — plaanis, pole veel kasutusele võetud' },
+// Typed against the shared CapabilityStatus union so a renamed status is
+// a compile error here, not a dead legend entry.
+const LEGEND: { status: CapabilityStatus; meaning: string }[] = [
+  { status: 'Saadaval', meaning: 'on praegu kasutusel' },
+  { status: 'Piloodis', meaning: 'kasutusel valitud koolidega testimiseks' },
+  { status: 'Kavandatud', meaning: 'sihtseis — plaanis, pole veel kasutusele võetud' },
 ];
 
 // Section anchors — also used by the on-page table of contents.
@@ -49,7 +52,7 @@ const SECTIONS = [
 // as one system.
 const STATUS_ACCENT: Record<StatusRow['status'], string> = {
   Saadaval: 'text-success-strong',
-  Piloodis: 'text-amber-700 dark:text-amber-400',
+  Piloodis: 'text-warning-strong',
   Kavandatud: 'text-text-secondary',
 };
 
@@ -194,21 +197,21 @@ const COMPLIANCE_ROWS: StatusRow[] = [
   {
     title: 'EU AI Act (2024/1689)',
     detail:
-      'Kohanduv õpimootor (BKT) on hinnatud Annex III punkti 3 haridusvaldkonna riskiklassi; Art. 6(3)(c) enesehindamine on otsustamisel. Õpetaja inimese-kontroll säilib.',
+      'Kohanduv õpimootor (BKT) kuulub Annex III punkti 3 haridusvaldkonna kohaldamisalasse; Art. 6(3)(c) enesehindamine (kas kõrge riski klass on välistatud) on pooleli. Õpetaja inimese-kontroll säilib.',
     status: 'Piloodis',
     note: 'FRIA ja ulatuse otsused on testimisel; allkirjastamine ja Art. 49 registreerimine on kavandatud.',
   },
   {
     title: 'NIS2 (2022/2555)',
     detail:
-      'Haridus ei kuulu lisadesse I/II — otsene kohustus ei laiene. Meetmed on võetud aluseks hea tavana.',
+      'Haridus ei kuulu lisadesse I/II — otsene kohustus ei laiene. NIS2-põhiseid meetmeid rakendatakse pilootfaasis hea tavana.',
     status: 'Piloodis',
     note: 'Siht on NIS2-põhine baastase, mitte formaalne vastavus.',
   },
   {
     title: 'GDPR (2016/679)',
     detail:
-      'Kohaldub. Rollid sõltuvad iga töötlustegevuse sisust: kool/omavalitsus on vastutav töötleja; MATx on volitatud töötleja dokumenteeritud juhiste alusel töötlemisel, muidu sõltumatu või kaasvastutav töötleja. Rollimaatriks tegevuse kaupa ja andmetöötluslepingu kooskõlastamine enne pilootlepinguid. Art. 8 alaealiste erikaitse (Eestis vanusepiir 13+, vanema nõusolek) kehtib juhul, kui õiguslikuks aluseks on nõusolek (art 6 lg 1 p a) infoühiskonna teenuse puhul, mida pakutakse otse lapsele.',
+      'Kohaldub juba pilootfaasis — staatus kajastab vastavusprogrammi valmidust, mitte seaduse kohaldumist. Rollid sõltuvad iga töötlustegevuse sisust: kool/omavalitsus on vastutav töötleja; MATx on volitatud töötleja dokumenteeritud juhiste alusel töötlemisel, muidu sõltumatu või kaasvastutav töötleja. Rollimaatriks tegevuse kaupa ja andmetöötluslepingu kooskõlastamine enne pilootlepinguid. Art. 8 alaealiste erikaitse (Eestis vanusepiir 13+, vanema nõusolek) kehtib juhul, kui õiguslikuks aluseks on nõusolek (art 6 lg 1 p a) infoühiskonna teenuse puhul, mida pakutakse otse lapsele.',
     status: 'Kavandatud',
     note: 'Alaealiste andmete kaitse on pilootfaasi põhirõhk; täismahus vastavus sihtseisus.',
   },
@@ -333,6 +336,16 @@ const PROCUREMENT_ROUTES_NEW: ProcurementRoute[] = [
 const PROCUREMENT_SPLIT_RULE =
   'Hankelepingut ei või piirmäärast allapoole jäämise eesmärgil osadeks jagada (RHS § 28 lg 2); eeldatavasse maksumusse arvestatakse ka lepingu uuendamine ja tulevased kohustused (RHS § 23 lg 2 p 1).';
 
+// Build-time staleness guard for the comment above: this page is statically
+// prerendered, so once a build runs after the expiry date the build fails
+// until the old-regime data is deleted — a loud error instead of stale
+// procurement rules staying live.
+if (Date.now() > new Date('2026-11-01T00:00:00+02:00').getTime()) {
+  throw new Error(
+    'Old-regime procurement data expired — delete PROCUREMENT_ROUTES, its RouteTable usage and the "Kehtib kuni 31.10.2026" header.',
+  );
+}
+
 function RouteTable({ rows, ariaLabel }: { rows: ProcurementRoute[]; ariaLabel: string }) {
   return (
     <section
@@ -399,7 +412,7 @@ const PRICE_BENCHMARKS: {
   {
     label: 'Õpikeskkonna hinnaankur: Opiq koolipakett 2026/27',
     median: '5,10 €/õpilane/kuu',
-    mean: '≈31–51 €/õpilane',
+    mean: '≈31–51 €/õpilane/aasta',
     note: 'Avalik hinnakiri (opiq.ee), mitte registristatistika. Soodushind 4,10 €/kuu (≥50% õpilastest, ≥9 kuud); algklassid 3,10 €/kuu. Aastas 10 arvelduskuud.',
     anchor: true,
   },
@@ -491,7 +504,10 @@ const HANKE_SOURCES: { title: string; detail: string }[] = [
 ];
 
 // Architecture facts that are true today (verified against the repo).
-const ARCHITECTURE_ROWS: (StatusRow & { id: string })[] = [
+// as const + satisfies: the array stays checked against StatusRow, while
+// the literal ids feed the ArchId union so AT_A_GLANCE_IDS and the diagram
+// below cannot reference a row id that doesn't exist.
+const ARCHITECTURE_ROWS = [
   {
     id: 'esikiht',
     title: 'Esikiht',
@@ -534,7 +550,10 @@ const ARCHITECTURE_ROWS: (StatusRow & { id: string })[] = [
     detail: 'Isemajutatud paigaldus; andmete asukohariik avalikustatakse enne pilootlepinguid.',
     status: 'Kavandatud',
   },
-];
+] as const satisfies readonly (StatusRow & { id: string })[];
+
+type ArchId = (typeof ARCHITECTURE_ROWS)[number]['id'];
+type ArchRow = (typeof ARCHITECTURE_ROWS)[number];
 
 const ALL_ROWS = [
   ...ARCHITECTURE_ROWS,
@@ -611,8 +630,10 @@ const GLOSSARY: { term: string; definition: string }[] = [
 const GITHUB_URL = 'https://github.com/matx-ee';
 
 // Subset of architecture rows promoted to the "At a glance" metric grid in
-// the summary. Same data source as the full list — no duplication.
-const AT_A_GLANCE_IDS = [
+// the summary. Same data source as the full list — no duplication. Typed
+// against ArchId so a renamed row id is a compile error, not a silently
+// missing card.
+const AT_A_GLANCE_IDS: readonly ArchId[] = [
   'esikiht',
   'tagakiht',
   'andmebaas',
@@ -627,15 +648,15 @@ const AT_A_GLANCE_IDS = [
  * relationships: layers and side components come from the data arrays.
  */
 function ArchitectureDiagram() {
-  const layerIds = ['esikiht', 'tagakiht', 'andmebaas'];
-  const sideIds = ['oppimootor', 'koodigraaf'];
+  const layerIds: readonly ArchId[] = ['esikiht', 'tagakiht', 'andmebaas'];
+  const sideIds: readonly ArchId[] = ['oppimootor', 'koodigraaf'];
 
   const layers = layerIds
     .map((id) => ARCHITECTURE_ROWS.find((row) => row.id === id))
-    .filter((row): row is StatusRow & { id: string } => row !== undefined);
+    .filter((row): row is ArchRow => row !== undefined);
   const sides = sideIds
     .map((id) => ARCHITECTURE_ROWS.find((row) => row.id === id))
-    .filter((row): row is StatusRow & { id: string } => row !== undefined);
+    .filter((row): row is ArchRow => row !== undefined);
   const deploy = ARCHITECTURE_ROWS.find((row) => row.id === 'paigaldus');
 
   return (
