@@ -278,29 +278,96 @@ const INTEGRATION_ROWS: StatusRow[] = [
 
 // Hankeinfo — reference data for procurement teams. Sources at the end of the
 // "Hanked" section. Statuses describe MATx's own deliverables, not the law.
-const PROCUREMENT_ROUTES = [
+// Two regimes side by side: current RHS (kuni 31.10.2026) and the amended RHS
+// (alates 01.11.2026, RT I, 03.07.2026, 3). Separate tables so "which rule
+// applies when" is unambiguous. ponytail: on 01.11.2026 delete the old-regime
+// array, its table and the header below — the new-regime data stays.
+type ProcurementRoute = { band: string; route: string; note: string };
+
+const PROCUREMENT_ROUTES: ProcurementRoute[] = [
   {
-    band: 'Kuni 30 000 € (kuni 31.10.2026) / kuni 50 000 € (alates 01.11.2026)',
+    band: 'Kuni 30 000 €',
     route: 'Otsetellimine — riigihangete seadus ei kohaldu; ost hankekorra järgi.',
     note: 'Ühe kooli tarkvaralitsentside ostud jäävad tihti alla piirmäära ega kajastu registris; täpset jaotust registriandmetest hinnata ei saa.',
   },
   {
-    band: '30 000–59 999 € (kuni 31.10.2026) / 50 000–139 999 € (riik) või 215 999 € (omavalitsus) (alates 01.11.2026)',
-    route: 'Lihthange — pakkumuste tähtaeg min 10 päeva, alates 01.11.2026 min 15 päeva.',
-    note: 'Keskmine kestus teatest lepinguni 2025. aastal: 47 päeva.',
+    band: '30 000–59 999 €',
+    route: 'Lihthange — pakkumuste tähtaeg min 10 päeva.',
+    note: 'Keskmine kestus teatest lepinguni 2025. aastal: 47 päeva (RaM 2025, tabel 1).',
   },
   {
-    band: '60 000–139 999 € (riik) või 215 999 € (omavalitsus) — kehtib kuni 31.10.2026',
+    band: '60 000–139 999 € (riik) / 60 000–215 999 € (omavalitsus)',
     route: 'Avatud hankemenetlus — pakkumuste tähtaeg min 15 päeva.',
-    note: 'Keskmine kestus teatest lepinguni 2025. aastal: 72 päeva.',
+    note: 'Keskmine kestus teatest lepinguni 2025. aastal: 72 päeva (RaM 2025, tabel 1).',
   },
   {
-    band: 'Alates 140 000 € (riik) või 216 000 € (omavalitsus)',
+    band: 'Alates 140 000 € (riik) / 216 000 € (omavalitsus)',
     route:
       'Rahvusvaheline (EL) menetlus — teade ka EL Teatajas (TED), pakkumuste tähtaeg min 30 päeva.',
     note: 'EL piirmäärad 2026–2027: 140 000 € (keskvalitsus) / 216 000 € (kohalikud omavalitsused).',
   },
 ];
+
+const PROCUREMENT_ROUTES_NEW: ProcurementRoute[] = [
+  {
+    band: 'Kuni 50 000 €',
+    route: 'Otsetellimine — riigihangete seadus ei kohaldu; ost hankekorra järgi.',
+    note: 'Ühe kooli tarkvaralitsentside ostud jäävad tihti alla piirmäära ega kajastu registris; täpset jaotust registriandmetest hinnata ei saa.',
+  },
+  {
+    band: '50 000–139 999 € (riik) / 50 000–215 999 € (omavalitsus)',
+    route: 'Lihthange — pakkumuste tähtaeg min 15 päeva.',
+    note: 'Siseriiklik avatud hankemenetlus kaob — lihthange jääb ülemiseks siseriiklikuks menetluseks.',
+  },
+  {
+    band: 'Alates 140 000 € (riik) / 216 000 € (omavalitsus)',
+    route:
+      'Rahvusvaheline (EL) menetlus — teade ka EL Teatajas (TED), pakkumuste tähtaeg min 30 päeva.',
+    note: 'EL piirmäärad 2026–2027: 140 000 € (keskvalitsus) / 216 000 € (kohalikud omavalitsused).',
+  },
+];
+
+// Anti-splitting and value aggregation. Kehtib mõlemas režiimis — muutmisseadus
+// RHS § 28 ega § 23 lg 2 p 1 ei muuda. Rendered on the page and in the Markdown
+// export from the same constant, so neither can drift.
+const PROCUREMENT_SPLIT_RULE =
+  'Hankelepingut ei või piirmäärast allapoole jäämise eesmärgil osadeks jagada (RHS § 28 lg 2); eeldatavasse maksumusse arvestatakse ka lepingu uuendamine ja tulevased kohustused (RHS § 23 lg 2 p 1).';
+
+function RouteTable({ rows, ariaLabel }: { rows: ProcurementRoute[]; ariaLabel: string }) {
+  return (
+    <section
+      className='rounded-xl border border-border bg-card overflow-x-auto shadow-card'
+      aria-label={ariaLabel}
+      // biome-ignore lint/a11y/noNoninteractiveTabindex: scrollable region must stay keyboard-reachable (WAI-ARIA scrollable-region pattern)
+      tabIndex={0}
+    >
+      <table className='w-full min-w-[680px] text-sm'>
+        <thead>
+          <tr className='border-b border-border text-left text-text-primary'>
+            <th className='px-5 py-3 font-semibold'>Piirmäär</th>
+            <th className='px-5 py-3 font-semibold'>Menetlus</th>
+            <th className='px-5 py-3 font-semibold'>Märkus</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((route) => (
+            <tr key={route.band} className='border-b border-border last:border-0 odd:bg-canvas'>
+              <td className='px-5 py-3 text-text-primary font-medium align-top'>
+                <TechText text={route.band} />
+              </td>
+              <td className='px-5 py-3 text-text-secondary leading-relaxed align-top'>
+                <TechText text={route.route} />
+              </td>
+              <td className='px-5 py-3 text-text-secondary text-xs leading-relaxed align-top'>
+                {route.note}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </section>
+  );
+}
 
 const PRICE_BENCHMARKS: {
   label: string;
@@ -399,7 +466,7 @@ const HANKE_SOURCES: { title: string; detail: string }[] = [
   {
     title: 'Piirmäärad ja menetlused',
     detail:
-      'Riigihangete seadus § 14–15 (RT I, 01.07.2017, 1) ja riigihangete seaduse ja teiste seaduste muutmise seadus (RT I, 03.07.2026, 3; jõustub 01.11.2026); EL piirmäärad 2026–2027: komisjoni delegeeritud määrus (EL) 2025/2152.',
+      'Riigihangete seadus § 14–15, § 23 ja § 28 (RT I, 01.07.2017, 1) ja riigihangete seaduse ja teiste seaduste muutmise seadus (RT I, 03.07.2026, 3; jõustub 01.11.2026); EL piirmäärad 2026–2027: komisjoni delegeeritud määrus (EL) 2025/2152.',
   },
   {
     title: 'Hinnaklassid',
@@ -413,7 +480,8 @@ const HANKE_SOURCES: { title: string; detail: string }[] = [
   },
   {
     title: 'Menetluse kestused ja pakkujate arv',
-    detail: 'Rahandusministeeriumi riigihangete valdkonna statistika ja kokkuvõte 2025 (fin.ee).',
+    detail:
+      'Rahandusministeeriumi riigihangete valdkonna statistika ja kokkuvõte 2025, tabel 1 „Menetluse aeg“ (fin.ee).',
   },
   {
     title: 'Juurdepääsetavus ja maksetähtaeg',
@@ -692,12 +760,26 @@ export default function TechnicalOverviewPage() {
                     { heading: 'Vastavus', rows: COMPLIANCE_ROWS },
                     { heading: 'Integratsioonid', rows: INTEGRATION_ROWS },
                     {
-                      heading: 'Ostuteed ja piirmäärad',
+                      heading: 'Ostuteed ja piirmäärad (kuni 31.10.2026)',
                       rows: PROCUREMENT_ROUTES.map((r) => ({
                         title: r.band,
                         detail: r.route,
                         note: r.note,
                       })),
+                    },
+                    {
+                      heading: 'Ostuteed ja piirmäärad (alates 01.11.2026)',
+                      rows: [
+                        ...PROCUREMENT_ROUTES_NEW.map((r) => ({
+                          title: r.band,
+                          detail: r.route,
+                          note: r.note,
+                        })),
+                        {
+                          title: 'Piirmäärast allapoole jäämise vältimine',
+                          detail: PROCUREMENT_SPLIT_RULE,
+                        },
+                      ],
                     },
                     {
                       heading: 'Hinnaklassid',
@@ -927,43 +1009,33 @@ export default function TechnicalOverviewPage() {
               <h3 className='text-lg font-semibold text-text-primary mb-3'>
                 Ostuteed ja piirmäärad (asjad ja teenused, ilma käibemaksuta)
               </h3>
-              {/* Structured data reads as a table, not prose: band thresholds
-              compare vertically; the note column keeps the caveats out of
-              the way. Scrolls horizontally on narrow viewports. */}
-              <section
-                className='rounded-xl border border-border bg-card overflow-x-auto mb-8 shadow-card'
-                aria-label='Ostuteede ja piirmäärade tabel — horisontaalselt keritav'
-                // biome-ignore lint/a11y/noNoninteractiveTabindex: scrollable region must stay keyboard-reachable (WAI-ARIA scrollable-region pattern)
-                tabIndex={0}
-              >
-                <table className='w-full min-w-[680px] text-sm'>
-                  <thead>
-                    <tr className='border-b border-border text-left text-text-primary'>
-                      <th className='px-5 py-3 font-semibold'>Piirmäär</th>
-                      <th className='px-5 py-3 font-semibold'>Menetlus</th>
-                      <th className='px-5 py-3 font-semibold'>Märkus</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {PROCUREMENT_ROUTES.map((route) => (
-                      <tr
-                        key={route.band}
-                        className='border-b border-border last:border-0 odd:bg-canvas'
-                      >
-                        <td className='px-5 py-3 text-text-primary font-medium align-top'>
-                          <TechText text={route.band} />
-                        </td>
-                        <td className='px-5 py-3 text-text-secondary leading-relaxed align-top'>
-                          <TechText text={route.route} />
-                        </td>
-                        <td className='px-5 py-3 text-text-secondary text-xs leading-relaxed align-top'>
-                          {route.note}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </section>
+              {/* Two regimes, two tables — the subheadings carry the validity
+              period so the band cells stay short and no row needs a date in
+              its label. */}
+              <div className='mb-4'>
+                <h4 className='text-sm font-semibold text-text-primary mb-2'>
+                  Kehtib kuni 31.10.2026
+                </h4>
+                <RouteTable
+                  rows={PROCUREMENT_ROUTES}
+                  ariaLabel='Ostuteed ja piirmäärad kuni 31.10.2026 — tabel, horisontaalselt keritav'
+                />
+              </div>
+              <div className='mb-3'>
+                <h4 className='text-sm font-semibold text-text-primary mb-2'>
+                  Alates 01.11.2026 (muudetud RHS)
+                </h4>
+                <RouteTable
+                  rows={PROCUREMENT_ROUTES_NEW}
+                  ariaLabel='Ostuteed ja piirmäärad alates 01.11.2026 — tabel, horisontaalselt keritav'
+                />
+              </div>
+              <p className='text-xs text-text-secondary leading-relaxed mb-8'>
+                <span className='font-medium text-text-primary'>
+                  Piirmäärast allapoole jäämise vältimine:
+                </span>{' '}
+                <TechText text={PROCUREMENT_SPLIT_RULE} />
+              </p>
 
               <h3 className='text-lg font-semibold text-text-primary mb-3'>Hinnaklassid</h3>
               {/* Horizontal scroll on narrow viewports: the table keeps its
@@ -985,23 +1057,17 @@ export default function TechnicalOverviewPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {PRICE_BENCHMARKS.map((row) => (
+                    {PRICE_BENCHMARKS.filter((row) => !row.anchor).map((row) => (
                       <tr
                         key={row.label}
                         className='border-b border-border last:border-0 odd:bg-canvas'
                       >
                         <td className='px-5 py-3 text-text-primary'>{row.label}</td>
-                        <td
-                          className='px-5 py-3 text-text-secondary tabular-nums whitespace-nowrap text-right'
-                          aria-label={row.anchor ? `Hind: ${row.median}` : undefined}
-                        >
-                          {row.anchor ? `Hind: ${row.median}` : row.median}
+                        <td className='px-5 py-3 text-text-secondary tabular-nums whitespace-nowrap text-right'>
+                          {row.median}
                         </td>
-                        <td
-                          className='px-5 py-3 text-text-secondary tabular-nums whitespace-nowrap text-right'
-                          aria-label={row.anchor ? `Aastas: ${row.mean}` : undefined}
-                        >
-                          {row.anchor ? `Aastas: ${row.mean}` : row.mean}
+                        <td className='px-5 py-3 text-text-secondary tabular-nums whitespace-nowrap text-right'>
+                          {row.mean}
                         </td>
                         <td className='px-5 py-3 text-text-secondary text-xs leading-relaxed'>
                           {row.note}
@@ -1011,6 +1077,20 @@ export default function TechnicalOverviewPage() {
                   </tbody>
                 </table>
               </section>
+              {/* Unit-price anchor is not registry statistics — a median/mean
+              column would mislead, so it renders as its own card below the
+              table. */}
+              {PRICE_BENCHMARKS.filter((row) => row.anchor).map((row) => (
+                <div
+                  key={row.label}
+                  className='rounded-xl border border-border bg-card p-5 shadow-card mb-8'
+                >
+                  <h4 className='font-semibold text-text-primary'>{row.label}</h4>
+                  <p className='text-sm text-text-secondary mt-1 leading-relaxed'>
+                    Kuuhind: {row.median} · aastas {row.mean}. {row.note}
+                  </p>
+                </div>
+              ))}
 
               <h3 className='text-lg font-semibold text-text-primary mb-3'>Lepingupraktika</h3>
               <ul className='grid gap-3 md:grid-cols-2 mb-8'>

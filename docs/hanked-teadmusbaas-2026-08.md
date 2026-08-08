@@ -71,6 +71,8 @@ Tõlgendus hankija jaoks:
   energiaprojektid (max 49,9 mln €). Mediaan on esinduslikum.
 - Haridussektori (CPV 80*) mediaan ~46 000 € — hinnapõhine otsus on Eestis norm
   (2025: 87% hankest madalaima hinna alusel, 74% mahust — RaM 2025 statistika).
+- Menetluse aeg 2025 (RaM 2025 statistika, tabel 1 „Menetluse aeg“):
+  lihthange 47 päeva, avatud menetlus 72 päeva (väljakuulutamisest lepingu sõlmimiseni).
 - **Registriandmed ei võimalda hinnata, kui suur osa ühe kooli tarkvaraostudest jääb
   alla 30 000 €** — RHS ei kohaldu nendele ostudele ja need ei kajastu registris
   (registris on 29% teadetest < 30 000 €, mis on vabatahtlikud väikehanked). Seega
@@ -166,7 +168,9 @@ Haridus- ja Teadusministeerium / Haridus- ja Noorteamet / Kiviõli Riigikool).
 2. **Ostutee**: näitena — alla piirmäära (< 30 000 €; alates 01.11.2026 < 50 000 €) võib ost
    olla otsetellimus, kuid see peab järgima organisatsiooni sisemist hankekorda ja
    riigihangete üldpõhimõtteid (RHS § 3); hankeväärtuse hinnangusse tuleb arvata ka
-   ettenähtavad lisanõuded ja pikendused. Kui eeldatav hankeväärtus jääb lihthange
+   ettenähtavad lisanõuded ja pikendused (RHS § 23 lg 2 p 1) ning hankelepingut ei või
+   piirmäärast allapoole jäämise eesmärgil osadeks jagada (RHS § 28 lg 2; muutmisseadus
+   seda sätet ei muuda — kehtib ka alates 01.11.2026). Kui eeldatav hankeväärtus jääb lihthange
    vahemikku (30 000–59 999 € kuni 31.10.2026; alates 01.11.2026 50 000–139 999 €
    riigiasutusel või 50 000–215 999 € omavalitsusel), soovita lihthanget — mitte
    „avatud hankemenetlust“; suurema väärtuse korral on avatud menetlus kohustuslik.
@@ -188,7 +192,8 @@ Haridus- ja Teadusministeerium / Haridus- ja Noorteamet / Kiviõli Riigikool).
 6. RTK KKK (menetluste tähtajad) — https://rtk.ee/korduma-kippuvad-kusimused-riigihangete-teemal
 7. Rahandusministeerium: Riigihangete valdkonna statistika ja kokkuvõte 2025 (08.05.2026) —
    https://fin.ee/sites/default/files/documents/2026-05/2025.a%20riigihangete%20valdkonna%20statistika%20ja%20kokkuv%C3%B5te_.pdf
-   (allalaetud 08.08.2026); sama 2024 (05.06.2025)
+   (allalaetud 08.08.2026; tabel 1 „Menetluse aeg“ — lihthange 47 päeva, avatud menetlus 72 päeva, 2025);
+   sama 2024 (05.06.2025)
 8. Riigihangete registri avaandmed (lepinguteated 2026 veebruar–juuli) —
    https://riigihanked.riik.ee/rhr/api/public/v1/opendata/notice_award/2026/month/2/xml (kuud 2–7)
 9. TenderGlass: HTM hankijaprofiil (registri koondandmed) —
