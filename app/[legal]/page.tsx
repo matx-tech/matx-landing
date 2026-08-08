@@ -85,7 +85,7 @@ const LEGAL_DOCS = {
                 ],
                 [
                   'b',
-                  'Kolmanda osapoole jälgimist (Google Analytics, Facebook Pixel, reklaamiplatvormid) ei kasuta. Veebiliikluse analüütika: praegu puudub; kui lisame tulevikus, teavitame ja uuendame poliitikat.',
+                  'Plausible Analytics — privaatsust austav, GDPR-nõuetele vastav veebiliikluse analüüs. Plausible on avatud lähtekoodiga, ei kasuta küpsiseid ega jälgi kasutajaid saitide vahel. Kogutud andmed: lehekülgede vaatamised, allikaviited (referrer), seadme tüüp (brauser/OS), riik (IP-aadressist tuletatud, täpset IP-aadressi ei salvestata). Õiguslik alus: legitiimne huvi (GDPR artikkel 6(1)(f)) — veebisaidi parandamine ja kasutajate vajaduste mõistmine. Isikuandmeid ei töödelda (ei küpsiseid, ei unikaalseid ID-sid). Andmed: Plausible Analytics (Euroopa Liit, servers Saksamaal). Privaatsuspoliitika: plausible.io/privacy. Kolmanda osapoole jälgimist (Google Analytics, Facebook Pixel, reklaamiplatvormid) ei kasuta.',
                 ],
               ]}
             />
