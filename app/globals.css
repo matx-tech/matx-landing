@@ -691,28 +691,7 @@
   }
 }
 
-/* Topic color utilities — CVI-compliant palette */
-.topic-protsendid {
-  color: var(--color-teal-700);
-}
-.topic-vorrandid {
-  color: var(--color-blue-700);
-}
-.topic-abivalemid {
-  color: var(--color-amber-700);
-}
-.topic-defineerimine {
-  color: var(--color-info-700);
-}
-.topic-vorrandi-koostamine {
-  color: var(--color-blue-400);
-}
-.topic-lahendamine {
-  color: var(--color-red-600);
-}
-.topic-lineaarne-funktsioon {
-  color: var(--color-blue-750);
-}
-.topic-astmed-juured {
-  color: var(--color-teal-400);
-}
+/* Topic color utilities — removed: never referenced by any component
+   (verified 08.2026); two entries (blue-400, teal-400) also failed WCAG
+   AA contrast as text on light backgrounds. Restore only with darker
+   steps (blue-700/teal-700 or the semantic token equivalents). */
