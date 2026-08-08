@@ -18,9 +18,9 @@ interface Registration {
   consent: boolean;
 }
 
-// Linear email check (no regex): indexOf-based, so adversarial input cannot
-// trigger backtracking (CodeQL js/polynomial-redos). RFC 5321 caps addresses
-// at 254 chars — reject anything longer outright.
+// Linear email check (no backtracking regex): indexOf-based, so adversarial
+// input cannot trigger backtracking (CodeQL js/polynomial-redos). RFC 5321
+// caps addresses at 254 chars — reject anything longer outright.
 function isValidEmail(value: string | undefined): boolean {
   const email = (value ?? '').trim();
   if (email.length === 0 || email.length > 254 || /\s/.test(email)) return false;
@@ -28,7 +28,12 @@ function isValidEmail(value: string | undefined): boolean {
   if (at <= 0) return false;
   const domain = email.slice(at + 1);
   const dot = domain.lastIndexOf('.');
-  return dot > 0 && dot < domain.length - 1;
+  return (
+    dot > 0 &&
+    dot < domain.length - 1 &&
+    // Reject multi-@ addresses (a@b@c.com): the domain must not contain @.
+    email.indexOf('@', at + 1) === -1
+  );
 }
 
 // In-memory fixed-window rate limit for the public Slack endpoint: suppresses
