@@ -7,6 +7,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Award, Menu, X } from 'lucide-react';
 import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { CALENDLY_URL, LANDING_NAV_ITEMS, SECTION_IDS } from '@/lib/content/landing-copy';
 import { usePrefersReducedMotion } from '@/lib/hooks/use-prefers-reduced-motion';
 import { gsapEase, motionTokens, staggers } from '@/lib/motion-tokens';
@@ -79,6 +80,11 @@ export function Navigation() {
             yTo(0);
             opacityTo(1);
           }
+
+          // Hidden nav must leave the tab order + AT tree: translated
+          // offscreen links would otherwise be focusable while invisible.
+          nav.inert = isHidden;
+          nav.setAttribute('aria-hidden', String(isHidden));
         },
       });
 
@@ -232,6 +238,7 @@ export function Navigation() {
             >
               Broneeri vestlus
             </a>
+            <ThemeToggle />
           </div>
 
           {/* Mobile Menu Button - Dialog Trigger */}
@@ -303,6 +310,7 @@ export function Navigation() {
             >
               Broneeri vestlus
             </a>
+            <ThemeToggle className='self-start' />
           </div>
 
           {/* Close button for keyboard users */}

@@ -1,6 +1,11 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+/* `dark:` variant follows the site theme (data-theme on <html>, set by the
+   layout bootstrap script + the ThemeToggle), NOT the OS media query —
+   otherwise dark: utilities would mismatch the active palette. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
 /* ── Tailwind v4 theme (migrated from tailwind.config.ts) ────────────────
    All color tokens are `@theme inline` aliases of the semantic CSS
    variables declared in @layer base below — utilities inline the var()
@@ -242,9 +247,10 @@
 
   /* --- Dark Theme Mapping ---
      Live via app/layout.tsx: data-theme is set from localStorage
-     ('matx-theme') with a prefers-color-scheme fallback; no toggle in the
-     UI yet. Keep the token names in sync with Tailwind's `dark:` variant
-     (which follows prefers-color-scheme) — both fire together today. */
+     ('matx-theme') with a prefers-color-scheme fallback; the ThemeToggle
+     in the navigation persists the explicit choice. Tailwind's `dark:`
+     variant is wired to [data-theme=dark] via @custom-variant above, so
+     dark: utilities and these token mappings always fire together. */
   [data-theme="dark"] {
     --color-bg-canvas: var(--color-ink-900);
     --color-bg-surface: var(--color-ink-800);

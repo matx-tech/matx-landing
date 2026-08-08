@@ -82,7 +82,14 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const nonce = (await headers()).get('x-nonce') ?? '';
 
   return (
-    <html lang='et' className={`${publicSans.variable} ${inter.variable} ${ibmPlexMono.variable}`}>
+    <html
+      lang='et'
+      // The inline theme script below sets data-theme on <html> before React
+      // hydrates; suppress the resulting attribute mismatch (the script's
+      // value is authoritative — React must not patch or warn on it).
+      suppressHydrationWarning
+      className={`${publicSans.variable} ${inter.variable} ${ibmPlexMono.variable}`}
+    >
       <head>
         {/* Structural data for search engines */}
         <script
