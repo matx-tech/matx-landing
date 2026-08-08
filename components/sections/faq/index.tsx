@@ -188,8 +188,7 @@ export function FAQSection() {
           <p className='text-text-secondary mb-4'>Teil on muid küsimusi?</p>
           <a
             href='mailto:andri@matx.ee'
-            className='inline-flex items-center gap-2 text-primary hover:text-secondary transition-colors focus-ring-target rounded-md min-h-[44px] px-2'
-            style={{ textDecoration: 'underline' }}
+            className='inline-flex items-center gap-2 text-primary hover:text-secondary transition-colors focus-ring-target rounded-md min-h-[44px] px-2 underline'
           >
             <span>andri@matx.ee</span>
             <span aria-hidden='true'>→</span>

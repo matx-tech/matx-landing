@@ -150,8 +150,7 @@ export function FooterSection() {
               <li>
                 <a
                   href={`#${SECTION_IDS.problem}`}
-                  className='text-text-secondary hover:text-primary transition-colors text-sm focus-ring-target rounded-md'
-                  style={{ textDecoration: 'underline' }}
+                  className='text-text-secondary hover:text-primary transition-colors text-sm focus-ring-target rounded-md underline'
                 >
                   Probleem
                 </a>
@@ -159,8 +158,7 @@ export function FooterSection() {
               <li>
                 <a
                   href={`#${SECTION_IDS.workflow}`}
-                  className='text-text-secondary hover:text-primary transition-colors text-sm focus-ring-target rounded-md'
-                  style={{ textDecoration: 'underline' }}
+                  className='text-text-secondary hover:text-primary transition-colors text-sm focus-ring-target rounded-md underline'
                 >
                   Töövoog
                 </a>
@@ -168,8 +166,7 @@ export function FooterSection() {
               <li>
                 <a
                   href={`#${SECTION_IDS.capabilities}`}
-                  className='text-text-secondary hover:text-primary transition-colors text-sm focus-ring-target rounded-md'
-                  style={{ textDecoration: 'underline' }}
+                  className='text-text-secondary hover:text-primary transition-colors text-sm focus-ring-target rounded-md underline'
                 >
                   Teemad
                 </a>
@@ -177,8 +174,7 @@ export function FooterSection() {
               <li>
                 <a
                   href={`#${SECTION_IDS.student}`}
-                  className='text-text-secondary hover:text-primary transition-colors text-sm focus-ring-target rounded-md'
-                  style={{ textDecoration: 'underline' }}
+                  className='text-text-secondary hover:text-primary transition-colors text-sm focus-ring-target rounded-md underline'
                 >
                   Õpitee
                 </a>
@@ -186,8 +182,7 @@ export function FooterSection() {
               <li>
                 <a
                   href={`#${SECTION_IDS.teacher}`}
-                  className='text-text-secondary hover:text-primary transition-colors text-sm focus-ring-target rounded-md'
-                  style={{ textDecoration: 'underline' }}
+                  className='text-text-secondary hover:text-primary transition-colors text-sm focus-ring-target rounded-md underline'
                 >
                   Õpetajale
                 </a>
@@ -195,8 +190,7 @@ export function FooterSection() {
               <li>
                 <a
                   href={`#${SECTION_IDS.faq}`}
-                  className='text-text-secondary hover:text-primary transition-colors text-sm focus-ring-target rounded-md'
-                  style={{ textDecoration: 'underline' }}
+                  className='text-text-secondary hover:text-primary transition-colors text-sm focus-ring-target rounded-md underline'
                 >
                   KKK
                 </a>
@@ -204,8 +198,7 @@ export function FooterSection() {
               <li>
                 <Link
                   href={TECH_OVERVIEW.href}
-                  className='text-text-secondary hover:text-primary transition-colors text-sm focus-ring-target rounded-md'
-                  style={{ textDecoration: 'underline' }}
+                  className='text-text-secondary hover:text-primary transition-colors text-sm focus-ring-target rounded-md underline'
                 >
                   {TECH_OVERVIEW.label}
                 </Link>
@@ -224,8 +217,7 @@ export function FooterSection() {
               <li>
                 <a
                   href='mailto:andri@matx.ee'
-                  className='text-text-secondary hover:text-primary transition-colors text-sm focus-ring-target rounded-md'
-                  style={{ textDecoration: 'underline' }}
+                  className='text-text-secondary hover:text-primary transition-colors text-sm focus-ring-target rounded-md underline'
                 >
                   andri@matx.ee
                 </a>
@@ -235,10 +227,10 @@ export function FooterSection() {
                   href={CALENDLY_URL}
                   target='_blank'
                   rel='noopener noreferrer'
-                  className='text-text-secondary hover:text-secondary transition-colors text-sm focus-ring-target rounded-md'
-                  style={{ textDecoration: 'underline' }}
+                  className='text-text-secondary hover:text-secondary transition-colors text-sm focus-ring-target rounded-md underline'
                 >
                   Broneeri vestlus
+                  <span className='sr-only'> (avaneb uues aknas)</span>
                 </a>
               </li>
             </ul>
@@ -294,22 +286,19 @@ export function FooterSection() {
           <div className='flex items-center gap-4 text-xs text-text-secondary'>
             <Link
               href='/privaatsus'
-              className='hover:text-primary transition-colors focus-ring-target rounded-md'
-              style={{ textDecoration: 'underline' }}
+              className='hover:text-primary transition-colors focus-ring-target rounded-md underline'
             >
               Privaatsuspoliitika
             </Link>
             <Link
               href='/tingimused'
-              className='hover:text-primary transition-colors focus-ring-target rounded-md'
-              style={{ textDecoration: 'underline' }}
+              className='hover:text-primary transition-colors focus-ring-target rounded-md underline'
             >
               Teenuse tingimused
             </Link>
             <Link
               href='/gdpr'
-              className='hover:text-primary transition-colors focus-ring-target rounded-md'
-              style={{ textDecoration: 'underline' }}
+              className='hover:text-primary transition-colors focus-ring-target rounded-md underline'
             >
               GDPR
             </Link>

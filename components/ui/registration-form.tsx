@@ -602,8 +602,7 @@ export function RegistrationForm({ isOpen, onClose }: RegistrationFormProps) {
               <p className='text-text-secondary text-sm mb-4'>Küsimused?</p>
               <a
                 href='mailto:andri@matx.ee'
-                className='text-primary hover:text-secondary transition-colors text-sm focus-ring-target rounded-md'
-                style={{ textDecoration: 'underline' }}
+                className='text-primary hover:text-secondary transition-colors text-sm focus-ring-target rounded-md underline'
               >
                 andri@matx.ee
               </a>

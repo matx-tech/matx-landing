@@ -148,8 +148,7 @@ export default async function LegalPage({ params }: { params: Promise<{ legal: s
 
         <Link
           href='/'
-          className='inline-block mt-10 text-primary hover:text-secondary transition-colors text-sm focus-ring-target rounded-md'
-          style={{ textDecoration: 'underline' }}
+          className='inline-block mt-10 text-primary hover:text-secondary transition-colors text-sm focus-ring-target rounded-md underline'
         >
           ← Tagasi avalehele
         </Link>
