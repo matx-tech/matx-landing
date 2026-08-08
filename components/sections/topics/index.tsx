@@ -12,7 +12,12 @@ if (typeof window !== 'undefined') {
 }
 
 import { CapabilityStatusBadge } from '@/components/ui/capability-status';
-import { SECTION_IDS, TOPICS_SECTION } from '@/lib/content/landing-copy';
+import {
+  CAPABILITY_STATUSES,
+  type CapabilityStatus,
+  SECTION_IDS,
+  TOPICS_SECTION,
+} from '@/lib/content/landing-copy';
 import { TOPIC_AREAS } from '@/lib/content/landing-evidence';
 import { usePrefersReducedMotion } from '@/lib/hooks/use-prefers-reduced-motion';
 import { gsapEase, motionTokens } from '@/lib/motion-tokens';
@@ -27,7 +32,26 @@ export function TopicsSection() {
   const trackRef = useRef<HTMLDivElement>(null);
   const viewportRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [statusFilter, setStatusFilter] = useState<CapabilityStatus | 'all'>('all');
   const prefersReducedMotion = usePrefersReducedMotion();
+
+  const visibleAreas =
+    statusFilter === 'all' ? TOPIC_AREAS : TOPIC_AREAS.filter((t) => t.status === statusFilter);
+
+  const filterChipClass = (active: boolean) =>
+    `px-4 py-2 rounded-full text-sm font-medium border transition-colors focus-ring-target min-h-[44px] ${
+      active
+        ? 'bg-primary text-text-inverse border-primary'
+        : 'bg-card text-text-secondary border-border hover:border-primary'
+    }`;
+
+  // Filter change: jump back to the first card — stale indices/bounds would
+  // otherwise point at cards that no longer exist.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: statusFilter is an intentional trigger — body never reads it, but the reset must run on every filter change.
+  useEffect(() => {
+    setActiveIndex(0);
+    if (trackRef.current) gsap.set(trackRef.current, { x: 0 });
+  }, [statusFilter]);
 
   useEffect(() => {
     if (!sectionRef.current) return;
@@ -63,6 +87,7 @@ export function TopicsSection() {
     return () => ctx.revert();
   }, [prefersReducedMotion]);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: statusFilter is an intentional trigger — filter changes must rebuild Draggable even when visibleAreas.length coincides across filters.
   useEffect(() => {
     if (!trackRef.current) return;
 
@@ -80,15 +105,20 @@ export function TopicsSection() {
         inertia: !prefersReducedMotion,
         throwResistance: 0.5,
         onDragEnd: function () {
-          const progress = Math.abs(this.x / (track.scrollWidth - trackParent.clientWidth));
-          const newIndex = Math.round(progress * (TOPIC_AREAS.length - 1));
-          setActiveIndex(Math.min(newIndex, TOPIC_AREAS.length - 1));
+          const range = track.scrollWidth - trackParent.clientWidth;
+          if (range <= 0) {
+            setActiveIndex(0);
+            return;
+          }
+          const progress = Math.abs(this.x / range);
+          const newIndex = Math.round(progress * (visibleAreas.length - 1));
+          setActiveIndex(Math.min(newIndex, visibleAreas.length - 1));
         },
       });
     }, track);
 
     return () => ctx.revert();
-  }, [prefersReducedMotion]);
+  }, [prefersReducedMotion, statusFilter, visibleAreas.length]);
 
   // Extracted movement logic shared by scrollTo, handleDotClick, and the
   // Observer callbacks — uses gsap.set so Draggable shares the transform cache.
@@ -97,9 +127,11 @@ export function TopicsSection() {
       if (!trackRef.current) return;
       setActiveIndex(index);
 
+      const range =
+        trackRef.current.scrollWidth - (trackRef.current.parentElement?.clientWidth ?? 0);
+      // Single-card filter has no travel; guard the divide-by-zero too.
       const targetX =
-        -(index / (TOPIC_AREAS.length - 1)) *
-        (trackRef.current.scrollWidth - (trackRef.current.parentElement?.clientWidth ?? 0));
+        visibleAreas.length <= 1 || range <= 0 ? 0 : -(index / (visibleAreas.length - 1)) * range;
 
       if (prefersReducedMotion) {
         gsap.set(trackRef.current, { x: targetX });
@@ -113,7 +145,7 @@ export function TopicsSection() {
         });
       }
     },
-    [prefersReducedMotion],
+    [prefersReducedMotion, visibleAreas.length],
   );
 
   const scrollTo = useCallback(
@@ -121,11 +153,11 @@ export function TopicsSection() {
       if (!trackRef.current) return;
       const newIndex =
         direction === 'next'
-          ? Math.min(activeIndex + 1, TOPIC_AREAS.length - 1)
+          ? Math.min(activeIndex + 1, visibleAreas.length - 1)
           : Math.max(activeIndex - 1, 0);
       moveToIndex(newIndex);
     },
-    [activeIndex, moveToIndex],
+    [activeIndex, moveToIndex, visibleAreas.length],
   );
 
   // Stable ref so Observer callbacks don't need scrollTo / moveToIndex in deps
@@ -151,14 +183,14 @@ export function TopicsSection() {
         type: 'wheel,touch,pointer',
         wheelSpeed: -1,
         onRight: () =>
-          moveToIndexRef.current(Math.min(activeIndexRef.current + 1, TOPIC_AREAS.length - 1)),
+          moveToIndexRef.current(Math.min(activeIndexRef.current + 1, visibleAreas.length - 1)),
         onLeft: () => moveToIndexRef.current(Math.max(activeIndexRef.current - 1, 0)),
         tolerance: 20,
       });
     }, viewport);
 
     return () => ctx.revert();
-  }, [prefersReducedMotion]);
+  }, [prefersReducedMotion, visibleAreas.length]);
 
   const handleDotClick = (index: number) => {
     moveToIndex(index);
@@ -188,6 +220,32 @@ export function TopicsSection() {
           </div>
         </div>
 
+        {/* Status filter */}
+        <fieldset
+          aria-label='Filtreeri teemasid staatuse järgi'
+          className='container mx-auto px-4 md:px-8 lg:px-16 mb-10 flex flex-wrap justify-center gap-2'
+        >
+          <button
+            type='button'
+            onClick={() => setStatusFilter('all')}
+            aria-pressed={statusFilter === 'all'}
+            className={filterChipClass(statusFilter === 'all')}
+          >
+            Kõik
+          </button>
+          {CAPABILITY_STATUSES.map((status) => (
+            <button
+              key={status}
+              type='button'
+              onClick={() => setStatusFilter(status)}
+              aria-pressed={statusFilter === status}
+              className={filterChipClass(statusFilter === status)}
+            >
+              {status}
+            </button>
+          ))}
+        </fieldset>
+
         {/* Topics Carousel */}
         <div className='relative'>
           {/* Nav Buttons */}
@@ -205,7 +263,7 @@ export function TopicsSection() {
             type='button'
             onClick={() => scrollTo('next')}
             className='absolute right-4 md:right-8 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full bg-elevated border border-border flex items-center justify-center hover:border-primary transition-colors disabled:opacity-30 focus-ring-target'
-            disabled={activeIndex === TOPIC_AREAS.length - 1}
+            disabled={activeIndex === visibleAreas.length - 1}
             aria-label='Järgmine teema'
           >
             <ChevronRight className='w-6 h-6 text-text-primary' />
@@ -218,7 +276,7 @@ export function TopicsSection() {
               className='flex gap-6 md:gap-8 cursor-grab active:cursor-grabbing'
               style={{ width: 'max-content' }}
             >
-              {TOPIC_AREAS.map((topic, index) => {
+              {visibleAreas.map((topic, index) => {
                 const Icon = TOPIC_ICONS[index % TOPIC_ICONS.length];
 
                 return (
@@ -267,7 +325,7 @@ export function TopicsSection() {
 
           {/* Pagination Dots */}
           <div className='flex justify-center gap-2 mt-8'>
-            {TOPIC_AREAS.map((area, index) => (
+            {visibleAreas.map((area, index) => (
               <button
                 key={area.name}
                 type='button'
