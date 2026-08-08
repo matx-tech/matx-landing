@@ -109,10 +109,10 @@ export const FOOTER_COPY = {
   contactEmail: 'andri@matx.ee',
   calendlyLabel: 'Broneeri vestlus',
   social: [
-    { href: 'https://twitter.com/matx_ee', label: 'MATx Twitter' },
-    { href: 'https://linkedin.com/company/matx-ee', label: 'MATx LinkedIn' },
-    { href: 'https://github.com/matx-ee', label: 'MATx GitHub' },
-    { href: 'mailto:andri@matx.ee', label: 'MATx meil' },
+    { id: 'twitter', href: 'https://twitter.com/matx_ee', label: 'MATx Twitter' },
+    { id: 'linkedin', href: 'https://linkedin.com/company/matx-ee', label: 'MATx LinkedIn' },
+    { id: 'github', href: 'https://github.com/matx-ee', label: 'MATx GitHub' },
+    { id: 'mail', href: 'mailto:andri@matx.ee', label: 'MATx meil' },
   ] as const,
 } as const;
 

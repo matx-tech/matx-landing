@@ -21,7 +21,9 @@
 - **Dual linting:** Biome errors fail commits even when `pnpm lint` passes (biome runs in pre-commit hook)
 - **pnpm build scripts:** New deps with build scripts need `allowBuilds: <pkg>: true` in `pnpm-workspace.yaml` or every pnpm command fails with `ERR_PNPM_IGNORED_BUILDS`
 - **Type-check warnings:** 8 `no-duplicate-type-constituents` warnings in icon maps are benign — leave them
-- **Plausible bot filter:** Without `X-Forwarded-For` header in proxy, Plausible silently rejects events — docs/analytics.md:31-33
+- **Plausible bot filter:** events are dropped without a forwarded client IP — set
+  `PLAUSIBLE_TRUST_PROXY=true` only behind a trusted proxy that re-creates the headers;
+  on a bare VPS accept the drop (see the startup warning) — docs/analytics.md
 - **Plausible goals:** Custom Events must be added as Goals in dashboard after event name definition; events don't count retroactively — docs/analytics.md:53-55
 - **Privacy policy:** Currently states no analytics; requires update after Plausible activation — docs/analytics.md:68-70
 

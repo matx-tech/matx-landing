@@ -9,8 +9,15 @@ import { CALENDLY_URL, FOOTER_COPY, SECTION_IDS, TECH_OVERVIEW } from '@/lib/con
 import { usePrefersReducedMotion } from '@/lib/hooks/use-prefers-reduced-motion';
 import { gsapEase, motionTokens, staggers } from '@/lib/motion-tokens';
 
-// Icon per social entry — order mirrors FOOTER_COPY.social.
-const SOCIAL_ICONS = [MessageCircle, Building2, GitBranch, Mail] as const;
+// Icon per social entry, keyed by the contract's stable id — a copy edit
+// (add/remove/reorder) is a compile error here, not a runtime crash.
+type SocialId = (typeof FOOTER_COPY.social)[number]['id'];
+const SOCIAL_ICONS: Record<SocialId, typeof MessageCircle> = {
+  twitter: MessageCircle,
+  linkedin: Building2,
+  github: GitBranch,
+  mail: Mail,
+};
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
@@ -239,8 +246,8 @@ export function FooterSection() {
 
             {/* Social Links */}
             <div className='flex gap-4 mt-4'>
-              {FOOTER_COPY.social.map((social, index) => {
-                const Icon = SOCIAL_ICONS[index];
+              {FOOTER_COPY.social.map((social) => {
+                const Icon = SOCIAL_ICONS[social.id];
                 return (
                   <a
                     key={social.label}

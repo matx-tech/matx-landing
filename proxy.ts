@@ -14,18 +14,29 @@ const isDev = process.env.NODE_ENV === 'development';
 // tracker (@plausible-analytics/tracker) is bundled client-side and posts to
 // /api/event, which this proxy forwards to Plausible first-party. The events
 // API uses User-Agent for unique-visitor counting and X-Forwarded-For for the
-// client IP — without the real visitor IP Plausible's bot filter silently
-// drops every event (docs: events-api.md). Next 16 seeds the header from the
-// socket when nothing upstream set it (base-server.js), so this works bare on
-// a VPS, behind nginx/Caddy/Cloudflare, or on serverless.
+// client IP — without the real visitor IP Plausible's bot filter drops events
+// (docs: events-api.md).
 //
-// Client-IP trust: only honor proxy-set headers (cf-connecting-ip /
-// x-forwarded-for) when the site runs behind a trusted reverse proxy that
-// strips and re-creates them — set PLAUSIBLE_TRUST_PROXY=true then. On a
-// direct VPS a client can forge these headers and corrupt visitor/bot data,
-// so they are ignored unless the flag is set.
+// Client-IP trust: set PLAUSIBLE_TRUST_PROXY=true ONLY when the site runs
+// behind a trusted reverse proxy (Cloudflare/nginx) that strips and
+// re-creates client-IP headers — the proxy then forwards cf-connecting-ip /
+// x-forwarded-for. On a direct VPS a client can forge those headers, so they
+// are ignored there: events may then be dropped by Plausible's bot filter.
+// Deploy behind a trusted proxy (or accept the drop) rather than un-gating
+// the headers — see docs/analytics.md.
 const analyticsEnabled = Boolean(process.env.PLAUSIBLE_SCRIPT_URL);
 const trustProxyHeaders = process.env.PLAUSIBLE_TRUST_PROXY === 'true';
+
+// Loud at deploy time instead of silently producing empty analytics: if the
+// site tracks but is not behind a trusted proxy, client IPs are not forwarded
+// and Plausible's bot filter will drop events.
+if (analyticsEnabled && !trustProxyHeaders) {
+  console.warn(
+    '[plausible] PLAUSIBLE_TRUST_PROXY is not set — client IP is not forwarded and ' +
+      "Plausible's bot filter may drop events. Set it to true only behind a trusted proxy " +
+      '(Cloudflare/nginx); see docs/analytics.md.',
+  );
+}
 
 const PLAUSIBLE_API_URL = 'https://plausible.io/api/event';
 
@@ -45,8 +56,8 @@ async function proxyPlausibleEvent(request: NextRequest): Promise<NextResponse> 
   if (contentType) headers.set('content-type', contentType);
   // Trust CF-Connecting-IP / X-Forwarded-For only behind a trusted proxy
   // (set by the CDN, not spoofable by the client). Without the flag the
-  // client IP is omitted — Plausible then counts the request without a
-  // reliable visitor IP rather than accepting a forged one.
+  // client IP is omitted — Plausible's bot filter may then drop the event,
+  // which is preferable to accepting a forged visitor IP (see module comment).
   const clientIp = trustProxyHeaders
     ? (request.headers.get('cf-connecting-ip') ??
       request.headers.get('x-forwarded-for')?.split(',')[0]?.trim())

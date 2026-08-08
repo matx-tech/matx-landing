@@ -28,10 +28,13 @@ github.com/plausible/docs).
   adblockeritest (dokumentatsioon: muidu jääb 5–25% külastusi kahe silma vahele) ega
   nõrgenda CSP-d — `script-src 'self'` ja `connect-src 'self'` jäävad kehtima.
 - Proks edastab Plausible'ile ainult vajalikud päised: `User-Agent` (unikaalse külastaja
-  arvestus), `Content-Type` ja `X-Forwarded-For` (külastaja IP). Ilma viimaseta lükkab
-  Plausible'i botifilter sündmuse vaikselt tagasi (docs/events-api). VPS-il on päis
-  garanteeritud: Next täidab selle ise socketi aadressist, kui keegi ees seda ei sea —
-  nginx/Caddy/Cloudflare ees ei vaja seega eraldi konfiguratsiooni.
+  arvestus), `Content-Type` ja — ainult usaldusväärse puhverserveri taga — `X-Forwarded-For`
+  (külastaja IP). Ilma viimaseta lükkab Plausible'i botifilter sündmuse vaikselt tagasi
+  (docs/events-api), seega sea `PLAUSIBLE_TRUST_PROXY=true` ainult siis, kui sait töötab
+  Cloudflare/nginx-i taga, mis päised ise eemaldab ja uuesti loob. Otsese VPS-i korral võib
+  klient need päised ise võltsida, mistõttu proxy neid ei edasta — analüütika võib sel juhul
+  jääda tühjaks (logis on hoiatus). Lahendus on puhverserver ette panna, mitte päiste
+  piirang maha võtta.
 - `components/providers/analytics-provider.tsx`: trackeri initsialiseerimine NPM-teegiga
   `@plausible-analytics/tracker` (dokumentatsiooni soovitatud NPM-lahendus) — endpoint,
   outboundLinks, formSubmissions; devis ka captureOnLocalhost. Eraldi skripti ei laeta —

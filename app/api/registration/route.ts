@@ -46,6 +46,12 @@ const submissionLog = new Map<string, { count: number; windowStart: number }>();
 
 function isRateLimited(clientKey: string): boolean {
   const now = Date.now();
+  // Prune expired windows on every call so the map cannot grow unbounded on
+  // a long-lived server — even a bot rotating spoofed client keys only keeps
+  // one entry per key, and each expires with its window.
+  for (const [key, entry] of submissionLog) {
+    if (now - entry.windowStart >= RATE_LIMIT_WINDOW_MS) submissionLog.delete(key);
+  }
   const entry = submissionLog.get(clientKey);
   if (!entry || now - entry.windowStart >= RATE_LIMIT_WINDOW_MS) {
     submissionLog.set(clientKey, { count: 1, windowStart: now });
