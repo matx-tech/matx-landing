@@ -29,13 +29,12 @@ export function TechText({ text }: { text: string }) {
     <>
       {text.split(TECH_SPLIT).map((part, index) =>
         TECH_MATCH.test(part) ? (
-          <code
-            key={index}
-            className="font-mono text-[0.85em] not-italic break-words"
-          >
+          // biome-ignore lint/suspicious/noArrayIndexKey: split parts — position is the only stable identity, parts can repeat
+          <code key={index} className='font-mono text-[0.85em] not-italic break-words'>
             {part}
           </code>
         ) : (
+          // biome-ignore lint/suspicious/noArrayIndexKey: split parts — position is the only stable identity, parts can repeat
           <span key={index}>{part}</span>
         ),
       )}
@@ -46,7 +45,13 @@ export function TechText({ text }: { text: string }) {
 /**
  * Status row card. Renders an <li> root — must be used inside a <ul> or <ol>.
  */
-export function StatusCard({ title, detail, note, status, showBadge = true }: StatusRow & { showBadge?: boolean }) {
+export function StatusCard({
+  title,
+  detail,
+  note,
+  status,
+  showBadge = true,
+}: StatusRow & { showBadge?: boolean }) {
   const muted = status === 'Kavandatud';
   return (
     <li
@@ -56,18 +61,17 @@ export function StatusCard({ title, detail, note, status, showBadge = true }: St
           : 'border-border bg-card shadow-card hover:shadow-card-hover'
       }`}
     >
-      <div className="flex items-start justify-between gap-4">
-        <div>
+      <div className='flex items-start justify-between gap-4'>
+        <div className='min-w-0'>
           <h3 className={`font-semibold ${muted ? 'text-text-secondary' : 'text-text-primary'}`}>
             {title}
           </h3>
-          <p className="text-sm text-text-secondary mt-1 leading-relaxed">
+          <p className='text-sm text-text-secondary mt-1 leading-relaxed'>
             <TechText text={detail} />
           </p>
           {note && (
-            <p className="text-xs text-text-secondary mt-2 italic leading-relaxed">
-              <span className="not-italic font-medium">Märkus:</span>{' '}
-              <TechText text={note} />
+            <p className='text-xs text-text-secondary mt-2 italic leading-relaxed'>
+              <span className='not-italic font-medium'>Märkus:</span> <TechText text={note} />
             </p>
           )}
         </div>
@@ -79,7 +83,7 @@ export function StatusCard({ title, detail, note, status, showBadge = true }: St
 
 export function StatusList({ rows, showBadge = true }: { rows: StatusRow[]; showBadge?: boolean }) {
   return (
-    <ul className="grid gap-3 lg:grid-cols-2">
+    <ul className='grid gap-3 lg:grid-cols-2'>
       {rows.map((row) => (
         <StatusCard key={row.title} {...row} showBadge={showBadge} />
       ))}

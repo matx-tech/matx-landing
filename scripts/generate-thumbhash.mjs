@@ -12,11 +12,11 @@
  * container seamlessly.
  */
 
-import { rgbaToThumbHash, thumbHashToDataURL } from 'thumbhash';
+import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
+import { basename, dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
-import { writeFileSync, mkdirSync, existsSync } from 'fs';
-import { join, dirname, basename } from 'path';
-import { fileURLToPath } from 'url';
+import { rgbaToThumbHash, thumbHashToDataURL } from 'thumbhash';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const base = join(__dirname, '..');
@@ -53,7 +53,7 @@ if (missing.length > 0) {
       missing.map((path) => `    - ${basename(path)}  (expected at ${path})`).join('\n') +
       `\n\n  Place a mobile portrait and desktop landscape screenshot in the\n` +
       `  project root, then re-run:\n` +
-      `    node scripts/generate-thumbhash.mjs\n`
+      `    node scripts/generate-thumbhash.mjs\n`,
   );
   process.exit(1);
 }
@@ -70,7 +70,7 @@ try {
   mkdirSync(outDir, { recursive: true });
   writeFileSync(
     join(outDir, 'thumbhash-strings.json'),
-    JSON.stringify({ mobile: mobile.base64Hash, desktop: desktop.base64Hash }, null, 2)
+    JSON.stringify({ mobile: mobile.base64Hash, desktop: desktop.base64Hash }, null, 2),
   );
 
   // --- Write TypeScript module (data URLs for build-time embedding) ---
@@ -98,10 +98,10 @@ export const DESKTOP_DATA_URL: string = ${JSON.stringify(desktop.dataUrl)};
   const detail = err instanceof Error ? err.message : String(err);
   console.error(
     `\n  Failed to generate thumbhash or write output files.\n` +
-    `  Error: ${detail}\n` +
-    `  Make sure both mobile-matx.png and desktop-matx.png are valid, decodable\n` +
-    `  images and that lib/ is writable, then re-run:\n` +
-    `    node scripts/generate-thumbhash.mjs\n`
+      `  Error: ${detail}\n` +
+      `  Make sure both mobile-matx.png and desktop-matx.png are valid, decodable\n` +
+      `  images and that lib/ is writable, then re-run:\n` +
+      `    node scripts/generate-thumbhash.mjs\n`,
   );
   process.exit(1);
 }

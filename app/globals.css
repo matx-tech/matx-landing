@@ -70,52 +70,56 @@
   --shadow-elevated: 0 8px 24px rgba(0, 0, 0, 0.12);
   --shadow-dropdown: 0 4px 16px rgba(0, 0, 0, 0.1);
 
-  --background-image-gradient-brand: linear-gradient(135deg, var(--color-blue-700) 0%, var(--color-teal-700) 100%);
+  --background-image-gradient-brand: linear-gradient(
+    135deg,
+    var(--color-blue-700) 0%,
+    var(--color-teal-700) 100%
+  );
 }
 
 @layer base {
   :root {
     /* --- Tier 1: Primitives (Theme-Agnostic Palette) --- */
-    --color-blue-800: #12324D;
-    --color-blue-750: #184E78;
-    --color-blue-700: #1E5A8A;
-    --color-blue-400: #63A0D6;
-    --color-blue-300: #7FB2DE;
-    --color-blue-100: #E7F0F8;
+    --color-blue-800: #12324d;
+    --color-blue-750: #184e78;
+    --color-blue-700: #1e5a8a;
+    --color-blue-400: #63a0d6;
+    --color-blue-300: #7fb2de;
+    --color-blue-100: #e7f0f8;
 
-    --color-teal-700: #0E6F68;
-    --color-teal-400: #3FA69D;
-    --color-teal-050: #E7F2F1;
+    --color-teal-700: #0e6f68;
+    --color-teal-400: #3fa69d;
+    --color-teal-050: #e7f2f1;
 
-    --color-green-700: #18794E;
-    --color-green-400: #3FB07A;
+    --color-green-700: #18794e;
+    --color-green-400: #3fb07a;
 
-    --color-red-800: #6E160F;
-    --color-red-700: #8F1D14;
-    --color-red-600: #B42318;
-    --color-red-400: #EC6A5E;
+    --color-red-800: #6e160f;
+    --color-red-700: #8f1d14;
+    --color-red-600: #b42318;
+    --color-red-400: #ec6a5e;
 
-    --color-amber-700: #B45309;
-    --color-amber-400: #E9963F;
-    --color-amber-100: #FBE9D4;
+    --color-amber-700: #b45309;
+    --color-amber-400: #e9963f;
+    --color-amber-100: #fbe9d4;
 
-    --color-info-700: #0B6FA4;
-    --color-info-400: #4FB0E5;
-    --color-info-050: #E4F1F8;
+    --color-info-700: #0b6fa4;
+    --color-info-400: #4fb0e5;
+    --color-info-050: #e4f1f8;
 
     --color-neutral-950: #111827;
     --color-neutral-700: #374151;
-    --color-neutral-600: #4B5563;
-    --color-neutral-300: #D9E2EC;
-    --color-neutral-050: #F8FAFC;
-    --color-neutral-000: #FFFFFF;
+    --color-neutral-600: #4b5563;
+    --color-neutral-300: #d9e2ec;
+    --color-neutral-050: #f8fafc;
+    --color-neutral-000: #ffffff;
 
-    --color-ink-900: #0B1220;
-    --color-ink-800: #131C2B;
-    --color-ink-700: #1B2740;
-    --color-ink-600: #26324A;
-    --color-ink-200: #97A4BA;
-    --color-ink-050: #E6EBF2;
+    --color-ink-900: #0b1220;
+    --color-ink-800: #131c2b;
+    --color-ink-700: #1b2740;
+    --color-ink-600: #26324a;
+    --color-ink-200: #97a4ba;
+    --color-ink-050: #e6ebf2;
 
     /* --- Spacing Scale (8px Grid System) --- */
     --space-1: 4px;
@@ -176,7 +180,7 @@
     --color-bg-info-subtle: var(--color-info-050);
     --color-border-info: var(--color-info-400);
     --color-text-info-strong: var(--color-info-700);
-    --color-bg-success-subtle: #E6F4ED;
+    --color-bg-success-subtle: #e6f4ed;
     --color-border-success: var(--color-green-400);
     --color-text-success-strong: var(--color-green-700);
     --color-bg-warning-subtle: var(--color-amber-50);
@@ -301,6 +305,7 @@
   }
 
   .lenis.lenis-smooth {
+    /* biome-ignore lint/complexity/noImportantStyles: must override Lenis's own scroll-behavior declaration */
     scroll-behavior: auto !important;
   }
 
@@ -316,11 +321,12 @@
     border-color: var(--color-border);
   }
 
+  /* biome-ignore lint/style/noDescendingSpecificity: base body rule sits after the .lenis overrides on purpose (grouped library rules); it sets unrelated properties, no override conflict */
   body {
     @apply antialiased;
     background-color: var(--color-bg-canvas);
     color: var(--color-text-primary);
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: "Inter", system-ui, sans-serif;
     font-size: 1.0625rem;
     line-height: 1.6;
     overflow-x: hidden;
@@ -334,7 +340,11 @@
   /* Display type stays unbroken — body copy hyphenates, headings must not
      (an Estonian heading like "Tehniline ülevaade" would otherwise render
      as "Tehnili-ne üle-vaade" in a narrow column) */
-  h1, h2, h3, h4, h5 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5 {
     hyphens: manual;
     /* body sets overflow-wrap: break-word (inherited) — reset it so a long
        non-hyphenated heading cannot split inside a word either */
@@ -387,10 +397,16 @@
 
   /* --- Reduced Motion --- */
   @media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after {
+    *,
+    *::before,
+    *::after {
+      /* biome-ignore lint/complexity/noImportantStyles: canonical reduced-motion override, must beat all animation declarations */
       animation-duration: 0.01ms !important;
+      /* biome-ignore lint/complexity/noImportantStyles: canonical reduced-motion override, must beat all animation declarations */
       animation-iteration-count: 1 !important;
+      /* biome-ignore lint/complexity/noImportantStyles: canonical reduced-motion override, must beat all transition declarations */
       transition-duration: 0.01ms !important;
+      /* biome-ignore lint/complexity/noImportantStyles: canonical reduced-motion override, must beat all scroll-behavior declarations */
       scroll-behavior: auto !important;
     }
   }
@@ -401,6 +417,7 @@
      during the critical rendering path; GSAP removes it when it's ready
      to take over the animation. */
   .gsap-animate-on-mount {
+    /* biome-ignore lint/complexity/noImportantStyles: must beat GSAP's inline opacity styles before hydration */
     opacity: 1 !important;
   }
 
@@ -428,7 +445,11 @@
 @layer components {
   .text-gradient-brand {
     @apply bg-clip-text text-transparent;
-    background-image: linear-gradient(135deg in oklch, var(--color-blue-700) 0%, var(--color-teal-700) 100%);
+    background-image: linear-gradient(
+      135deg in oklch,
+      var(--color-blue-700) 0%,
+      var(--color-teal-700) 100%
+    );
   }
 
   /* --- Primary Button (Tier 3 Compliant) --- */
@@ -545,11 +566,15 @@
     transition-property: box-shadow;
     transition-duration: var(--duration-slow);
     transition-timing-function: var(--easing-standard);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
+    box-shadow:
+      0 1px 3px rgba(0, 0, 0, 0.08),
+      0 1px 2px rgba(0, 0, 0, 0.04);
   }
 
   .card:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.04);
+    box-shadow:
+      0 4px 12px rgba(0, 0, 0, 0.08),
+      0 2px 4px rgba(0, 0, 0, 0.04);
   }
 
   /* --- Heatmap Cell Pattern Classes (Colour-Blind Safe) --- */
@@ -582,21 +607,13 @@
 
   .heatmap-cell-4 {
     background-color: var(--heatmap-level-4);
-    background-image: radial-gradient(
-      circle,
-      rgba(255, 255, 255, 0.3) 1px,
-      transparent 1px
-    );
+    background-image: radial-gradient(circle, rgba(255, 255, 255, 0.3) 1px, transparent 1px);
     background-size: 6px 6px;
   }
 
   .heatmap-cell-5 {
     background-color: var(--heatmap-level-5);
-    background-image: radial-gradient(
-      circle,
-      rgba(255, 255, 255, 0.35) 2px,
-      transparent 2px
-    );
+    background-image: radial-gradient(circle, rgba(255, 255, 255, 0.35) 2px, transparent 2px);
     background-size: 8px 8px;
   }
 }
@@ -620,7 +637,10 @@
   }
 
   @keyframes ripple {
-    to { transform: scale(4); opacity: 0; }
+    to {
+      transform: scale(4);
+      opacity: 0;
+    }
   }
 
   .animate-ripple {
@@ -651,7 +671,7 @@
     position: relative;
   }
   .section-fade-from-canvas::before {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     left: 0;
@@ -666,7 +686,7 @@
     position: relative;
   }
   .section-fade-from-surface::before {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     left: 0;
@@ -679,11 +699,27 @@
 }
 
 /* Topic color utilities — CVI-compliant palette */
-.topic-protsendid { color: var(--color-teal-700); }
-.topic-vorrandid { color: var(--color-blue-700); }
-.topic-abivalemid { color: var(--color-amber-700); }
-.topic-defineerimine { color: var(--color-info-700); }
-.topic-vorrandi-koostamine { color: var(--color-blue-400); }
-.topic-lahendamine { color: var(--color-red-600); }
-.topic-lineaarne-funktsioon { color: var(--color-blue-750); }
-.topic-astmed-juured { color: var(--color-teal-400); }
+.topic-protsendid {
+  color: var(--color-teal-700);
+}
+.topic-vorrandid {
+  color: var(--color-blue-700);
+}
+.topic-abivalemid {
+  color: var(--color-amber-700);
+}
+.topic-defineerimine {
+  color: var(--color-info-700);
+}
+.topic-vorrandi-koostamine {
+  color: var(--color-blue-400);
+}
+.topic-lahendamine {
+  color: var(--color-red-600);
+}
+.topic-lineaarne-funktsioon {
+  color: var(--color-blue-750);
+}
+.topic-astmed-juured {
+  color: var(--color-teal-400);
+}

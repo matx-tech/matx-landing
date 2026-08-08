@@ -1,11 +1,11 @@
 'use client';
 
-import { useRef } from 'react';
-import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
+import gsap from 'gsap';
 import { SplitText } from 'gsap/SplitText';
+import { useRef } from 'react';
 import { usePrefersReducedMotion } from '@/lib/hooks/use-prefers-reduced-motion';
-import { motionTokens, gsapEase, staggers } from '@/lib/motion-tokens';
+import { gsapEase, motionTokens, staggers } from '@/lib/motion-tokens';
 
 // SplitText is owned by the hero headline animations — register at module
 // scope here instead of in the root provider.
@@ -32,15 +32,25 @@ function scheduleIdle(cb: () => void): () => void {
     // timeout: a busy main thread must not starve the reveal forever — the
     // fallback class stays applied and the LCP subline sits offset until
     // the callback eventually runs.
-    const id = requestIdleCallback(() => { if (!cancelled) cb(); }, { timeout: 1000 });
-    return () => { cancelled = true; cancelIdleCallback(id); };
+    const id = requestIdleCallback(
+      () => {
+        if (!cancelled) cb();
+      },
+      { timeout: 1000 },
+    );
+    return () => {
+      cancelled = true;
+      cancelIdleCallback(id);
+    };
   }
   // requestIdleCallback is not available in Safari < 15.4,
   // so fall back to a rAF + macrotask which still defers past paint.
   let timeoutId: ReturnType<typeof setTimeout> | undefined;
   const raf = requestAnimationFrame(() => {
     if (cancelled) return;
-    timeoutId = setTimeout(() => { if (!cancelled) cb(); }, 0);
+    timeoutId = setTimeout(() => {
+      if (!cancelled) cb();
+    }, 0);
   });
   return () => {
     cancelled = true;
@@ -121,7 +131,7 @@ export function AnimatedWordReveal({
             ease: gsapEase(motionTokens.easing.emphasized),
             delay,
             immediateRender: false,
-          }
+          },
         );
       });
 
@@ -143,7 +153,7 @@ export function AnimatedWordReveal({
     <div className={`overflow-hidden ${className}`}>
       <h1
         ref={containerRef}
-        className="gsap-animate-on-mount relative leading-none"
+        className='gsap-animate-on-mount relative leading-none'
         style={{ perspective: '400px' }}
       >
         {children}
@@ -236,7 +246,9 @@ export function MATxLogoAnimation({ delay = 0 }: { delay?: number }) {
       const mm = gsap.matchMedia();
 
       mm.add('(prefers-reduced-motion: reduce)', () => {
-        lettersRef.current.forEach((letter) => letter.classList.remove('gsap-animate-on-mount'));
+        lettersRef.current.forEach((letter) => {
+          letter.classList.remove('gsap-animate-on-mount');
+        });
         gsap.set(lettersRef.current, { scale: 1, opacity: 1, rotation: 0 });
       });
 
@@ -245,7 +257,9 @@ export function MATxLogoAnimation({ delay = 0 }: { delay?: number }) {
 
         // Strip CSS fallback before gsap.set — .gsap-animate-on-mount has
         // opacity: 1 !important which overrides GSAP inline styles.
-        letters.forEach((letter) => letter.classList.remove('gsap-animate-on-mount'));
+        letters.forEach((letter) => {
+          letter.classList.remove('gsap-animate-on-mount');
+        });
 
         gsap.set(letters, {
           scale: 0,
@@ -271,10 +285,10 @@ export function MATxLogoAnimation({ delay = 0 }: { delay?: number }) {
   );
 
   return (
-    <div ref={containerRef} className="inline-flex items-center">
+    <div ref={containerRef} className='inline-flex items-center'>
       {'MATx'.split('').map((char, index) => (
         <span
-          key={index}
+          key={char}
           ref={(el) => {
             if (el) lettersRef.current[index] = el;
           }}

@@ -1,8 +1,8 @@
 'use client';
 
 import { useRef } from 'react';
-import { cn } from '@/lib/utils';
 import { useRippleEffect } from '@/lib/hooks/use-ripple-effect';
+import { cn } from '@/lib/utils';
 
 interface MATxButtonProps {
   children: React.ReactNode;
@@ -49,13 +49,14 @@ export function MATxButton({
 
   return (
     <button
+      type='button'
       ref={buttonRef}
       onClick={handleClick}
       disabled={disabled}
       className={cn(baseStyles, variants[variant], sizes[size], className)}
     >
-      <span className="relative z-10">{children}</span>
-      <span ref={ripplesRef} className="absolute inset-0 pointer-events-none" />
+      <span className='relative z-10'>{children}</span>
+      <span ref={ripplesRef} className='absolute inset-0 pointer-events-none' />
     </button>
   );
 }

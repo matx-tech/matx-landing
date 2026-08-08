@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
-import { X, Check, AlertCircle } from 'lucide-react';
-import Link from 'next/link';
 import * as Dialog from '@radix-ui/react-dialog';
+import { AlertCircle, Check, X } from 'lucide-react';
+import Link from 'next/link';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { dialogExitMs } from '@/lib/dialog-timing';
 
 const roles = [
@@ -97,40 +97,43 @@ export function RegistrationForm({ isOpen, onClose }: RegistrationFormProps) {
     }
   }, []);
 
-  const validateField = useCallback((name: string, value: string): string | undefined => {
-    switch (name) {
-      case 'schoolName':
-        if (!value.trim()) return 'Kooli nimi on kohustuslik';
-        if (value.trim().length < 3) return 'Kooli nimi peab olema vähemalt 3 tähemärki';
-        break;
-      case 'contactName':
-        if (!value.trim()) return 'Kontaktisiku nimi on kohustuslik';
-        if (value.trim().length < 2) return 'Nimi peab olema vähemalt 2 tähemärki';
-        break;
-      case 'role':
-        if (!value.trim()) return 'Roll on kohustuslik';
-        break;
-      case 'otherRole':
-        if (formData.role === 'Muu haridustöötaja' && !value.trim()) {
-          return 'Täpsustage oma roll';
-        }
-        break;
-      case 'email':
-        if (!value.trim()) return 'E-post on kohustuslik';
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) return 'Sisestage kehtiv e-posti aadress';
-        break;
-      case 'phone':
-        if (!value.trim()) return 'Telefoninumber on kohustuslik';
-        if (!/^[+\d][\d\s-]{6,}$/.test(value.replace(/\s/g, ''))) {
-          return 'Sisestage kehtiv telefoninumber';
-        }
-        break;
-      case 'classGroups':
-        if (!value.trim()) return 'Klassirühmade arv on kohustuslik';
-        break;
-    }
-    return undefined;
-  }, [formData.role]);
+  const validateField = useCallback(
+    (name: string, value: string): string | undefined => {
+      switch (name) {
+        case 'schoolName':
+          if (!value.trim()) return 'Kooli nimi on kohustuslik';
+          if (value.trim().length < 3) return 'Kooli nimi peab olema vähemalt 3 tähemärki';
+          break;
+        case 'contactName':
+          if (!value.trim()) return 'Kontaktisiku nimi on kohustuslik';
+          if (value.trim().length < 2) return 'Nimi peab olema vähemalt 2 tähemärki';
+          break;
+        case 'role':
+          if (!value.trim()) return 'Roll on kohustuslik';
+          break;
+        case 'otherRole':
+          if (formData.role === 'Muu haridustöötaja' && !value.trim()) {
+            return 'Täpsustage oma roll';
+          }
+          break;
+        case 'email':
+          if (!value.trim()) return 'E-post on kohustuslik';
+          if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) return 'Sisestage kehtiv e-posti aadress';
+          break;
+        case 'phone':
+          if (!value.trim()) return 'Telefoninumber on kohustuslik';
+          if (!/^[+\d][\d\s-]{6,}$/.test(value.replace(/\s/g, ''))) {
+            return 'Sisestage kehtiv telefoninumber';
+          }
+          break;
+        case 'classGroups':
+          if (!value.trim()) return 'Klassirühmade arv on kohustuslik';
+          break;
+      }
+      return undefined;
+    },
+    [formData.role],
+  );
 
   const validateForm = useCallback((): boolean => {
     const newErrors: FormErrors = {};
@@ -150,60 +153,69 @@ export function RegistrationForm({ isOpen, onClose }: RegistrationFormProps) {
     return Object.keys(newErrors).length === 0;
   }, [formData, validateField, consent]);
 
-  const handleBlur = useCallback((name: string) => {
-    setTouched((prev) => new Set(prev).add(name));
-    const error = validateField(name, formData[name as keyof FormData]);
-    setErrors((prev) => ({ ...prev, [name]: error }));
-  }, [formData, validateField]);
-
-  const handleChange = useCallback((name: string, value: string) => {
-    setFormData((prev) => ({ ...prev, [name]: value }));
-    // Re-validate on change if already touched
-    if (touched.has(name)) {
-      const error = validateField(name, value);
+  const handleBlur = useCallback(
+    (name: string) => {
+      setTouched((prev) => new Set(prev).add(name));
+      const error = validateField(name, formData[name as keyof FormData]);
       setErrors((prev) => ({ ...prev, [name]: error }));
-    }
-  }, [touched, validateField]);
+    },
+    [formData, validateField],
+  );
 
-  const handleSubmit = useCallback((e: React.FormEvent) => {
-    e.preventDefault();
+  const handleChange = useCallback(
+    (name: string, value: string) => {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+      // Re-validate on change if already touched
+      if (touched.has(name)) {
+        const error = validateField(name, value);
+        setErrors((prev) => ({ ...prev, [name]: error }));
+      }
+    },
+    [touched, validateField],
+  );
 
-    // Mark all fields as touched
-    const allFields = ['schoolName', 'contactName', 'role', 'email', 'phone', 'classGroups'];
-    if (formData.role === 'Muu haridustöötaja') {
-      allFields.push('otherRole');
-    }
-    setTouched(new Set(allFields));
+  const handleSubmit = useCallback(
+    (e: React.FormEvent) => {
+      e.preventDefault();
 
-    if (!validateForm()) {
-      setAnnouncement('Palun parandage vormi vead enne saatmist');
-      // Move focus to the first invalid field so keyboard/screen-reader
-      // users land on the error instead of hunting for it.
-      formRef.current?.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus();
-      return;
-    }
+      // Mark all fields as touched
+      const allFields = ['schoolName', 'contactName', 'role', 'email', 'phone', 'classGroups'];
+      if (formData.role === 'Muu haridustöötaja') {
+        allFields.push('otherRole');
+      }
+      setTouched(new Set(allFields));
 
-    // No backend yet (static landing page) — compose a real registration
-    // email in the visitor's mail client instead of faking success. The
-    // visitor sends it; MATx replies with the booking link.
-    const subject = `Piloodi registreerimine: ${formData.schoolName}`;
-    const body = [
-      `Kool: ${formData.schoolName}`,
-      `Kontaktisik: ${formData.contactName}`,
-      `Roll: ${formData.role === 'Muu haridustöötaja' ? `${formData.role} — ${formData.otherRole}` : formData.role}`,
-      `E-post: ${formData.email}`,
-      `Telefon: ${formData.phone}`,
-      `Klassirühmad: ${formData.classGroups}`,
-    ].join('\n');
-    window.location.href = `mailto:andri@matx.ee?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+      if (!validateForm()) {
+        setAnnouncement('Palun parandage vormi vead enne saatmist');
+        // Move focus to the first invalid field so keyboard/screen-reader
+        // users land on the error instead of hunting for it.
+        formRef.current?.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus();
+        return;
+      }
 
-    // The draft is kept until the visitor explicitly clears it ("Sulge" on
-    // the success screen) — a cancelled or unavailable mail client must not
-    // lose their data. There is no way to detect that the mail was actually
-    // composed/sent, so the success copy below must not claim the app opened.
-    setIsSuccess(true);
-    setAnnouncement('Registreerimise kiri on koostatud');
-  }, [formData, validateForm]);
+      // No backend yet (static landing page) — compose a real registration
+      // email in the visitor's mail client instead of faking success. The
+      // visitor sends it; MATx replies with the booking link.
+      const subject = `Piloodi registreerimine: ${formData.schoolName}`;
+      const body = [
+        `Kool: ${formData.schoolName}`,
+        `Kontaktisik: ${formData.contactName}`,
+        `Roll: ${formData.role === 'Muu haridustöötaja' ? `${formData.role} — ${formData.otherRole}` : formData.role}`,
+        `E-post: ${formData.email}`,
+        `Telefon: ${formData.phone}`,
+        `Klassirühmad: ${formData.classGroups}`,
+      ].join('\n');
+      window.location.href = `mailto:andri@matx.ee?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+
+      // The draft is kept until the visitor explicitly clears it ("Sulge" on
+      // the success screen) — a cancelled or unavailable mail client must not
+      // lose their data. There is no way to detect that the mail was actually
+      // composed/sent, so the success copy below must not claim the app opened.
+      setIsSuccess(true);
+      setAnnouncement('Registreerimise kiri on koostatud');
+    },
+    [formData, validateForm],
+  );
 
   const handleClose = useCallback(() => {
     setIsSuccess(false);
@@ -212,12 +224,15 @@ export function RegistrationForm({ isOpen, onClose }: RegistrationFormProps) {
     onClose();
   }, [onClose]);
 
-  const handleOpenChange = useCallback((open: boolean) => {
-    // Draft is kept in localStorage on purpose — an accidental close (or
-    // refresh) must not lose the visitor's data. Explicit "Sulge" on the
-    // success screen clears it via handleClearAndClose.
-    if (!open) handleClose();
-  }, [handleClose]);
+  const handleOpenChange = useCallback(
+    (open: boolean) => {
+      // Draft is kept in localStorage on purpose — an accidental close (or
+      // refresh) must not lose the visitor's data. Explicit "Sulge" on the
+      // success screen clears it via handleClearAndClose.
+      if (!open) handleClose();
+    },
+    [handleClose],
+  );
 
   const handleClearAndClose = useCallback(() => {
     setFormData(initialFormData);
@@ -227,7 +242,9 @@ export function RegistrationForm({ isOpen, onClose }: RegistrationFormProps) {
 
   const inputClassName = (hasError: boolean): string =>
     `w-full px-4 py-3 rounded-lg bg-surface border text-text-primary placeholder:text-text-secondary/50 focus-ring-target transition-colors ${
-      hasError ? 'border-red-600 dark:border-red-400 focus:border-red-600 dark:focus:border-red-400' : 'border-border'
+      hasError
+        ? 'border-red-600 dark:border-red-400 focus:border-red-600 dark:focus:border-red-400'
+        : 'border-border'
     }`;
 
   return (
@@ -235,43 +252,38 @@ export function RegistrationForm({ isOpen, onClose }: RegistrationFormProps) {
       <Dialog.Portal>
         <Dialog.Overlay
           style={{ animationDuration: `${dialogExitMs}ms` }}
-          className="fixed inset-0 z-50 bg-canvas/95 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0"
+          className='fixed inset-0 z-50 bg-canvas/95 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0'
         />
-        <Dialog.Content
-          className="fixed left-[50%] top-[50%] z-50 w-full max-w-lg translate-x-[-50%] translate-y-[-50%] bg-elevated rounded-xl border border-border shadow-elevated overflow-hidden max-h-[90vh] overflow-y-auto focus:outline-none data-[state=closed]:animate-out data-[state=closed]:fade-out-0"
-        >
-          <Dialog.Title className="sr-only">Registreeri kool pilootkatsetusele</Dialog.Title>
+        <Dialog.Content className='fixed left-[50%] top-[50%] z-50 w-full max-w-lg translate-x-[-50%] translate-y-[-50%] bg-elevated rounded-xl border border-border shadow-elevated overflow-hidden max-h-[90vh] overflow-y-auto focus:outline-none data-[state=closed]:animate-out data-[state=closed]:fade-out-0'>
+          <Dialog.Title className='sr-only'>Registreeri kool pilootkatsetusele</Dialog.Title>
 
           {/* Live region for announcements */}
-          <div
-            role="status"
-            aria-live="polite"
-            className="sr-only"
-          >
+          <div role='status' aria-live='polite' className='sr-only'>
             {announcement}
           </div>
 
           {/* Header */}
-          <div className="relative px-8 pt-8 pb-4">
+          <div className='relative px-8 pt-8 pb-4'>
             {!isSuccess ? (
               <>
-                <h2 className="text-2xl font-display font-bold text-text-primary mb-2">
+                <h2 className='text-2xl font-display font-bold text-text-primary mb-2'>
                   Registreeri oma kool pilootkatsetusele
                 </h2>
-                <p className="text-text-secondary text-sm">
+                <p className='text-text-secondary text-sm'>
                   Targa Tuleviku Fondi toetusel. Tasuta. Kohustusteta.
                 </p>
               </>
             ) : (
-              <div className="text-center py-6">
-                <div className="w-16 h-16 rounded-full bg-secondary/20 flex items-center justify-center mx-auto mb-4">
-                  <Check className="w-8 h-8 text-secondary" />
+              <div className='text-center py-6'>
+                <div className='w-16 h-16 rounded-full bg-secondary/20 flex items-center justify-center mx-auto mb-4'>
+                  <Check className='w-8 h-8 text-secondary' />
                 </div>
-                <h2 className="text-2xl font-display font-bold text-text-primary mb-2">
+                <h2 className='text-2xl font-display font-bold text-text-primary mb-2'>
                   Registreerimise kiri on koostatud!
                 </h2>
-                <p className="text-text-secondary">
-                  Registreerimiskiri on koostatud. Kui meilirakendus ei avanunud, saatke andmed aadressile andri@matx.ee.
+                <p className='text-text-secondary'>
+                  Registreerimiskiri on koostatud. Kui meilirakendus ei avanunud, saatke andmed
+                  aadressile andri@matx.ee.
                 </p>
               </div>
             )}
@@ -279,29 +291,35 @@ export function RegistrationForm({ isOpen, onClose }: RegistrationFormProps) {
 
           {/* Form or Success */}
           {!isSuccess ? (
-            <form onSubmit={handleSubmit} ref={formRef} className="px-8 pb-8 space-y-4" noValidate>
+            <form onSubmit={handleSubmit} ref={formRef} className='px-8 pb-8 space-y-4' noValidate>
               {/* School Name */}
               <div>
-                <label htmlFor="schoolName" className="block text-sm font-medium text-text-primary mb-2">
-                  Kooli nimi <span className="text-red-600 dark:text-red-400">*</span>
+                <label
+                  htmlFor='schoolName'
+                  className='block text-sm font-medium text-text-primary mb-2'
+                >
+                  Kooli nimi <span className='text-red-600 dark:text-red-400'>*</span>
                 </label>
                 <input
-                  id="schoolName"
-                  type="text"
+                  id='schoolName'
+                  type='text'
                   required
                   minLength={3}
-                  placeholder="Kooli ametlik nimi"
+                  placeholder='Kooli ametlik nimi'
                   className={inputClassName(!!errors.schoolName)}
                   value={formData.schoolName}
                   onChange={(e) => handleChange('schoolName', e.target.value)}
                   onBlur={() => handleBlur('schoolName')}
-                  autoComplete="organization"
+                  autoComplete='organization'
                   aria-invalid={errors.schoolName ? 'true' : 'false'}
                   aria-describedby={errors.schoolName ? 'schoolName-error' : undefined}
                 />
                 {errors.schoolName && (
-                  <p id="schoolName-error" className="mt-1 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
-                    <AlertCircle className="w-4 h-4" />
+                  <p
+                    id='schoolName-error'
+                    className='mt-1 text-sm text-red-600 dark:text-red-400 flex items-center gap-1'
+                  >
+                    <AlertCircle className='w-4 h-4' />
                     {errors.schoolName}
                   </p>
                 )}
@@ -309,25 +327,31 @@ export function RegistrationForm({ isOpen, onClose }: RegistrationFormProps) {
 
               {/* Contact Name */}
               <div>
-                <label htmlFor="contactName" className="block text-sm font-medium text-text-primary mb-2">
-                  Kontaktisiku nimi <span className="text-red-600 dark:text-red-400">*</span>
+                <label
+                  htmlFor='contactName'
+                  className='block text-sm font-medium text-text-primary mb-2'
+                >
+                  Kontaktisiku nimi <span className='text-red-600 dark:text-red-400'>*</span>
                 </label>
                 <input
-                  id="contactName"
-                  type="text"
+                  id='contactName'
+                  type='text'
                   required
-                  placeholder="Ees- ja perekonnanimi"
+                  placeholder='Ees- ja perekonnanimi'
                   className={inputClassName(!!errors.contactName)}
                   value={formData.contactName}
                   onChange={(e) => handleChange('contactName', e.target.value)}
                   onBlur={() => handleBlur('contactName')}
-                  autoComplete="name"
+                  autoComplete='name'
                   aria-invalid={errors.contactName ? 'true' : 'false'}
                   aria-describedby={errors.contactName ? 'contactName-error' : undefined}
                 />
                 {errors.contactName && (
-                  <p id="contactName-error" className="mt-1 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
-                    <AlertCircle className="w-4 h-4" />
+                  <p
+                    id='contactName-error'
+                    className='mt-1 text-sm text-red-600 dark:text-red-400 flex items-center gap-1'
+                  >
+                    <AlertCircle className='w-4 h-4' />
                     {errors.contactName}
                   </p>
                 )}
@@ -335,11 +359,11 @@ export function RegistrationForm({ isOpen, onClose }: RegistrationFormProps) {
 
               {/* Role */}
               <div>
-                <label htmlFor="role" className="block text-sm font-medium text-text-primary mb-2">
-                  Roll <span className="text-red-600 dark:text-red-400">*</span>
+                <label htmlFor='role' className='block text-sm font-medium text-text-primary mb-2'>
+                  Roll <span className='text-red-600 dark:text-red-400'>*</span>
                 </label>
                 <select
-                  id="role"
+                  id='role'
                   required
                   className={inputClassName(!!errors.role)}
                   value={formData.role}
@@ -348,18 +372,21 @@ export function RegistrationForm({ isOpen, onClose }: RegistrationFormProps) {
                   aria-invalid={errors.role ? 'true' : 'false'}
                   aria-describedby={errors.role ? 'role-error' : undefined}
                 >
-                  <option value="" disabled className="text-text-secondary">
+                  <option value='' disabled className='text-text-secondary'>
                     Valige oma roll
                   </option>
                   {roles.map((role) => (
-                    <option key={role} value={role} className="text-text-primary">
+                    <option key={role} value={role} className='text-text-primary'>
                       {role}
                     </option>
                   ))}
                 </select>
                 {errors.role && (
-                  <p id="role-error" className="mt-1 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
-                    <AlertCircle className="w-4 h-4" />
+                  <p
+                    id='role-error'
+                    className='mt-1 text-sm text-red-600 dark:text-red-400 flex items-center gap-1'
+                  >
+                    <AlertCircle className='w-4 h-4' />
                     {errors.role}
                   </p>
                 )}
@@ -368,14 +395,17 @@ export function RegistrationForm({ isOpen, onClose }: RegistrationFormProps) {
               {/* Other Role (conditional) */}
               {formData.role === 'Muu haridustöötaja' && (
                 <div>
-                  <label htmlFor="otherRole" className="block text-sm font-medium text-text-primary mb-2">
-                    Täpsustage roll <span className="text-red-600 dark:text-red-400">*</span>
+                  <label
+                    htmlFor='otherRole'
+                    className='block text-sm font-medium text-text-primary mb-2'
+                  >
+                    Täpsustage roll <span className='text-red-600 dark:text-red-400'>*</span>
                   </label>
                   <input
-                    id="otherRole"
-                    type="text"
+                    id='otherRole'
+                    type='text'
                     required
-                    placeholder="Teie roll koolis"
+                    placeholder='Teie roll koolis'
                     className={inputClassName(!!errors.otherRole)}
                     value={formData.otherRole}
                     onChange={(e) => handleChange('otherRole', e.target.value)}
@@ -384,8 +414,11 @@ export function RegistrationForm({ isOpen, onClose }: RegistrationFormProps) {
                     aria-describedby={errors.otherRole ? 'otherRole-error' : undefined}
                   />
                   {errors.otherRole && (
-                    <p id="otherRole-error" className="mt-1 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
-                      <AlertCircle className="w-4 h-4" />
+                    <p
+                      id='otherRole-error'
+                      className='mt-1 text-sm text-red-600 dark:text-red-400 flex items-center gap-1'
+                    >
+                      <AlertCircle className='w-4 h-4' />
                       {errors.otherRole}
                     </p>
                   )}
@@ -394,26 +427,29 @@ export function RegistrationForm({ isOpen, onClose }: RegistrationFormProps) {
 
               {/* Email */}
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-text-primary mb-2">
-                  Asutuse e-post <span className="text-red-600 dark:text-red-400">*</span>
+                <label htmlFor='email' className='block text-sm font-medium text-text-primary mb-2'>
+                  Asutuse e-post <span className='text-red-600 dark:text-red-400'>*</span>
                 </label>
                 <input
-                  id="email"
-                  type="email"
+                  id='email'
+                  type='email'
                   required
-                  placeholder="nimi@kool.ee"
+                  placeholder='nimi@kool.ee'
                   className={inputClassName(!!errors.email)}
                   value={formData.email}
                   onChange={(e) => handleChange('email', e.target.value)}
                   onBlur={() => handleBlur('email')}
-                  autoComplete="email"
-                  inputMode="email"
+                  autoComplete='email'
+                  inputMode='email'
                   aria-invalid={errors.email ? 'true' : 'false'}
                   aria-describedby={errors.email ? 'email-error' : undefined}
                 />
                 {errors.email && (
-                  <p id="email-error" className="mt-1 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
-                    <AlertCircle className="w-4 h-4" />
+                  <p
+                    id='email-error'
+                    className='mt-1 text-sm text-red-600 dark:text-red-400 flex items-center gap-1'
+                  >
+                    <AlertCircle className='w-4 h-4' />
                     {errors.email}
                   </p>
                 )}
@@ -421,26 +457,29 @@ export function RegistrationForm({ isOpen, onClose }: RegistrationFormProps) {
 
               {/* Phone */}
               <div>
-                <label htmlFor="phone" className="block text-sm font-medium text-text-primary mb-2">
-                  Telefoninumber <span className="text-red-600 dark:text-red-400">*</span>
+                <label htmlFor='phone' className='block text-sm font-medium text-text-primary mb-2'>
+                  Telefoninumber <span className='text-red-600 dark:text-red-400'>*</span>
                 </label>
                 <input
-                  id="phone"
-                  type="tel"
+                  id='phone'
+                  type='tel'
                   required
-                  placeholder="+372 5XXX XXXX"
+                  placeholder='+372 5XXX XXXX'
                   className={inputClassName(!!errors.phone)}
                   value={formData.phone}
                   onChange={(e) => handleChange('phone', e.target.value)}
                   onBlur={() => handleBlur('phone')}
-                  autoComplete="tel"
-                  inputMode="tel"
+                  autoComplete='tel'
+                  inputMode='tel'
                   aria-invalid={errors.phone ? 'true' : 'false'}
                   aria-describedby={errors.phone ? 'phone-error' : undefined}
                 />
                 {errors.phone && (
-                  <p id="phone-error" className="mt-1 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
-                    <AlertCircle className="w-4 h-4" />
+                  <p
+                    id='phone-error'
+                    className='mt-1 text-sm text-red-600 dark:text-red-400 flex items-center gap-1'
+                  >
+                    <AlertCircle className='w-4 h-4' />
                     {errors.phone}
                   </p>
                 )}
@@ -448,14 +487,18 @@ export function RegistrationForm({ isOpen, onClose }: RegistrationFormProps) {
 
               {/* Class Groups */}
               <div>
-                <label htmlFor="classGroups" className="block text-sm font-medium text-text-primary mb-2">
-                  7.-9. klassi klassirühmade arv <span className="text-red-600 dark:text-red-400">*</span>
+                <label
+                  htmlFor='classGroups'
+                  className='block text-sm font-medium text-text-primary mb-2'
+                >
+                  7.-9. klassi klassirühmade arv{' '}
+                  <span className='text-red-600 dark:text-red-400'>*</span>
                 </label>
                 <input
-                  id="classGroups"
-                  type="text"
+                  id='classGroups'
+                  type='text'
                   required
-                  placeholder="Näiteks: 4 paralleelklassi 8. klassis"
+                  placeholder='Näiteks: 4 paralleelklassi 8. klassis'
                   className={inputClassName(!!errors.classGroups)}
                   value={formData.classGroups}
                   onChange={(e) => handleChange('classGroups', e.target.value)}
@@ -464,8 +507,11 @@ export function RegistrationForm({ isOpen, onClose }: RegistrationFormProps) {
                   aria-describedby={errors.classGroups ? 'classGroups-error' : undefined}
                 />
                 {errors.classGroups && (
-                  <p id="classGroups-error" className="mt-1 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
-                    <AlertCircle className="w-4 h-4" />
+                  <p
+                    id='classGroups-error'
+                    className='mt-1 text-sm text-red-600 dark:text-red-400 flex items-center gap-1'
+                  >
+                    <AlertCircle className='w-4 h-4' />
                     {errors.classGroups}
                   </p>
                 )}
@@ -473,10 +519,13 @@ export function RegistrationForm({ isOpen, onClose }: RegistrationFormProps) {
 
               {/* Consent */}
               <div>
-                <label htmlFor="consent" className="flex items-start gap-3 text-sm text-text-secondary cursor-pointer">
+                <label
+                  htmlFor='consent'
+                  className='flex items-start gap-3 text-sm text-text-secondary cursor-pointer'
+                >
                   <input
-                    id="consent"
-                    type="checkbox"
+                    id='consent'
+                    type='checkbox'
                     required
                     checked={consent}
                     onChange={(e) => {
@@ -484,17 +533,17 @@ export function RegistrationForm({ isOpen, onClose }: RegistrationFormProps) {
                       // Clear the consent error as soon as the box is checked
                       if (e.target.checked) setErrors((prev) => ({ ...prev, consent: undefined }));
                     }}
-                    className="mt-0.5 h-5 w-5 shrink-0 rounded border-border accent-primary focus-ring-target"
+                    className='mt-0.5 h-5 w-5 shrink-0 rounded border-border accent-primary focus-ring-target'
                     aria-invalid={errors.consent ? 'true' : 'false'}
                     aria-describedby={errors.consent ? 'consent-error' : undefined}
                   />
                   <span>
                     Olen nõus, et MATx kasutab minu andmeid piloodi registreerimiseks.{' '}
                     <Link
-                      href="/privaatsus"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-primary underline hover:text-secondary transition-colors focus-ring-target rounded-sm"
+                      href='/privaatsus'
+                      target='_blank'
+                      rel='noopener noreferrer'
+                      className='text-primary underline hover:text-secondary transition-colors focus-ring-target rounded-sm'
                     >
                       Privaatsuspoliitika
                     </Link>
@@ -502,8 +551,11 @@ export function RegistrationForm({ isOpen, onClose }: RegistrationFormProps) {
                   </span>
                 </label>
                 {errors.consent && (
-                  <p id="consent-error" className="mt-1 text-sm text-red-600 flex items-center gap-1">
-                    <AlertCircle className="w-4 h-4" />
+                  <p
+                    id='consent-error'
+                    className='mt-1 text-sm text-red-600 flex items-center gap-1'
+                  >
+                    <AlertCircle className='w-4 h-4' />
                     {errors.consent}
                   </p>
                 )}
@@ -511,50 +563,55 @@ export function RegistrationForm({ isOpen, onClose }: RegistrationFormProps) {
 
               {/* Submit Button */}
               <button
-                type="submit"
-                className="w-full py-4 rounded-lg bg-primary text-text-inverse font-semibold hover:bg-primary/90 transition-colors focus-ring-target min-h-[44px] mt-2"
+                type='submit'
+                className='w-full py-4 rounded-lg bg-primary text-text-inverse font-semibold hover:bg-primary/90 transition-colors focus-ring-target min-h-[44px] mt-2'
               >
                 Esita registreering
               </button>
 
-              <p className="text-center text-xs text-text-secondary">
+              <p className='text-center text-xs text-text-secondary'>
                 Võtame ühendust 48 tunni jooksul
               </p>
             </form>
           ) : (
-            <div className="px-8 pb-8 text-center">
-              <div className="bg-secondary/10 rounded-xl p-6 mb-6 text-left">
-                <h3 className="font-semibold text-text-primary mb-3">Järgmised sammud:</h3>
-                <ol className="space-y-3 text-sm text-text-secondary">
-                  <li className="flex items-start gap-4">
-                    <span className="w-6 h-6 rounded-full bg-secondary/20 text-secondary text-sm flex items-center justify-center shrink-0">1</span>
+            <div className='px-8 pb-8 text-center'>
+              <div className='bg-secondary/10 rounded-xl p-6 mb-6 text-left'>
+                <h3 className='font-semibold text-text-primary mb-3'>Järgmised sammud:</h3>
+                <ol className='space-y-3 text-sm text-text-secondary'>
+                  <li className='flex items-start gap-4'>
+                    <span className='w-6 h-6 rounded-full bg-secondary/20 text-secondary text-sm flex items-center justify-center shrink-0'>
+                      1
+                    </span>
                     <span>Saada registreerimiskiri meilirakendusest</span>
                   </li>
-                  <li className="flex items-start gap-4">
-                    <span className="w-6 h-6 rounded-full bg-secondary/20 text-secondary text-sm flex items-center justify-center shrink-0">2</span>
+                  <li className='flex items-start gap-4'>
+                    <span className='w-6 h-6 rounded-full bg-secondary/20 text-secondary text-sm flex items-center justify-center shrink-0'>
+                      2
+                    </span>
                     <span>Vastame 48 tunni jooksul broneerimislingiga</span>
                   </li>
-                  <li className="flex items-start gap-4">
-                    <span className="w-6 h-6 rounded-full bg-secondary/20 text-secondary text-sm flex items-center justify-center shrink-0">3</span>
+                  <li className='flex items-start gap-4'>
+                    <span className='w-6 h-6 rounded-full bg-secondary/20 text-secondary text-sm flex items-center justify-center shrink-0'>
+                      3
+                    </span>
                     <span>Sügisene pilootkatsetus algus: August 2026</span>
                   </li>
                 </ol>
               </div>
 
-              <p className="text-text-secondary text-sm mb-4">
-                Küsimused?
-              </p>
+              <p className='text-text-secondary text-sm mb-4'>Küsimused?</p>
               <a
-                href="mailto:andri@matx.ee"
-                className="text-primary hover:text-secondary transition-colors text-sm focus-ring-target rounded-md"
+                href='mailto:andri@matx.ee'
+                className='text-primary hover:text-secondary transition-colors text-sm focus-ring-target rounded-md'
                 style={{ textDecoration: 'underline' }}
               >
                 andri@matx.ee
               </a>
 
               <button
+                type='button'
                 onClick={handleClearAndClose}
-                className="block w-full mt-6 py-3 rounded-lg border border-border text-text-primary hover:bg-surface transition-colors focus-ring-target min-h-[44px]"
+                className='block w-full mt-6 py-3 rounded-lg border border-border text-text-primary hover:bg-surface transition-colors focus-ring-target min-h-[44px]'
               >
                 Sulge
               </button>
@@ -564,10 +621,11 @@ export function RegistrationForm({ isOpen, onClose }: RegistrationFormProps) {
           {/* Close button */}
           <Dialog.Close asChild>
             <button
-              className="absolute top-4 right-4 w-11 h-11 rounded-lg bg-surface flex items-center justify-center hover:bg-surface/80 transition-colors focus-ring-target"
-              aria-label="Sulge"
+              type='button'
+              className='absolute top-4 right-4 w-11 h-11 rounded-lg bg-surface flex items-center justify-center hover:bg-surface/80 transition-colors focus-ring-target'
+              aria-label='Sulge'
             >
-              <X className="w-5 h-5 text-text-secondary" />
+              <X className='w-5 h-5 text-text-secondary' />
             </button>
           </Dialog.Close>
         </Dialog.Content>

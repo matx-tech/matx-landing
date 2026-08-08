@@ -17,10 +17,10 @@ export function Fraction({
     <span
       className={`inline-flex flex-col items-center leading-none ${className}`}
       aria-label={`${num}/${den}`}
-      role="img"
+      role='img'
     >
-      <span className="tabular-nums leading-tight border-b border-current pb-px">{num}</span>
-      <span className="tabular-nums leading-tight pt-px">{den}</span>
+      <span className='tabular-nums leading-tight border-b border-current pb-px'>{num}</span>
+      <span className='tabular-nums leading-tight pt-px'>{den}</span>
     </span>
   );
 }
@@ -44,24 +44,23 @@ export function InlineFractionalExpression({
   const rendered = tokens.map((token, i) => {
     const fracMatch = token.match(/^(\d+)\/(\d+)$/);
     if (fracMatch) {
-      return (
-        <Fraction key={i} num={fracMatch[1]} den={fracMatch[2]} />
-      );
+      // biome-ignore lint/suspicious/noArrayIndexKey: token position is the only stable identity (expression text can repeat tokens)
+      return <Fraction key={i} num={fracMatch[1]} den={fracMatch[2]} />;
     }
     // Preserve whitespace as spaces
     if (/^\s+$/.test(token)) {
+      // biome-ignore lint/suspicious/noArrayIndexKey: token position is the only stable identity (expression text can repeat tokens)
       return <span key={i}> </span>;
     }
     return (
-      <span key={i} className="self-center">
+      // biome-ignore lint/suspicious/noArrayIndexKey: token position is the only stable identity (expression text can repeat tokens)
+      <span key={i} className='self-center'>
         {token}
       </span>
     );
   });
 
   return (
-    <span className={`inline-flex items-center gap-px align-middle ${className}`}>
-      {rendered}
-    </span>
+    <span className={`inline-flex items-center gap-px align-middle ${className}`}>{rendered}</span>
   );
 }

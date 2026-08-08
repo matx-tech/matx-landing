@@ -35,15 +35,17 @@ export function TechnicalTOC({ items }: { items: readonly TocItem[] }) {
       { rootMargin: '-96px 0px -65% 0px', threshold: 0 },
     );
 
-    sections.forEach((section) => observer.observe(section));
+    sections.forEach((section) => {
+      observer.observe(section);
+    });
     return () => observer.disconnect();
   }, [items]);
 
   return (
-    <nav aria-label="Sisukord" className="hidden xl:block w-60 shrink-0">
-      <div className="sticky top-24">
-        <h2 className="text-sm font-semibold text-text-primary mb-3">Selles lehes</h2>
-        <ul className="space-y-1 border-l border-border">
+    <nav aria-label='Sisukord' className='hidden xl:block w-60 shrink-0'>
+      <div className='sticky top-24'>
+        <h2 className='text-sm font-semibold text-text-primary mb-3'>Selles lehes</h2>
+        <ul className='space-y-1 border-l border-border'>
           {items.map(({ id, label }) => (
             <li key={id}>
               <a
