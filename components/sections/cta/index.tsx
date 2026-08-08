@@ -119,13 +119,8 @@ export function CTASection() {
         },
         {
           element: statsRef.current[1],
-          target: statsRef.current[1]?.textContent ?? '85%',
-          chars: '0123456789%',
-        },
-        {
-          element: statsRef.current[2],
-          target: statsRef.current[2]?.textContent ?? '2.3×',
-          chars: '0123456789.×',
+          target: statsRef.current[1]?.textContent ?? '10',
+          chars: '0123456789',
         },
       ];
 
@@ -307,6 +302,7 @@ export function CTASection() {
               className='block w-full px-6 py-3 text-base rounded-xl bg-secondary text-text-inverse font-semibold hover:bg-secondary/90 transition-all focus-ring-target min-h-[44px]'
             >
               Broneeri 15-min vestlus
+              <span className='sr-only'> (avaneb uues aknas)</span>
             </a>
             <div className='mt-4 flex justify-center gap-4 text-xs text-text-secondary'>
               <span>Video kõne</span>
@@ -327,9 +323,8 @@ export function CTASection() {
             <path id='ctaPath' d='M 100 15 Q 300 5 500 15' fill='none' stroke='none' />
             <text fontSize='12' fill='var(--color-text-secondary)'>
               <textPath href='#ctaPath'>
-                Alusta tasuta · Õpi mõistvalt · Säästa aega · 150+ ülesannet · BKT mootor · EU AI
-                Act · Alusta tasuta · Õpi mõistvalt · Säästa aega · 150+ ülesannet · BKT mootor · EU
-                AI Act ·
+                Alusta tasuta · Õpi mõistvalt · Säästa aega · 150+ ülesannet · Alusta tasuta · Õpi
+                mõistvalt · Säästa aega · 150+ ülesannet ·
               </textPath>
             </text>
             <circle
@@ -354,7 +349,7 @@ export function CTASection() {
             >
               150+
             </div>
-            <div className='text-text-secondary text-sm'>ülesannet</div>
+            <div className='text-text-secondary text-sm'>ülesannet (Saadaval)</div>
           </div>
           <div className='text-center'>
             <div
@@ -363,20 +358,9 @@ export function CTASection() {
               }}
               className='text-3xl md:text-4xl font-display font-bold text-secondary'
             >
-              85%
+              10
             </div>
-            <div className='text-text-secondary text-sm'>mastery rate</div>
-          </div>
-          <div className='text-center'>
-            <div
-              ref={(el) => {
-                statsRef.current[2] = el;
-              }}
-              className='text-3xl md:text-4xl font-display font-bold text-accent'
-            >
-              2.3×
-            </div>
-            <div className='text-text-secondary text-sm'>kiirem progress</div>
+            <div className='text-text-secondary text-sm'>kooli (Piloodis)</div>
           </div>
         </div>
 
