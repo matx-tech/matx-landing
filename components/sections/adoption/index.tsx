@@ -123,7 +123,7 @@ export function AdoptionSection() {
             return (
               <div
                 key={route.audience}
-                className='adoption-card bg-card rounded-xl p-6 shadow-sm border border-border hover:shadow-md transition-shadow'
+                className='adoption-card bg-card rounded-xl p-6 shadow-sm border border-border hover:shadow-md transition-shadow flex flex-col h-full'
               >
                 {/* Icon */}
                 <div className='w-12 h-12 rounded-lg bg-primary/10 text-primary flex items-center justify-center mb-4'>
@@ -139,13 +139,15 @@ export function AdoptionSection() {
                 <h3 className='text-xl font-semibold text-text-primary mb-3'>{route.title}</h3>
 
                 {/* Description */}
-                <p className='text-sm text-text-secondary mb-6'>{route.description}</p>
+                <p className='text-sm text-text-secondary mb-6 hyphens-manual'>
+                  {route.description}
+                </p>
 
-                {/* CTA */}
+                {/* CTA — mt-auto pins all buttons to the card bottom */}
                 <button
                   type='button'
                   onClick={() => handleCTAClick(route.ctaAction)}
-                  className='w-full px-4 py-2.5 text-sm font-medium rounded-lg bg-primary text-text-inverse hover:bg-primary/90 transition-colors focus-ring-target min-h-[44px]'
+                  className='w-full px-4 py-2.5 text-sm font-medium rounded-lg bg-primary text-text-inverse hover:bg-primary/90 transition-colors focus-ring-target min-h-[44px] mt-auto'
                   aria-label={`${route.cta} - ${route.audience}`}
                 >
                   {route.cta}

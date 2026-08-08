@@ -239,9 +239,8 @@ export const ADOPTION_ROUTES = [
     title: 'Hankeinfo',
     // Enne avalikustamist kontrolli piirmäärad ja tingimused hankepartneriga —
     // RHS muudatused jõustuvad 01.11.2026.
-    description:
-      'Alla 30 000 € ostud (alates 01.11.2026 alla 50 000 €) jäävad riigihangete seaduse kohaldamisalast välja ja on tehtavad hankekorra järgi; 30 000–59 999 € ostud (alates 01.11.2026 50 000–139 999 € riigiasutustel ja 50 000–215 999 € omavalitsustel) kuuluvad lihthankesse. Hinnakiri (õpilasepõhine aastahind), lepingutingimused ja tehnilised nõuded on koostamisel ja avaldatakse siin.',
-    cta: 'Vaata alustamise võimalusi',
+    description: 'Riigihangete seaduse piirmäärad ja hinnakiri ühel lehel.',
+    cta: 'Vaata hankeinfot',
     ctaAction: 'procurement',
     ctaRoute: TECH_OVERVIEW.href,
   },
@@ -251,7 +250,7 @@ export const ADOPTION_ROUTES = [
     title: 'Tehniline ülevaade',
     description:
       'Arhitektuur, turvameetmed ja vastavusstaatus ühel lehel: identiteet ja sessioonid, pseudonüümimine, integratsioonid ja hankeinfo.',
-    cta: 'Vaata tehnilist ülevaadet',
+    cta: 'Vaata ülevaadet',
     ctaAction: 'technical',
     ctaRoute: TECH_OVERVIEW.href,
   },
