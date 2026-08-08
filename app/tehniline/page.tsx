@@ -193,7 +193,7 @@ const SECURITY_CONTROLS: StatusRow[] = [
 const COMPLIANCE_ROWS: StatusRow[] = [
   {
     title: 'EU AI Act (2024/1689)',
-    detail: 'Kohanduv õpimootor (BKT) on hinnatud Annex III §3 haridusvaldkonna riskiklassi; Art. 6(3)(c) enesehindamine on otsustamisel. Õpetaja inimese-kontroll säilib.',
+    detail: 'Kohanduv õpimootor (BKT) on hinnatud Annex III punkti 3 haridusvaldkonna riskiklassi; Art. 6(3)(c) enesehindamine on otsustamisel. Õpetaja inimese-kontroll säilib.',
     status: 'Piloodis',
     note: 'FRIA ja ulatuse otsused on testimisel; allkirjastamine ja Art. 49 registreerimine on kavandatud.',
   },
@@ -205,7 +205,7 @@ const COMPLIANCE_ROWS: StatusRow[] = [
   },
   {
     title: 'GDPR (2016/679)',
-    detail: 'Kohaldub. Vastutav töötleja on kool/omavalitsus, volitatud töötleja MATx. Art. 8 alaealiste erikaitse (Eestis vanusepiir 13+, vanema nõusolek) kehtib juhul, kui õiguslikuks aluseks on nõusolek (art 6 lg 1 p a) infoühiskonna teenuse puhul, mida pakutakse otse lapsele.',
+    detail: 'Kohaldub. Rollid sõltuvad töötlustegevusest ja fikseeritakse andmetöötluslepingus: kool/omavalitsus on vastutav töötleja, MATx volitatud töötleja juhiste alusel töötlemisel. Art. 8 alaealiste erikaitse (Eestis vanusepiir 13+, vanema nõusolek) kehtib juhul, kui õiguslikuks aluseks on nõusolek (art 6 lg 1 p a) infoühiskonna teenuse puhul, mida pakutakse otse lapsele.',
     status: 'Kavandatud',
     note: 'Alaealiste andmete kaitse on pilootfaasi põhirõhk; täismahus vastavus sihtseisus.',
   },
@@ -319,7 +319,7 @@ const PRICE_BENCHMARKS: {
 const CONTRACT_NORMS = [
   {
     title: 'Kestus',
-    detail: 'RHS ei piira lepingu kestust — lepinguvabadus. Tarkvaralitsentside lepingud on Eesti praktikas tavaliselt 12–36 kuud; raamlepingud kuni 4 aastat (direktiiv 2014/24/EL art 33).',
+    detail: 'RHS ei piira tavalise hankelepingu kestust — lepinguvabadus. Tarkvaralitsentside lepingud on Eesti praktikas tavaliselt 12–36 kuud; raamlepingud üldjuhul kuni 4 aastat (RHS § 29 lg 2; direktiiv 2014/24/EL art 33), pikem tähtaeg vajab põhjendust.',
   },
   {
     title: 'Maksetähtaeg',
@@ -350,11 +350,11 @@ const TENDER_TECH_REQUIREMENTS = [
   },
   {
     title: 'Identiteet ja integratsioonid',
-    detail: 'HarID/TAAT OIDC, EHIS, eKool/Stuudium — staatused integratsioonide tabelis.',
+    detail: 'HarID/TAAT OIDC ja EHIS — staatused integratsioonide tabelis.',
   },
   {
     title: 'AI-komponent',
-    detail: 'Kohanduv õpimootor (BKT) — EU AI Act 2024/1689 III lisa § 3 hõlmab kindlaksmääratud hariduslikke kasutusjuhte; Art 6(3) erand võib välistada kõrge riski klassi, kui otsuseid oluliselt ei mõjutata ega profileerita; enesehindamine pooleli, õpetaja kontroll säilib — staatus vastavuse tabelis.',
+    detail: 'Kohanduv õpimootor (BKT) — EU AI Act 2024/1689 III lisa punkt 3 hõlmab kindlaksmääratud hariduslikke kasutusjuhte; Art 6(3) erand võib välistada kõrge riski klassi, kui süsteem ei kujuta olulist riski, otsuseid oluliselt ei mõjutata ja vähemalt üks punktides a–d toodud tingimus on täidetud; profileerimise korral erand ei kohaldu; enesehindamine pooleli, õpetaja kontroll säilib — staatus vastavuse tabelis.',
   },
   {
     title: 'Turve',
@@ -373,7 +373,7 @@ const HANKE_SOURCES: { title: string; detail: string }[] = [
   {
     title: 'Hinnaklassid',
     detail:
-      'Riigihangete registri avaandmed (lepinguteated, 2026. a I poolaasta; mediaanid ja keskmised arvutatud maksumusega teadetest). Ühe kooli alla 30 000 € ostud ei kajastu registris.',
+      'Riigihangete registri avaandmed (lepinguteated, 2026. a veebruar–juuli; mediaanid ja keskmised arvutatud maksumusega teadetest). Ühe kooli alla 30 000 € ostud ei kajastu registris.',
   },
   {
     title: 'Õpikeskkonna hinnaankur',
@@ -749,8 +749,8 @@ export default function TechnicalOverviewPage() {
             <p className="text-sm text-text-secondary leading-relaxed">
               MATx on pilootfaasis. Osa allpool kirjeldatud turvameetmetest on veel
               väljatöötamisel ja testimisel. „Kavandatud&ldquo; tähendab sihtseisu,
-              mitte lubadust, et meede on täna kasutuses. Kõik kavandatud meetmed
-              viiakse kasutusse enne piloodi laiendamist.
+              mitte lubadust, et meede on täna kasutuses. Piloodi laiendamine
+              eeldab kõigi kavandatud meetmete kasutuselevõttu.
             </p>
           </div>
         </section>
@@ -783,7 +783,7 @@ export default function TechnicalOverviewPage() {
           <SectionHeading
             id="vastavus"
             title="Vastavus"
-            lead="NIS2 ja DORA ei ole haridussektorile kohalduvad nõuded — seda öeldakse välja, mitte ei väideta vastavust. GDPR kohaldub: vastutav töötleja on kool, volitatud töötleja MATx."
+            lead="NIS2 ja DORA ei ole haridussektorile kohalduvad nõuded — seda öeldakse välja, mitte ei väideta vastavust. GDPR kohaldub: rollid sõltuvad töötlustegevusest ja fikseeritakse andmetöötluslepingus."
           />
           <StatusFilterSection rows={COMPLIANCE_ROWS} plannedLabel="Kavandatud vastavustegevused" />
         </section>
