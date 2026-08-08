@@ -24,8 +24,17 @@ export const PROHIBITED_PHRASES = [
 // Shared UI labels
 export const SCROLL_INDICATOR_LABEL = 'Keri alla' as const;
 
+// Registration dialog chunk-fallback overlay
+export const REGISTRATION_COPY = {
+  error: 'Registreerimisvormi laadimine ebaõnnestus.',
+  retry: 'Proovi uuesti',
+  close: 'Sulge',
+  loading: 'Laadime registreerimisvormi…',
+  cancel: 'Tühista',
+} as const;
+
 // Shared URLs
-export const CALENDLY_URL = 'https://calendly.com/matx-demo' as const;
+export const CALENDLY_URL = 'https://calendly.com/matx-ee/15min' as const;
 
 // Site metadata — single source for OG/Twitter/JSON-LD
 export const SITE_META = {
@@ -134,9 +143,6 @@ export const TOPICS_SECTION = {
   description: 'Praegune õppesisu katab valitud põhikooli matemaatika oskusi. Uued teemad lisatakse piloodi käigus.',
 } as const;
 
-// Icon identifiers for context cards
-type ContextIconId = 'trending-down' | 'clock' | 'minus';
-
 // National context cards
 export const NATIONAL_CONTEXT = [
   {
@@ -161,9 +167,6 @@ export const NATIONAL_CONTEXT = [
     icon: 'minus' as const,
   },
 ] as const;
-
-// Icon identifiers for trust pillars
-type TrustIconId = 'shield' | 'eye' | 'file-text';
 
 // Trust pillars
 export const TRUST_PILLARS = [
@@ -211,18 +214,18 @@ export const ADOPTION_ROUTES = [
     audience: 'Hankele',
     audienceId: 'procurement' as const,
     title: 'Hankeinfo',
-    description: 'Hinnakiri, lepingutingimused ja tehnilised nõuded on saadaval peatselt. Vahepeal tutvu alustamise võimalustega.',
-    cta: 'Vaata alustamise võimalusi',
-    ctaAction: 'procurement',
+    description: 'Hinnakiri, lepingutingimused ja tehnilised nõuded on saadaval peatselt. Broneeri vestlus, et arutada hankeprotsessi ja ajakava.',
+    cta: 'Broneeri demokõne',
+    ctaAction: 'calendly',
     ctaRoute: null as string | null,
   },
   {
     audience: 'IT-le',
     audienceId: 'it' as const,
     title: 'Tehniline ülevaade',
-    description: 'Arhitektuuri, turvalisuse ja integratsiooni detailid on peatselt saadaval. Vahepeal tutvu alustamise võimalustega.',
-    cta: 'Vaata alustamise võimalusi',
-    ctaAction: 'technical',
+    description: 'Arhitektuuri, turvalisuse ja integratsiooni detailid on peatselt saadaval. Broneeri vestlus tehniliste nõuete arutamiseks.',
+    cta: 'Broneeri demokõne',
+    ctaAction: 'calendly',
     ctaRoute: null as string | null,
   },
 ] as const;
@@ -281,6 +284,7 @@ export const NAV_LABELS = {
 // Section IDs for navigation
 export const SECTION_IDS = {
   hero: 'hero',
+  problem: 'probleem',
   workflow: 'töövoog',
   student: 'õpilasele',
   teacher: 'õpetajale',

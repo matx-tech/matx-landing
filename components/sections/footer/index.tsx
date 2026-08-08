@@ -1,13 +1,21 @@
 'use client';
 
 import { useRef, useEffect } from 'react';
+import Link from 'next/link';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Award, GraduationCap, Mail, MessageCircle, Building2, GitBranch } from 'lucide-react';
 import { usePrefersReducedMotion } from '@/lib/hooks/use-prefers-reduced-motion';
 import { motionTokens, gsapEase, staggers } from '@/lib/motion-tokens';
-import { SECTION_IDS } from '@/lib/content/landing-copy';
+import { SECTION_IDS, CALENDLY_URL } from '@/lib/content/landing-copy';
 
+if (typeof window !== 'undefined') {
+  gsap.registerPlugin(ScrollTrigger);
+}
+
+/**
+ * Renders the MATx landing page footer with branding, navigation, contact links, legal links, and responsive entrance animations.
+ */
 export function FooterSection() {
   const footerRef = useRef<HTMLElement>(null);
   const sectionsRef = useRef<(HTMLDivElement | null)[]>([]);
@@ -78,7 +86,7 @@ export function FooterSection() {
           {
             scaleX: 1,
             duration: motionTokens.duration.crawl,
-            ease: 'none',
+            ease: gsapEase(motionTokens.easing.linear),
             scrollTrigger: {
               trigger: footerRef.current,
               start: 'top 90%',
@@ -128,7 +136,7 @@ export function FooterSection() {
             <h3 className="text-text-primary font-display font-semibold mb-4 text-sm">Navigatsioon</h3>
             <ul className="space-y-2">
               <li>
-                <a href="#probleem" className="text-text-secondary hover:text-primary transition-colors text-sm focus-ring-target rounded-md" style={{ textDecoration: 'underline' }}>
+                <a href={`#${SECTION_IDS.problem}`} className="text-text-secondary hover:text-primary transition-colors text-sm focus-ring-target rounded-md" style={{ textDecoration: 'underline' }}>
                   Probleem
                 </a>
               </li>
@@ -175,7 +183,7 @@ export function FooterSection() {
               </li>
               <li>
                 <a
-                  href="https://calendly.com/matx-ee/15min"
+                  href={CALENDLY_URL}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-text-secondary hover:text-secondary transition-colors text-sm focus-ring-target rounded-md"
@@ -232,15 +240,15 @@ export function FooterSection() {
             © 2026 MATx. Kõik õigused kaitstud. Targa Tuleviku Fondi toetatud.
           </p>
           <div className="flex items-center gap-4 text-xs text-text-secondary">
-            <a href="#" className="hover:text-primary transition-colors focus-ring-target rounded-md" style={{ textDecoration: 'underline' }}>
+            <Link href="/privaatsus" className="hover:text-primary transition-colors focus-ring-target rounded-md" style={{ textDecoration: 'underline' }}>
               Privaatsuspoliitika
-            </a>
-            <a href="#" className="hover:text-primary transition-colors focus-ring-target rounded-md" style={{ textDecoration: 'underline' }}>
+            </Link>
+            <Link href="/tingimused" className="hover:text-primary transition-colors focus-ring-target rounded-md" style={{ textDecoration: 'underline' }}>
               Teenuse tingimused
-            </a>
-            <a href="#" className="hover:text-primary transition-colors focus-ring-target rounded-md" style={{ textDecoration: 'underline' }}>
+            </Link>
+            <Link href="/gdpr" className="hover:text-primary transition-colors focus-ring-target rounded-md" style={{ textDecoration: 'underline' }}>
               GDPR
-            </a>
+            </Link>
           </div>
         </div>
 

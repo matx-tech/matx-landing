@@ -30,6 +30,8 @@ export const motionTokens = {
     accelerate: [0.4, 0, 1, 1] as [number, number, number, number],
     /** Standard ease-out — generic section reveals (teacher, student, adoption, context). */
     smooth:     [0.22, 1, 0.36, 1] as [number, number, number, number],
+    /** Linear — scrubbed/continuous motion (marquee, motion-path, gradient lines). */
+    linear:     [0, 0, 1, 1] as [number, number, number, number],
     /** Bounce — playful moments (empty states, hover pop). */
     bounce:     [0.34, 1.56, 0.64, 1] as [number, number, number, number],
   } as const,

@@ -6,23 +6,30 @@ import { SITE_META } from '@/lib/content/landing-copy';
 
 const publicSans = Public_Sans({
   subsets: ['latin'],
-  variable: '--font-display',
+  variable: '--font-public-sans',
   display: 'swap',
-  weight: ['400', '500', '600', '700'],
+  // Only weights actually used: every font-display element is font-bold or font-semibold.
+  weight: ['600', '700'],
 });
 
 const inter = Inter({
   subsets: ['latin'],
-  variable: '--font-inter',
-  display: 'swap',
+  variable: '--font-inter-next',
+  // optional + preload:false — body text paints in the system fallback
+  // immediately; if Inter misses the optional window it is never swapped in,
+  // eliminating the late font-swap flash/CLS on slow devices. The hero display
+  // font (Public Sans) is preloaded separately and keeps `swap`.
+  display: 'optional',
+  preload: false,
   weight: ['400', '500', '600'],
 });
 
 const ibmPlexMono = IBM_Plex_Mono({
   subsets: ['latin'],
-  variable: '--font-ibm-mono',
+  variable: '--font-ibm-plex-mono',
   display: 'swap',
-  weight: ['400', '500'],
+  // All 10 font-mono usages are default-weight.
+  weight: ['400'],
 });
 
 export const metadata: Metadata = {
@@ -65,10 +72,16 @@ export const metadata: Metadata = {
   },
 };
 
+/**
+ * Defines the root document structure and wraps page content with the site's scrolling provider.
+ *
+ * @returns The root HTML document containing page content and MATx metadata.
+ */
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="et" className={`${publicSans.variable} ${inter.variable} ${ibmPlexMono.variable}`}>
       <head>
+        {/* Structural data for search engines */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{

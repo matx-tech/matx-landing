@@ -1,11 +1,133 @@
-# To get started with Dependabot version updates, you'll need to specify which
-# package ecosystems to update and where the package manifests are located.
-# Please see the documentation for all configuration options:
-# https://docs.github.com/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
-
 version: 2
 updates:
-  - package-ecosystem: "" # See documentation for possible values
-    directory: "/" # Location of package manifests
+  # ── npm / pnpm ──────────────────────────────────────────────────────────
+  - package-ecosystem: npm
+    directory: /
     schedule:
-      interval: "daily"
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: Europe/Tallinn
+    versioning-strategy: increase
+    open-pull-requests-limit: 5
+    target-branch: main
+    labels:
+      - dependencies
+      - javascript
+    reviewers:
+      - tomkabel
+    assignees:
+      - tomkabel
+    commit-message:
+      prefix: deps
+      prefix-development: "deps(dev)"
+      include: scope
+    rebase-strategy: auto
+    # Install scripts intentionally NOT allowed (default `deny`): a
+    # compromised dependency could otherwise run arbitrary code with
+    # Dependabot's token scope during automated updates. None of our
+    # dependencies require lifecycle scripts — sharp ≥0.33 ships prebuilt
+    # binaries via optionalDependencies (no postinstall; verified 0.35.3),
+    # and the rest are pure JS. If an update ever fails for a missing
+    # install script, pin that package and review the script explicitly.
+
+    # ── Groups ────────────────────────────────────────────────────────────
+
+    groups:
+      # Radix UI primitives — released in lockstep; single PR avoids skew.
+      radix:
+        patterns:
+          - "@radix-ui/*"
+
+      # Next.js + React + their type stubs / lint config / bundle analyzer —
+      # version-coupled (eslint-config-next and @next/bundle-analyzer track
+      # Next releases); single PR avoids skew between framework and tooling.
+      framework:
+        patterns:
+          - "next"
+          - "react"
+          - "react-dom"
+          - "@types/react"
+          - "@types/react-dom"
+          - "eslint-config-next"
+          - "@next/bundle-analyzer"
+
+      # GSAP core + React hook — hook pins a peer range on gsap.
+      gsap:
+        patterns:
+          - "gsap"
+          - "@gsap/*"
+
+      # Tailwind CSS + PostCSS pipeline — config / plugin compatibility.
+      tailwind:
+        patterns:
+          - "tailwindcss"
+          - "postcss"
+          - "tailwind-merge"
+
+      # ESLint core + TypeScript parser/plugin — parser / plugin compatibility.
+      eslint:
+        patterns:
+          - "eslint"
+          - "@typescript-eslint/*"
+
+      # Sharp is a native module; review carefully because prebuilt
+      # binaries must match the deployment platform (Linux x64).
+      sharp:
+        patterns:
+          - "sharp"
+
+      # ThumbHash — tiny pure-JS lib; safe to auto-merge on green CI.
+      thumbhash:
+        patterns:
+          - "thumbhash"
+
+      # Dev tooling that rarely breaks but groups well in one PR.
+      dev-tools:
+        patterns:
+          - "typescript"
+          - "npm-check-updates"
+          - "@types/node"
+
+      # Production catch-all for uncategorised runtime deps (lucide-react,
+      # lenis, clsx, class-variance-authority).
+      production:
+        dependency-type: production
+        patterns:
+          - "*"
+        exclude-patterns:
+          - "next"
+          - "react"
+          - "react-dom"
+          - "gsap"
+          - "@gsap/*"
+          - "@radix-ui/*"
+          - "tailwindcss"
+          - "postcss"
+          - "autoprefixer"
+          - "tailwind-merge"
+          - "tailwindcss-animate"
+          - "thumbhash"
+          - "sharp"
+          - "eslint"
+          - "eslint-config-next"
+          - "@typescript-eslint/*"
+
+  # ── GitHub Actions ──────────────────────────────────────────────────────
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: Europe/Tallinn
+    target-branch: main
+    labels:
+      - dependencies
+      - ci
+    reviewers:
+      - tomkabel
+    commit-message:
+      prefix: "ci(deps)"
+      include: scope
+    rebase-strategy: auto

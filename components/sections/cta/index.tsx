@@ -3,19 +3,41 @@
 import { useRef, useEffect } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { ScrambleTextPlugin } from 'gsap/ScrambleTextPlugin';
 import { GraduationCap, Users } from 'lucide-react';
+import { CALENDLY_URL } from '@/lib/content/landing-copy';
 import { usePrefersReducedMotion } from '@/lib/hooks/use-prefers-reduced-motion';
+import { useRegistration } from '@/components/providers/registration-provider';
 import { motionTokens, gsapEase, staggers } from '@/lib/motion-tokens';
 
 if (typeof window !== 'undefined') {
-  gsap.registerPlugin(ScrollTrigger);
+  gsap.registerPlugin(ScrollTrigger, ScrambleTextPlugin);
 }
 
-interface CTASectionProps {
-  onOpenRegistration: () => void;
+// MotionPathPlugin (~12KB) is only used by the decorative dot — keep it in its
+// own on-demand chunk, fetched only when the section effect actually needs it.
+// The promise is cached across mounts/effect re-runs; on failure it's dropped
+// so a later mount can retry (callers attach their own rejection handler).
+let motionPathPluginPromise: Promise<typeof import('gsap/MotionPathPlugin')> | null = null;
+/**
+ * Loads the GSAP MotionPathPlugin and reuses the pending or resolved load.
+ *
+ * @returns The loaded MotionPathPlugin module
+ */
+function loadMotionPathPlugin(): Promise<typeof import('gsap/MotionPathPlugin')> {
+  if (!motionPathPluginPromise) {
+    motionPathPluginPromise = import('gsap/MotionPathPlugin').catch((error) => {
+      motionPathPluginPromise = null;
+      throw error;
+    });
+  }
+  return motionPathPluginPromise;
 }
 
-export function CTASection({ onOpenRegistration }: CTASectionProps) {
+/**
+ * Renders a call-to-action section for school registration and teacher consultations.
+ */
+export function CTASection() {
   const sectionRef = useRef<HTMLElement>(null);
   const titleRef = useRef<HTMLDivElement>(null);
   const statsRef = useRef<(HTMLDivElement | null)[]>([]);
@@ -23,6 +45,7 @@ export function CTASection({ onOpenRegistration }: CTASectionProps) {
   const marqueeRef = useRef<HTMLDivElement>(null);
   const motionDotRef = useRef<SVGCircleElement>(null);
   const prefersReducedMotion = usePrefersReducedMotion();
+  const { openRegistration } = useRegistration();
 
   useEffect(() => {
     if (!sectionRef.current || !titleRef.current) return;
@@ -37,6 +60,9 @@ export function CTASection({ onOpenRegistration }: CTASectionProps) {
       }
       return;
     }
+
+    let cancelled = false;
+    let motionTween: ReturnType<typeof gsap.to> | null = null;
 
     const ctx = gsap.context(() => {
       gsap.set(lines, { y: motionTokens.distance.xxl, opacity: 0 });
@@ -153,27 +179,40 @@ export function CTASection({ onOpenRegistration }: CTASectionProps) {
         });
       }
 
-      // MotionPath: decorative dot follows the SVG text curve on scroll
+      // MotionPath: decorative dot follows the SVG text curve on scroll.
       if (motionDotRef.current && document.querySelector('#ctaPath')) {
-        gsap.to(motionDotRef.current, {
-          motionPath: {
-            path: '#ctaPath',
-            align: '#ctaPath',
-            alignOrigin: [0.5, 0.5],
-          },
-          duration: motionTokens.duration.crawl,
-          ease: 'none',
-          scrollTrigger: {
-            trigger: marqueeRef.current,
-            start: 'top 80%',
-            end: 'bottom 20%',
-            scrub: 1,
-          },
-        });
+        void loadMotionPathPlugin().then(({ MotionPathPlugin }) => {
+          if (cancelled) return;
+          gsap.registerPlugin(MotionPathPlugin);
+          motionTween = gsap.to(motionDotRef.current, {
+            motionPath: {
+              path: '#ctaPath',
+              align: '#ctaPath',
+              alignOrigin: [0.5, 0.5],
+            },
+            duration: motionTokens.duration.crawl,
+            ease: gsapEase(motionTokens.easing.linear),
+            scrollTrigger: {
+              trigger: marqueeRef.current,
+              start: 'top 80%',
+              end: 'bottom 20%',
+              scrub: 1,
+            },
+          });
+        })
+        // Decorative dot — fail silently if the on-demand chunk can't load.
+        .catch(() => {});
       }
     }, sectionRef);
 
-    return () => ctx.revert();
+    return () => {
+      cancelled = true;
+      // Kill the scrub ScrollTrigger before the tween — the trigger can
+      // outlive the tween and keep a dead scrub attached to the marquee.
+      motionTween?.scrollTrigger?.kill();
+      motionTween?.kill();
+      ctx.revert();
+    };
   }, [prefersReducedMotion]);
 
   return (
@@ -214,7 +253,8 @@ export function CTASection({ onOpenRegistration }: CTASectionProps) {
               Liitu 10 pilootkooliga. Sügisesed klassid 7.-9. klassini.
             </p>
             <button
-              onClick={onOpenRegistration}
+              type="button"
+              onClick={openRegistration}
               className="w-full px-6 py-3 text-base rounded-xl bg-primary text-text-inverse font-semibold hover:bg-primary/90 transition-all focus-ring-target min-h-[44px]"
             >
               Registreeri kool
@@ -239,7 +279,7 @@ export function CTASection({ onOpenRegistration }: CTASectionProps) {
               Demostreerime platvormi ja vastame küsimustele.
             </p>
             <a
-              href="https://calendly.com/matx-ee/15min"
+              href={CALENDLY_URL}
               target="_blank"
               rel="noopener noreferrer"
               className="block w-full px-6 py-3 text-base rounded-xl bg-secondary text-text-inverse font-semibold hover:bg-secondary/90 transition-all focus-ring-target min-h-[44px]"

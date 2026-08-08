@@ -7,6 +7,9 @@
 
 # testing
 /coverage
+/test-results/
+/playwright-report/
+/blob-report/
 
 # next.js
 /.next/
@@ -37,6 +40,19 @@ yarn-error.log*
 # test artifacts
 /test-results/
 
+# lighthouse audit reports
+/.audits/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+# Added by code-review-graph
+.code-review-graph/
+
+# local agent tooling
+.claude/
+.serena/
+.mcp.json
+
+# review scratch dumps
+gh-pr-comments.md
