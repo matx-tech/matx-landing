@@ -245,14 +245,17 @@ export async function POST(request: Request) {
     return Response.json({ error: 'Too many requests, try again later' }, { status: 429 });
   }
 
+  // Escape user input for mrkdwn in the plain-text fallback too: Slack parses
+  // the `text` property as mrkdwn, so a raw value like `https://evil.example`
+  // would render as a clickable link here if left unescaped.
   const lines = [
     'Uus piloodi registreerimine',
-    `Kool: ${schoolName}`,
-    `Kontaktisik: ${contactName}`,
-    `Roll: ${role}`,
-    `E-post: ${email}`,
-    `Telefon: ${phone}`,
-    `Klassirühmad: ${classGroups}`,
+    `Kool: ${escapeMrkdwn(schoolName)}`,
+    `Kontaktisik: ${escapeMrkdwn(contactName)}`,
+    `Roll: ${escapeMrkdwn(role)}`,
+    `E-post: ${escapeMrkdwn(email)}`,
+    `Telefon: ${escapeMrkdwn(phone)}`,
+    `Klassirühmad: ${escapeMrkdwn(classGroups)}`,
   ].join('\n');
 
   const payload = {
