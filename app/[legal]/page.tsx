@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { LegalDocument } from '@/components/legal/legal-document';
+import { ClauseList, LegalDocument } from '@/components/legal/legal-document';
 import { SITE_META } from '@/lib/content/landing-copy';
 import { SecurityMeasuresSection, SubprocessorTable } from '@/lib/content/legal-content';
 
@@ -36,7 +36,37 @@ const LEGAL_DOCS = {
       },
       {
         heading: '7. Andmesubjekti õigused',
-        body: 'Teil on õigus: (a) juurdepääs — saada koopia oma isikuandmetest (artikkel 15); (b) parandamine — parandada ebatäpseid andmeid (artikkel 16); (c) kustutamine — nõuda andmete kustutamist ("õigus olla unustatud", artikkel 17); (d) töötlemise piirang — peatada töötlemine teatud juhtudel (artikkel 18); (e) andmete ülekantavus — saada andmed struktureeritud, masinloetavas vormingus (artikkel 20); (f) vastuväide — esitada vastuväide töötlemisele õigustatud huvi alusel (artikkel 21); (g) nõusoleku tagasivõtmine — kui töötlemine põhineb nõusolekul (artikkel 7(3)). Õiguste kasutamiseks kirjutage andri@matx.ee. Vastame 30 päeva jooksul.',
+        body: (
+          <>
+            <p>Teil on õigus:</p>
+            <ClauseList
+              items={[
+                ['a', 'juurdepääs — saada koopia oma isikuandmetest (artikkel 15)'],
+                ['b', 'parandamine — parandada ebatäpseid andmeid (artikkel 16)'],
+                [
+                  'c',
+                  'kustutamine — nõuda andmete kustutamist ("õigus olla unustatud", artikkel 17)',
+                ],
+                ['d', 'töötlemise piirang — peatada töötlemine teatud juhtudel (artikkel 18)'],
+                [
+                  'e',
+                  'andmete ülekantavus — saada andmed struktureeritud, masinloetavas vormingus (artikkel 20)',
+                ],
+                [
+                  'f',
+                  'vastuväide — esitada vastuväide töötlemisele õigustatud huvi alusel (artikkel 21)',
+                ],
+                [
+                  'g',
+                  'nõusoleku tagasivõtmine — kui töötlemine põhineb nõusolekul (artikkel 7(3)).',
+                ],
+              ]}
+            />
+            <p className='mt-4'>
+              Õiguste kasutamiseks kirjutage andri@matx.ee. Vastame 30 päeva jooksul.
+            </p>
+          </>
+        ),
       },
       {
         heading: '8. Automaatne otsustamine ja profileerimine',
@@ -44,7 +74,23 @@ const LEGAL_DOCS = {
       },
       {
         heading: '9. Küpsised (cookies) ja jälgimistehnoloogiad',
-        body: 'Matx.ee kasutab: (a) hädavajalikud küpsised — teema eelistus (tume/hele), vormi täitmise salvestamine brauseri localStorage-s (õiguslik alus: legitiimne huvi, GDPR artikkel 6(1)(f)). Salvestatud andmed: teema valik (matx-theme), registreerimisvormi mustand (matx-registration-draft). Andmed ei lahku brauserist ega ole serveri poolel kättesaadavad. Säilib ka pärast brauseri sulgemist kuni manuaalse kustutamiseni. Puhastamiseks: brauseri seaded → localStorage kustutamine või vormi "Sulge" nupp (kustutab registreerimismustand). (b) Kolmanda osapoole jälgimist (Google Analytics, Facebook Pixel, reklaamiplatvormid) ei kasuta. Veebiliikluse analüütika: praegu puudub; kui lisame tulevikus, teavitame ja uuendame poliitikat.',
+        body: (
+          <>
+            <p>Matx.ee kasutab:</p>
+            <ClauseList
+              items={[
+                [
+                  'a',
+                  'hädavajalikud küpsised — teema eelistus (tume/hele), vormi täitmise salvestamine brauseri localStorage-s (õiguslik alus: legitiimne huvi, GDPR artikkel 6(1)(f)). Salvestatud andmed: teema valik (matx-theme), registreerimisvormi mustand (matx-registration-draft). Andmed ei lahku brauserist ega ole serveri poolel kättesaadavad. Säilib ka pärast brauseri sulgemist kuni manuaalse kustutamiseni. Puhastamiseks: brauseri seaded → localStorage kustutamine või vormi "Sulge" nupp (kustutab registreerimismustand).',
+                ],
+                [
+                  'b',
+                  'Kolmanda osapoole jälgimist (Google Analytics, Facebook Pixel, reklaamiplatvormid) ei kasuta. Veebiliikluse analüütika: praegu puudub; kui lisame tulevikus, teavitame ja uuendame poliitikat.',
+                ],
+              ]}
+            />
+          </>
+        ),
       },
       {
         heading: '10. Andmete turvalisus',
@@ -87,7 +133,32 @@ const LEGAL_DOCS = {
       },
       {
         heading: '3. Kasutajate kohustused',
-        body: 'Kool kohustub: (a) tagama, et platvormi kasutavad ainult volitatud isikud (õpetajad, õpilased); (b) mitte jagama sisselogimisandmeid kolmandatele isikutele; (c) teatama kohe kahtlustatavatest turvaintsidentidest aadressile andri@matx.ee; (d) mitte kasutama platvormi ebaseaduslikul eesmärgil ega viisil, mis kahjustab teisi kasutajaid või MATx-i infrastruktuuri; (e) järgima Eesti isikuandmete kaitse seadust ja GDPR-i õpilaste andmete töötlemisel.',
+        body: (
+          <>
+            <p>Kool kohustub:</p>
+            <ClauseList
+              items={[
+                [
+                  'a',
+                  'tagama, et platvormi kasutavad ainult volitatud isikud (õpetajad, õpilased)',
+                ],
+                ['b', 'mitte jagama sisselogimisandmeid kolmandatele isikutele'],
+                [
+                  'c',
+                  'teatama kohe kahtlustatavatest turvaintsidentidest aadressile andri@matx.ee',
+                ],
+                [
+                  'd',
+                  'mitte kasutama platvormi ebaseaduslikul eesmärgil ega viisil, mis kahjustab teisi kasutajaid või MATx-i infrastruktuuri',
+                ],
+                [
+                  'e',
+                  'järgima Eesti isikuandmete kaitse seadust ja GDPR-i õpilaste andmete töötlemisel.',
+                ],
+              ]}
+            />
+          </>
+        ),
       },
       {
         heading: '4. Intellektuaalne omand',
@@ -99,7 +170,32 @@ const LEGAL_DOCS = {
       },
       {
         heading: '6. Vastutuse piirangud',
-        body: 'MATx-i soovitused on otsustugi, mitte lõplikud juhised. Õpetaja säilitab täieliku kontrolli ja vastutuse pedagoogiliste otsuste üle. AI süsteemide läbipaistvus: MATx järgib EL AI akti (Regulation 2024/1689) artikkel 13 läbipaistvusnõudeid — õpetaja näeb, millistel andmetel soovitus põhineb ja kuidas see genereeriti. Inimese järelevalve (artikkel 29): õpetaja peab heaks kiitma soovituse enne rakendamist; automaatne rakendamine puudub. MATx ei vastuta: (a) õpetaja otsuste tagajärgede eest; (b) kaudse kahju eest (kaotatud tulu, maine kahjustus); (c) kolmandate osapoolte teenuste (hosting, integratsioonid) katkestuste eest. Otsene vastutus: tahtliku või raske hooletuse korral vastutab MATx Eesti seaduste kohaselt (VÕS § 115). Vastutuse piirmäär (va tahtlus/raske hooletus): pilootfaasis piirdub tegelike otseste kuludega; pärast kommertsialiseerimist: 12 kuu teenustasu summa. Välistamatud vastutused: EL-i seadused ei luba välistada vastutust isikukahju, pettuse või tahtliku õiguserikkumise eest — need jäävad kehtima.',
+        body: (
+          <>
+            <p>
+              MATx-i soovitused on otsustugi, mitte lõplikud juhised. Õpetaja säilitab täieliku
+              kontrolli ja vastutuse pedagoogiliste otsuste üle. AI süsteemide läbipaistvus: MATx
+              järgib EL AI akti (Regulation 2024/1689) artikkel 13 läbipaistvusnõudeid — õpetaja
+              näeb, millistel andmetel soovitus põhineb ja kuidas see genereeriti. Inimese
+              järelevalve (artikkel 29): õpetaja peab heaks kiitma soovituse enne rakendamist;
+              automaatne rakendamine puudub. MATx ei vastuta:
+            </p>
+            <ClauseList
+              items={[
+                ['a', 'õpetaja otsuste tagajärgede eest'],
+                ['b', 'kaudse kahju eest (kaotatud tulu, maine kahjustus)'],
+                ['c', 'kolmandate osapoolte teenuste (hosting, integratsioonid) katkestuste eest'],
+              ]}
+            />
+            <p className='mt-4'>
+              Otsene vastutus: tahtliku või raske hooletuse korral vastutab MATx Eesti seaduste
+              kohaselt (VÕS § 115). Vastutuse piirmäär (va tahtlus/raske hooletus): pilootfaasis
+              piirdub tegelike otseste kuludega; pärast kommertsialiseerimist: 12 kuu teenustasu
+              summa. Välistamatud vastutused: EL-i seadused ei luba välistada vastutust isikukahju,
+              pettuse või tahtliku õiguserikkumise eest — need jäävad kehtima.
+            </p>
+          </>
+        ),
       },
       {
         heading: '7. Teenuse lõpetamine',
@@ -139,11 +235,66 @@ const LEGAL_DOCS = {
       },
       {
         heading: '2. Töötlemise ese, kestus ja iseloom',
-        body: 'Töötlemise ese: õpilaste isikuandmed (nimi, kasutajanimi, klassirühm, vastused, veamustrite andmed, edusammude statistika). Töötlemise eesmärk: (a) õpilaste vastuste salvestamine ja analüüs; (b) veamustrite tuvastamine; (c) isikupärastatud harjutuste genereerimine; (d) õpetajale statistilise ülevaate esitamine. Töötlemise kestus: piloodi kestus + 90 päeva pärast lepingu lõppu (andmete eksportimise ja kustutamise periood). Töötlemise iseloom: automatiseeritud andmetöötlus (masinõpe, andmebaaside haldus); inimlik sekkumine ainult tehnilise toe ja veaotsingu korral (pseudonümiseeritud andmetega).',
+        body: (
+          <>
+            <p>
+              Töötlemise ese: õpilaste isikuandmed (nimi, kasutajanimi, klassirühm, vastused,
+              veamustrite andmed, edusammude statistika). Töötlemise eesmärk:
+            </p>
+            <ClauseList
+              items={[
+                ['a', 'õpilaste vastuste salvestamine ja analüüs'],
+                ['b', 'veamustrite tuvastamine'],
+                ['c', 'isikupärastatud harjutuste genereerimine'],
+                ['d', 'õpetajale statistilise ülevaate esitamine.'],
+              ]}
+            />
+            <p className='mt-4'>
+              Töötlemise kestus: piloodi kestus + 90 päeva pärast lepingu lõppu (andmete
+              eksportimise ja kustutamise periood). Töötlemise iseloom: automatiseeritud
+              andmetöötlus (masinõpe, andmebaaside haldus); inimlik sekkumine ainult tehnilise toe
+              ja veaotsingu korral (pseudonümiseeritud andmetega).
+            </p>
+          </>
+        ),
       },
       {
         heading: '3. Töötleja kohustused',
-        body: 'Töötleja töötleb isikuandmeid ainult Vastutava töötleja dokumenteeritud juhiste alusel. Töötleja: (a) ei kasuta andmeid muudel eesmärkidel peale lepingus määratletud; (b) tagab, et volitatud töötajad on võtnud konfidentsiaalsuskohustuse; (c) rakendab GDPR artikli 32 kohased turvameetmed (vt punkt 5); (d) kaasab allatöötlejaid ainult Vastutava töötleja eelneval kirjalikul nõusolekul; (e) abistab Vastutavat töötlejat andmesubjekti õiguste (juurdepääs, parandamine, kustutamine) täitmisel 14 päeva jooksul; (f) abistab Vastutavat töötlejat andmekaitse mõjuhinnangu (DPIA) läbiviimisel, kui see on nõutav; (g) kustutab või tagastab kõik isikuandmed lepingu lõppemisel Vastutava töötleja valikul; (h) esitab Vastutavale töötlejale kogu vajaliku info GDPR artikli 28 nõuete täitmise tõendamiseks.',
+        body: (
+          <>
+            <p>
+              Töötleja töötleb isikuandmeid ainult Vastutava töötleja dokumenteeritud juhiste
+              alusel. Töötleja:
+            </p>
+            <ClauseList
+              items={[
+                ['a', 'ei kasuta andmeid muudel eesmärkidel peale lepingus määratletud'],
+                ['b', 'tagab, et volitatud töötajad on võtnud konfidentsiaalsuskohustuse'],
+                ['c', 'rakendab GDPR artikli 32 kohased turvameetmed (vt punkt 5)'],
+                [
+                  'd',
+                  'kaasab allatöötlejaid ainult Vastutava töötleja eelneval kirjalikul nõusolekul',
+                ],
+                [
+                  'e',
+                  'abistab Vastutavat töötlejat andmesubjekti õiguste (juurdepääs, parandamine, kustutamine) täitmisel 14 päeva jooksul',
+                ],
+                [
+                  'f',
+                  'abistab Vastutavat töötlejat andmekaitse mõjuhinnangu (DPIA) läbiviimisel, kui see on nõutav',
+                ],
+                [
+                  'g',
+                  'kustutab või tagastab kõik isikuandmed lepingu lõppemisel Vastutava töötleja valikul',
+                ],
+                [
+                  'h',
+                  'esitab Vastutavale töötlejale kogu vajaliku info GDPR artikli 28 nõuete täitmise tõendamiseks.',
+                ],
+              ]}
+            />
+          </>
+        ),
       },
       {
         heading: '4. Allatöötlejad (subprocessors)',
@@ -155,19 +306,118 @@ const LEGAL_DOCS = {
       },
       {
         heading: '6. Andmemurre (breach) teated',
-        body: 'Cloudflare teavitab meid (Töötlejat) isikuandmete rikkumisest viivitamatult pärast teadasaamist. Töötleja teavitab Vastutavat töötlejat 24 tunni jooksul pärast Cloudflare teatist (e-post + telefon). Teatis sisaldab: (a) rikkumise iseloom ja ulatus; (b) mõjutatud andmete kategooriad ja andmesubjektide arv (hinnanguline); (c) tõenäolised tagajärjed; (d) võetud või kavandatud leevendusmeetmed; (e) kontaktisik (andri@matx.ee, +372 5820 5882). Vastutav töötleja otsustab, kas ja millal teavitada Andmekaitse Inspektsiooni (72h GDPR artikkel 33) ja andmesubjekte (artikkel 34). Töötleja abistab teatiste koostamisel.',
+        body: (
+          <>
+            <p>
+              Cloudflare teavitab meid (Töötlejat) isikuandmete rikkumisest viivitamatult pärast
+              teadasaamist. Töötleja teavitab Vastutavat töötlejat 24 tunni jooksul pärast
+              Cloudflare teatist (e-post + telefon). Teatis sisaldab:
+            </p>
+            <ClauseList
+              items={[
+                ['a', 'rikkumise iseloom ja ulatus'],
+                ['b', 'mõjutatud andmete kategooriad ja andmesubjektide arv (hinnanguline)'],
+                ['c', 'tõenäolised tagajärjed'],
+                ['d', 'võetud või kavandatud leevendusmeetmed'],
+                ['e', 'kontaktisik (andri@matx.ee, +372 5820 5882).'],
+              ]}
+            />
+            <p className='mt-4'>
+              Vastutav töötleja otsustab, kas ja millal teavitada Andmekaitse Inspektsiooni (72h
+              GDPR artikkel 33) ja andmesubjekte (artikkel 34). Töötleja abistab teatiste
+              koostamisel.
+            </p>
+          </>
+        ),
       },
       {
         heading: '7. Andmesubjekti õiguste toetamine',
-        body: 'Vastutav töötleja vastutab andmesubjekti päringute (GDPR artiklid 15-22) vastuvõtmise eest. Töötleja abistab: (a) juurdepääs (artikkel 15): eksportib õpilase kõik andmed JSON-vormingus 14 päeva jooksul; (b) parandamine (artikkel 16): parandab andmed Vastutava töötleja juhise alusel 7 päeva jooksul; (c) kustutamine (artikkel 17): kustutab õpilase andmed jäädavalt 30 päeva jooksul; (d) piirang (artikkel 18): peatab õpilase andmete töötlemise (märgistab "külmutatud") 7 päeva jooksul; (e) ülekantavus (artikkel 20): ekspordib andmed masinloetavas vormingus (JSON/CSV). Töötleja ei vasta päringutele otse — kõik päringud suunatakse Vastutavale töötlejale.',
+        body: (
+          <>
+            <p>
+              Vastutav töötleja vastutab andmesubjekti päringute (GDPR artiklid 15-22) vastuvõtmise
+              eest. Töötleja abistab:
+            </p>
+            <ClauseList
+              items={[
+                [
+                  'a',
+                  'juurdepääs (artikkel 15): eksportib õpilase kõik andmed JSON-vormingus 14 päeva jooksul',
+                ],
+                [
+                  'b',
+                  'parandamine (artikkel 16): parandab andmed Vastutava töötleja juhise alusel 7 päeva jooksul',
+                ],
+                [
+                  'c',
+                  'kustutamine (artikkel 17): kustutab õpilase andmed jäädavalt 30 päeva jooksul',
+                ],
+                [
+                  'd',
+                  'piirang (artikkel 18): peatab õpilase andmete töötlemise (märgistab "külmutatud") 7 päeva jooksul',
+                ],
+                [
+                  'e',
+                  'ülekantavus (artikkel 20): ekspordib andmed masinloetavas vormingus (JSON/CSV).',
+                ],
+              ]}
+            />
+            <p className='mt-4'>
+              Töötleja ei vasta päringutele otse — kõik päringud suunatakse Vastutavale töötlejale.
+            </p>
+          </>
+        ),
       },
       {
         heading: '8. Andmete kustutamine ja tagastamine lepingu lõppemisel',
-        body: 'Lepingu lõppemisel (piloodi lõpp, lepingu lõpetamine): Vastutav töötleja valib: (a) andmete tagastamine — Töötleja eksportib kõik andmed CSV/JSON-vormingus 30 päeva jooksul; (b) kustutamine — Töötleja kustutab kõik andmed jäädavalt (sh varukoopiad) 90 päeva jooksul. Kustutamise sertifikaat: Töötleja väljastab kirjaliku kinnituse andmete kustutamise kohta. Erand: andmed, mille säilitamine on seadusega kohustuslik (nt maksude arvestus, kohtuvaidluse tõendid), säilitatakse minimaalselt vajaliku aja.',
+        body: (
+          <>
+            <p>Lepingu lõppemisel (piloodi lõpp, lepingu lõpetamine): Vastutav töötleja valib:</p>
+            <ClauseList
+              items={[
+                [
+                  'a',
+                  'andmete tagastamine — Töötleja eksportib kõik andmed CSV/JSON-vormingus 30 päeva jooksul',
+                ],
+                [
+                  'b',
+                  'kustutamine — Töötleja kustutab kõik andmed jäädavalt (sh varukoopiad) 90 päeva jooksul.',
+                ],
+              ]}
+            />
+            <p className='mt-4'>
+              Kustutamise sertifikaat: Töötleja väljastab kirjaliku kinnituse andmete kustutamise
+              kohta. Erand: andmed, mille säilitamine on seadusega kohustuslik (nt maksude arvestus,
+              kohtuvaidluse tõendid), säilitatakse minimaalselt vajaliku aja.
+            </p>
+          </>
+        ),
       },
       {
         heading: '9. Auditid ja inspektsioonid',
-        body: 'Vastutaval töötlejal on õigus: (a) nõuda Töötlejalt GDPR-i vastavuse tõendeid (sertifikaadid, auditiaruanded); (b) teostada audit Töötleja ruumides või süsteemides 30 päeva etteteatamisega (töötundidel, mitte rohkem kui 2× aastas); (c) määrata sõltumatu audiitor (Töötleja kinnitab audiitori — põhjendamatu keeldumine ei ole lubatud). Töötleja katab oma auditeerimise kulud; Vastutav töötleja katab enda audiitori kulud. Turvakriitilise teabe (salasõnad, võtmed) juurdepääs auditi ajal ainult pseudonümiseeritud või hägustatud kujul.',
+        body: (
+          <>
+            <p>Vastutaval töötlejal on õigus:</p>
+            <ClauseList
+              items={[
+                ['a', 'nõuda Töötlejalt GDPR-i vastavuse tõendeid (sertifikaadid, auditiaruanded)'],
+                [
+                  'b',
+                  'teostada audit Töötleja ruumides või süsteemides 30 päeva etteteatamisega (töötundidel, mitte rohkem kui 2× aastas)',
+                ],
+                [
+                  'c',
+                  'määrata sõltumatu audiitor (Töötleja kinnitab audiitori — põhjendamatu keeldumine ei ole lubatud)',
+                ],
+              ]}
+            />
+            <p className='mt-4'>
+              Töötleja katab oma auditeerimise kulud; Vastutav töötleja katab enda audiitori kulud.
+              Turvakriitilise teabe (salasõnad, võtmed) juurdepääs auditi ajal ainult
+              pseudonümiseeritud või hägustatud kujul.
+            </p>
+          </>
+        ),
       },
       {
         heading: '10. Andmete rahvusvaheline edastus',

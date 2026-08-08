@@ -79,36 +79,24 @@ function linkifyContent(text: string): React.ReactNode {
   return parts.length > 0 ? parts : text;
 }
 
-function parseInlineList(text: string): React.ReactNode {
-  const listPattern = /\(([a-z])\)\s+([^;]+?)(?=\s*\([a-z]\)|;|$)/gi;
-  const matches = Array.from(text.matchAll(listPattern));
-
-  if (matches.length >= 3) {
-    const beforeList = text.substring(0, matches[0].index);
-    const afterList = text.substring(
-      matches[matches.length - 1].index + matches[matches.length - 1][0].length,
-    );
-
-    return (
-      <>
-        {linkifyContent(beforeList.trim())}
-        <ul className='mt-4 space-y-2 ml-6 list-none'>
-          {matches.map((m) => (
-            <li key={`clause-${m[1]}`} className='text-text-secondary text-sm leading-relaxed'>
-              <strong className='text-text-primary'>({m[1]})</strong> {linkifyContent(m[2].trim())}
-            </li>
-          ))}
-        </ul>
-        {afterList.trim() && (
-          <p className='mt-4 text-text-secondary text-sm leading-relaxed'>
-            {linkifyContent(afterList.trim())}
-          </p>
-        )}
-      </>
-    );
-  }
-
-  return linkifyContent(text);
+/**
+ * Clause list — explicit replacement for the old (a)/(b)/(c) regex parser.
+ * Item text still runs through linkifyContent so emails/URLs stay clickable.
+ */
+export function ClauseList({
+  items,
+}: {
+  items: readonly (readonly [clause: string, text: string])[];
+}) {
+  return (
+    <ul className='mt-4 space-y-2 ml-6 list-none'>
+      {items.map(([clause, text]) => (
+        <li key={clause} className='text-text-secondary text-sm leading-relaxed'>
+          <strong className='text-text-primary'>({clause})</strong> {linkifyContent(text)}
+        </li>
+      ))}
+    </ul>
+  );
 }
 
 export function LegalDocument({ title, updated, sections }: LegalDocumentProps) {
@@ -232,9 +220,7 @@ export function LegalDocument({ title, updated, sections }: LegalDocumentProps) 
                     {section.heading}
                   </h2>
                   <div className='prose-legal text-text-secondary text-sm leading-relaxed'>
-                    {typeof section.body === 'string'
-                      ? parseInlineList(section.body)
-                      : section.body}
+                    {typeof section.body === 'string' ? linkifyContent(section.body) : section.body}
                   </div>
                   {i < sections.length - 1 && <hr className='mt-12 border-border opacity-30' />}
                 </section>
