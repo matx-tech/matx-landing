@@ -9,27 +9,23 @@ import { type NextRequest, NextResponse } from 'next/server';
 //    caching for routes under this proxy.
 const isDev = process.env.NODE_ENV === 'development';
 
-// Plausible analytics — first-party proxy (docs: proxy/introduction,
-// events-api). The tracker script and event endpoint are served from our own
-// origin, which bypasses adblockers and keeps the strict CSP above valid
-// (script-src/connect-src 'self' still cover both paths). On a self-hosted
-// VPS nobody adds X-Forwarded-For for us (unlike Netlify/Vercel edges), and
-// without the real visitor IP Plausible's bot filter silently drops every
-// event — so the header is set explicitly here, per the docs.
-// Unset = analytics fully disabled (no interception, paths 404).
-const plausibleScriptUrl = process.env.PLAUSIBLE_SCRIPT_URL;
+// Plausible analytics enable gate — set PLAUSIBLE_SCRIPT_URL (the site's
+// personalized script URL from the dashboard) to turn analytics on. The npm
+// tracker (@plausible-analytics/tracker) is bundled client-side and posts to
+// /api/event, which this proxy forwards to Plausible first-party. The events
+// API uses User-Agent for unique-visitor counting and X-Forwarded-For for the
+// client IP — without the real visitor IP Plausible's bot filter silently
+// drops every event (docs: events-api.md). Next 16 seeds the header from the
+// socket when nothing upstream set it (base-server.js), so this works bare on
+// a VPS, behind nginx/Caddy/Cloudflare, or on serverless.
+const analyticsEnabled = Boolean(process.env.PLAUSIBLE_SCRIPT_URL);
 
-async function proxyPlausible(
-  request: NextRequest,
-  pathname: string,
-  scriptUrl: string,
-): Promise<NextResponse> {
-  const destination = pathname === '/js/script.js' ? scriptUrl : 'https://plausible.io/api/event';
+const PLAUSIBLE_API_URL = 'https://plausible.io/api/event';
 
-  // Forward only what Plausible needs: User-Agent (drives unique-visitor
-  // counting + device reports), Content-Type and the client IP. Never forward
-  // the full header set — cookies/authorization on our origin must not leak
-  // to plausible.io.
+async function proxyPlausibleEvent(request: NextRequest): Promise<NextResponse> {
+  // Forward only what Plausible needs: User-Agent, Content-Type and the
+  // client IP. Never forward the request headers wholesale — cookies and
+  // other site headers must not leak to Plausible.
   const headers = new Headers();
   const userAgent = request.headers.get('user-agent');
   if (userAgent) headers.set('user-agent', userAgent);
@@ -37,40 +33,32 @@ async function proxyPlausible(
   if (contentType) headers.set('content-type', contentType);
   // First valid IP from a comma chain is used by Plausible; passing the chain
   // through unchanged is correct whether we're bare, behind nginx or behind a
-  // CDN. On self-hosted Node the header is guaranteed present — Next seeds it
-  // from the socket address when nothing upstream set it (base-server.js).
+  // CDN.
   const clientIp = request.headers.get('x-forwarded-for');
   if (clientIp) headers.set('x-forwarded-for', clientIp);
 
   try {
-    const upstream = await fetch(destination, {
+    const upstream = await fetch(PLAUSIBLE_API_URL, {
       method: request.method,
       headers,
-      // Event payloads are small JSON; buffering keeps the edge-runtime
-      // fetch simple (no stream duplex dance).
       body: request.method === 'POST' ? await request.arrayBuffer() : undefined,
       signal: AbortSignal.timeout(10_000),
     });
     return new NextResponse(upstream.body, {
       status: upstream.status,
       headers: {
-        'content-type':
-          upstream.headers.get('content-type') ??
-          (pathname === '/js/script.js'
-            ? 'application/javascript; charset=utf-8'
-            : 'application/json'),
+        'content-type': upstream.headers.get('content-type') ?? 'application/json',
       },
     });
   } catch (error) {
-    console.error(`[plausible] proxy to ${destination} failed`, error);
+    console.error(`[plausible] proxy to ${PLAUSIBLE_API_URL} failed`, error);
     return new NextResponse(null, { status: 502 });
   }
 }
 
 export async function proxy(request: NextRequest) {
-  const pathname = request.nextUrl.pathname;
-  if (plausibleScriptUrl && (pathname === '/js/script.js' || pathname === '/api/event')) {
-    return proxyPlausible(request, pathname, plausibleScriptUrl);
+  if (analyticsEnabled && request.nextUrl.pathname === '/api/event') {
+    return proxyPlausibleEvent(request);
   }
 
   const nonce = btoa(crypto.randomUUID());
@@ -110,9 +98,8 @@ export const config = {
         { type: 'header', key: 'purpose', value: 'prefetch' },
       ],
     },
-    // The Plausible event endpoint sits under /api — explicitly re-included
-    // here so the proxy above can intercept it (the first matcher excludes
-    // the api namespace so API responses never get nonce/CSP headers).
-    '/api/event',
+    // Analytics beacon — intercepted by the proxy, excluded from the CSP
+    // matcher above (no nonce/CSP headers needed on proxied responses).
+    { source: '/api/event' },
   ],
 };

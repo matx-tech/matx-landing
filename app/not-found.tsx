@@ -1,15 +1,18 @@
-import { headers } from 'next/headers';
+'use client';
+
 import Link from 'next/link';
+import { useEffect } from 'react';
+import { EVENTS, track } from '@/lib/analytics';
 
 /**
- * Root 404 page — renders inside the root layout (fonts, theme, CSP nonce).
- * The inline script fires Plausible's '404' event per the docs' 404 tracking
- * snippet (error-pages-tracking-404.md); the guard makes it a no-op while
- * analytics is unconfigured. Requires the matching '404' goal in the
- * Plausible dashboard (Goals → Custom event → "404").
+ * Root 404 page. The 404 event fires through the shared queue: this effect
+ * runs before the layout's AnalyticsProvider init, so track() buffers the
+ * event until the tracker is ready (docs: error-pages-tracking-404).
  */
-export default async function NotFound() {
-  const nonce = (await headers()).get('x-nonce') ?? '';
+export default function NotFound() {
+  useEffect(() => {
+    track(EVENTS.notFound);
+  }, []);
 
   return (
     <main className='flex min-h-[70vh] flex-col items-center justify-center gap-4 px-4 text-center'>
@@ -26,13 +29,6 @@ export default async function NotFound() {
       >
         Tagasi esilehele
       </Link>
-      <script
-        nonce={nonce}
-        // biome-ignore lint/security/noDangerouslySetInnerHtml: Plausible 404 tracking, official docs snippet
-        dangerouslySetInnerHTML={{
-          __html: `document.addEventListener('DOMContentLoaded', function () { if (window.plausible) window.plausible('404'); });`,
-        }}
-      />
     </main>
   );
 }

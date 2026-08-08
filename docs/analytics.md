@@ -16,9 +16,9 @@ Leht kasutab [Plausible](https://plausible.io) — küpsiseta, isikuandmeteta ve
 3. Kopeeri oma saidi skripti URL (kujul `https://plausible.io/js/pa-XXXXX.js`) ja pane see
    VPS-i keskkonnamuutujana: `PLAUSIBLE_SCRIPT_URL=https://plausible.io/js/pa-XXXXX.js`
    (systemd: `Environment=`; muidu `next start` loeb `.env.local`).
-   Kuni muutuja puudub, on analüütika täielikult välja lülitatud (skripti ega proxy'd ei
-   renderdata). Kohalikuks testimiseks pane sama muutuja `.env.local`-isse — dev-režiimis
-   loendatakse localhost liiklust (`captureOnLocalhost`).
+   Kuni muutuja puudub, on analüütika täielikult välja lülitatud (trackerit ei initsialiseerita
+   ega proxy'd ei käivitata). Kohalikuks testimiseks pane sama muutuja `.env.local`-isse —
+   dev-režiimis loendatakse localhost liiklust (`captureOnLocalhost`).
 
 ## Kuidas see töötab
 
@@ -31,8 +31,12 @@ Leht kasutab [Plausible](https://plausible.io) — küpsiseta, isikuandmeteta ve
   Plausible'i botifilter sündmuse vaikselt tagasi (docs/events-api). VPS-il on päis
   garanteeritud: Next täidab selle ise socketi aadressist, kui keegi ees seda ei sea —
   nginx/Caddy/Cloudflare ees ei vaja seega eraldi konfiguratsiooni.
-- `app/layout.tsx`: skript + `plausible.init()` (endpoint, outboundLinks, formSubmissions).
-- `lib/analytics.ts`: tüübikindel `track()` + sündmuste nimede loend (EVENTS).
+- `components/providers/analytics-provider.tsx`: trackeri initsialiseerimine NPM-teegiga
+  `@plausible-analytics/tracker` (dokumentatsiooni soovitatud NPM-lahendus) — endpoint,
+  outboundLinks, formSubmissions; devis ka captureOnLocalhost. Eraldi skripti ei laeta —
+  teek ise on tracker (lehevaatamised, sh SPA-navigatsioon, automaatsed kuularid).
+- `lib/analytics.ts`: tüübikindel `track()` (puhverdab sündmused enne init'i — vajalik
+  404-sündmuse jaoks) + sündmuste nimede loend (EVENTS).
 
 ## Sündmused ja eesmärgid (Goals)
 
@@ -52,10 +56,12 @@ loomist.
 
 ## Kontroll
 
-- `pnpm build && pnpm start`, siis `curl -s localhost:3000/js/script.js` → 200 (skript).
+- `pnpm build && pnpm start`, siis `curl -X POST -H 'Content-Type: application/json' --data '{}' localhost:3000/api/event` → **202** (Plausible vastab) või **502** (ülesvoolu võrku ei pääse — proxy ise töötab).
 - Interaktsioon → brauseri Network tab: `POST /api/event` vastusega **202**.
 - Vastuse päis `x-plausible-dropped: 1` = sündmus jõudis Plausible'i, aga lükati tagasi
   (localhost/staging domeen pole kontosse lisatud).
+- Automatiseeritud brauserid (navigator.webdriver) lükkab teek vaikselt tagasi — testi
+  päris brauseriga või eemalda webdriver-lipp.
 
 ## Tähelepanek
 

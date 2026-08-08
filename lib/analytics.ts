@@ -1,41 +1,52 @@
-/**
- * Plausible analytics — thin typed wrapper around window.plausible.
- *
- * The queue function and init options are injected server-side in
- * app/layout.tsx (nonce'd inline script); this helper only fires events, so
- * it works whether or not the tracker script has finished loading (calls are
- * buffered by the queue) and is a no-op when analytics is disabled (no
- * PLAUSIBLE_SCRIPT_URL env — no script, no queue).
- */
+import type { PlausibleConfig } from '@plausible-analytics/tracker';
 
-// Event names are the goal names in the Plausible dashboard — keep them in
-// one place so the code and the Goals tab can't drift.
+/**
+ * Event names — single source of truth so dashboard goals match exactly.
+ */
 export const EVENTS = {
-  /** Registration dialog opened (any CTA). */
-  dialogOpen: 'Dialog Open',
-  /** Successful pilot registration submission. Props: role. */
   pilotSignup: 'Pilot Signup',
-  /** A gated section was revealed ("Laadi sisu" / scroll). Props: section. */
-  sectionReveal: 'Section Reveal',
-  /** Theme switched. Props: theme. */
   themeToggle: 'Theme Toggle',
-  /** 404 page visit (fired from app/not-found.tsx). */
+  sectionReveal: 'Section Reveal',
+  dialogOpen: 'Dialog Open',
   notFound: '404',
 } as const;
 
-declare global {
-  interface Window {
-    plausible?: (event: string, options?: { props?: Record<string, string> }) => void;
+let initialized = false;
+// ponytail: tiny FIFO for events fired before init() (the 404 page's effect
+// runs before the layout's AnalyticsProvider effect). A real queue lib is
+// overkill; the buffer is drained once on init and never grows in practice.
+const early: Array<{ event: string; props?: Record<string, string> }> = [];
+
+/**
+ * Initializes the Plausible tracker (client-only). Drains events that were
+ * queued before initialization. Idempotent.
+ *
+ * The tracker package is imported dynamically on purpose: its module body
+ * references browser globals (`location`), so a static import would crash
+ * SSR. The dynamic import also keeps the tracker out of the main bundle.
+ */
+export async function enableAnalytics(config: PlausibleConfig): Promise<void> {
+  if (initialized) return;
+  initialized = true;
+  const { init, track } = await import('@plausible-analytics/tracker');
+  init(config);
+  for (const { event, props } of early.splice(0)) {
+    track(event, props === undefined ? {} : { props });
   }
 }
 
 /**
- * Fires a Plausible custom event with optional custom properties.
- *
- * @param event - Event/goal name (must match the dashboard goal exactly)
- * @param props - Optional key-value custom properties (strings only)
+ * Fires a Plausible custom event. Safe to call before init (buffered), on the
+ * server (no-op), and when analytics is disabled (never initialized).
  */
 export function track(event: string, props?: Record<string, string>): void {
   if (typeof window === 'undefined') return;
-  window.plausible?.(event, props === undefined ? undefined : { props });
+  if (!initialized) {
+    early.push({ event, props });
+    return;
+  }
+  // The module is already cached once enableAnalytics ran.
+  void import('@plausible-analytics/tracker').then(({ track: plausibleTrack }) => {
+    plausibleTrack(event, props === undefined ? {} : { props });
+  });
 }

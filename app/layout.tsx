@@ -2,12 +2,13 @@ import './globals.css';
 import type { Metadata } from 'next';
 import { IBM_Plex_Mono, Inter, Public_Sans } from 'next/font/google';
 import { headers } from 'next/headers';
+import { AnalyticsProvider } from '@/components/providers/analytics-provider';
 import { LenisProvider } from '@/components/providers/lenis-provider';
 import { SITE_META } from '@/lib/content/landing-copy';
 
-// Plausible tracker URL (docs' personalized /js/pa-XXXXX.js) — set to enable
-// analytics; while unset neither the script tag nor the next.config rewrites
-// are emitted.
+// Plausible tracker enable gate — set PLAUSIBLE_SCRIPT_URL to turn analytics
+// on; while unset the AnalyticsProvider (which inits the npm tracker) is not
+// rendered and proxy.ts skips /api/event.
 const plausibleScriptUrl = process.env.PLAUSIBLE_SCRIPT_URL;
 
 const publicSans = Public_Sans({
@@ -134,34 +135,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             }),
           }}
         />
-        {/* Plausible analytics — first-party proxy (rewrites in next.config.js).
-            Rendered only when PLAUSIBLE_SCRIPT_URL is set. The init call stays
-            inline so events queue before the async script arrives; the nonce
-            satisfies the CSP. Official snippet per plausible.io/docs. */}
-        {plausibleScriptUrl && (
-          <>
-            <script async src='/js/script.js' />
-            <script
-              nonce={nonce}
-              // biome-ignore lint/security/noDangerouslySetInnerHtml: Plausible tracker bootstrap, official docs snippet
-              dangerouslySetInnerHTML={{
-                __html: `window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};plausible.init(${JSON.stringify(
-                  {
-                    endpoint: '/api/event',
-                    outboundLinks: true,
-                    formSubmissions: true,
-                    ...(process.env.NODE_ENV === 'development' ? { captureOnLocalhost: true } : {}),
-                  },
-                )});`,
-              }}
-            />
-          </>
-        )}
       </head>
       <body className={`${inter.className} antialiased`}>
         <a href='#main' className='skip-link'>
           Jäta navigatsioon vahele
         </a>
+        {plausibleScriptUrl && <AnalyticsProvider />}
         <LenisProvider>{children}</LenisProvider>
       </body>
     </html>
