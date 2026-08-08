@@ -2,6 +2,8 @@
 
 Next.js 16 (App Router; request interception lives in `proxy.ts`, the Next 16 replacement for `middleware.ts`) + TypeScript strict + Tailwind v4 + GSAP/Lenis. Package manager: pnpm.
 
+**Context system:** Load `docs/kernel.md` for commands, conventions, landmines, and project requirements.
+
 ## Scripts
 
 | Command | What |
