@@ -233,7 +233,8 @@ export function RegistrationForm({ isOpen, onClose }: RegistrationFormProps) {
         setAnnouncement(REGISTRATION_COPY.announcementSuccess);
       } catch {
         // Draft stays in localStorage, so a retry never loses the visitor's data.
-        setAnnouncement(REGISTRATION_COPY.announcementError);
+        // The failure is announced by the visible role="alert" below — don't
+        // repeat it in the role="status" live region.
         setSubmitError(true);
       } finally {
         setIsSubmitting(false);
