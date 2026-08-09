@@ -94,7 +94,9 @@ jobs:
   report:
     needs: e2e
     runs-on: ubuntu-24.04
-    if: always()
+    # Only aggregate when e2e actually ran — a skipped e2e (e.g. quality
+    # failed) uploads no junit artifacts, and download-artifact would error.
+    if: needs.e2e.result == 'success'
     steps:
       - uses: actions/download-artifact@v4
         with:
