@@ -68,3 +68,10 @@ CLAUDE.md
 
 # python bytecode cache (bmad tooling)
 __pycache__/
+
+# bmad session artifacts + edit backups
+/_bmad-output/
+/_bmad/bmad-loop/
+/_bmad/bmb/
+/_bmad/tea/
+/_bmad/scripts/*.bak
