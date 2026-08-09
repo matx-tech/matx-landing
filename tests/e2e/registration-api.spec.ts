@@ -28,11 +28,6 @@ const skipWithoutCapture = () =>
   test.skip(!!process.env.BASE_URL, 'test-webhook capture only exists in local webServer mode');
 
 test.describe('registration intake API', () => {
-  test.beforeEach(async ({ request }) => {
-    // Capture buffer is shared server state — keep it small between tests.
-    await request.delete('/api/test-webhook');
-  });
-
   test('GET /api/health reports consistent service status (TC-002)', async ({ request }) => {
     const res = await request.get('/api/health');
     expect(res.status()).toBe(200);
