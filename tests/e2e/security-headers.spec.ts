@@ -29,7 +29,9 @@ test.describe('security headers', () => {
     const nonce = csp.match(/'nonce-([^']+)'/)?.[1];
     expect(nonce).toBeDefined();
     const html = await res.text();
-    const scriptNonce = html.match(/<script[^>]*\snonce="([^"]+)"/);
+    const scriptNonce = html.match(
+      /<script\b(?![^>]*\bsrc\s*=)[^>]*\snonce="([^"]+)"/,
+    );
     expect(scriptNonce).not.toBeNull();
     expect(scriptNonce?.[1]).toBe(nonce);
   });
