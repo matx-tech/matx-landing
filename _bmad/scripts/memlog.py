@@ -237,13 +237,13 @@ def cmd_init(args) -> int:
 
 def cmd_append(args) -> int:
     """
-    Append a one-line entry to an existing memory log.
+    Append a normalized one-line entry to an existing memory log.
     
     Parameters:
-    	args: Command-line arguments containing the log target, entry text, and optional type or attribution.
+    	args: Command-line arguments specifying the log target, entry text, and optional type or attribution.
     
     Returns:
-    	0 after the entry is written and acknowledged.
+    	int: 0 after the entry is written.
     """
     path = resolve(args)
     meta, body = read_memlog(path)
@@ -261,13 +261,14 @@ def cmd_append(args) -> int:
 
 
 def cmd_set(args) -> int:
-    """Set a frontmatter field in an existing memory log.
+    """
+    Set a frontmatter field in an existing memory log.
     
     Parameters:
     	args: Command-line arguments containing the log target, field name, and value.
     
     Returns:
-    	int: `0` after the field is updated and the log is acknowledged.
+    	int: 0 after the field is updated successfully.
     """
     path = resolve(args)
     meta, body = read_memlog(path)
@@ -293,7 +294,7 @@ def main(argv: list[str] | None = None) -> int:
     	argv (list[str] | None): Command-line arguments to parse, or `None` to use the process arguments.
     
     Returns:
-    	int: `0` for a successful command, `2` when command execution reports an error.
+    	int: The selected subcommand's exit status.
     """
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = p.add_subparsers(dest="cmd", required=True)

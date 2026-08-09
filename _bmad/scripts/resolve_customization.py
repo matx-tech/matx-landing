@@ -45,14 +45,14 @@ def find_project_root(start: Path) -> Path | None:
 
 def extract_key(data, dotted_key: str):
     """
-    Retrieve a value from nested mapping data using a dot-separated key path.
+    Retrieve a value from nested dictionaries using a dot-separated key path.
     
     Parameters:
-    	data: The mapping to traverse.
+    	data: The dictionary to traverse.
     	dotted_key (str): The dot-separated path to the requested value.
     
     Returns:
-    	The value at the specified path, or the `_MISSING` sentinel when the path does not exist.
+    	The value at the specified path, or the `_MISSING` sentinel if any path segment is absent or the path reaches a non-dictionary value.
     """
     current = data
     for part in dotted_key.split("."):

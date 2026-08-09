@@ -49,7 +49,9 @@ export function TechText({ text }: { text: string }) {
 }
 
 /**
- * Status row card. Renders an <li> root — must be used inside a <ul> or <ol>.
+ * Renders a status row as a styled list item.
+ *
+ * @param showBadge - Whether to display the capability status badge.
  */
 export function StatusCard({
   title,

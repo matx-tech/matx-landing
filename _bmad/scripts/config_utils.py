@@ -16,7 +16,19 @@ _KEYED_MERGE_FIELDS = ("code", "id")
 
 
 def load_toml(path: Path, *, required: bool = False) -> dict[str, Any]:
-    """Load a TOML table, allowing absence only for optional layers."""
+    """
+    Load a TOML file as a configuration table.
+    
+    Parameters:
+    	path (Path): Path to the TOML file.
+    	required (bool): Whether a missing file should raise ConfigError.
+    
+    Returns:
+    	dict[str, Any]: The parsed TOML table, or an empty dictionary when an optional file is missing.
+    
+    Raises:
+    	ConfigError: If a required file is missing, the path is not a file, the file cannot be read or parsed, or the TOML document is not a table.
+    """
     if not path.exists():
         if required:
             raise ConfigError(f"required TOML file not found: {path}")
@@ -101,16 +113,16 @@ def _merge_arrays(base: list[Any], override: list[Any]) -> list[Any]:
 
 def structural_merge(base: Any, override: Any) -> Any:
     """
-    Merge configuration values recursively.
+    Merge configuration values recursively, applying override values at each level.
     
     Parameters:
         base (Any): The original configuration value.
-        override (Any): The value whose settings take precedence.
+        override (Any): The value that takes precedence.
     
     Returns:
-        Any: The merged value, with dictionaries merged recursively, keyed
-            dictionary arrays combined by identifier, unkeyed arrays appended,
-            and other values replaced by the override.
+        Any: The merged value. Dictionaries are merged recursively, arrays use
+            keyed or append-based merging, and other values are replaced by the
+            override.
     """
     if isinstance(base, dict) and isinstance(override, dict):
         result = dict(base)
@@ -161,14 +173,14 @@ def load_central_config(project_root: Path) -> dict[str, Any]:
 
 def load_customization(project_root: Path | None, skill_dir: Path) -> dict[str, Any]:
     """
-    Load skill customization settings with project-level overrides.
+    Load skill customization settings with project and user overrides.
     
     Parameters:
-        project_root (Path | None): Project root used to locate optional customization overrides.
-        skill_dir (Path): Directory containing the required skill customization file.
+        project_root (Path | None): Project root containing optional customization overrides.
+        skill_dir (Path): Directory containing the required ``customize.toml`` file.
     
     Returns:
-        dict[str, Any]: Merged customization settings, with user overrides taking precedence.
+        dict[str, Any]: Merged customization settings, with later overrides taking precedence.
     """
     skill_name = skill_dir.name
     custom_dir = project_root / "_bmad" / "custom" if project_root else None

@@ -35,11 +35,11 @@ export async function enableAnalytics(config: PlausibleConfig): Promise<void> {
 }
 
 /**
- * Sends a custom analytics event when tracking is enabled.
+ * Records an analytics event when analytics has been initialized.
  *
- * Events triggered before initialization are buffered, while server-side calls are ignored.
+ * Events recorded before initialization are buffered, and calls made during server-side execution are ignored.
  *
- * @param event - The name of the event to track
+ * @param event - The name of the event to record
  * @param props - Optional properties associated with the event
  */
 export function track(event: string, props?: Record<string, string>): void {
