@@ -1,4 +1,4 @@
-import { test, expect } from '../support/fixtures';
+import { expect, test } from '../support/fixtures';
 
 test.describe('navigation', () => {
   test('desktop nav: clicking a link scrolls to the section', async ({ openHome, page }) => {

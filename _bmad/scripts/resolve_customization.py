@@ -1,0 +1,125 @@
+#!/usr/bin/env python3
+# /// script
+# requires-python = ">=3.11"
+# ///
+"""Resolve a skill's default, team, and user TOML customization layers."""
+
+import argparse
+import json
+import sys
+from pathlib import Path
+
+# Installed scripts are consumer files, not a location for interpreter caches.
+sys.dont_write_bytecode = True
+
+try:
+    from config_utils import ConfigError, load_customization
+except ModuleNotFoundError as error:
+    if error.name != "tomllib":
+        raise
+    sys.stderr.write("error: Python 3.11+ is required (stdlib `tomllib` not found).\n")
+    raise SystemExit(3) from None
+
+
+_MISSING = object()
+
+
+def find_project_root(start: Path) -> Path | None:
+    """
+    Find the nearest project root at or above the given path.
+    
+    Parameters:
+        start (Path): Path from which to begin the upward search.
+    
+    Returns:
+        Path | None: The nearest directory containing `_bmad` or `.git`, or `None` if no project root is found.
+    """
+    current = start.resolve()
+    while True:
+        if (current / "_bmad").exists() or (current / ".git").exists():
+            return current
+        if current.parent == current:
+            return None
+        current = current.parent
+
+
+def extract_key(data, dotted_key: str):
+    """
+    Retrieve a value from nested mapping data using a dot-separated key path.
+    
+    Parameters:
+    	data: The mapping to traverse.
+    	dotted_key (str): The dot-separated path to the requested value.
+    
+    Returns:
+    	The value at the specified path, or the `_MISSING` sentinel when the path does not exist.
+    """
+    current = data
+    for part in dotted_key.split("."):
+        if isinstance(current, dict) and part in current:
+            current = current[part]
+        else:
+            return _MISSING
+    return current
+
+
+def write_json_stdout(output) -> None:
+    """Write a JSON representation of the output to standard output using UTF-8 encoding."""
+    reconfigure = getattr(sys.stdout, "reconfigure", None)
+    if reconfigure is not None:
+        reconfigure(encoding="utf-8")
+    sys.stdout.write(json.dumps(output, indent=2, ensure_ascii=False) + "\n")
+
+
+def main() -> int:
+    """
+    Resolve skill customization and write the merged configuration or selected fields as JSON.
+    
+    Returns:
+    	int: 0 on success, or 1 when customization loading fails.
+    """
+    parser = argparse.ArgumentParser(
+        description="Resolve skill customization using three-layer TOML merge."
+    )
+    parser.add_argument(
+        "--skill", "-s", required=True, help="Absolute path to the skill directory"
+    )
+    parser.add_argument(
+        "--project-root",
+        "-p",
+        help="Explicit project root containing _bmad/ (recommended)",
+    )
+    parser.add_argument(
+        "--key",
+        "-k",
+        action="append",
+        default=[],
+        help="Dotted field path to resolve (repeatable). Omit for full dump.",
+    )
+    args = parser.parse_args()
+
+    skill_dir = Path(args.skill).resolve()
+    project_root = (
+        Path(args.project_root).resolve()
+        if args.project_root
+        else find_project_root(skill_dir) or find_project_root(Path.cwd())
+    )
+    try:
+        merged = load_customization(project_root, skill_dir)
+    except ConfigError as error:
+        sys.stderr.write(f"error: {error}\n")
+        return 1
+
+    output = merged
+    if args.key:
+        output = {}
+        for key in args.key:
+            value = extract_key(merged, key)
+            if value is not _MISSING:
+                output[key] = value
+    write_json_stdout(output)
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

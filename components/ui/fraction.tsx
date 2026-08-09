@@ -1,8 +1,12 @@
 'use client';
 
 /**
- * Fraction component — renders numerator over denominator with a horizontal bar.
- * Use inline for body text; standalone for answer blocks.
+ * Renders a numerator above a denominator with a horizontal bar.
+ *
+ * @param num - The fraction's numerator
+ * @param den - The fraction's denominator
+ * @param className - An optional CSS class applied to the fraction
+ * @returns An accessible fraction element labeled as `num/den`
  */
 export function Fraction({
   num,
@@ -17,20 +21,20 @@ export function Fraction({
     <span
       className={`inline-flex flex-col items-center leading-none ${className}`}
       aria-label={`${num}/${den}`}
-      role="img"
+      role='img'
     >
-      <span className="tabular-nums leading-tight border-b border-current pb-px">{num}</span>
-      <span className="tabular-nums leading-tight pt-px">{den}</span>
+      <span className='tabular-nums leading-tight border-b border-current pb-px'>{num}</span>
+      <span className='tabular-nums leading-tight pt-px'>{den}</span>
     </span>
   );
 }
 
 /**
- * Renders a simple inline math expression with fractions.
- * Supports operators + − × ÷ between fractions or integers.
- * Recognises patterns like "3/4", "1/2" and renders them as vertical fractions.
- * Operators are vertically centred on the fraction bar (vinculum), not
- * baseline-aligned with the numerator.
+ * Renders an inline mathematical expression with numeric fractions.
+ *
+ * @param expression - The expression to render, including fractions, numbers, operators, and whitespace
+ * @param className - An optional CSS class for the container
+ * @returns An inline container displaying the formatted expression
  */
 export function InlineFractionalExpression({
   expression,
@@ -44,24 +48,23 @@ export function InlineFractionalExpression({
   const rendered = tokens.map((token, i) => {
     const fracMatch = token.match(/^(\d+)\/(\d+)$/);
     if (fracMatch) {
-      return (
-        <Fraction key={i} num={fracMatch[1]} den={fracMatch[2]} />
-      );
+      // biome-ignore lint/suspicious/noArrayIndexKey: token position is the only stable identity (expression text can repeat tokens)
+      return <Fraction key={i} num={fracMatch[1]} den={fracMatch[2]} />;
     }
     // Preserve whitespace as spaces
     if (/^\s+$/.test(token)) {
+      // biome-ignore lint/suspicious/noArrayIndexKey: token position is the only stable identity (expression text can repeat tokens)
       return <span key={i}> </span>;
     }
     return (
-      <span key={i} className="self-center">
+      // biome-ignore lint/suspicious/noArrayIndexKey: token position is the only stable identity (expression text can repeat tokens)
+      <span key={i} className='self-center'>
         {token}
       </span>
     );
   });
 
   return (
-    <span className={`inline-flex items-center gap-px align-middle ${className}`}>
-      {rendered}
-    </span>
+    <span className={`inline-flex items-center gap-px align-middle ${className}`}>{rendered}</span>
   );
 }

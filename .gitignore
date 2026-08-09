@@ -53,6 +53,11 @@ next-env.d.ts
 .claude/
 .serena/
 .mcp.json
+.agents/
+.codex/
+.impeccable/
+inject-puppeteer.mjs
 
 # review scratch dumps
 gh-pr-comments.md
+CLAUDE.md

@@ -1,10 +1,18 @@
 'use client';
 
-import { useEffect, useLayoutEffect, useRef, createContext, useContext, useCallback, useMemo } from 'react';
-import type Lenis from 'lenis';
+import { useGSAP } from '@gsap/react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { useGSAP } from '@gsap/react';
+import type Lenis from 'lenis';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+} from 'react';
 import { usePrefersReducedMotion } from '@/lib/hooks/use-prefers-reduced-motion';
 
 // Only register plugins that are needed across the entire site.
@@ -26,7 +34,7 @@ const LenisContext = createContext<LenisContextValue>({
 export const useLenis = () => useContext(LenisContext);
 
 /**
- * Provides application-wide scrolling through Lenis with native scrolling fallback.
+ * Provides application-wide smooth scrolling with native scrolling fallback.
  *
  * @param children - The content rendered within the provider.
  */
@@ -35,6 +43,9 @@ export function LenisProvider({ children }: { children: React.ReactNode }) {
   const reducedMotionRef = useRef(false);
   const tickerCbRef = useRef<((time: number) => void) | null>(null);
   const focusTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Pending selector-poll timeout — cleared on unmount and before each new
+  // poll so a stale callback can never scroll/focus after the provider is gone.
+  const selectorPollTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const prefersReducedMotion = usePrefersReducedMotion();
 
   // Mirror the render-time preference before paint — the effect-driven ref
@@ -54,43 +65,59 @@ export function LenisProvider({ children }: { children: React.ReactNode }) {
 
     // Lenis is a smooth-scroll enhancement, not a prerequisite for content.
     // Load it lazily so the library stays out of the initial JS bundle.
-    void import('lenis').then(({ default: LenisClass }) => {
-      if (disposed) return;
+    void import('lenis')
+      .then(({ default: LenisClass }) => {
+        if (disposed) return;
 
-      function createLenis(rm: boolean) {
-        return new LenisClass({
-          lerp: rm ? 0 : 0.1,
-          duration: rm ? 0 : 1.2,
-          smoothWheel: !rm,
-          touchMultiplier: rm ? 1 : 2,
-          autoRaf: false,
-        });
-      }
+        /**
+         * Creates a Lenis instance configured for the user's motion preference.
+         *
+         * @param rm - Whether reduced motion is preferred
+         * @returns A configured Lenis instance
+         */
+        function createLenis(rm: boolean) {
+          return new LenisClass({
+            lerp: rm ? 0 : 0.1,
+            duration: rm ? 0 : 1.2,
+            smoothWheel: !rm,
+            touchMultiplier: rm ? 1 : 2,
+            autoRaf: false,
+          });
+        }
 
-      // The hook value is the render-time preference; if it changed while the
-      // chunk was in flight, the effect re-runs (dep below), disposes this
-      // closure and rebuilds with the fresh value.
-      lenisInstance = createLenis(prefersReducedMotion);
-      lenisRef.current = lenisInstance;
+        // The hook value is the render-time preference; if it changed while the
+        // chunk was in flight, the effect re-runs (dep below), disposes this
+        // closure and rebuilds with the fresh value.
+        lenisInstance = createLenis(prefersReducedMotion);
+        lenisRef.current = lenisInstance;
 
-      function registerRaf(instance: Lenis) {
-        // Remove previous callback first so we never double-register
-        if (tickerCbRef.current) gsap.ticker.remove(tickerCbRef.current);
-        const cb = (time: number) => instance.raf(time * 1000);
-        tickerCbRef.current = cb;
-        gsap.ticker.add(cb);
-      }
+        /**
+         * Registers the Lenis animation frame callback with GSAP's ticker.
+         *
+         * @param instance - The Lenis instance to advance on each ticker update
+         */
+        function registerRaf(instance: Lenis) {
+          // Remove previous callback first so we never double-register
+          if (tickerCbRef.current) gsap.ticker.remove(tickerCbRef.current);
+          const cb = (time: number) => instance.raf(time * 1000);
+          tickerCbRef.current = cb;
+          gsap.ticker.add(cb);
+        }
 
-      registerRaf(lenisInstance);
-      lenisInstance.on('scroll', ScrollTrigger.update);
-    })
-    // Lenis is a progressive enhancement: if the lazy chunk fails to load,
-    // keep native scrolling — nothing depends on the instance.
-    .catch(() => {});
+        registerRaf(lenisInstance);
+        lenisInstance.on('scroll', ScrollTrigger.update);
+      })
+      // Lenis is a progressive enhancement: if the lazy chunk fails to load,
+      // keep native scrolling — nothing depends on the instance.
+      .catch(() => {});
 
     return () => {
       disposed = true;
       if (focusTimerRef.current) clearTimeout(focusTimerRef.current);
+      if (selectorPollTimerRef.current !== null) {
+        window.clearTimeout(selectorPollTimerRef.current);
+        selectorPollTimerRef.current = null;
+      }
       if (tickerCbRef.current) gsap.ticker.remove(tickerCbRef.current);
       lenisInstance?.destroy();
       lenisRef.current = null;
@@ -113,96 +140,119 @@ export function LenisProvider({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
-  const scrollTo = useCallback((target: string | number | HTMLElement, options?: { focusHeading?: boolean }) => {
-    const targetElement = typeof target === 'string'
-      ? document.querySelector(target)
-      : target instanceof HTMLElement
-        ? target
-        : null;
-
-    // Focus the section heading after the scroll settles (default on) —
-    // shared by the Lenis and native-fallback paths so both behave the same
-    // for direct consumers (adoption route cards, nav links).
-    const focusHeading = () => {
-      if (options?.focusHeading === false) return;
-      if (focusTimerRef.current) clearTimeout(focusTimerRef.current);
-      focusTimerRef.current = setTimeout(() => {
-        // SectionGate swaps its id-bearing placeholder for the mounted
-        // section while we scroll, detaching the element captured above.
-        // Re-resolve the selector so the heading lives in the real section.
-        const liveTarget =
-          typeof target === 'string'
-            ? document.querySelector(target)
-            : targetElement?.isConnected
-              ? targetElement
-              : null;
-
-        const heading = liveTarget?.querySelector('h2, h1');
-
-        if (heading instanceof HTMLElement) {
-          // Ensure heading can receive focus
-          if (!heading.hasAttribute('tabindex')) {
-            heading.setAttribute('tabindex', '-1');
-          }
-          heading.focus({ preventScroll: true });
-        }
+  const scrollTo = useCallback(
+    (target: string | number | HTMLElement, options?: { focusHeading?: boolean }) => {
+      // Cancel pending timers from an earlier navigation: neither an obsolete
+      // focus hand-off (focusHeading) nor a stale selector poll may scroll or
+      // move focus after the user has navigated somewhere else.
+      if (focusTimerRef.current !== null) {
+        window.clearTimeout(focusTimerRef.current);
         focusTimerRef.current = null;
-      }, reducedMotionRef.current ? 0 : 1400); // Slightly longer than scroll duration
-    };
+      }
+      if (selectorPollTimerRef.current !== null) {
+        window.clearTimeout(selectorPollTimerRef.current);
+        selectorPollTimerRef.current = null;
+      }
+      const targetElement =
+        typeof target === 'string'
+          ? document.querySelector(target)
+          : target instanceof HTMLElement
+            ? target
+            : null;
 
-    // Lenis is a progressive enhancement: while the lazy chunk is still
-    // loading (or if it failed — the .catch above never retries), fall back
-    // to native scrolling so direct scrollTo() consumers (adoption route
-    // cards, nav links) never swallow clicks.
-    if (!lenisRef.current) {
-      const behavior: ScrollBehavior = reducedMotionRef.current ? 'auto' : 'smooth';
+      // Focus the section heading after the scroll settles (default on) —
+      // shared by the Lenis and native-fallback paths so both behave the same
+      // for direct consumers (adoption route cards, nav links).
+      const focusHeading = () => {
+        if (options?.focusHeading === false) return;
+        if (focusTimerRef.current) clearTimeout(focusTimerRef.current);
+        focusTimerRef.current = setTimeout(
+          () => {
+            // SectionGate swaps its id-bearing placeholder for the mounted
+            // section while we scroll, detaching the element captured above.
+            // Re-resolve the selector so the heading lives in the real section.
+            const liveTarget =
+              typeof target === 'string'
+                ? document.querySelector(target)
+                : targetElement?.isConnected
+                  ? targetElement
+                  : null;
+
+            const heading = liveTarget?.querySelector('h2, h1');
+
+            if (heading instanceof HTMLElement) {
+              // Ensure heading can receive focus
+              if (!heading.hasAttribute('tabindex')) {
+                heading.setAttribute('tabindex', '-1');
+              }
+              heading.focus({ preventScroll: true });
+            }
+            focusTimerRef.current = null;
+          },
+          reducedMotionRef.current ? 0 : 1400,
+        ); // Slightly longer than scroll duration
+      };
+
+      // Lenis is a progressive enhancement: while the lazy chunk is still
+      // loading (or if it failed — the .catch above never retries), fall back
+      // to native scrolling so direct scrollTo() consumers (adoption route
+      // cards, nav links) never swallow clicks.
+      if (!lenisRef.current) {
+        const behavior: ScrollBehavior = reducedMotionRef.current ? 'auto' : 'smooth';
+        if (targetElement instanceof HTMLElement) {
+          // Same fixed-nav offset as the Lenis path (-80).
+          const top = targetElement.getBoundingClientRect().top + window.scrollY - 80;
+          window.scrollTo({ top: Math.max(top, 0), behavior });
+          focusHeading();
+        } else if (typeof target === 'number') {
+          window.scrollTo({ top: target, behavior });
+        }
+        return;
+      }
+
       if (targetElement instanceof HTMLElement) {
-        // Same fixed-nav offset as the Lenis path (-80).
-        const top = targetElement.getBoundingClientRect().top + window.scrollY - 80;
-        window.scrollTo({ top: Math.max(top, 0), behavior });
+        lenisRef.current.scrollTo(targetElement, {
+          offset: -80, // Account for fixed nav height
+          duration: reducedMotionRef.current ? 0 : 1.2,
+        });
+
         focusHeading();
       } else if (typeof target === 'number') {
-        window.scrollTo({ top: target, behavior });
-      }
-      return;
-    }
-
-    if (targetElement instanceof HTMLElement) {
-      lenisRef.current.scrollTo(targetElement, {
-        offset: -80, // Account for fixed nav height
-        duration: reducedMotionRef.current ? 0 : 1.2,
-      });
-
-      focusHeading();
-    } else if (typeof target === 'number') {
-      lenisRef.current.scrollTo(target);
-    } else if (typeof target === 'string') {
-      // The target isn't in the DOM yet — a gated section whose chunk is
-      // still loading (its id-bearing placeholder was already swapped for
-      // the skeleton, which carries the id too). Poll briefly for the real
-      // element instead of dropping the scroll entirely.
-      const poll = (remaining: number) => {
-        const el = document.querySelector(target);
-        if (el instanceof HTMLElement) {
-          if (!lenisRef.current) {
-            const behavior: ScrollBehavior = reducedMotionRef.current ? 'auto' : 'smooth';
-            const top = el.getBoundingClientRect().top + window.scrollY - 80;
-            window.scrollTo({ top: Math.max(top, 0), behavior });
-          } else {
-            lenisRef.current.scrollTo(el, {
-              offset: -80, // Account for fixed nav height
-              duration: reducedMotionRef.current ? 0 : 1.2,
-            });
+        lenisRef.current.scrollTo(target);
+      } else if (typeof target === 'string') {
+        // The target isn't in the DOM yet — a gated section whose chunk is
+        // still loading (its id-bearing placeholder was already swapped for
+        // the skeleton, which carries the id too). Poll briefly for the real
+        // element instead of dropping the scroll entirely.
+        const poll = (remaining: number) => {
+          // This tick has begun: the ref no longer refers to a pending timer
+          // (it either fired, or scrollTo's start cleared it).
+          selectorPollTimerRef.current = null;
+          const el = document.querySelector(target);
+          if (el instanceof HTMLElement) {
+            if (!lenisRef.current) {
+              const behavior: ScrollBehavior = reducedMotionRef.current ? 'auto' : 'smooth';
+              const top = el.getBoundingClientRect().top + window.scrollY - 80;
+              window.scrollTo({ top: Math.max(top, 0), behavior });
+            } else {
+              lenisRef.current.scrollTo(el, {
+                offset: -80, // Account for fixed nav height
+                duration: reducedMotionRef.current ? 0 : 1.2,
+              });
+            }
+            focusHeading();
+            return;
           }
-          focusHeading();
-          return;
-        }
-        if (remaining <= 0) return;
-        setTimeout(() => poll(remaining - 1), 200);
-      };
-      poll(15);
-    }
-  }, []);
+          if (remaining <= 0) return;
+          if (selectorPollTimerRef.current !== null)
+            window.clearTimeout(selectorPollTimerRef.current);
+          selectorPollTimerRef.current = setTimeout(() => poll(remaining - 1), 200);
+        };
+        poll(15);
+      }
+    },
+    [],
+  );
 
   // Handle anchor link clicks for focus management
   useEffect(() => {
@@ -235,9 +285,5 @@ export function LenisProvider({ children }: { children: React.ReactNode }) {
   // is created once — consumers don't re-render when the provider re-renders.
   const contextValue = useMemo(() => ({ scrollTo }), [scrollTo]);
 
-  return (
-    <LenisContext.Provider value={contextValue}>
-      {children}
-    </LenisContext.Provider>
-  );
+  return <LenisContext.Provider value={contextValue}>{children}</LenisContext.Provider>;
 }
