@@ -16,19 +16,7 @@ _KEYED_MERGE_FIELDS = ("code", "id")
 
 
 def load_toml(path: Path, *, required: bool = False) -> dict[str, Any]:
-    """
-    Load a TOML file as a configuration table.
-    
-    Parameters:
-    	path (Path): Path to the TOML file.
-    	required (bool): Whether a missing file should raise ConfigError.
-    
-    Returns:
-    	dict[str, Any]: The parsed TOML table, or an empty dictionary when an optional file is missing.
-    
-    Raises:
-    	ConfigError: If a required file is missing, the path is not a file, the file cannot be read or parsed, or the TOML document is not a table.
-    """
+    """Load a TOML table, allowing absence only for optional layers."""
     if not path.exists():
         if required:
             raise ConfigError(f"required TOML file not found: {path}")
@@ -48,18 +36,6 @@ def load_toml(path: Path, *, required: bool = False) -> dict[str, Any]:
 
 
 def _detect_keyed_merge_field(items: list[Any]) -> str | None:
-    """
-    Identify the field used to merge an array of dictionaries by key.
-    
-    Parameters:
-        items (list[Any]): Array items to inspect.
-    
-    Returns:
-        str | None: The identifier field name, or `None` when the items are not keyed dictionaries.
-    
-    Raises:
-        ConfigError: If a candidate identifier is not a string or is empty.
-    """
     if not items or not all(isinstance(item, dict) for item in items):
         return None
     for candidate in _KEYED_MERGE_FIELDS:
@@ -80,16 +56,6 @@ def _detect_keyed_merge_field(items: list[Any]) -> str | None:
 
 
 def _merge_arrays(base: list[Any], override: list[Any]) -> list[Any]:
-    """
-    Merge configuration arrays by keyed identity or append their items.
-    
-    Parameters:
-    	base (list[Any]): The existing array.
-    	override (list[Any]): The overriding array.
-    
-    Returns:
-    	list[Any]: The merged array, with matching keyed entries replaced and new entries appended; unkeyed arrays are concatenated.
-    """
     keyed_field = _detect_keyed_merge_field(base + override)
     if keyed_field is None:
         return list(base) + list(override)
@@ -112,18 +78,7 @@ def _merge_arrays(base: list[Any], override: list[Any]) -> list[Any]:
 
 
 def structural_merge(base: Any, override: Any) -> Any:
-    """
-    Merge configuration values recursively, applying override values at each level.
-    
-    Parameters:
-        base (Any): The original configuration value.
-        override (Any): The value that takes precedence.
-    
-    Returns:
-        Any: The merged value. Dictionaries are merged recursively, arrays use
-            keyed or append-based merging, and other values are replaced by the
-            override.
-    """
+    """Merge tables recursively, keyed table arrays by identity, and append other arrays."""
     if isinstance(base, dict) and isinstance(override, dict):
         result = dict(base)
         for key, value in override.items():
@@ -135,15 +90,6 @@ def structural_merge(base: Any, override: Any) -> Any:
 
 
 def merge_layers(layers: Iterable[dict[str, Any]]) -> dict[str, Any]:
-    """
-    Merge configuration layers in order, with later layers taking precedence.
-    
-    Parameters:
-    	layers (Iterable[dict[str, Any]]): Configuration dictionaries ordered from lowest to highest precedence.
-    
-    Returns:
-    	dict[str, Any]: The combined configuration.
-    """
     merged: dict[str, Any] = {}
     for layer in layers:
         merged = structural_merge(merged, layer)
@@ -151,15 +97,6 @@ def merge_layers(layers: Iterable[dict[str, Any]]) -> dict[str, Any]:
 
 
 def load_central_config(project_root: Path) -> dict[str, Any]:
-    """
-    Load the central BMAD configuration and apply available override layers.
-    
-    Parameters:
-    	project_root (Path): Project root containing the `_bmad` configuration directory.
-    
-    Returns:
-    	dict[str, Any]: The merged configuration, with later layers taking precedence.
-    """
     bmad_dir = project_root / "_bmad"
     return merge_layers(
         (
@@ -172,16 +109,6 @@ def load_central_config(project_root: Path) -> dict[str, Any]:
 
 
 def load_customization(project_root: Path | None, skill_dir: Path) -> dict[str, Any]:
-    """
-    Load skill customization settings with project and user overrides.
-    
-    Parameters:
-        project_root (Path | None): Project root containing optional customization overrides.
-        skill_dir (Path): Directory containing the required ``customize.toml`` file.
-    
-    Returns:
-        dict[str, Any]: Merged customization settings, with later overrides taking precedence.
-    """
     skill_name = skill_dir.name
     custom_dir = project_root / "_bmad" / "custom" if project_root else None
     return merge_layers(
