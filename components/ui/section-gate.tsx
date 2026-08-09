@@ -1,7 +1,15 @@
 'use client';
 
-import { useEffect, useRef, useState, type ReactNode } from 'react';
+import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { type ReactNode, useEffect, useRef, useState } from 'react';
+import { EVENTS, track } from '@/lib/analytics';
+
+// SectionGate calls ScrollTrigger.refresh() below, so register the plugin
+// locally instead of depending on LenisProvider's initialization.
+if (typeof window !== 'undefined') {
+  gsap.registerPlugin(ScrollTrigger);
+}
 
 interface SectionGateProps {
   children: ReactNode;
@@ -55,6 +63,7 @@ export function SectionGate({
       // Open when the placeholder's top is at/below the reveal line
       // (viewport bottom + lookahead) — i.e. near, visible, or scrolled past.
       if (rect.top <= window.innerHeight + REVEAL_MARGIN_PX) {
+        track(EVENTS.sectionReveal, { section: id ?? 'unnamed' });
         setVisible(true);
       }
     };
@@ -78,7 +87,9 @@ export function SectionGate({
       window.removeEventListener('resize', scheduleCheck);
       if (rafId !== null) cancelAnimationFrame(rafId);
     };
-  }, [visible]);
+    // id is a stable prop per gate, but the reveal path reads it for the
+    // analytics event — declare it so the effect resubscribes if it moves.
+  }, [visible, id]);
 
   // Focus hand-off when the sr-only load button opened the gate: the button
   // unmounts with the placeholder, so without this keyboard focus drops to
@@ -103,20 +114,17 @@ export function SectionGate({
         const el = document.getElementById(id);
         return el instanceof HTMLElement ? el : null;
       }
-      return (
-        revealedRef.current?.querySelector('h1, h2, h3, h4, h5, h6') ?? null
-      );
+      return revealedRef.current?.querySelector('h1, h2, h3, h4, h5, h6') ?? null;
     };
 
     // The failed-chunk fallback section (or its wrapper, for id-less gates)
     // isn't the final hand-off target — return its retry control so focus
     // lands on the actionable element without committing the hand-off.
     const errorRetryTarget = (target: HTMLElement): HTMLButtonElement | null =>
-      (target.closest('[data-gate-state="error"]') ??
-        target.querySelector('[data-gate-state="error"]'))?.querySelector<HTMLButtonElement>(
-        'button'
-      ) ??
-      null;
+      (
+        target.closest('[data-gate-state="error"]') ??
+        target.querySelector('[data-gate-state="error"]')
+      )?.querySelector<HTMLButtonElement>('button') ?? null;
 
     // Park focus on the retry control only when focus was actually lost —
     // i.e. it dropped to <body> because the previous retry button unmounted
@@ -193,7 +201,8 @@ export function SectionGate({
           const wrapper = revealedRef.current;
           const retry = wrapper ? errorRetryTarget(wrapper) : null;
           if (retry) focusRetry(retry);
-          else if (document.activeElement === document.body) wrapper?.focus({ preventScroll: true });
+          else if (document.activeElement === document.body)
+            wrapper?.focus({ preventScroll: true });
         }
         return; // slow path below keeps watching
       }
@@ -261,12 +270,13 @@ export function SectionGate({
     <div ref={containerRef}>
       <div ref={ref} id={id} className={`relative ${placeholderClassName} scroll-mt-20`}>
         <button
-          type="button"
+          type='button'
           onClick={() => {
             openedByButtonRef.current = true;
+            track(EVENTS.sectionReveal, { section: id ?? 'unnamed' });
             setVisible(true);
           }}
-          className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 rounded-lg bg-surface px-4 py-2 text-sm font-semibold text-text-primary shadow-card focus-ring-target"
+          className='sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 rounded-lg bg-surface px-4 py-2 text-sm font-semibold text-text-primary shadow-card focus-ring-target'
         >
           Laadi sisu
         </button>

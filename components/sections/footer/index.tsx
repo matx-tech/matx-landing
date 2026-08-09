@@ -1,20 +1,30 @@
 'use client';
 
-import { useRef, useEffect } from 'react';
-import Link from 'next/link';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { Award, GraduationCap, Mail, MessageCircle, Building2, GitBranch } from 'lucide-react';
+import { Award, Building2, GitBranch, GraduationCap, Mail, MessageCircle } from 'lucide-react';
+import Link from 'next/link';
+import { useEffect, useRef } from 'react';
+import { CALENDLY_URL, FOOTER_COPY, SECTION_IDS, TECH_OVERVIEW } from '@/lib/content/landing-copy';
 import { usePrefersReducedMotion } from '@/lib/hooks/use-prefers-reduced-motion';
-import { motionTokens, gsapEase, staggers } from '@/lib/motion-tokens';
-import { SECTION_IDS, CALENDLY_URL } from '@/lib/content/landing-copy';
+import { gsapEase, motionTokens, staggers } from '@/lib/motion-tokens';
+
+// Icon per social entry, keyed by the contract's stable id — a copy edit
+// (add/remove/reorder) is a compile error here, not a runtime crash.
+type SocialId = (typeof FOOTER_COPY.social)[number]['id'];
+const SOCIAL_ICONS: Record<SocialId, typeof MessageCircle> = {
+  twitter: MessageCircle,
+  linkedin: Building2,
+  github: GitBranch,
+  mail: Mail,
+};
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
 }
 
 /**
- * Renders the MATx landing page footer with branding, navigation, contact links, legal links, and responsive entrance animations.
+ * Renders the MATx landing-page footer with branding, navigation, contact and social links, legal links, and motion-aware entrance animations.
  */
 export function FooterSection() {
   const footerRef = useRef<HTMLElement>(null);
@@ -55,7 +65,7 @@ export function FooterSection() {
               start: 'top 85%',
               toggleActions: 'play none none reverse',
             },
-          }
+          },
         );
       }
 
@@ -74,7 +84,7 @@ export function FooterSection() {
               start: 'top 85%',
               toggleActions: 'play none none reverse',
             },
-          }
+          },
         );
       }
 
@@ -93,7 +103,7 @@ export function FooterSection() {
               end: 'bottom bottom',
               scrub: 0.5,
             },
-          }
+          },
         );
       }
     }, footerRef);
@@ -102,158 +112,195 @@ export function FooterSection() {
   }, [prefersReducedMotion]);
 
   return (
-    <footer ref={footerRef} className="relative bg-canvas border-t border-border section-fade-from-surface">
-      <div className="container mx-auto px-4 md:px-8 lg:px-16 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
+    <footer
+      ref={footerRef}
+      className='relative bg-canvas border-t border-border section-fade-from-surface'
+    >
+      <div className='container mx-auto px-4 md:px-8 lg:px-16 py-16'>
+        <div className='grid grid-cols-1 md:grid-cols-4 gap-8 mb-12'>
           {/* Logo & Description */}
           <div
-            ref={(el) => { sectionsRef.current[0] = el; }}
-            className="md:col-span-2"
+            ref={(el) => {
+              sectionsRef.current[0] = el;
+            }}
+            className='md:col-span-2'
           >
-            <div className="flex items-center gap-2 mb-4">
-              <span className="text-2xl font-display font-bold">
-                <span className="text-primary">MAT</span>
-                <span className="text-secondary">x</span>
+            <div className='flex items-center gap-2 mb-4'>
+              <span className='text-2xl font-display font-bold'>
+                <span className='text-primary'>MAT</span>
+                <span className='text-secondary'>x</span>
               </span>
             </div>
-            <p className="text-text-secondary text-sm max-w-md mb-4">
-              Adaptiivne matemaatikaõpikeskkond Eesti põhikoolidele. Andmepõhine õpitee, teaduslikel alustel.
-            </p>
-            <div className="flex flex-wrap gap-4">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-elevated border border-border">
-                <Award className="w-3 h-3 text-warning" />
-                <span className="text-xs text-text-secondary">FELLIN HÄKK 2026</span>
+            <p className='text-text-secondary text-sm max-w-md mb-4'>{FOOTER_COPY.description}</p>
+            <div className='flex flex-wrap gap-4'>
+              <div className='inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-elevated border border-border'>
+                <Award className='w-3 h-3 text-warning' />
+                <span className='text-xs text-text-secondary'>{FOOTER_COPY.awardPrimary}</span>
               </div>
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-elevated border border-border">
-                <GraduationCap className="w-3 h-3 text-secondary" />
-                <span className="text-xs text-text-secondary">Presidendi Häkaton</span>
+              <div className='inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-elevated border border-border'>
+                <GraduationCap className='w-3 h-3 text-secondary' />
+                <span className='text-xs text-text-secondary'>{FOOTER_COPY.awardSecondary}</span>
               </div>
             </div>
           </div>
 
           {/* Links */}
-          <div ref={(el) => { sectionsRef.current[1] = el; }}>
-            <h3 className="text-text-primary font-display font-semibold mb-4 text-sm">Navigatsioon</h3>
-            <ul className="space-y-2">
+          <div
+            ref={(el) => {
+              sectionsRef.current[1] = el;
+            }}
+          >
+            <h3 className='text-text-primary font-display font-semibold mb-4 text-sm'>
+              {FOOTER_COPY.navHeading}
+            </h3>
+            <ul className='space-y-2'>
               <li>
-                <a href={`#${SECTION_IDS.problem}`} className="text-text-secondary hover:text-primary transition-colors text-sm focus-ring-target rounded-md" style={{ textDecoration: 'underline' }}>
+                <a
+                  href={`#${SECTION_IDS.problem}`}
+                  className='text-text-secondary hover:text-primary transition-colors text-sm focus-ring-target rounded-md underline'
+                >
                   Probleem
                 </a>
               </li>
               <li>
-                <a href={`#${SECTION_IDS.workflow}`} className="text-text-secondary hover:text-primary transition-colors text-sm focus-ring-target rounded-md" style={{ textDecoration: 'underline' }}>
+                <a
+                  href={`#${SECTION_IDS.workflow}`}
+                  className='text-text-secondary hover:text-primary transition-colors text-sm focus-ring-target rounded-md underline'
+                >
                   Töövoog
                 </a>
               </li>
               <li>
-                <a href={`#${SECTION_IDS.capabilities}`} className="text-text-secondary hover:text-primary transition-colors text-sm focus-ring-target rounded-md" style={{ textDecoration: 'underline' }}>
+                <a
+                  href={`#${SECTION_IDS.capabilities}`}
+                  className='text-text-secondary hover:text-primary transition-colors text-sm focus-ring-target rounded-md underline'
+                >
                   Teemad
                 </a>
               </li>
               <li>
-                <a href={`#${SECTION_IDS.student}`} className="text-text-secondary hover:text-primary transition-colors text-sm focus-ring-target rounded-md" style={{ textDecoration: 'underline' }}>
+                <a
+                  href={`#${SECTION_IDS.student}`}
+                  className='text-text-secondary hover:text-primary transition-colors text-sm focus-ring-target rounded-md underline'
+                >
                   Õpitee
                 </a>
               </li>
               <li>
-                <a href={`#${SECTION_IDS.teacher}`} className="text-text-secondary hover:text-primary transition-colors text-sm focus-ring-target rounded-md" style={{ textDecoration: 'underline' }}>
+                <a
+                  href={`#${SECTION_IDS.teacher}`}
+                  className='text-text-secondary hover:text-primary transition-colors text-sm focus-ring-target rounded-md underline'
+                >
                   Õpetajale
                 </a>
               </li>
               <li>
-                <a href={`#${SECTION_IDS.faq}`} className="text-text-secondary hover:text-primary transition-colors text-sm focus-ring-target rounded-md" style={{ textDecoration: 'underline' }}>
+                <a
+                  href={`#${SECTION_IDS.faq}`}
+                  className='text-text-secondary hover:text-primary transition-colors text-sm focus-ring-target rounded-md underline'
+                >
                   KKK
                 </a>
+              </li>
+              <li>
+                <Link
+                  href={TECH_OVERVIEW.href}
+                  className='text-text-secondary hover:text-primary transition-colors text-sm focus-ring-target rounded-md underline'
+                >
+                  {TECH_OVERVIEW.label}
+                </Link>
               </li>
             </ul>
           </div>
 
           {/* Contact */}
-          <div ref={(el) => { sectionsRef.current[2] = el; }}>
-            <h3 className="text-text-primary font-display font-semibold mb-4 text-sm">Kontakt</h3>
-            <ul className="space-y-2">
+          <div
+            ref={(el) => {
+              sectionsRef.current[2] = el;
+            }}
+          >
+            <h3 className='text-text-primary font-display font-semibold mb-4 text-sm'>
+              {FOOTER_COPY.contactHeading}
+            </h3>
+            <ul className='space-y-2'>
               <li>
                 <a
-                  href="mailto:andri@matx.ee"
-                  className="text-text-secondary hover:text-primary transition-colors text-sm focus-ring-target rounded-md"
-                  style={{ textDecoration: 'underline' }}
+                  href={`mailto:${FOOTER_COPY.contactEmail}`}
+                  className='text-text-secondary hover:text-primary transition-colors text-sm focus-ring-target rounded-md underline'
                 >
-                  andri@matx.ee
+                  {FOOTER_COPY.contactEmail}
                 </a>
               </li>
               <li>
                 <a
                   href={CALENDLY_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-text-secondary hover:text-secondary transition-colors text-sm focus-ring-target rounded-md"
-                  style={{ textDecoration: 'underline' }}
+                  target='_blank'
+                  rel='noopener noreferrer'
+                  className='text-text-secondary hover:text-secondary transition-colors text-sm focus-ring-target rounded-md underline'
                 >
-                  Broneeri vestlus
+                  {FOOTER_COPY.calendlyLabel}
+                  <span className='sr-only'> (avaneb uues aknas)</span>
                 </a>
               </li>
             </ul>
 
             {/* Social Links */}
-            <div className="flex gap-4 mt-4">
-              <a
-                href="https://twitter.com/matx_ee"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-11 h-11 rounded-lg bg-elevated border border-border flex items-center justify-center hover:bg-surface transition-colors focus-ring-target"
-                aria-label="MATx Twitter"
-              >
-                <MessageCircle className="w-4 h-4 text-text-secondary" />
-              </a>
-              <a
-                href="https://linkedin.com/company/matx-ee"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-11 h-11 rounded-lg bg-elevated border border-border flex items-center justify-center hover:bg-surface transition-colors focus-ring-target"
-                aria-label="MATx LinkedIn"
-              >
-                <Building2 className="w-4 h-4 text-text-secondary" />
-              </a>
-              <a
-                href="https://github.com/matx-ee"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-11 h-11 rounded-lg bg-elevated border border-border flex items-center justify-center hover:bg-surface transition-colors focus-ring-target"
-                aria-label="MATx GitHub"
-              >
-                <GitBranch className="w-4 h-4 text-text-secondary" />
-              </a>
-              <a
-                href="mailto:andri@matx.ee"
-                className="w-11 h-11 rounded-lg bg-elevated border border-border flex items-center justify-center hover:bg-surface transition-colors focus-ring-target"
-                aria-label="MATx meil"
-              >
-                <Mail className="w-4 h-4 text-text-secondary" />
-              </a>
+            <div className='flex gap-4 mt-4'>
+              {FOOTER_COPY.social.map((social) => {
+                const Icon = SOCIAL_ICONS[social.id];
+                return (
+                  <a
+                    key={social.id}
+                    href={social.href}
+                    target={social.href.startsWith('http') ? '_blank' : undefined}
+                    rel={social.href.startsWith('http') ? 'noopener noreferrer' : undefined}
+                    className='w-11 h-11 rounded-lg bg-elevated border border-border flex items-center justify-center hover:bg-surface transition-colors focus-ring-target'
+                    aria-label={social.label}
+                  >
+                    <Icon className='w-4 h-4 text-text-secondary' />
+                  </a>
+                );
+              })}
             </div>
           </div>
         </div>
 
         {/* Bottom Bar */}
-        <div ref={bottomRef} className="pt-8 border-t border-border flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-text-secondary text-xs">
+        <div
+          ref={bottomRef}
+          className='pt-8 border-t border-border flex flex-col md:flex-row items-center justify-between gap-4'
+        >
+          <p className='text-text-secondary text-xs'>
             © 2026 MATx. Kõik õigused kaitstud. Targa Tuleviku Fondi toetatud.
           </p>
-          <div className="flex items-center gap-4 text-xs text-text-secondary">
-            <Link href="/privaatsus" className="hover:text-primary transition-colors focus-ring-target rounded-md" style={{ textDecoration: 'underline' }}>
+          <div className='flex items-center gap-4 text-xs text-text-secondary'>
+            <Link
+              href='/privaatsus'
+              className='hover:text-primary transition-colors focus-ring-target rounded-md underline'
+            >
               Privaatsuspoliitika
             </Link>
-            <Link href="/tingimused" className="hover:text-primary transition-colors focus-ring-target rounded-md" style={{ textDecoration: 'underline' }}>
+            <Link
+              href='/tingimused'
+              className='hover:text-primary transition-colors focus-ring-target rounded-md underline'
+            >
               Teenuse tingimused
             </Link>
-            <Link href="/gdpr" className="hover:text-primary transition-colors focus-ring-target rounded-md" style={{ textDecoration: 'underline' }}>
+            <Link
+              href='/gdpr'
+              className='hover:text-primary transition-colors focus-ring-target rounded-md underline'
+            >
               GDPR
             </Link>
           </div>
         </div>
 
         {/* Brand gradient line */}
-        <div ref={gradientRef} className="mt-8 h-1 bg-gradient-brand rounded-full opacity-30" style={{ transformOrigin: 'left' }} />
+        <div
+          ref={gradientRef}
+          className='mt-8 h-1 bg-gradient-brand rounded-full opacity-30'
+          style={{ transformOrigin: 'left' }}
+        />
       </div>
     </footer>
   );

@@ -6,14 +6,14 @@
 
 'use client';
 
-import { useRef } from 'react';
+import { useGSAP } from '@gsap/react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { useGSAP } from '@gsap/react';
-import { PRODUCT_FIXTURE } from '@/lib/content/landing-evidence';
+import { useRef } from 'react';
 import { InlineFractionalExpression } from '@/components/ui/fraction';
+import { PRODUCT_FIXTURE } from '@/lib/content/landing-evidence';
 import { usePrefersReducedMotion } from '@/lib/hooks/use-prefers-reduced-motion';
-import { motionTokens, gsapEase } from '@/lib/motion-tokens';
+import { gsapEase, motionTokens } from '@/lib/motion-tokens';
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
@@ -41,7 +41,7 @@ export function ProductFixture({
   animated = true,
   triggerId,
   delay = 0,
-  className = ''
+  className = '',
 }: ProductFixtureProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const answerRef = useRef<HTMLDivElement>(null);
@@ -50,9 +50,9 @@ export function ProductFixture({
   const actionRef = useRef<HTMLDivElement>(null);
   const prefersReducedMotion = usePrefersReducedMotion();
 
-  // Derive initial style opacity: always hidden (0) when animated and NOT reduced motion
-  const panelInitialOpacity = (animated && !prefersReducedMotion) ? 0 : undefined;
-
+  // Panels render fully visible (SSR/no-JS safe) — the hidden initial state is
+  // applied by GSAP just before animation in the effect below, never in the
+  // server HTML, so content can't get stuck invisible if JS fails.
   useGSAP(
     () => {
       if (!animated || !containerRef.current) return;
@@ -60,16 +60,23 @@ export function ProductFixture({
       const elements = [answerRef.current, signalRef.current, retryRef.current, actionRef.current];
 
       if (prefersReducedMotion) {
-        // Set all panels to their final visible state
-        const visibleElements = elements.filter(Boolean);
+        // Content is already visible via the CSS fallback — hand control back
+        // from the !important rule so inline state matches the DOM.
+        const visibleElements = elements.filter((el): el is HTMLDivElement => el !== null);
+        visibleElements.forEach((el) => el.classList.remove('gsap-animate-on-mount'));
         gsap.set(visibleElements, { opacity: 1, y: 0 });
         return;
       }
 
       // Filter out any null refs before passing to GSAP (defensive against
       // React commit-order edge cases where a child ref hasn't attached yet).
-      const validElements = elements.filter(Boolean);
+      const validElements = elements.filter((el): el is HTMLDivElement => el !== null);
       if (validElements.length === 0) return;
+
+      // Strip the CSS fallback before gsap.set — .gsap-animate-on-mount has
+      // opacity: 1 !important which overrides GSAP inline styles (keeps panels
+      // visible through SSR/hydration until the animation takes over).
+      validElements.forEach((el) => el.classList.remove('gsap-animate-on-mount'));
 
       // Set initial state
       gsap.set(validElements, { opacity: 0, y: motionTokens.distance.md });
@@ -79,12 +86,20 @@ export function ProductFixture({
       if (triggerId) {
         const triggerEl = document.getElementById(triggerId);
         if (triggerEl) {
-          scrollTriggerConfig = { trigger: triggerEl, start: 'top center', end: 'bottom center', toggleActions: 'play none none reverse' };
+          scrollTriggerConfig = {
+            trigger: triggerEl,
+            start: 'top center',
+            end: 'bottom center',
+            toggleActions: 'play none none reverse',
+          };
         }
       }
 
       const timeline = gsap.timeline({
-        defaults: { duration: motionTokens.duration.slow, ease: gsapEase(motionTokens.easing.smooth) },
+        defaults: {
+          duration: motionTokens.duration.slow,
+          ease: gsapEase(motionTokens.easing.smooth),
+        },
         scrollTrigger: scrollTriggerConfig,
       });
 
@@ -103,96 +118,94 @@ export function ProductFixture({
         .to(targets.retry, { opacity: 1, y: 0 }, '+=0.3')
         .to(targets.action, { opacity: 1, y: 0 }, '+=0.3');
     },
-    { scope: containerRef, dependencies: [animated, triggerId, delay, prefersReducedMotion], revertOnUpdate: true },
+    {
+      scope: containerRef,
+      dependencies: [animated, triggerId, delay, prefersReducedMotion],
+      revertOnUpdate: true,
+    },
   );
 
   return (
     <section
       ref={containerRef}
       className={`space-y-4 ${className}`}
-      aria-labelledby="workflow-fixture-title"
+      aria-labelledby='workflow-fixture-title'
     >
       {/* Label */}
-      <h2 id="workflow-fixture-title" className="text-xs font-medium text-text-secondary uppercase tracking-wider">
+      <h2
+        id='workflow-fixture-title'
+        className='text-xs font-medium text-text-secondary uppercase tracking-wider'
+      >
         {PRODUCT_FIXTURE.label}
       </h2>
 
       {/* Student answer */}
       <div
         ref={answerRef}
-        className="p-4 bg-card rounded-lg border border-border"
-        style={panelInitialOpacity !== undefined ? { opacity: panelInitialOpacity } : undefined}
+        className='gsap-animate-on-mount p-4 bg-card rounded-lg border border-border'
       >
-        <div className="text-sm font-medium text-text-primary mb-2">
+        <div className='text-sm font-medium text-text-primary mb-2'>
           <InlineFractionalExpression expression={PRODUCT_FIXTURE.task.question} />
         </div>
-        <div className="text-sm text-text-secondary mb-1">
-          Õpilase vastus:{' '}<span className="font-mono text-alert"><InlineFractionalExpression expression={PRODUCT_FIXTURE.answer.submitted} /></span>
+        <div className='text-sm text-text-secondary mb-1'>
+          Õpilase vastus:{' '}
+          <span className='font-mono text-alert'>
+            <InlineFractionalExpression expression={PRODUCT_FIXTURE.answer.submitted} />
+          </span>
         </div>
-        <div className="text-xs text-text-secondary">
-          Oskus: {PRODUCT_FIXTURE.task.skill}
-        </div>
+        <div className='text-xs text-text-secondary'>Oskus: {PRODUCT_FIXTURE.task.skill}</div>
       </div>
 
       {/* Signal detection */}
       <div
         ref={signalRef}
-        className="p-4 bg-info-surface rounded-lg border border-info-border"
-        style={panelInitialOpacity !== undefined ? { opacity: panelInitialOpacity } : undefined}
+        className='gsap-animate-on-mount p-4 bg-info-surface rounded-lg border border-info-border'
       >
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-xs font-medium text-info uppercase tracking-wider">
+        <div className='flex items-center justify-between mb-2'>
+          <span className='text-xs font-medium text-info uppercase tracking-wider'>
             {PRODUCT_FIXTURE.signal.label}
           </span>
-          <span className="text-xs text-info">
-            {PRODUCT_FIXTURE.signal.confidence}
-          </span>
+          <span className='text-xs text-info'>{PRODUCT_FIXTURE.signal.confidence}</span>
         </div>
-        <div className="text-sm font-medium text-info-strong">
-          {PRODUCT_FIXTURE.signal.pattern}
-        </div>
+        <div className='text-sm font-medium text-info-strong'>{PRODUCT_FIXTURE.signal.pattern}</div>
       </div>
 
       {/* Targeted retry */}
       <div
         ref={retryRef}
-        className="p-4 bg-card rounded-lg border border-border"
-        style={panelInitialOpacity !== undefined ? { opacity: panelInitialOpacity } : undefined}
+        className='gsap-animate-on-mount p-4 bg-card rounded-lg border border-border'
       >
-        <div className="text-xs font-medium text-text-secondary uppercase tracking-wider mb-2">
+        <div className='text-xs font-medium text-text-secondary uppercase tracking-wider mb-2'>
           Järgmine harjutus
         </div>
-        <div className="text-sm font-medium text-text-primary mb-2">
+        <div className='text-sm font-medium text-text-primary mb-2'>
           <InlineFractionalExpression expression={PRODUCT_FIXTURE.retry.question} />
         </div>
-        <div className="text-xs text-text-secondary">
-          {PRODUCT_FIXTURE.retry.rationale}
-        </div>
+        <div className='text-xs text-text-secondary'>{PRODUCT_FIXTURE.retry.rationale}</div>
       </div>
 
       {/* Teacher action */}
       <div
         ref={actionRef}
-        className="p-4 bg-success-surface rounded-lg border border-success-border"
-        style={panelInitialOpacity !== undefined ? { opacity: panelInitialOpacity } : undefined}
+        className='gsap-animate-on-mount p-4 bg-success-surface rounded-lg border border-success-border'
       >
-        <div className="text-xs font-medium text-success uppercase tracking-wider mb-2">
+        <div className='text-xs font-medium text-success uppercase tracking-wider mb-2'>
           Õpetaja otsustab
         </div>
-        <div className="text-sm font-medium text-success-strong mb-2">
+        <div className='text-sm font-medium text-success-strong mb-2'>
           {PRODUCT_FIXTURE.teacherAction.recommendation}
         </div>
-        <div className="text-xs text-success mb-3">
+        <div className='text-xs text-success mb-3'>
           Põhjendus: {PRODUCT_FIXTURE.teacherAction.evidence}
         </div>
-        <div className="flex gap-2 flex-wrap">
+        <div className='flex gap-2 flex-wrap'>
           {PRODUCT_FIXTURE.teacherAction.options.map((option) => (
             <button
               key={option.action}
-              className="px-3 py-1.5 text-xs font-medium rounded border border-success-border bg-surface text-success-strong opacity-60 cursor-default"
-              type="button"
-              disabled
-              title="Näidisandmed — tegevus ei ole selles vaates aktiivne"
+              className='px-3 py-1.5 text-xs font-medium rounded border border-success-border bg-surface text-success-strong opacity-60 cursor-default'
+              type='button'
+              aria-disabled='true'
+              title='Näidisandmed — tegevus ei ole selles vaates aktiivne'
             >
               {option.label}
             </button>

@@ -3,8 +3,10 @@
  * Single source of truth for all public-facing copy
  */
 
-// Capability maturity status
-export type CapabilityStatus = 'Saadaval' | 'Piloodis' | 'Kavandatud';
+// Capability maturity status — single source of truth for the status
+// vocabulary used across the landing page and the technical overview.
+export const CAPABILITY_STATUSES = ['Saadaval', 'Piloodis', 'Kavandatud'] as const;
+export type CapabilityStatus = (typeof CAPABILITY_STATUSES)[number];
 
 // Prohibited phrases that must not appear in public copy
 export const PROHIBITED_PHRASES = [
@@ -31,16 +33,34 @@ export const REGISTRATION_COPY = {
   close: 'Sulge',
   loading: 'Laadime registreerimisvormi…',
   cancel: 'Tühista',
+  dialogTitle: 'Registreeri kool pilootkatsetusele',
+  dialogHeading: 'Registreeri oma kool pilootkatsetusele',
+  dialogSubtitle: 'Targa Tuleviku Fondi toetusel. Tasuta. Kohustusteta.',
+  submit: 'Esita registreering',
+  submitting: 'Saadetakse…',
+  contactNote: 'Võtame ühendust 48 tunni jooksul',
+  contactEmail: 'andri@matx.ee',
+  successTitle: 'Registreerimine on edastatud!',
+  successBody: 'Täname! Võtame teiega ühendust 48 tunni jooksul.',
+  nextStepsHeading: 'Järgmised sammud:',
+  nextStep1: 'Registreerimine on edastatud MATx meeskonnale',
+  nextStep2: 'Vastame 48 tunni jooksul broneerimislingiga',
+  announcementSuccess: 'Registreerimine on edastatud',
 } as const;
 
 // Shared URLs
 export const CALENDLY_URL = 'https://calendly.com/matx-ee/15min' as const;
 
+// Technical overview page — single source for its URL and navigation label
+export const TECH_OVERVIEW = { href: '/tehniline', label: 'Tehniline ülevaade' } as const;
+
 // Site metadata — single source for OG/Twitter/JSON-LD
 export const SITE_META = {
   title: 'MATx — Õpilase harjutamine ja õpetaja otsus ühes töövoos',
-  shortDescription: 'Seob õpilase vastused, jälgitavad signaalid ja õpetaja tegevussoovituse üheks läbipaistvaks töövooks.',
-  longDescription: 'Seob õpilase harjutamise, arusaadava tagasiside ja õpetaja tegevussoovituse üheks jälgitavaks töövooks',
+  shortDescription:
+    'Seob õpilase vastused, jälgitavad signaalid ja õpetaja tegevussoovituse üheks läbipaistvaks töövooks.',
+  longDescription:
+    'Seob õpilase harjutamise, arusaadava tagasiside ja õpetaja tegevussoovituse üheks jälgitavaks töövooks',
   url: 'https://matx.ee',
   locale: 'et_EE' as const,
 } as const;
@@ -48,10 +68,64 @@ export const SITE_META = {
 // Locked narrative strings
 export const HERO_COPY = {
   headline: 'Iga vastus aitab leida järgmise sammu.',
-  support: 'matx.ee seob õpilase harjutamise, arusaadava tagasiside ja õpetaja tegevussoovituse üheks jälgitavaks töövooks.',
+  support:
+    'matx.ee seob õpilase harjutamise, arusaadava tagasiside ja õpetaja tegevussoovituse üheks jälgitavaks töövooks.',
   primaryCTA: 'Liitu kooli piloodiga',
   secondaryCTA: 'Vaata töövoogu',
   trustLine: 'Soovitused toetavad õpetaja otsust. Õpetaja kontroll säilib.',
+  // Persona picker — labels mirror the ADOPTION_ROUTES vocabulary.
+  personaPrompt: 'Ma olen:',
+  personas: [
+    { id: 'teacher', label: 'Õpetaja' },
+    { id: 'principal', label: 'Koolijuht' },
+    { id: 'procurement', label: 'Hankija/IT' },
+  ] as const,
+  principalCTA: 'Broneeri demokõne',
+  procurementCTA: 'Vaata tehnilist ülevaadet',
+} as const;
+
+// CTA section — statistics, marquee highlights and card copy rendered from
+// one contract so display and animation fallbacks cannot drift.
+export const CTA_COPY = {
+  cardTitle: 'Koolide registreerimine',
+  cardBody: 'Liitu 10 pilootkooliga. Sügisesed klassid 7.-9. klassini.',
+  registerCta: 'Registreeri kool',
+  stats: [
+    {
+      id: 'tasks',
+      value: '150+',
+      label: 'ülesannet (Saadaval)',
+      // Scramble alphabet for the CTA number animation.
+      chars: '0123456789+',
+    },
+    { id: 'schools', value: '10', label: 'kooli (Piloodis)', chars: '0123456789' },
+  ] as const,
+  marqueeItems: ['Alusta tasuta', 'Õpi mõistvalt', 'Säästa aega'] as const,
+} as const;
+
+// Awards — rendered in the hero badge row and the footer from one contract.
+export const AWARDS = {
+  fellin: 'FELLIN HÄKK 2026 — I koht',
+  presidential: 'Presidendi Häkaton 2026',
+} as const;
+
+// Footer — public description, awards, contact and social links from one
+// contract; matches the JSON-LD sameAs list in app/layout.tsx.
+export const FOOTER_COPY = {
+  description:
+    'Adaptiivne matemaatikaõpikeskkond Eesti põhikoolidele. Andmepõhine õpitee, teaduslikel alustel.',
+  awardPrimary: AWARDS.fellin,
+  awardSecondary: AWARDS.presidential,
+  navHeading: 'Navigatsioon',
+  contactHeading: 'Kontakt',
+  contactEmail: 'andri@matx.ee',
+  calendlyLabel: 'Broneeri vestlus',
+  social: [
+    { id: 'twitter', href: 'https://twitter.com/matx_ee', label: 'MATx Twitter' },
+    { id: 'linkedin', href: 'https://linkedin.com/company/matx-ee', label: 'MATx LinkedIn' },
+    { id: 'github', href: 'https://github.com/matx-ee', label: 'MATx GitHub' },
+    { id: 'mail', href: 'mailto:andri@matx.ee', label: 'MATx meil' },
+  ] as const,
 } as const;
 
 // Evidence loop stages
@@ -59,26 +133,35 @@ export const EVIDENCE_STAGES = [
   {
     number: 1,
     title: 'Õpilane vastab',
-    description: 'Õpilane lahendab ülesande digitaalselt või paberil. Vastus registreeritakse süsteemis.',
+    description:
+      'Õpilane lahendab ülesande digitaalselt või paberil. Vastus registreeritakse süsteemis.',
+    eyebrow: 'Registreeritud',
+    visual: 'answer' as const,
   },
   {
     number: 2,
     title: 'Vastust tõlgendatakse',
-    description: 'Süsteem tuvastab võimaliku veamustri. Signaal on kontrollitav, mitte lõplik diagnoos.',
+    description: 'Süsteem tuvastab võimaliku veamustri õpilase vastuses.',
     caveat: 'Signaal on võimalik veamuster, mitte lõplik diagnoos',
     tone: 'info' as const,
+    eyebrow: 'Kontrollitav signaal',
+    visual: 'signal' as const,
   },
   {
     number: 3,
     title: 'Harjutus sihitakse',
     description: 'Õpilasele pakutakse järgmine harjutus, mis aitab veamustrit täpsustada.',
+    eyebrow: 'Järgmine samm',
+    visual: 'retry' as const,
   },
   {
     number: 4,
     title: 'Õpetaja otsustab',
-    description: 'Õpetaja vaatab soovituse üle ja võib selle vastu võtta, muuta või eirata.',
+    description: 'Õpetaja vaatab soovituse üle koos tõendusmaterjaliga.',
     caveat: 'Õpetaja võib soovituse vastu võtta, muuta või eirata',
     tone: 'success' as const,
+    eyebrow: 'Õpetaja otsus',
+    visual: 'decision' as const,
   },
 ] as const;
 
@@ -101,7 +184,8 @@ export const PROBLEM_BEATS = [
 // Student story
 export const STUDENT_STORY = {
   heading: 'Õpilane näeb, mida järgmisena harjutada.',
-  description: 'Õpilane saab selge tagasiside ja konkreetse järgmise sammu. Üks õige kordus ei tähenda veel valdamist — süsteem jätkab jälgimist.',
+  description:
+    'Õpilane saab selge tagasiside ja konkreetse järgmise sammu. Üks õige kordus ei tähenda veel valdamist — süsteem jätkab jälgimist.',
   steps: [
     {
       title: 'Õpilane lahendab ülesande',
@@ -133,14 +217,16 @@ export const STUDENT_STORY = {
 // Teacher story
 export const TEACHER_STORY = {
   heading: 'Õpetaja vaatab soovituse üle ja otsustab',
-  description: 'Õpetaja näeb õpilaste töid, tuvastatud veamustreid ja süsteemi soovitusi. Õpetaja võib soovituse vastu võtta, muuta või eirata.',
+  description:
+    'Õpetaja näeb õpilaste töid, tuvastatud veamustreid ja süsteemi soovitusi. Õpetaja võib soovituse vastu võtta, muuta või eirata.',
   heatmapLabel: 'Näidisandmed',
 } as const;
 
 // Capability/Topics section
 export const TOPICS_SECTION = {
   heading: 'Mida saab MATx-is harjutada?',
-  description: 'Praegune õppesisu katab valitud põhikooli matemaatika oskusi. Uued teemad lisatakse piloodi käigus.',
+  description:
+    'Praegune õppesisu katab valitud põhikooli matemaatika oskusi. Uued teemad lisatakse piloodi käigus.',
 } as const;
 
 // National context cards
@@ -154,14 +240,16 @@ export const NATIONAL_CONTEXT = [
   },
   {
     title: 'Õpetajate ajakoormus',
-    description: 'Õpetajad raporteerivad suurt halduskoormust ja piiratud aega individuaalseks toetuseks.',
+    description:
+      'Õpetajad raporteerivad suurt halduskoormust ja piiratud aega individuaalseks toetuseks.',
     source: 'Haridus- ja Teadusministeerium, 2023',
     limitation: 'Ainult kontekst. MATx ei ole põhjus ega tagajärg.',
     icon: 'clock' as const,
   },
   {
     title: 'Ebavõrdne juurdepääs toele',
-    description: 'Kõik koolid ei oma võrdset juurdepääsu täiendavatele õppematerjalidele ja tööriistadele.',
+    description:
+      'Kõik koolid ei oma võrdset juurdepääsu täiendavatele õppematerjalidele ja tööriistadele.',
     source: 'Eesti Hariduse Infosüsteem, 2024',
     limitation: 'Ainult kontekst. MATx ei ole põhjus ega tagajärg.',
     icon: 'minus' as const,
@@ -182,7 +270,8 @@ export const TRUST_PILLARS = [
   },
   {
     title: 'Väidete, staatuse ja allika nähtavus',
-    description: 'Iga väide on märgistatud staatusega (Saadaval, Piloodis, Kavandatud) ja allikaga.',
+    description:
+      'Iga väide on märgistatud staatusega (Saadaval, Piloodis, Kavandatud) ja allikaga.',
     icon: 'file-text' as const,
   },
 ] as const;
@@ -214,44 +303,58 @@ export const ADOPTION_ROUTES = [
     audience: 'Hankele',
     audienceId: 'procurement' as const,
     title: 'Hankeinfo',
-    description: 'Hinnakiri, lepingutingimused ja tehnilised nõuded on saadaval peatselt. Broneeri vestlus, et arutada hankeprotsessi ja ajakava.',
-    cta: 'Broneeri demokõne',
-    ctaAction: 'calendly',
-    ctaRoute: null as string | null,
+    // Enne avalikustamist kontrolli piirmäärad ja tingimused hankepartneriga —
+    // RHS muudatused jõustuvad 01.11.2026.
+    description: 'Riigihangete seaduse piirmäärad ja hinnaklassid ühel lehel.',
+    cta: 'Vaata hankeinfot',
+    ctaAction: 'procurement',
+    ctaRoute: TECH_OVERVIEW.href,
   },
   {
     audience: 'IT-le',
     audienceId: 'it' as const,
     title: 'Tehniline ülevaade',
-    description: 'Arhitektuuri, turvalisuse ja integratsiooni detailid on peatselt saadaval. Broneeri vestlus tehniliste nõuete arutamiseks.',
-    cta: 'Broneeri demokõne',
-    ctaAction: 'calendly',
-    ctaRoute: null as string | null,
+    description:
+      'Arhitektuur, turvameetmed ja vastavusstaatus ühel lehel: identiteet ja sessioonid, pseudonüümimine, integratsioonid ja hankeinfo.',
+    cta: 'Vaata ülevaadet',
+    ctaAction: 'technical',
+    ctaRoute: TECH_OVERVIEW.href,
   },
 ] as const;
 
+// FAQ entry shape — answerLink is optional; only rendered when present
+export interface FAQEntry {
+  question: string;
+  answer: string;
+  answerLink?: { href: string; label: string };
+}
+
 // FAQ entries
-export const FAQ_ENTRIES = [
+export const FAQ_ENTRIES: readonly FAQEntry[] = [
   {
     question: 'Kellele MATx on mõeldud?',
-    answer: 'MATx on loodud põhikooli matemaatikaõpetajatele ja õpilastele. Praegu oleme piloodifaasis valitud koolidega.',
+    answer:
+      'MATx on loodud põhikooli matemaatikaõpetajatele ja õpilastele. Praegu oleme piloodifaasis valitud koolidega.',
   },
   {
     question: 'Kuidas õpetaja soovitusi üle vaatab?',
-    answer: 'Õpetaja näeb iga soovituse juures õpilase vastust, tuvastatud veamustrit ja põhjendust. Õpetaja võib soovituse vastu võtta, muuta või eirata.',
+    answer:
+      'Õpetaja näeb iga soovituse juures õpilase vastust, tuvastatud veamustrit ja põhjendust. Õpetaja võib soovituse vastu võtta, muuta või eirata.',
   },
   {
     question: 'Milliseid oskusi saab praegu harjutada?',
-    answer: 'Praegu katame valitud põhikooli matemaatika oskusi: liitmine, lahutamine, korrutamine, jagamine ja murdude põhitehted. Uued teemad lisatakse piloodi käigus.',
+    answer:
+      'Praegu katame valitud põhikooli matemaatika oskusi: liitmine, lahutamine, korrutamine, jagamine ja murdude põhitehted. Uued teemad lisatakse piloodi käigus.',
   },
   {
     question: 'Mis on Saadaval, Piloodis ja Kavandatud?',
-    answer: 'Saadaval tähendab, et funktsioon on kasutamiseks valmis. Piloodis tähendab, et funktsioon on kasutusel valitud koolidega testimiseks. Kavandatud tähendab, et funktsioon on plaanis, kuid pole veel arendatud.',
+    answer:
+      'Saadaval tähendab, et funktsioon on kasutamiseks valmis. Piloodis tähendab, et funktsioon on kasutusel valitud koolidega testimiseks. Kavandatud tähendab sihtseisu, mitte lubadust: meede on planeeritud ja osalt välja arendatud, kuid pole veel põhiharul kasutusele võetud.',
   },
   {
     question: 'Kuidas andmeid kasutatakse?',
-    answer: 'Õpilase vastused ja veamustrid jäävad õpetajale nähtavaks. Andmeid kasutatakse soovituste genereerimiseks. Täpne andmekaitse poliitika on saadaval siin.',
-    answerLink: { href: '/privaatsus', label: 'Privaatsuspoliitika' },
+    answer:
+      'Õpilase vastused ja veamustrid jäävad õpetajale nähtavaks. Andmeid kasutatakse soovituste genereerimiseks. Pilootfaasis saad täpse andmekaitse info piloodilepingust.',
   },
   {
     question: 'Kuidas piloodiga liituda?',
@@ -259,7 +362,8 @@ export const FAQ_ENTRIES = [
   },
   {
     question: 'Kas MATx asendab õpetajat?',
-    answer: 'Ei. MATx toetab õpetaja otsust, andes struktuuri õpilase töö jälgimisele ja järgmise sammu soovitamisele. Õpetaja kontroll säilib.',
+    answer:
+      'Ei. MATx toetab õpetaja otsust, andes struktuuri õpilase töö jälgimisele ja järgmise sammu soovitamisele. Õpetaja kontroll säilib.',
   },
 ] as const;
 
@@ -294,6 +398,30 @@ export const SECTION_IDS = {
   trust: 'usaldus',
   faq: 'kkk',
 } as const;
+
+// llms.txt — LLM-friendly site index, served at /llms.txt via
+// app/llms.txt/route.ts. Single source of truth; route validates that every
+// internal URL is a sitemap route and no PROHIBITED_PHRASES token appears.
+export const LLMS_TXT = `# MATx
+
+> MATx (${SITE_META.url}) on Eesti põhikooli matemaatikaõpetajatele ja õpilastele mõeldud veebitoode, mis seob õpilase harjutamise, arusaadava tagasiside ja õpetaja tegevussoovituse üheks jälgitavaks töövooks: iga vastus aitab leida järgmise sammu.
+
+MATx on pilootfaasis valitud koolidega. Töövoog põhineb tõendusloogil: õpilase vastus → kontrollitav veamustri signaal (hüpotees, mitte lõplik diagnoos) → sihitud järgmine harjutus → õpetaja otsus (soovituse vastuvõtmine, muutmine või eiramine). Õpetaja kontroll säilib alati.
+
+Igal võimekusel on avalik staatus — Saadaval, Piloodis või Kavandatud — ja allikas. Avalikult on keelatud väljamõeldud statistika, garantiid ja ülepaisutatud vastavusväited. Piloodiga liitumine toimub registreerimisvormi kaudu; 15-minutiline tutvustuskõne on broneeritav Calendlys.
+
+## Lehed
+
+- [Esileht](${SITE_META.url}/): Toote tutvustus — tõendusloogi etapid, probleem ja lahendus ning piloodiga liitumise vorm.
+- [Tehniline ülevaade](${SITE_META.url}/tehniline): Arhitektuur, turvalisus, andmekaitse, vastavus, hanked ja võimekuste staatused hankijatele ning kooli IT-le.
+
+## Optional
+
+- [Privaatsuspoliitika](${SITE_META.url}/privaatsus): Isikuandmete töötlemise kirjeldus.
+- [Teenuse tingimused](${SITE_META.url}/tingimused): MATx-i kasutustingimused.
+- [GDPR](${SITE_META.url}/gdpr): Andmekaitse teave õpilaste ja õpetajate andmete kohta.
+- [Demo broneerimine](https://calendly.com/matx-ee/15min): 15-minutiline tutvustuskõne MATx-i meeskonnaga.
+`;
 
 export const LANDING_NAV_ITEMS = [
   { label: 'Kuidas töötab', href: `#${SECTION_IDS.workflow}` },

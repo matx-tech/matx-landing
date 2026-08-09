@@ -1,8 +1,15 @@
 import './globals.css';
 import type { Metadata } from 'next';
-import { Public_Sans, Inter, IBM_Plex_Mono } from 'next/font/google';
+import { IBM_Plex_Mono, Inter, Public_Sans } from 'next/font/google';
+import { headers } from 'next/headers';
+import { AnalyticsProvider } from '@/components/providers/analytics-provider';
 import { LenisProvider } from '@/components/providers/lenis-provider';
 import { SITE_META } from '@/lib/content/landing-copy';
+
+// Plausible tracker enable gate — set PLAUSIBLE_SCRIPT_URL to turn analytics
+// on; while unset the AnalyticsProvider (which inits the npm tracker) is not
+// rendered and proxy.ts skips /api/event.
+const plausibleScriptUrl = process.env.PLAUSIBLE_SCRIPT_URL;
 
 const publicSans = Public_Sans({
   subsets: ['latin'],
@@ -73,17 +80,35 @@ export const metadata: Metadata = {
 };
 
 /**
- * Defines the root document structure and wraps page content with the site's scrolling provider.
+ * Defines the site's root document and provides analytics and scrolling behavior for page content.
  *
  * @returns The root HTML document containing page content and MATx metadata.
  */
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const nonce = (await headers()).get('x-nonce') ?? '';
+
   return (
-    <html lang="et" className={`${publicSans.variable} ${inter.variable} ${ibmPlexMono.variable}`}>
+    <html
+      lang='et'
+      // The inline theme script below sets data-theme on <html> before React
+      // hydrates; suppress the resulting attribute mismatch (the script's
+      // value is authoritative — React must not patch or warn on it).
+      suppressHydrationWarning
+      className={`${publicSans.variable} ${inter.variable} ${ibmPlexMono.variable}`}
+    >
       <head>
         {/* Structural data for search engines */}
         <script
-          type="application/ld+json"
+          nonce={nonce}
+          // biome-ignore lint/security/noDangerouslySetInnerHtml: inline theme bootstrap, must run before React hydrates
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem('matx-theme');if(!t){t=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){}})();`,
+          }}
+        />
+        <script
+          type='application/ld+json'
+          nonce={nonce}
+          // biome-ignore lint/security/noDangerouslySetInnerHtml: JSON-LD structured data, static schema.org content
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               '@context': 'https://schema.org',
@@ -112,9 +137,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body className={`${inter.className} antialiased`}>
-        <a href="#main" className="skip-link">
+        <a href='#main' className='skip-link'>
           Jäta navigatsioon vahele
         </a>
+        {plausibleScriptUrl && <AnalyticsProvider />}
         <LenisProvider>{children}</LenisProvider>
       </body>
     </html>
