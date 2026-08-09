@@ -490,11 +490,14 @@ def _verify_existing(destination: Path, manifest: dict[str, Any]) -> None:
 def _publish(destination: Path, outputs: dict[str, bytes], manifest: dict[str, Any]) -> None:
     """
     Publish rendered outputs and their manifest as an immutable generation.
-    
+
     Parameters:
     	destination (Path): Directory where the generation is published.
     	outputs (dict[str, bytes]): Mapping of relative output paths to their byte content.
     	manifest (dict[str, Any]): Manifest describing the generated outputs.
+
+    Raises:
+    	OSError: Propagated from filesystem operations (mkdir, write_bytes, mkdtemp, rename).
     """
     destination.parent.mkdir(parents=True, exist_ok=True)
     if destination.exists():
