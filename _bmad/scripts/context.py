@@ -700,6 +700,9 @@ def sparse_fetch(project: str, record: dict):
             "context_root must be a non-empty relative path without '..' "
             "(it resolves inside the clone)"
         )
+    # Note: context_root "." stays valid on purpose — the obeya bootstrap
+    # (whole-repo fetch) relies on it. Tighten the rule above only together
+    # with that fetch path.
     with tempfile.TemporaryDirectory() as tmp:
         clone = Path(tmp) / "clone"
         proc = subprocess.run(
@@ -714,18 +717,41 @@ def sparse_fetch(project: str, record: dict):
             text=True,
             check=False,
         )
-        if sparse_checkout.returncode != 0:
-            return None, sparse_checkout.stderr.strip()
+        # A failed sparse-checkout is survivable when context_root still
+        # resolves to a directory inside the clone — the obeya bootstrap uses
+        # context_root "." (whole-repo fetch), where the sparse call may be a
+        # no-op. The strict resolve checks below are the real security
+        # boundary; keep the stderr to surface in the error if the path is
+        # genuinely missing.
+        sparse_checkout_stderr = (
+            sparse_checkout.stderr.strip() if sparse_checkout.returncode != 0 else None
+        )
         sha = subprocess.run(["git", "-C", str(clone), "rev-parse", "HEAD"],
                              capture_output=True, text=True).stdout.strip()
+        # Strict confinement: the fetched repository could ship a symlink at
+        # context_root (or inside it) pointing outside the clone. Resolve the
+        # path, verify it stays under the resolved clone root, and reject
+        # symlinks anywhere in the bundle before copying.
+        clone_root = clone.resolve()
         src = clone / context_root
-        if not src.is_dir():
+        try:
+            resolved_src = src.resolve(strict=True)
+        except OSError:
+            detail = f" ({sparse_checkout_stderr})" if sparse_checkout_stderr else ""
+            return None, f"context root {context_root!r} not present in {remote}{detail}"
+        try:
+            resolved_src.relative_to(clone_root)
+        except ValueError:
+            return None, f"context root {context_root!r} resolves outside the clone"
+        if src.is_symlink() or any(path.is_symlink() for path in resolved_src.rglob("*")):
+            return None, f"context root {context_root!r} contains unsupported symlinks"
+        if not resolved_src.is_dir():
             return None, f"context root {context_root!r} not present in {remote}"
         dest = cache_dir() / f"{project}@{sha}"
         if dest.exists():
             shutil.rmtree(dest)
         dest.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copytree(src, dest)
+        shutil.copytree(resolved_src, dest)
         fetched_at = dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds")
         pointer = cache_dir() / f"{project}.latest.json"
         tmp_pointer = pointer.with_suffix(".json.tmp")
