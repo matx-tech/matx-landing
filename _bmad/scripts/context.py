@@ -743,15 +743,15 @@ def sparse_fetch(project: str, record: dict):
         src = clone / context_root
         try:
             resolved_src = src.resolve(strict=True)
-        except (OSError, RuntimeError) as exc:
-            # RuntimeError covers symlink loops ("Symlink loop from ...") —
-            # a hostile bundle must degrade to a clean rejection, never a
-            # traceback from this confinement block.
+        except OSError:
             detail = f" ({sparse_checkout_stderr})" if sparse_checkout_stderr else ""
-            reason = str(exc) if isinstance(exc, RuntimeError) else ""
+            return None, f"context root {context_root!r} not present in {remote}{detail}"
+        except RuntimeError as exc:
+            # Symlink loop ("Symlink loop from ...") — the path exists but
+            # cannot be resolved; a hostile bundle must degrade to a clean
+            # rejection, never a traceback from this confinement block.
             return None, (
-                f"context root {context_root!r} not present in {remote}{detail}"
-                + (f" ({reason})" if reason else "")
+                f"context root {context_root!r} could not be resolved in {remote} ({exc})"
             )
         try:
             resolved_src.relative_to(clone_root)
