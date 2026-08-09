@@ -1,20 +1,7 @@
 import { expect, test } from '@playwright/test';
+import { PROHIBITED_PHRASES, SITE_META } from '@/lib/content/landing-copy';
 
-const PROHIBITED_PHRASES = [
-  'täielik kooskõla',
-  'A+ usaldusskoor',
-  '99.9% uptime',
-  'garanteeritud',
-  '2.3× kiirem',
-  'säästa 10 tundi',
-  'EU AI Act — täielik kooskõla',
-  'NIS2 vastavus',
-  'Iga neljas ebaõnnestub',
-  '1.9× nõudlus-pakkumise lõhe',
-  'Olemasolevad ei tööta',
-] as const;
-
-const SITE_URL = 'https://matx.ee';
+const SITE_URL = SITE_META.url;
 
 test.describe('machine-readable files', () => {
   test('GET /llms.txt returns 200 with expected content @p0', async ({ request }) => {
