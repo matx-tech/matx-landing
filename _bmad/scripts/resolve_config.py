@@ -25,16 +25,6 @@ _MISSING = object()
 
 
 def extract_key(data, dotted_key: str):
-    """
-    Retrieve a value from nested dictionaries using a dot-separated key path.
-    
-    Parameters:
-        data: The nested dictionary structure to search.
-        dotted_key (str): The dot-separated path to the desired value.
-    
-    Returns:
-        The value at the specified path, or `_MISSING` when the path cannot be resolved.
-    """
     current = data
     for part in dotted_key.split("."):
         if isinstance(current, dict) and part in current:
@@ -45,12 +35,6 @@ def extract_key(data, dotted_key: str):
 
 
 def main() -> int:
-    """
-    Resolve the central configuration and write either the complete configuration or selected values as JSON.
-    
-    Returns:
-        int: 0 on success, or 1 if the configuration cannot be loaded.
-    """
     parser = argparse.ArgumentParser(
         description="Resolve BMad central config using four-layer TOML merge."
     )

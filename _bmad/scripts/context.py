@@ -39,19 +39,11 @@ DEFAULT_KNOWLEDGE = "docs"
 
 
 def fail(msg, code=1):
-    """
-    Print an error message to standard error and terminate the process.
-    
-    Parameters:
-    	msg (str): Error message to display.
-    	code (int): Process exit status.
-    """
     print(msg, file=sys.stderr)
     sys.exit(code)
 
 
 def emit(data, as_json, human=""):
-    """Print data as JSON or human-readable text."""
     if as_json:
         print(json.dumps(data))
     elif human:
@@ -80,15 +72,6 @@ except ImportError:  # Python 3.10: TOML layers skipped, YAML fallback still wor
 
 
 def _installed_resolver_config(project_root: Path):
-    """
-    Load scalar configuration values from the installed project resolver.
-    
-    Parameters:
-        project_root (Path): Project root containing the resolver and configuration.
-    
-    Returns:
-        dict or None: Scalar configuration values, or `None` if the resolver is unavailable or returns invalid JSON.
-    """
     resolver = project_root / "_bmad" / "scripts" / "resolve_config.py"
     if not (resolver.exists() and (project_root / "_bmad" / "config.toml").exists()):
         return None
@@ -105,15 +88,6 @@ def _installed_resolver_config(project_root: Path):
 
 
 def _toml_chain(project_root: Path):
-    """
-    Load scalar configuration values from the available TOML layers.
-    
-    Parameters:
-    	project_root (Path): Root directory containing the configuration layers.
-    
-    Returns:
-    	dict: Merged scalar configuration values, or None when TOML support or the base configuration layer is unavailable.
-    """
     if tomllib is None or not (project_root / TOML_LAYERS[0]).exists():
         return None
     merged = {}
@@ -133,14 +107,6 @@ def _toml_chain(project_root: Path):
 
 
 def _yaml_chain(project_root: Path):
-    """Merge configuration values from the available YAML layers.
-    
-    Parameters:
-        project_root (Path): Project root containing the YAML configuration files.
-    
-    Returns:
-        dict: Configuration values keyed by name, with later layers overriding earlier values.
-    """
     merged = {}
     for rel in YAML_LAYERS:  # later layers win per key
         f = project_root / rel
@@ -154,15 +120,6 @@ def _yaml_chain(project_root: Path):
 
 
 def resolve_full_config(project_root: Path) -> dict:
-    """
-    Load project configuration using the configured precedence and apply default values.
-    
-    Parameters:
-    	project_root (Path): Root directory of the project whose configuration is loaded.
-    
-    Returns:
-    	dict: Resolved configuration values.
-    """
     cfg = (_installed_resolver_config(project_root)
            or _toml_chain(project_root)
            or {})
@@ -174,29 +131,12 @@ def resolve_full_config(project_root: Path) -> dict:
 
 
 def bundle_root(project_root: Path, override: str | None, cfg: dict) -> Path:
-    """Resolve the project knowledge bundle directory.
-    
-    Parameters:
-        project_root (Path): Root directory used for relative bundle paths.
-        override (str | None): Optional bundle path that takes precedence over configuration.
-        cfg (dict): Configuration containing the ``project_knowledge`` path.
-    
-    Returns:
-        Path: The resolved bundle directory.
-    """
     raw = override or str(cfg.get("project_knowledge", DEFAULT_KNOWLEDGE))
     raw = raw.replace("{project-root}/", "").replace("{project-root}", "")
     return (project_root / raw) if not Path(raw).is_absolute() else Path(raw)
 
 
 def cmd_config(args, project_root, cfg, as_json):
-    """Display the configured project context settings and resolved bundle root.
-    
-    Parameters:
-        project_root (Path): Root directory of the project.
-        cfg (dict): Project configuration values.
-        as_json (bool): Whether to format the output as JSON.
-    """
     out = {k: cfg.get(k) for k in CONFIG_KEYS}
     out["bundle_root"] = str(bundle_root(project_root, None, cfg))
     emit(out, as_json, "\n".join(f"{k}: {v}" for k, v in out.items() if v is not None))
@@ -205,15 +145,7 @@ def cmd_config(args, project_root, cfg, as_json):
 # ── frontmatter ──────────────────────────────────────────────────────────────
 
 def parse_frontmatter(text: str):
-    """
-    Parse flat YAML-style frontmatter from Markdown text.
-    
-    Parameters:
-        text (str): Markdown text that may begin with a frontmatter block.
-    
-    Returns:
-        tuple: Parsed fields, an error message if the frontmatter is malformed, and the Markdown body.
-    """
+    """Returns (fields|None, error|None, body). Naive flat YAML subset."""
     if not text.startswith("---\n"):
         return None, None, text
     end = text.find("\n---\n", 4)
@@ -235,14 +167,7 @@ def parse_frontmatter(text: str):
 
 
 def load_entries(root: Path):
-    """Load conformant Markdown entries from the bundle root.
-    
-    Parameters:
-    	root (Path): Bundle directory containing the entry files.
-    
-    Returns:
-    	list: Tuples containing each entry's path, parsed frontmatter fields, parsing error, and body. Foreign files and reserved bundle files are excluded.
-    """
+    """Conformant entries at the bundle root: (path, fields|None, error|None, body)."""
     out = []
     if not root.is_dir():
         return out
@@ -264,14 +189,6 @@ def load_entries(root: Path):
 
 
 def load_compasses(root: Path):
-    """Load all Markdown compass files from the bundle's compass directory.
-    
-    Parameters:
-        root (Path): Bundle root containing the compass directory.
-    
-    Returns:
-        list: Tuples containing each compass path, parsed frontmatter fields, parsing error, and body text.
-    """
     out = []
     cdir = root / "compass"
     if not cdir.is_dir():
@@ -288,27 +205,10 @@ def load_compasses(root: Path):
 
 
 def trust_of(fields: dict) -> str:
-    """Classify an entry based on whether its frontmatter contains a verification field.
-    
-    Parameters:
-    	fields (dict): Parsed frontmatter fields.
-    
-    Returns:
-    	str: ``"verified"`` when the fields include ``verified``; otherwise, ``"generated"``.
-    """
     return "verified" if "verified" in fields else "generated"
 
 
 def index_rows(entries):
-    """
-    Generate Markdown index rows for valid context entries.
-    
-    Parameters:
-    	entries: Entries containing a file path, frontmatter fields, and parse status.
-    
-    Returns:
-    	list[str]: Markdown-formatted index rows for entries with valid type and title fields.
-    """
     rows = []
     for f, fields, err, _ in entries:
         if err or not fields or "type" not in fields or "title" not in fields:
@@ -319,31 +219,12 @@ def index_rows(entries):
 
 
 def render_index(entries) -> str:
-    """Generate Markdown index content for the supplied entries.
-    
-    Parameters:
-    	entries: Entries to include in the index.
-    
-    Returns:
-    	str: The generated index content.
-    """
     return INDEX_MARKER + "\n\n" + "\n".join(index_rows(entries)) + "\n"
 
 
 # ── validate ─────────────────────────────────────────────────────────────────
 
 def cmd_validate(args, project_root, cfg, as_json):
-    """
-    Validate the project context bundle and report structural, link, index, and size issues.
-    
-    Parameters:
-    	args: Command-line arguments, including the optional bundle root.
-    	project_root: Root directory of the project.
-    	cfg: Resolved project configuration.
-    	as_json: Whether to emit results as JSON.
-    
-    Exits with status 1 when validation findings exist; otherwise exits with status 0.
-    """
     root = bundle_root(project_root, args.root, cfg)
     findings = []
     entries = load_entries(root)
@@ -423,18 +304,6 @@ def cmd_validate(args, project_root, cfg, as_json):
 # ── index ────────────────────────────────────────────────────────────────────
 
 def cmd_index(args, project_root, cfg, as_json):
-    """
-    Regenerate the bundle's Markdown index from conformant entries.
-    
-    Parameters:
-    	args: Command arguments containing an optional bundle-root override.
-    	project_root: Project root used to resolve the bundle path.
-    	cfg: Resolved project configuration.
-    	as_json: Whether to format the result as JSON.
-    
-    Raises:
-    	SystemExit: If an existing index is not marked as generated.
-    """
     root = bundle_root(project_root, args.root, cfg)
     root.mkdir(parents=True, exist_ok=True)  # first index run in a fresh project
     idx = root / "index.md"
@@ -452,16 +321,6 @@ def cmd_index(args, project_root, cfg, as_json):
 # ── sweep ────────────────────────────────────────────────────────────────────
 
 def source_date(project_root: Path, source: str):
-    """
-    Determine the latest available date for a repository source.
-    
-    Parameters:
-        project_root (Path): Root directory of the project repository.
-        source (str): Repository-relative path to the source.
-    
-    Returns:
-        str or None: The latest source date in ISO format, or None when the source cannot be found.
-    """
     proc = subprocess.run(["git", "log", "-1", "--format=%cI", "--", source],
                           cwd=str(project_root), capture_output=True, text=True)
     if proc.returncode == 0 and proc.stdout.strip():
@@ -476,16 +335,7 @@ PATH_TOKEN = re.compile(r"`([^`\s]+/[^`\s]+)`")
 
 
 def missing_body_paths(project_root: Path, text: str):
-    """
-    Identify repository-relative paths referenced in backticks whose top-level directory exists but whose target does not.
-    
-    Parameters:
-        project_root (Path): Root directory of the repository.
-        text (str): Text containing backticked path references.
-    
-    Returns:
-        list[str]: Referenced paths with an existing top-level directory and a missing target.
-    """
+    """Backticked repo-relative paths whose top directory exists but the file does not."""
     out = []
     for tok in PATH_TOKEN.findall(text):
         tok = tok.strip().rstrip("/")
@@ -498,15 +348,6 @@ def missing_body_paths(project_root: Path, text: str):
 
 
 def cmd_sweep(args, project_root, cfg, as_json):
-    """
-    Report stale entries and missing sources or referenced repository paths.
-    
-    Parameters:
-    	args: Command arguments, including the optional bundle root and date.
-    	project_root: Root directory of the project.
-    	cfg: Project configuration used to resolve the bundle location.
-    	as_json: Whether to emit the result as JSON.
-    """
     root = bundle_root(project_root, args.root, cfg)
     today = args.today or dt.date.today().isoformat()
     stale, missing = [], []
@@ -540,16 +381,6 @@ def cmd_sweep(args, project_root, cfg, as_json):
 # ── compass ──────────────────────────────────────────────────────────────────
 
 def nearest_compass(root: Path, target: str):
-    """
-    Selects the most specific compass covering a repository path.
-    
-    Parameters:
-        root (Path): Project root containing the compass files.
-        target (str): Repository-relative path to match against compass areas.
-    
-    Returns:
-        tuple | None: The matching compass file, frontmatter fields, and body, or `None` when no compass covers the target.
-    """
     best, best_len = None, -1
     for f, fields, err, body in load_compasses(root):
         area = str(fields.get("area", "")).rstrip("/")
@@ -562,15 +393,6 @@ def nearest_compass(root: Path, target: str):
 
 
 def cmd_compass(args, project_root, cfg, as_json):
-    """
-    Display the compass that most specifically matches a repository path.
-    
-    Parameters:
-    	args: Command arguments containing the bundle root override and target path.
-    	project_root (Path): Project root used to resolve the bundle.
-    	cfg: Project configuration used when resolving the bundle.
-    	as_json (bool): Whether to emit JSON-formatted output.
-    """
     root = bundle_root(project_root, args.root, cfg)
     hit = nearest_compass(root, args.path.rstrip("/"))
     if not hit:
@@ -585,15 +407,7 @@ def cmd_compass(args, project_root, cfg, as_json):
 # ── resolve ──────────────────────────────────────────────────────────────────
 
 def parse_registry(path: Path) -> dict:
-    """
-    Parse project definitions from a minimal indentation-based registry file.
-    
-    Parameters:
-        path (Path): Path to the registry file.
-    
-    Returns:
-        dict: Mapping of project names to their configuration values.
-    """
+    """Minimal indent parser for the obeya registry: projects.<name>.<key>: value."""
     projects, current = {}, None
     in_projects = False
     for line in path.read_text(encoding="utf-8").splitlines():
@@ -613,15 +427,7 @@ def parse_registry(path: Path) -> dict:
 
 
 def find_workspace(project_root: Path):
-    """
-    Find sibling project checkouts and the nearest available project registry.
-    
-    Parameters:
-        project_root (Path): Root directory of the current project.
-    
-    Returns:
-        tuple: A mapping of sibling checkout names to paths and the parsed registry, or None when no registry is found.
-    """
+    """Walk up for sibling checkouts and an obeya checkout. Returns (siblings, registry)."""
     siblings, registry = {}, None
     node = project_root.parent
     for _ in range(6):
@@ -642,24 +448,10 @@ def find_workspace(project_root: Path):
 
 
 def cache_dir() -> Path:
-    """
-    Return the directory used to cache context bundles.
-    
-    Returns:
-    	Path: The configured cache directory, or the default directory under the user's home directory.
-    """
     return Path(os.environ.get("BMAD_CONTEXT_CACHE", str(Path.home() / ".bmad" / "context-cache")))
 
 
 def cache_lookup(project: str):
-    """Retrieve the latest cached context bundle for a project.
-    
-    Parameters:
-        project (str): Project identifier used to locate the cache pointer.
-    
-    Returns:
-        dict or None: Cached bundle metadata, or `None` when no valid cached bundle is available.
-    """
     pointer = cache_dir() / f"{project}.latest.json"
     if pointer.exists():
         try:
@@ -675,20 +467,6 @@ def cache_lookup(project: str):
 
 
 def sparse_fetch(project: str, record: dict):
-    """
-    Fetch a project's context bundle from its configured remote and cache it locally.
-    
-    Parameters:
-        project (str): Project identifier used for cache entries and the latest pointer.
-        record (dict): Remote configuration containing `remote`, with optional `branch`
-            and `context_root` values.
-    
-    Returns:
-        tuple: A tuple containing the cached bundle metadata and an error message.
-            The metadata is returned on success and includes its path, commit SHA,
-            fetch timestamp, and source; otherwise, the first value is `None` and
-            the second contains the failure reason.
-    """
     remote, branch = record.get("remote"), record.get("branch", "main")
     context_root = record.get("context_root", DEFAULT_KNOWLEDGE)
     if not isinstance(remote, str) or not isinstance(branch, str) or not isinstance(context_root, str):
@@ -783,44 +561,18 @@ def sparse_fetch(project: str, record: dict):
 
 
 def git_head(path: Path):
-    """
-    Get the current Git commit SHA for a checkout.
-    
-    Parameters:
-    	path (Path): Directory of the Git checkout.
-    
-    Returns:
-    	str or None: The commit SHA, or `None` if the Git command fails.
-    """
     proc = subprocess.run(["git", "rev-parse", "HEAD"], cwd=str(path),
                           capture_output=True, text=True)
     return proc.stdout.strip() if proc.returncode == 0 else None
 
 
 def sibling_bundle(checkout: Path):
-    """Resolve a sibling checkout's context bundle when it contains a kernel or index file.
-    
-    Parameters:
-    	checkout (Path): Path to the sibling project checkout.
-    
-    Returns:
-    	Path: The resolved bundle root, or `None` when no recognized bundle files exist.
-    """
     sib_cfg = resolve_full_config(checkout)
     root = bundle_root(checkout, None, sib_cfg)
     return root if (root / "kernel.md").exists() or (root / "index.md").exists() else None
 
 
 def cmd_resolve(args, project_root, cfg, as_json):
-    """
-    Resolve a project context bundle and optionally select an entry within it.
-    
-    Parameters:
-    	args: Command arguments containing the project name, optional entry name, and refresh flag.
-    	project_root: Root directory of the current project.
-    	cfg: Project configuration used to identify the current project and resolve its bundle.
-    	as_json: Whether to emit the result as JSON.
-    """
     project, _, entry = args.name.partition(":")
     result = None
     self_name = cfg.get("project_name") or project_root.name
@@ -868,33 +620,13 @@ def cmd_resolve(args, project_root, cfg, as_json):
 # ── sync ─────────────────────────────────────────────────────────────────────
 
 def strip_frontmatter(text: str) -> str:
-    """
-    Remove frontmatter from Markdown text.
-    
-    Parameters:
-        text (str): Markdown content that may begin with frontmatter.
-    
-    Returns:
-        str: The content without frontmatter, or the original text when no removable frontmatter is present.
-    """
     fields, err, body = parse_frontmatter(text)
     return text if fields is None and err is None and not body else (body or text)
 
 
 def rewrite_links(content: str, source_dir: Path, target_dir: Path) -> str:
-    """
-    Re-anchor relative Markdown links for content moved to a different directory.
-    
-    Parameters:
-        content (str): Markdown content containing links to rewrite.
-        source_dir (Path): Directory from which the original links are resolved.
-        target_dir (Path): Directory from which the rewritten links will resolve.
-    
-    Returns:
-        str: Content with relative `.md` links converted to paths relative to `target_dir`.
-    """
+    """Re-anchor relative .md links so they resolve from the file the block lands in."""
     def repl(m):
-        """Convert a relative Markdown link to a path relative to the destination directory."""
         text, target = m.group(1), m.group(2)
         if target.startswith(("http://", "https://", "#", "/")) or not target.endswith(".md"):
             return m.group(0)
@@ -904,17 +636,6 @@ def rewrite_links(content: str, source_dir: Path, target_dir: Path) -> str:
 
 
 def apply_block(target: Path, content: str, dry: bool = False) -> bool:
-    """
-    Insert or replace the managed context block in a file.
-    
-    Parameters:
-    	target (Path): File to update.
-    	content (str): Content to place in the managed block.
-    	dry (bool): Whether to report changes without writing them.
-    
-    Returns:
-    	bool: `True` if the generated content differs from the existing file, `False` otherwise.
-    """
     block = f"{BLOCK_START}\n{content.rstrip()}\n{BLOCK_END}\n"
     if target.exists():
         text = target.read_text(encoding="utf-8")
@@ -934,16 +655,6 @@ def apply_block(target: Path, content: str, dry: bool = False) -> bool:
 
 
 def cmd_sync(args, project_root, cfg, as_json):
-    """
-    Synchronize kernel and compass content into project `AGENTS.md` files.
-    
-    Parameters:
-    	args: Command arguments, including the optional `dry_run` flag.
-    	project_root: Root directory of the project receiving synchronized content.
-    	cfg: Project configuration containing the context placement and bundle settings.
-    	as_json: Whether to emit the result as JSON.
-    
-    """
     placement = cfg.get("context_placement")
     if placement not in ("agent-files", "both"):
         fail(f"sync runs only under the agent-files or both placement "
@@ -972,14 +683,6 @@ def cmd_sync(args, project_root, cfg, as_json):
 # ── bootstrap ────────────────────────────────────────────────────────────────
 
 def cmd_bootstrap(args, project_root, cfg, as_json):
-    """Copy the current context script into the project's `_bmad/scripts` directory.
-    
-    Parameters:
-    	args: Command-line arguments for the bootstrap operation.
-    	project_root (Path): Root directory of the project.
-    	cfg: Project configuration.
-    	as_json (bool): Whether to format the result as JSON.
-    """
     target = project_root / "_bmad" / "scripts" / "context.py"
     target.parent.mkdir(parents=True, exist_ok=True)
     self_bytes = Path(__file__).resolve().read_bytes()
@@ -991,12 +694,6 @@ def cmd_bootstrap(args, project_root, cfg, as_json):
 # ── main ─────────────────────────────────────────────────────────────────────
 
 def main(argv=None):
-    """
-    Parse command-line arguments and dispatch the selected context management command.
-    
-    Parameters:
-        argv (list, optional): Command-line arguments to parse instead of the process arguments.
-    """
     p = argparse.ArgumentParser(prog="context.py", description=__doc__)
     p.add_argument("--json", action="store_true", dest="as_json")
     p.add_argument("--project-root", default=".")

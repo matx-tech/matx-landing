@@ -1,0 +1,10 @@
+{
+  "name": "matx-landing",
+  "image": "mcr.microsoft.com/devcontainers/typescript-node:24",
+  "postCreateCommand": "corepack enable && pnpm install --frozen-lockfile",
+  "customizations": {
+    "vscode": {
+      "extensions": ["dbaeumer.vscode-eslint"]
+    }
+  }
+}

@@ -69,7 +69,7 @@ test.describe('registration dialog', () => {
     await expect(dialog.getByText(/kehtiv e-posti aadress/i)).toBeVisible();
   });
 
-  test('accepts submission with consent when webhook configured', async ({ openHome, page }) => {
+  test('accepts submission with consent (delivers to test webhook)', async ({ openHome, page }) => {
     await openHome();
 
     const trigger = page.getByRole('button', { name: 'Registreeru piloodile' });
@@ -99,13 +99,47 @@ test.describe('registration dialog', () => {
 
     const response = await responsePromise;
 
-    // Either success (200) or webhook not configured (503) are valid outcomes
-    expect([200, 503]).toContain(response.status());
+    // Deterministic: webServer.env points the webhook at the local test
+    // capture, so delivery always succeeds locally. Against a deployed server
+    // (BASE_URL set) a non-200 must fail loudly — an unconfigured webhook
+    // means registrations are silently lost, and the old [200, 503] tolerance
+    // masked exactly that.
+    expect(response.status()).toBe(200);
+    await expect(dialog.getByText(/registreerimine on edastatud!/i)).toBeVisible();
+  });
 
-    if (response.status() === 200) {
-      // Success state should appear
-      await expect(dialog.getByText(/registreerimine on edastatud!/i)).toBeVisible();
-    }
-    // 503 means SLACK_WEBHOOK_URL not set (expected in test env without secrets)
+  test('shows a visible error when the webhook fails (RISK-004)', async ({ openHome, page }) => {
+    await openHome();
+
+    const trigger = page.getByRole('button', { name: 'Registreeru piloodile' });
+    await revealSection(page, 'piloot', trigger);
+    await trigger.click();
+
+    const dialog = page.getByRole('dialog');
+    await expect(dialog).toBeVisible();
+
+    // Fill required fields
+    await dialog.getByLabel(/kooli nimi/i).fill('Test Gümnaasium');
+    await dialog.getByLabel(/kontaktisiku nimi/i).fill('Mari Tamm');
+    await dialog.getByLabel(/roll/i).selectOption('Matemaatikaõpetaja');
+    await dialog.getByLabel(/asutuse e-post/i).fill('mari@testkooli.ee');
+    await dialog.getByLabel(/telefon/i).fill('5551234');
+    await dialog.getByLabel(/klassirühmad/i).fill('7.-9. klass (3 rühma)');
+    await dialog.getByRole('checkbox').check();
+
+    // Simulate an upstream webhook failure (server-side 502 path).
+    await page.route('**/api/registration', (route) =>
+      route.fulfill({
+        status: 502,
+        contentType: 'application/json',
+        body: JSON.stringify({ error: 'Slack webhook failed' }),
+      }),
+    );
+
+    await dialog.getByRole('button', { name: /esita registreering/i }).click();
+
+    // The error must be visible on screen (role=alert), not only announced
+    // to screen readers via the sr-only live region.
+    await expect(dialog.getByRole('alert')).toContainText(/ebaõnnestus/i);
   });
 });

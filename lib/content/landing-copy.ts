@@ -46,6 +46,7 @@ export const REGISTRATION_COPY = {
   nextStep1: 'Registreerimine on edastatud MATx meeskonnale',
   nextStep2: 'Vastame 48 tunni jooksul broneerimislingiga',
   announcementSuccess: 'Registreerimine on edastatud',
+  announcementError: 'Registreerimise saatmine ebaõnnestus. Proovige uuesti.',
 } as const;
 
 // Shared URLs

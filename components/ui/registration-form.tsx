@@ -74,6 +74,9 @@ export function RegistrationForm({ isOpen, onClose }: RegistrationFormProps) {
   const [touched, setTouched] = useState<Set<string>>(new Set());
   const [announcement, setAnnouncement] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  // Visible submit failure (RISK-004): the sr-only live region announces the
+  // error to screen readers, but sighted users need an on-screen message too.
+  const [submitError, setSubmitError] = useState(false);
   // Draft initialization gate: the save effect must not run against the empty
   // initial state before the load effect has rehydrated the stored draft,
   // or it would delete the draft it is about to load.
@@ -216,6 +219,7 @@ export function RegistrationForm({ isOpen, onClose }: RegistrationFormProps) {
 
       if (isSubmitting) return;
       setIsSubmitting(true);
+      setSubmitError(false);
       try {
         const res = await fetch('/api/registration', {
           method: 'POST',
@@ -229,7 +233,9 @@ export function RegistrationForm({ isOpen, onClose }: RegistrationFormProps) {
         setAnnouncement(REGISTRATION_COPY.announcementSuccess);
       } catch {
         // Draft stays in localStorage, so a retry never loses the visitor's data.
-        setAnnouncement('Registreerimise saatmine ebaõnnestus. Proovige uuesti.');
+        // The failure is announced by the visible role="alert" below — don't
+        // repeat it in the role="status" live region.
+        setSubmitError(true);
       } finally {
         setIsSubmitting(false);
       }
@@ -241,6 +247,7 @@ export function RegistrationForm({ isOpen, onClose }: RegistrationFormProps) {
     setIsSuccess(false);
     setErrors({});
     setTouched(new Set());
+    setSubmitError(false);
     onClose();
   }, [onClose]);
 
@@ -594,6 +601,15 @@ export function RegistrationForm({ isOpen, onClose }: RegistrationFormProps) {
                 </div>
 
                 {/* Submit Button */}
+                {submitError && (
+                  <p
+                    role='alert'
+                    className='mt-4 text-sm text-red-600 dark:text-red-400 flex items-center gap-1'
+                  >
+                    <AlertCircle className='w-4 h-4 shrink-0' />
+                    {REGISTRATION_COPY.announcementError}
+                  </p>
+                )}
                 <button
                   type='submit'
                   disabled={isSubmitting}

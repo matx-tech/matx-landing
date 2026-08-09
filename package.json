@@ -3,9 +3,19 @@
   "version": "0.1.0",
   "private": true,
   "engines": {
-    "node": "=24"
+    "node": ">=24.0.0"
   },
-  "packageManager": "pnpm@11.20.0+sha512.9a6f330a95b66446ea088faf1521405a8a01f07fde7124cc9958dfed52d4bb436737e65b08f85f37b46fcba375092558ac51262b816844b22f63406ed166bfee",
+  "packageManager": "pnpm@11.20.0",
+  "devEngines": {
+    "packageManager": {
+      "name": "pnpm",
+      "version": "11.20.0"
+    },
+    "runtime": {
+      "name": "node",
+      "version": "24"
+    }
+  },
   "scripts": {
     "prepare": "lefthook install",
     "dev": "next dev",
@@ -16,8 +26,8 @@
     "typecheck": "tsc --noEmit",
     "test": "node --experimental-strip-types --test \"tests/unit/**/*.test.ts\"",
     "test:e2e": "playwright test",
-    "audit:mobile": "mkdir -p .audits && lighthouse http://localhost:3000 --preset=perf --throttling-method=simulate --throttling.rttMs=150 --throttling.throughputKbps=1638.4 --throttling.uploadThroughputKbps=750 --throttling.cpuSlowdownMultiplier=4 --output-path=.audits/mobile-$(date +%Y%m%d-%H%M%S).report.html --save-assets=false",
-    "audit:desktop": "mkdir -p .audits && lighthouse http://localhost:3000 --preset=desktop --output-path=.audits/desktop-$(date +%Y%m%d-%H%M%S).report.html --save-assets=false"
+    "audit:mobile": "node scripts/lighthouse-gate.mjs --mobile",
+    "audit:desktop": "node scripts/lighthouse-gate.mjs --desktop"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",
