@@ -243,18 +243,18 @@ def _resolve_short_config(
     central: dict[str, Any], key: str, project_root: Path
 ) -> tuple[str, str]:
     """
-    Resolve a uniquely matching configuration key to its full path and string value.
+    Resolve a uniquely matching short configuration key to its full path and value.
     
     Parameters:
         central (dict[str, Any]): Central configuration data to search.
-        key (str): Configuration key to resolve.
-        project_root (Path): Project root used when resolving configured paths.
+        key (str): Short configuration key to resolve.
+        project_root (Path): Project root used to expand project-root placeholders.
     
     Returns:
-        tuple[str, str]: The full configuration path and its resolved value.
+        tuple[str, str]: The full configuration path and resolved string value.
     
     Raises:
-        RenderError: If the key is missing or matches multiple configuration values.
+        RenderError: If the key is missing or ambiguous, or its value is invalid.
     """
     matches = _find_config_values(central, key)
     if not matches:
@@ -351,11 +351,11 @@ def _resolve_replacements(
     	sources (dict[str, str]): Markdown source paths and their contents.
     	central (dict[str, Any]): Central configuration values.
     	customization (dict[str, Any]): Workflow customization values.
-    	defaults (dict[str, Any] | None): Customization defaults, required when customization tokens are present.
-    	project_root (Path): Project root used to resolve project-relative configuration paths.
+    	defaults (dict[str, Any] | None): Customization defaults required when customization tokens are present.
+    	project_root (Path): Project root used when resolving configuration values.
     
     Returns:
-    	tuple[dict[str, str], dict[str, Any]]: Replacement text keyed by token and the resolved input values keyed by their configuration source.
+    	tuple[dict[str, str], dict[str, Any]]: Replacement text keyed by token and resolved input values keyed by their source paths.
     """
     replacements: dict[str, str] = {}
     input_values: dict[str, Any] = {}
@@ -489,15 +489,15 @@ def _verify_existing(destination: Path, manifest: dict[str, Any]) -> None:
 
 def _publish(destination: Path, outputs: dict[str, bytes], manifest: dict[str, Any]) -> None:
     """
-    Publishes rendered outputs and their manifest as an immutable generation.
-    
+    Publish rendered outputs and their manifest as an immutable generation.
+
     Parameters:
-    	destination (Path): Directory where the generation should be published.
+    	destination (Path): Directory where the generation is published.
     	outputs (dict[str, bytes]): Mapping of relative output paths to their byte content.
     	manifest (dict[str, Any]): Manifest describing the generated outputs.
-    
+
     Raises:
-    	OSError: If staging or publishing the generation fails.
+    	OSError: Propagated from filesystem operations (mkdir, write_bytes, mkdtemp, rename).
     """
     destination.parent.mkdir(parents=True, exist_ok=True)
     if destination.exists():
