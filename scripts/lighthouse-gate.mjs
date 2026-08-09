@@ -29,7 +29,7 @@ const flag = (name, fallback) => {
   const cli = args.find((arg) => arg.startsWith(`--${name}=`))?.split('=')[1];
   const env = process.env[`LH_${name.toUpperCase()}`];
   const value = Number(cli ?? env ?? fallback);
-  if (Number.isNaN(value)) {
+  if (!Number.isFinite(value) || value < 0 || value > 100) {
     console.error(`[lighthouse-gate] invalid --${name}=${cli ?? env}`);
     process.exit(1);
   }
