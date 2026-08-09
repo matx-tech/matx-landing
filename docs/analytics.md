@@ -23,8 +23,9 @@ github.com/plausible/docs).
 
 ## Kuidas see töötab
 
-- `proxy.ts` proksib `/js/script.js` → Plausible'i isikupärastatud skript ja
-  `/api/event` → Plausible'i API. Esimese osapoole ühendus matx.ee kaudu: ei sõltu
+- Tracker: `@plausible-analytics/tracker` (npm) on kaasa pakitud ja initsialiseeritakse
+  kliendipoolselt; `proxy.ts` proksib ainult `/api/event` → Plausible'i API.
+  Esimese osapoole ühendus matx.ee kaudu: ei sõltu
   adblockeritest (dokumentatsioon: muidu jääb 5–25% külastusi kahe silma vahele) ega
   nõrgenda CSP-d — `script-src 'self'` ja `connect-src 'self'` jäävad kehtima.
 - Proks edastab Plausible'ile ainult vajalikud päised: `User-Agent` (unikaalse külastaja

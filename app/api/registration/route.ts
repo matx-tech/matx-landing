@@ -228,7 +228,11 @@ export async function POST(request: Request) {
       request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ??
       'anonymous')
     : 'anonymous';
-  if (isRateLimited(clientKey)) {
+  // Test runs (Playwright webServer.env sets TEST_WEBHOOK_CAPTURE) skip the
+  // limiter: all test traffic shares the 'anonymous' fallback bucket, and CI
+  // retries + parallel workers would exhaust the 5/10min window mid-run. The
+  // limiter protects the public endpoint; the env var never exists in prod.
+  if (isRateLimited(clientKey) && process.env.TEST_WEBHOOK_CAPTURE !== 'true') {
     return Response.json({ error: 'Too many requests, try again later' }, { status: 429 });
   }
 

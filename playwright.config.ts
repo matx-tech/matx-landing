@@ -46,5 +46,14 @@ export default defineConfig({
         port: 3200,
         reuseExistingServer: !process.env.CI,
         timeout: 120_000,
+        // Deterministic registration tests: deliver webhook payloads to the
+        // local test capture (app/api/test-webhook) instead of the real Slack
+        // webhook, and gate that route on. Test-only env vars — never set in
+        // production; the capture route 404s without TEST_WEBHOOK_CAPTURE.
+        env: {
+          ...process.env,
+          SLACK_WEBHOOK_URL: 'http://localhost:3200/api/test-webhook',
+          TEST_WEBHOOK_CAPTURE: 'true',
+        },
       },
 });

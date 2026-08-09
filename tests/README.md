@@ -33,12 +33,35 @@ BASE_URL=https://preview.example.com pnpm test:e2e
 ```
 tests/
   e2e/                       # spec files — one file per user-facing area
+    registration-api.spec.ts # API integration: /api/registration, /api/health
+    content-contract.spec.ts # rendered copy matches landing-copy contract (AD-2)
+    security-headers.spec.ts # CSP header + per-request nonce (AD-5)
+    machine-readable.spec.ts # /llms.txt, /robots.txt, /sitemap.xml, OG meta (FR-12)
+    tehniline-status.spec.ts # three-status vocabulary on /tehniline (FR-3, AD-3)
+    reduced-motion.spec.ts   # no hidden content / no lingering animation (FR-15)
+  unit/
+    content-contract.test.ts # status vocabulary + prohibited phrases (AD-2, AD-3)
   support/
     fixtures/index.ts        # shared fixtures (openHome: reduced-motion + hydration wait)
     helpers/reveal.ts        # revealSection(): opens SectionGate-deferred sections
 ```
 
-### Fixtures
+### Test webhook capture
+
+Local runs (no `BASE_URL`) are deterministic because `webServer.env` points
+`SLACK_WEBHOOK_URL` at the in-app capture route `app/api/test-webhook` and
+sets `TEST_WEBHOOK_CAPTURE=true` (without it the route 404s; it is inert in
+production). Registration deliveries land in server memory, and the API spec
+asserts the exact Slack payload there — including mrkdwn escaping (RISK-001)
+and the 502 failure path via the `FAILWEBHOOK` marker (RISK-004).
+
+Preview runs (`BASE_URL` set) target a deployed server: capture-dependent
+tests skip themselves, the registration E2E asserts a hard 200 (an
+unconfigured webhook means lost registrations — the old `[200, 503]`
+tolerance masked that), and `/api/health` (TC-002) reports webhook config
+status.
+
+## Fixtures
 
 - `openHome` — navigates to `/` with **reduced motion emulated** so GSAP
   entrance tweens don't race assertions, and waits for the nav island to
