@@ -686,8 +686,20 @@ def sparse_fetch(project: str, record: dict):
     context_root = record.get("context_root", DEFAULT_KNOWLEDGE)
     if not isinstance(remote, str) or not isinstance(branch, str) or not isinstance(context_root, str):
         return None, "invalid registry entry: remote, branch and context_root must be strings"
-    if remote.startswith("-") or branch.startswith("-") or context_root.startswith("-"):
-        return None, "invalid registry value: remote/branch/context_root must not start with '-'"
+    context_path = Path(context_root)
+    if (
+        remote.startswith("-")
+        or branch.startswith("-")
+        or context_root.startswith("-")
+        or not context_root
+        or context_path.is_absolute()
+        or ".." in context_path.parts
+    ):
+        return None, (
+            "invalid registry value: remote/branch must not start with '-'; "
+            "context_root must be a non-empty relative path without '..' "
+            "(it resolves inside the clone)"
+        )
     with tempfile.TemporaryDirectory() as tmp:
         clone = Path(tmp) / "clone"
         proc = subprocess.run(
@@ -696,8 +708,14 @@ def sparse_fetch(project: str, record: dict):
             capture_output=True, text=True)
         if proc.returncode != 0:
             return None, proc.stderr.strip()
-        subprocess.run(["git", "-C", str(clone), "sparse-checkout", "set", "--", context_root],
-                       capture_output=True, check=False)
+        sparse_checkout = subprocess.run(
+            ["git", "-C", str(clone), "sparse-checkout", "set", "--", context_root],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        if sparse_checkout.returncode != 0:
+            return None, sparse_checkout.stderr.strip()
         sha = subprocess.run(["git", "-C", str(clone), "rev-parse", "HEAD"],
                              capture_output=True, text=True).stdout.strip()
         src = clone / context_root

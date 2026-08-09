@@ -142,9 +142,13 @@ export function LenisProvider({ children }: { children: React.ReactNode }) {
 
   const scrollTo = useCallback(
     (target: string | number | HTMLElement, options?: { focusHeading?: boolean }) => {
-      // Cancel any pending selector poll from an earlier navigation: an
-      // obsolete poll must not scroll to or focus a stale target after the
-      // user has navigated somewhere else.
+      // Cancel pending timers from an earlier navigation: neither an obsolete
+      // focus hand-off (focusHeading) nor a stale selector poll may scroll or
+      // move focus after the user has navigated somewhere else.
+      if (focusTimerRef.current !== null) {
+        window.clearTimeout(focusTimerRef.current);
+        focusTimerRef.current = null;
+      }
       if (selectorPollTimerRef.current !== null) {
         window.clearTimeout(selectorPollTimerRef.current);
         selectorPollTimerRef.current = null;
