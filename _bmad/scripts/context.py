@@ -84,10 +84,10 @@ def _installed_resolver_config(project_root: Path):
     Load scalar configuration values from the installed project resolver.
     
     Parameters:
-        project_root (Path): Root directory of the project to resolve.
+        project_root (Path): Project root containing the resolver and configuration.
     
     Returns:
-        dict or None: Scalar configuration values from the resolver, or `None` when the resolver is unavailable or produces invalid output.
+        dict or None: Scalar configuration values, or `None` if the resolver is unavailable or returns invalid JSON.
     """
     resolver = project_root / "_bmad" / "scripts" / "resolve_config.py"
     if not (resolver.exists() and (project_root / "_bmad" / "config.toml").exists()):
@@ -105,6 +105,15 @@ def _installed_resolver_config(project_root: Path):
 
 
 def _toml_chain(project_root: Path):
+    """
+    Load scalar configuration values from the available TOML layers.
+    
+    Parameters:
+    	project_root (Path): Root directory containing the configuration layers.
+    
+    Returns:
+    	dict: Merged scalar configuration values, or None when TOML support or the base configuration layer is unavailable.
+    """
     if tomllib is None or not (project_root / TOML_LAYERS[0]).exists():
         return None
     merged = {}
@@ -197,13 +206,13 @@ def cmd_config(args, project_root, cfg, as_json):
 
 def parse_frontmatter(text: str):
     """
-    Parse flat YAML-style frontmatter and return its fields, parse error, and body.
+    Parse flat YAML-style frontmatter from Markdown text.
     
     Parameters:
-        text (str): Markdown text that may begin with frontmatter.
+        text (str): Markdown text that may begin with a frontmatter block.
     
     Returns:
-        tuple: A tuple containing the parsed fields or None, an error message or None, and the remaining body text.
+        tuple: Parsed fields, an error message if the frontmatter is malformed, and the Markdown body.
     """
     if not text.startswith("---\n"):
         return None, None, text
@@ -415,19 +424,16 @@ def cmd_validate(args, project_root, cfg, as_json):
 
 def cmd_index(args, project_root, cfg, as_json):
     """
-    Regenerate the bundle's Markdown index from its conformant entries.
+    Regenerate the bundle's Markdown index from conformant entries.
     
     Parameters:
-    	args: Command arguments, including an optional bundle-root override.
-    	project_root: The project root used to resolve the bundle path.
+    	args: Command arguments containing an optional bundle-root override.
+    	project_root: Project root used to resolve the bundle path.
     	cfg: Resolved project configuration.
-    	as_json: Whether to emit the result as JSON.
+    	as_json: Whether to format the result as JSON.
     
     Raises:
-    	SystemExit: If an existing index lacks the generated-index marker.
-    
-    Returns:
-    	None.
+    	SystemExit: If an existing index is not marked as generated.
     """
     root = bundle_root(project_root, args.root, cfg)
     root.mkdir(parents=True, exist_ok=True)  # first index run in a fresh project
@@ -446,14 +452,15 @@ def cmd_index(args, project_root, cfg, as_json):
 # ── sweep ────────────────────────────────────────────────────────────────────
 
 def source_date(project_root: Path, source: str):
-    """Retrieve the latest available date for a repository source.
+    """
+    Determine the latest available date for a repository source.
     
     Parameters:
         project_root (Path): Root directory of the project repository.
         source (str): Repository-relative path to the source.
     
     Returns:
-        str: The source date in ISO format, or None when the source does not exist.
+        str or None: The latest source date in ISO format, or None when the source cannot be found.
     """
     proc = subprocess.run(["git", "log", "-1", "--format=%cI", "--", source],
                           cwd=str(project_root), capture_output=True, text=True)
@@ -902,11 +909,11 @@ def apply_block(target: Path, content: str, dry: bool = False) -> bool:
     
     Parameters:
     	target (Path): File to update.
-    	content (str): Content for the managed block.
-    	dry (bool): Whether to skip writing the updated content.
+    	content (str): Content to place in the managed block.
+    	dry (bool): Whether to report changes without writing them.
     
     Returns:
-    	bool: `true` if the resulting content differs from the existing file, `false` otherwise.
+    	bool: `True` if the generated content differs from the existing file, `False` otherwise.
     """
     block = f"{BLOCK_START}\n{content.rstrip()}\n{BLOCK_END}\n"
     if target.exists():

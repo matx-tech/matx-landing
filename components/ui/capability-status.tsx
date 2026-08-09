@@ -36,9 +36,10 @@ const STATUS_LIVE_DOT: Record<CapabilityStatus, boolean> = {
 };
 
 /**
- * Displays a capability status as an accessible badge with status-specific styling and an icon.
+ * Displays a capability status as an accessible badge with status-specific styling and indicators.
  *
- * @returns A status badge containing the capability status text and corresponding visual indicators.
+ * @param status - The capability status to display.
+ * @returns A badge containing the status text, corresponding icon, and live indicator when applicable.
  */
 export function CapabilityStatusBadge({ status, className = '' }: CapabilityStatusProps) {
   const Icon = STATUS_ICONS[status];

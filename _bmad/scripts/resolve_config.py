@@ -33,7 +33,7 @@ def extract_key(data, dotted_key: str):
         dotted_key (str): The dot-separated path to the desired value.
     
     Returns:
-        The value at the specified path, or the private missing-value sentinel when the path cannot be resolved.
+        The value at the specified path, or `_MISSING` when the path cannot be resolved.
     """
     current = data
     for part in dotted_key.split("."):
@@ -46,10 +46,10 @@ def extract_key(data, dotted_key: str):
 
 def main() -> int:
     """
-    Resolve the central configuration and write the selected values as JSON.
+    Resolve the central configuration and write either the complete configuration or selected values as JSON.
     
     Returns:
-        int: 0 on success, or 1 when the configuration cannot be loaded.
+        int: 0 on success, or 1 if the configuration cannot be loaded.
     """
     parser = argparse.ArgumentParser(
         description="Resolve BMad central config using four-layer TOML merge."
