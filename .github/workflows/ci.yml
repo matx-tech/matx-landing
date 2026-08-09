@@ -31,6 +31,10 @@ jobs:
   e2e:
     needs: quality
     runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4]
     steps:
       - uses: actions/checkout@v7
         with:
@@ -42,15 +46,65 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm test
       - run: pnpm exec playwright install --with-deps chromium
-      - run: pnpm test:e2e
+      - run: pnpm exec playwright test --shard=${{ matrix.shard }}/4 --reporter=list,junit,html
+        env:
+          JUNIT_REPORT_PATH: test-results/junit-${{ matrix.shard }}.xml
       - uses: actions/upload-artifact@v4
         if: failure()
         with:
-          name: playwright-report
+          name: playwright-report-${{ matrix.shard }}
           path: |
             playwright-report/
             test-results/
           retention-days: 7
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: junit-results-${{ matrix.shard }}
+          path: test-results/junit-${{ matrix.shard }}.xml
+          retention-days: 7
+
+  burn-in:
+    needs: quality
+    runs-on: ubuntu-24.04
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: corepack enable
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps chromium
+      - name: Burn-in P0 tests (flaky detection)
+        run: |
+          for i in {1..5}; do
+            echo "=== Burn-in iteration $i/5 ==="
+            pnpm exec playwright test --grep @p0 --reporter=line || exit 1
+          done
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: burn-in-failure
+          path: test-results/
+          retention-days: 7
+
+  report:
+    needs: e2e
+    runs-on: ubuntu-24.04
+    if: always()
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: junit-results-*
+          path: junit-results
+          merge-multiple: true
+      - name: Aggregate test results
+        run: |
+          echo "## Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "Shard results collected: $(ls -1 junit-results/*.xml | wc -l)/4" >> $GITHUB_STEP_SUMMARY
 
   dependency-review:
     if: github.event_name == 'pull_request'
