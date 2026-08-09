@@ -721,11 +721,18 @@ def sparse_fetch(project: str, record: dict):
         # resolves to a directory inside the clone — the obeya bootstrap uses
         # context_root "." (whole-repo fetch), where the sparse call may be a
         # no-op. The strict resolve checks below are the real security
-        # boundary; keep the stderr to surface in the error if the path is
-        # genuinely missing.
+        # boundary; the stderr is surfaced in the error if the path is
+        # genuinely missing, and warned about so a degraded fetch is never
+        # silently cached and served as a fresh bundle.
         sparse_checkout_stderr = (
             sparse_checkout.stderr.strip() if sparse_checkout.returncode != 0 else None
         )
+        if sparse_checkout_stderr:
+            print(
+                f"[bmad] warning: sparse-checkout failed for {context_root!r}; "
+                f"caching whatever the clone contains: {sparse_checkout_stderr}",
+                file=sys.stderr,
+            )
         sha = subprocess.run(["git", "-C", str(clone), "rev-parse", "HEAD"],
                              capture_output=True, text=True).stdout.strip()
         # Strict confinement: the fetched repository could ship a symlink at
@@ -736,9 +743,16 @@ def sparse_fetch(project: str, record: dict):
         src = clone / context_root
         try:
             resolved_src = src.resolve(strict=True)
-        except OSError:
+        except (OSError, RuntimeError) as exc:
+            # RuntimeError covers symlink loops ("Symlink loop from ...") —
+            # a hostile bundle must degrade to a clean rejection, never a
+            # traceback from this confinement block.
             detail = f" ({sparse_checkout_stderr})" if sparse_checkout_stderr else ""
-            return None, f"context root {context_root!r} not present in {remote}{detail}"
+            reason = str(exc) if isinstance(exc, RuntimeError) else ""
+            return None, (
+                f"context root {context_root!r} not present in {remote}{detail}"
+                + (f" ({reason})" if reason else "")
+            )
         try:
             resolved_src.relative_to(clone_root)
         except ValueError:
