@@ -276,6 +276,7 @@ export function FooterSection() {
               src='/ttf-logo.svg'
               alt=''
               aria-hidden
+              unoptimized
               width={160}
               height={68}
               className='h-8 w-auto rounded-md dark:bg-white dark:border dark:border-border dark:px-3 dark:py-1'
