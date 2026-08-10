@@ -3,7 +3,7 @@
 import gsap from 'gsap';
 import { ScrambleTextPlugin } from 'gsap/ScrambleTextPlugin';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { GraduationCap, Users } from 'lucide-react';
+import { CalendarDays, GraduationCap, Users } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 import { useRegistration } from '@/components/providers/registration-provider';
 import { CALENDLY_URL, CTA_COPY } from '@/lib/content/landing-copy';
@@ -353,8 +353,12 @@ export function CTASection() {
 
         {/* Grant info */}
         <div className='mt-12 inline-flex items-center gap-4 px-6 py-3 rounded-xl bg-elevated border border-border'>
+          <CalendarDays className='w-4 h-4 text-text-secondary flex-shrink-0' aria-hidden='true' />
           <span className='text-text-secondary text-sm'>
-            Taotlus esitatakse Targa Tuleviku Fondile — tähtaeg 31. august 2026
+            {CTA_COPY.grantInfo.submitPrefix}{' '}
+            <strong className='font-semibold text-text-primary'>{CTA_COPY.grantFund}</strong> —
+            {CTA_COPY.grantInfo.deadlineLabel}{' '}
+            <strong className='font-semibold text-text-primary'>{CTA_COPY.grantDeadline}</strong>
           </span>
         </div>
       </div>

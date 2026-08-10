@@ -3,6 +3,7 @@
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Award, Building2, GitBranch, GraduationCap, Mail, MessageCircle } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useRef } from 'react';
 import { CALENDLY_URL, FOOTER_COPY, SECTION_IDS, TECH_OVERVIEW } from '@/lib/content/landing-copy';
@@ -270,9 +271,20 @@ export function FooterSection() {
           ref={bottomRef}
           className='pt-8 border-t border-border flex flex-col md:flex-row items-center justify-between gap-4'
         >
-          <p className='text-text-secondary text-xs'>
-            © 2026 MATx. Kõik õigused kaitstud. Targa Tuleviku Fondi toetatud.
-          </p>
+          <div className='flex flex-col items-center gap-3 sm:flex-row sm:gap-4'>
+            <Image
+              src='/ttf-logo.svg'
+              alt=''
+              aria-hidden='true'
+              unoptimized
+              width={160}
+              height={68}
+              className='h-8 w-auto rounded-md dark:bg-white dark:border dark:border-border dark:px-3 dark:py-1'
+            />
+            <p className='text-center text-xs text-text-secondary sm:text-left'>
+              {FOOTER_COPY.copyright}
+            </p>
+          </div>
           <div className='flex items-center gap-4 text-xs text-text-secondary'>
             <Link
               href='/privaatsus'

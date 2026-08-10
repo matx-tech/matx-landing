@@ -102,6 +102,13 @@ export const CTA_COPY = {
     { id: 'schools', value: '10', label: 'kooli (Piloodis)', chars: '0123456789' },
   ] as const,
   marqueeItems: ['Alusta tasuta', 'Õpi mõistvalt', 'Säästa aega'] as const,
+  // Grant pill — sentence fragments, fund and deadline rendered in CTA section.
+  grantInfo: {
+    submitPrefix: 'Taotlus esitatakse',
+    deadlineLabel: 'tähtaeg',
+  },
+  grantFund: 'Targa Tuleviku Fondile',
+  grantDeadline: '31. august 2026',
 } as const;
 
 // Awards — rendered in the hero badge row and the footer from one contract.
@@ -121,6 +128,7 @@ export const FOOTER_COPY = {
   contactHeading: 'Kontakt',
   contactEmail: 'andri@matx.ee',
   calendlyLabel: 'Broneeri vestlus',
+  copyright: '© 2026 MATx. Kõik õigused kaitstud. Targa Tuleviku Fondi toetatud.',
   social: [
     { id: 'twitter', href: 'https://twitter.com/matx_ee', label: 'MATx Twitter' },
     { id: 'linkedin', href: 'https://linkedin.com/company/matx-ee', label: 'MATx LinkedIn' },

@@ -231,7 +231,13 @@ export function TeacherSection() {
 
             {/* Unified scroll container for headers + grid */}
             <div className='overflow-x-auto'>
-              <div style={{ minWidth: '620px' }}>
+              {/* min-width sized so the longest skill label ("Kümnendmurrud",
+                  ~85.3px at text-xs) fits on one line per column (~800px total),
+                  while staying inside the card's content box (max-w-4xl 896px
+                  minus p-6 = 848px) so desktop shows no horizontal scrollbar;
+                  hyphens:auto stays as the no-overlap safety net for wider
+                  fallback fonts */}
+              <div style={{ minWidth: '820px' }}>
                 {/* Skill names row */}
                 <div className='mb-2 text-xs text-text-secondary'>
                   <div
@@ -239,7 +245,7 @@ export function TeacherSection() {
                     style={{ gridTemplateColumns: `repeat(${skills}, minmax(0, 1fr))` }}
                   >
                     {SKILL_NAMES.map((name) => (
-                      <span key={name} className='text-center'>
+                      <span key={name} className='text-center hyphens-auto'>
                         {name}
                       </span>
                     ))}
