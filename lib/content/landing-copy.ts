@@ -102,7 +102,11 @@ export const CTA_COPY = {
     { id: 'schools', value: '10', label: 'kooli (Piloodis)', chars: '0123456789' },
   ] as const,
   marqueeItems: ['Alusta tasuta', 'Õpi mõistvalt', 'Säästa aega'] as const,
-  // Grant pill — fund and deadline rendered with emphasis in the CTA section.
+  // Grant pill — sentence fragments, fund and deadline rendered in CTA section.
+  grantInfo: {
+    submitPrefix: 'Taotlus esitatakse',
+    deadlineLabel: 'tähtaeg',
+  },
   grantFund: 'Targa Tuleviku Fondile',
   grantDeadline: '31. august 2026',
 } as const;
