@@ -232,10 +232,12 @@ export function TeacherSection() {
             {/* Unified scroll container for headers + grid */}
             <div className='overflow-x-auto'>
               {/* min-width sized so the longest skill label ("Kümnendmurrud",
-                  85.3px at text-xs) fits on one line per column — below this,
-                  headers hyphen-wrap mid-word; hyphens:auto stays as the
-                  no-overlap safety net for wider fallback fonts */}
-              <div style={{ minWidth: '880px' }}>
+                  ~85.3px at text-xs) fits on one line per column (~800px total),
+                  while staying inside the card's content box (max-w-4xl 896px
+                  minus p-6 = 848px) so desktop shows no horizontal scrollbar;
+                  hyphens:auto stays as the no-overlap safety net for wider
+                  fallback fonts */}
+              <div style={{ minWidth: '820px' }}>
                 {/* Skill names row */}
                 <div className='mb-2 text-xs text-text-secondary'>
                   <div
