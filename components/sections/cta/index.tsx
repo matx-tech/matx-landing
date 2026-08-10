@@ -356,8 +356,9 @@ export function CTASection() {
           <CalendarDays className='w-4 h-4 text-text-secondary flex-shrink-0' aria-hidden='true' />
           <span className='text-text-secondary text-sm'>
             Taotlus esitatakse{' '}
-            <strong className='font-semibold text-text-primary'>Targa Tuleviku Fondile</strong> —
-            tähtaeg <strong className='font-semibold text-text-primary'>31. august 2026</strong>
+            <strong className='font-semibold text-text-primary'>{CTA_COPY.grantFund}</strong> —
+            tähtaeg{' '}
+            <strong className='font-semibold text-text-primary'>{CTA_COPY.grantDeadline}</strong>
           </span>
         </div>
       </div>
