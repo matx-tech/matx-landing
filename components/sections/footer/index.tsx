@@ -275,7 +275,7 @@ export function FooterSection() {
             <Image
               src='/ttf-logo.svg'
               alt=''
-              aria-hidden
+              aria-hidden='true'
               unoptimized
               width={160}
               height={68}
