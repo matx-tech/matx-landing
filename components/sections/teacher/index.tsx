@@ -245,7 +245,7 @@ export function TeacherSection() {
                     style={{ gridTemplateColumns: `repeat(${skills}, minmax(0, 1fr))` }}
                   >
                     {SKILL_NAMES.map((name) => (
-                      <span key={name} className='text-center'>
+                      <span key={name} className='text-center hyphens-auto'>
                         {name}
                       </span>
                     ))}
