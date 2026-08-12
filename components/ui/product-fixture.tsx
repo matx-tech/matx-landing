@@ -63,7 +63,9 @@ export function ProductFixture({
         // Content is already visible via the CSS fallback — hand control back
         // from the !important rule so inline state matches the DOM.
         const visibleElements = elements.filter((el): el is HTMLDivElement => el !== null);
-        visibleElements.forEach((el) => el.classList.remove('gsap-animate-on-mount'));
+        visibleElements.forEach((el) => {
+          el.classList.remove('gsap-animate-on-mount');
+        });
         gsap.set(visibleElements, { opacity: 1, y: 0 });
         return;
       }
@@ -76,7 +78,9 @@ export function ProductFixture({
       // Strip the CSS fallback before gsap.set — .gsap-animate-on-mount has
       // opacity: 1 !important which overrides GSAP inline styles (keeps panels
       // visible through SSR/hydration until the animation takes over).
-      validElements.forEach((el) => el.classList.remove('gsap-animate-on-mount'));
+      validElements.forEach((el) => {
+        el.classList.remove('gsap-animate-on-mount');
+      });
 
       // Set initial state
       gsap.set(validElements, { opacity: 0, y: motionTokens.distance.md });

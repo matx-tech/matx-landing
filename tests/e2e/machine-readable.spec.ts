@@ -28,10 +28,10 @@ test.describe('machine-readable files', () => {
     expect(res.status()).toBe(200);
     const body = await res.text();
     expect(body).toContain(SITE_URL);
-    expect(body).toContain(SITE_URL + '/tehniline');
-    expect(body).toContain(SITE_URL + '/privaatsus');
-    expect(body).toContain(SITE_URL + '/tingimused');
-    expect(body).toContain(SITE_URL + '/gdpr');
+    expect(body).toContain(`${SITE_URL}/tehniline`);
+    expect(body).toContain(`${SITE_URL}/privaatsus`);
+    expect(body).toContain(`${SITE_URL}/tingimused`);
+    expect(body).toContain(`${SITE_URL}/gdpr`);
   });
 
   test('GET / returns OG metadata in HTML head @p0', async ({ request }) => {
