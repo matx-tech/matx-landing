@@ -102,7 +102,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           nonce={nonce}
           // biome-ignore lint/security/noDangerouslySetInnerHtml: inline theme bootstrap, must run before React hydrates
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem('matx-theme');if(!t){t=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){}})();`,
+            __html: `(function(){try{var t=localStorage.getItem('matx-theme')||'light';document.documentElement.setAttribute('data-theme',t);}catch(e){}})();`,
           }}
         />
         <script

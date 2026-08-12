@@ -247,10 +247,10 @@
 
   /* --- Dark Theme Mapping ---
      Live via app/layout.tsx: data-theme is set from localStorage
-     ('matx-theme') with a prefers-color-scheme fallback; the ThemeToggle
-     in the navigation persists the explicit choice. Tailwind's `dark:`
-     variant is wired to [data-theme=dark] via @custom-variant above, so
-     dark: utilities and these token mappings always fire together. */
+     ('matx-theme'), defaulting to light when nothing is saved; the
+     ThemeToggle in the navigation persists the explicit choice. Tailwind's
+     `dark:` variant is wired to [data-theme=dark] via @custom-variant above,
+     so dark: utilities and these token mappings always fire together. */
   [data-theme="dark"] {
     --color-bg-canvas: var(--color-ink-900);
     --color-bg-surface: var(--color-ink-800);

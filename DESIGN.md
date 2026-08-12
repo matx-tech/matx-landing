@@ -182,7 +182,7 @@ A cool, trustworthy palette: a confident blue leads, a fjord teal supports, and 
 ### Neutral
 
 - **Paper** (light theme): canvas #f8fafc, surface #ffffff, border #d9e2ec, primary text #111827, muted text #374151.
-- **Ink** (dark theme): canvas #0b1220, surface #131c2b, elevated #1b2740, border #26324a, primary text #e6ebf2, muted text #97a4ba. Dark mode is selected by the saved `matx-theme` preference or system preference; tokens remap, not duplicate.
+- **Ink** (dark theme): canvas #0b1220, surface #131c2b, elevated #1b2740, border #26324a, primary text #e6ebf2, muted text #97a4ba. Light is the default; dark mode is selected only by the saved `matx-theme` preference (the site does not follow the OS preference). Tokens remap, not duplicate.
 
 ### Named Rules
 

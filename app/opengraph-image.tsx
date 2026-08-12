@@ -5,7 +5,7 @@ export const alt = 'MATx — adaptiivne matemaatikaõpikeskkond Eesti põhikooli
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
-// Static OG card, generated at build time. Colors echo the dark theme
+// Static OG card, generated at build time. Colors echo the light theme
 /**
  * Generates the MATx-branded Open Graph image.
  *
@@ -21,14 +21,14 @@ export default function OpengraphImage() {
         flexDirection: 'column',
         justifyContent: 'space-between',
         padding: '88px 96px',
-        background: '#0b1220',
-        color: '#ffffff',
+        background: '#ffffff',
+        color: '#0b1220',
       }}
     >
       <div style={{ display: 'flex', alignItems: 'flex-start' }}>
         <span style={{ fontSize: 88, fontWeight: 700, letterSpacing: '-0.02em' }}>
-          <span style={{ color: '#63a0d6' }}>MAT</span>
-          <span style={{ color: '#3fa69d' }}>x</span>
+          <span style={{ color: '#1e5a8a' }}>MAT</span>
+          <span style={{ color: '#0e6f68' }}>x</span>
         </span>
         <div
           style={{
@@ -44,13 +44,13 @@ export default function OpengraphImage() {
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 24, maxWidth: 880 }}>
         <div style={{ fontSize: 52, fontWeight: 600, lineHeight: 1.15 }}>{SITE_META.title}</div>
-        <div style={{ fontSize: 30, lineHeight: 1.4, color: '#97a4ba' }}>
+        <div style={{ fontSize: 30, lineHeight: 1.4, color: '#4b5563' }}>
           {SITE_META.shortDescription}
         </div>
       </div>
-      <div style={{ display: 'flex', alignItems: 'center', fontSize: 30, color: '#97a4ba' }}>
+      <div style={{ display: 'flex', alignItems: 'center', fontSize: 30, color: '#4b5563' }}>
         matx.ee
-        <span style={{ marginLeft: 24, fontSize: 22, color: '#3fa69d' }}>FELLIN HÄKK 2026</span>
+        <span style={{ marginLeft: 24, fontSize: 22, color: '#0e6f68' }}>FELLIN HÄKK 2026</span>
       </div>
     </div>,
     size,
