@@ -54,6 +54,8 @@ next-env.d.ts
 .code-review-graph/
 
 # local agent tooling
+.m1nd/
+.pnpm-store/
 .claude/
 .serena/
 .mcp.json
