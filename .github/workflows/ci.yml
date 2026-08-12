@@ -4,6 +4,7 @@ on:
   push:
     branches: [main]
   pull_request:
+  workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -107,6 +108,20 @@ jobs:
         run: |
           echo "## Test Results" >> $GITHUB_STEP_SUMMARY
           echo "Shard results collected: $(ls -1 junit-results/*.xml | wc -l)/4" >> $GITHUB_STEP_SUMMARY
+
+  verify-live-headers:
+    runs-on: ubuntu-24.04
+    # Post-deploy assertion: the deployed site must serve the cross-origin
+    # header policy (documents isolated, static assets cross-origin
+    # embeddable). See scripts/verify-cross-origin-headers.sh. Runs on main
+    # pushes (deploy follows from the VPS) and on manual dispatch.
+    if: github.event_name == 'push'
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Verify cross-origin header policy on matx.ee
+        run: bash scripts/verify-cross-origin-headers.sh https://matx.ee
 
   dependency-review:
     if: github.event_name == 'pull_request'
