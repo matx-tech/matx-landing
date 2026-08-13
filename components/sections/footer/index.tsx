@@ -6,6 +6,7 @@ import { Award, Building2, GitBranch, GraduationCap, Mail, MessageCircle } from 
 import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useRef } from 'react';
+import { MatxLogo } from '@/components/ui/matx-logo';
 import { CALENDLY_URL, FOOTER_COPY, SECTION_IDS, TECH_OVERVIEW } from '@/lib/content/landing-copy';
 import { usePrefersReducedMotion } from '@/lib/hooks/use-prefers-reduced-motion';
 import { gsapEase, motionTokens, staggers } from '@/lib/motion-tokens';
@@ -127,10 +128,7 @@ export function FooterSection() {
             className='md:col-span-2'
           >
             <div className='flex items-center gap-2 mb-4'>
-              <span className='text-2xl font-display font-bold'>
-                <span className='text-primary'>MAT</span>
-                <span className='text-secondary'>x</span>
-              </span>
+              <MatxLogo className='h-10 w-auto' />
             </div>
             <p className='text-text-secondary text-sm max-w-md mb-4'>{FOOTER_COPY.description}</p>
             <div className='flex flex-wrap gap-4'>
