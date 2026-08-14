@@ -289,10 +289,12 @@ export function MATxLogoAnimation({ delay = 0 }: { delay?: number }) {
   );
 
   return (
-    <div ref={containerRef} className='inline-flex items-end'>
+    <div ref={containerRef} role='img' aria-label='MATx' className='inline-flex items-end'>
       {/* Real vector letterforms (MATX_LETTERS); sizes/margins are cap-height
           fractions of the parent font-size so the lockup scales with the
-          text-5xl→7xl classes and stays spacing-exact at every breakpoint. */}
+          text-5xl→7xl classes and stays spacing-exact at every breakpoint.
+          Per-letter aria-hidden + role="img" on the wrapper: the lockup is
+          announced once as "MATx", not letter-by-letter. */}
       {MATX_LETTERS.map((letter, index) => (
         <svg
           key={letter.viewBox}
@@ -308,7 +310,7 @@ export function MATxLogoAnimation({ delay = 0 }: { delay?: number }) {
             height: `${HERO_LOGO_SCALE * letter.height}em`,
             width: `${HERO_LOGO_SCALE * letter.width}em`,
             marginLeft: `${HERO_LOGO_SCALE * letter.gapBefore}em`,
-            fill: index === 3 ? 'var(--color-accent)' : 'var(--color-action-primary-bg)',
+            fill: letter.accent ? 'var(--color-accent)' : 'var(--color-action-primary-bg)',
           }}
         >
           {letter.paths.map((d) => (

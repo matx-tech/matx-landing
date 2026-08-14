@@ -23,10 +23,38 @@ const MATX_X = [
 // Keeps per-glyph renders (hero animation, favicon crops) spacing-exact:
 // width/height/gapBefore reproduce the source lockup at any size.
 export const MATX_LETTERS = [
-  { viewBox: '196 130 387 359', paths: [MATX_M], width: 1.078, height: 1, gapBefore: 0.547 },
-  { viewBox: '604 130 415 359', paths: [MATX_A], width: 1.156, height: 1, gapBefore: 0.056 },
-  { viewBox: '966 130 330 359', paths: [MATX_T], width: 0.919, height: 1, gapBefore: -0.147 },
-  { viewBox: '1266 247 290 241', paths: MATX_X, width: 0.808, height: 0.671, gapBefore: -0.085 },
+  {
+    viewBox: '196 130 387 359',
+    paths: [MATX_M],
+    width: 1.078,
+    height: 1,
+    gapBefore: 0.547,
+    accent: false,
+  },
+  {
+    viewBox: '604 130 415 359',
+    paths: [MATX_A],
+    width: 1.156,
+    height: 1,
+    gapBefore: 0.056,
+    accent: false,
+  },
+  {
+    viewBox: '966 130 330 359',
+    paths: [MATX_T],
+    width: 0.919,
+    height: 1,
+    gapBefore: -0.147,
+    accent: false,
+  },
+  {
+    viewBox: '1266 247 290 241',
+    paths: MATX_X,
+    width: 0.808,
+    height: 0.671,
+    gapBefore: -0.085,
+    accent: true,
+  },
 ] as const;
 
 interface MatxLogoProps extends SVGProps<SVGSVGElement> {
