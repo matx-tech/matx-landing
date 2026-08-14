@@ -7,7 +7,13 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useRef } from 'react';
 import { MatxLogo } from '@/components/ui/matx-logo';
-import { CALENDLY_URL, FOOTER_COPY, SECTION_IDS, TECH_OVERVIEW } from '@/lib/content/landing-copy';
+import {
+  CALENDLY_URL,
+  FOOTER_COPY,
+  SECTION_IDS,
+  TECH_OVERVIEW,
+  TTF_URL,
+} from '@/lib/content/landing-copy';
 import { usePrefersReducedMotion } from '@/lib/hooks/use-prefers-reduced-motion';
 import { gsapEase, motionTokens, staggers } from '@/lib/motion-tokens';
 
@@ -280,7 +286,17 @@ export function FooterSection() {
               className='h-8 w-auto rounded-md dark:bg-white dark:border dark:border-border dark:px-3 dark:py-1'
             />
             <p className='text-center text-xs text-text-secondary sm:text-left'>
-              {FOOTER_COPY.copyright}
+              {FOOTER_COPY.copyrightPrefix}
+              <a
+                href={TTF_URL}
+                target='_blank'
+                rel='noopener noreferrer'
+                className='underline hover:text-primary transition-colors focus-ring-target rounded-sm'
+              >
+                {FOOTER_COPY.copyrightFundNote}
+                <span className='sr-only'> (avaneb uues aknas)</span>
+              </a>
+              .
             </p>
           </div>
           <div className='flex items-center gap-4 text-xs text-text-secondary'>
