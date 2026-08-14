@@ -6,7 +6,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { GraduationCap, Users } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 import { useRegistration } from '@/components/providers/registration-provider';
-import { CALENDLY_URL, CTA_COPY, TTF_URL } from '@/lib/content/landing-copy';
+import { CALENDLY_URL, CTA_COPY, FUNDER_QUOTE, TTF_URL } from '@/lib/content/landing-copy';
 import { usePrefersReducedMotion } from '@/lib/hooks/use-prefers-reduced-motion';
 import { gsapEase, motionTokens, staggers } from '@/lib/motion-tokens';
 
@@ -253,6 +253,23 @@ export function CTASection() {
               .
             </p>
           </div>
+          <figure className='mt-6 max-w-2xl mx-auto'>
+            <blockquote className='text-sm text-text-secondary italic'>
+              „{FUNDER_QUOTE.text}“
+            </blockquote>
+            <figcaption className='text-xs text-text-secondary mt-2'>
+              —{' '}
+              <a
+                href={FUNDER_QUOTE.href}
+                target='_blank'
+                rel='noopener noreferrer'
+                className='underline hover:text-primary transition-colors focus-ring-target rounded-sm'
+              >
+                {FUNDER_QUOTE.source}
+                <span className='sr-only'> (avaneb uues aknas)</span>
+              </a>
+            </figcaption>
+          </figure>
         </div>
 
         {/* Dual CTAs */}

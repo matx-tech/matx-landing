@@ -46,7 +46,7 @@ The mechanism a neighboring product could not truthfully copy: a per-answer **ev
 - Name: MATx; domain matx.ee; site metadata locale et_EE.
 - Voice: honest, evidence-first, teacher-respectful Estonian. Core promise: "Soovitused toetavad õpetaja otsust. Õpetaja kontroll säilib."
 - National-context claims (PISA 2022, Haridus- ja Teadusministeerium 2023, EHIS 2024) are labeled as context only — MATx is neither cause nor effect.
-- No testimonials, fabricated customers, benchmarks, or pricing claims.
+- No testimonials, fabricated customers, benchmarks, or pricing claims. Real funder endorsements with a public source URL are allowed (quoted, attributed, not testimonials).
 
 ## Evidence on Hand
 

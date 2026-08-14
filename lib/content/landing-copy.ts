@@ -55,6 +55,13 @@ export const REGISTRATION_COPY = {
 export const CALENDLY_URL = 'https://calendly.com/matx-ee/15min' as const;
 // Funder — TTF announced the MATx partnership 2026-08-13.
 export const TTF_URL = 'https://ttf.ee' as const;
+// Funder endorsement — quoted from TTF's public announcement (LinkedIn post).
+// A real statement with a source URL, not a testimonial.
+export const FUNDER_QUOTE = {
+  text: 'Targa Tuleviku Fondi toel saab MATx algaval õppeaastal oma metoodikat valideerida ning viia lahenduse esimeste õpilaste ja õpetajateni.',
+  source: 'Targa Tuleviku Fond',
+  href: 'https://www.linkedin.com/posts/targa-tuleviku-fond_targatulevikufond-tarktulevikalgabtaeuna-activity-7493681596756107264-rEUg',
+} as const;
 
 // Technical overview page — single source for its URL and navigation label
 export const TECH_OVERVIEW = { href: '/tehniline', label: 'Tehniline ülevaade' } as const;
