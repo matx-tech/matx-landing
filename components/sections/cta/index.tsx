@@ -3,10 +3,10 @@
 import gsap from 'gsap';
 import { ScrambleTextPlugin } from 'gsap/ScrambleTextPlugin';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { CalendarDays, GraduationCap, Users } from 'lucide-react';
-import { useEffect, useRef } from 'react';
+import { GraduationCap, Users } from 'lucide-react';
+import { Fragment, useEffect, useRef } from 'react';
 import { useRegistration } from '@/components/providers/registration-provider';
-import { CALENDLY_URL, CTA_COPY } from '@/lib/content/landing-copy';
+import { CALENDLY_URL, CTA_COPY, FUNDER_QUOTE, TTF_URL } from '@/lib/content/landing-copy';
 import { usePrefersReducedMotion } from '@/lib/hooks/use-prefers-reduced-motion';
 import { gsapEase, motionTokens, staggers } from '@/lib/motion-tokens';
 
@@ -240,9 +240,36 @@ export function CTASection() {
           </div>
           <div className='cta-line mt-4'>
             <p className='text-text-secondary'>
-              Pilootkatsetus on 100% tasuta. Targa Tuleviku Fondi toetusel.
+              {CTA_COPY.freePilotNote}{' '}
+              <a
+                href={TTF_URL}
+                target='_blank'
+                rel='noopener noreferrer'
+                className='underline hover:text-primary transition-colors focus-ring-target rounded-sm'
+              >
+                Targa Tuleviku Fondi toetusel
+                <span className='sr-only'> (avaneb uues aknas)</span>
+              </a>
+              .
             </p>
           </div>
+          <figure className='mt-6 max-w-2xl mx-auto'>
+            <blockquote className='text-sm text-text-secondary italic'>
+              „{FUNDER_QUOTE.text}“
+            </blockquote>
+            <figcaption className='text-xs text-text-secondary mt-2'>
+              —{' '}
+              <a
+                href={FUNDER_QUOTE.href}
+                target='_blank'
+                rel='noopener noreferrer'
+                className='underline hover:text-primary transition-colors focus-ring-target rounded-sm'
+              >
+                {FUNDER_QUOTE.source}
+                <span className='sr-only'> (avaneb uues aknas)</span>
+              </a>
+            </figcaption>
+          </figure>
         </div>
 
         {/* Dual CTAs */}
@@ -267,9 +294,16 @@ export function CTASection() {
               {CTA_COPY.registerCta}
             </button>
             <div className='mt-4 flex justify-center gap-4 text-xs text-text-secondary'>
-              <span>Tasuta</span>
-              <span>·</span>
-              <span>48h vastus</span>
+              {CTA_COPY.cardChips.map((chip, index) => (
+                <Fragment key={chip}>
+                  {index > 0 && (
+                    <span aria-hidden='true' className='select-none'>
+                      ·
+                    </span>
+                  )}
+                  <span>{chip}</span>
+                </Fragment>
+              ))}
             </div>
           </div>
 
@@ -349,17 +383,6 @@ export function CTASection() {
               <div className='text-text-secondary text-sm'>{stat.label}</div>
             </div>
           ))}
-        </div>
-
-        {/* Grant info */}
-        <div className='mt-12 inline-flex items-center gap-4 px-6 py-3 rounded-xl bg-elevated border border-border'>
-          <CalendarDays className='w-4 h-4 text-text-secondary flex-shrink-0' aria-hidden='true' />
-          <span className='text-text-secondary text-sm'>
-            {CTA_COPY.grantInfo.submitPrefix}{' '}
-            <strong className='font-semibold text-text-primary'>{CTA_COPY.grantFund}</strong> —
-            {CTA_COPY.grantInfo.deadlineLabel}{' '}
-            <strong className='font-semibold text-text-primary'>{CTA_COPY.grantDeadline}</strong>
-          </span>
         </div>
       </div>
     </section>

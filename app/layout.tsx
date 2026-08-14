@@ -63,7 +63,7 @@ export const metadata: Metadata = {
     locale: SITE_META.locale,
   },
   twitter: {
-    card: 'summary',
+    card: 'summary_large_image',
     title: SITE_META.title,
     description: SITE_META.shortDescription,
   },

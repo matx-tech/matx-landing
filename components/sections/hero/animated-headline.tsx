@@ -4,8 +4,12 @@ import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { SplitText } from 'gsap/SplitText';
 import { useRef } from 'react';
+import { MATX_LETTERS } from '@/components/ui/matx-logo';
 import { usePrefersReducedMotion } from '@/lib/hooks/use-prefers-reduced-motion';
 import { gsapEase, motionTokens, staggers } from '@/lib/motion-tokens';
+
+// Hero wordmark size as a fraction of the parent em (was 0.7; bumped 10%).
+const HERO_LOGO_SCALE = 0.77;
 
 // SplitText is owned by the hero headline animations — register at module
 // scope here instead of in the root provider.
@@ -237,7 +241,7 @@ export function AnimatedCharacterReveal({ children, className = '' }: AnimatedSu
  */
 export function MATxLogoAnimation({ delay = 0 }: { delay?: number }) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const lettersRef = useRef<HTMLSpanElement[]>([]);
+  const lettersRef = useRef<SVGSVGElement[]>([]);
 
   useGSAP(
     () => {
@@ -285,20 +289,34 @@ export function MATxLogoAnimation({ delay = 0 }: { delay?: number }) {
   );
 
   return (
-    <div ref={containerRef} className='inline-flex items-center'>
-      {'MATx'.split('').map((char, index) => (
-        <span
-          key={char}
+    <div ref={containerRef} role='img' aria-label='MATx' className='inline-flex items-end'>
+      {/* Real vector letterforms (MATX_LETTERS); sizes/margins are cap-height
+          fractions of the parent font-size so the lockup scales with the
+          text-5xl→7xl classes and stays spacing-exact at every breakpoint.
+          Per-letter aria-hidden + role="img" on the wrapper: the lockup is
+          announced once as "MATx", not letter-by-letter. */}
+      {MATX_LETTERS.map((letter, index) => (
+        <svg
+          key={letter.viewBox}
           ref={(el) => {
             if (el) lettersRef.current[index] = el;
           }}
-          className={`gsap-animate-on-mount inline-block ${
-            char === 'x' ? 'text-secondary' : 'text-primary'
-          }`}
-          style={{ display: 'inline-block' }}
+          viewBox={letter.viewBox}
+          aria-hidden='true'
+          focusable='false'
+          className='gsap-animate-on-mount'
+          style={{
+            display: 'inline-block',
+            height: `${HERO_LOGO_SCALE * letter.height}em`,
+            width: `${HERO_LOGO_SCALE * letter.width}em`,
+            marginLeft: `${HERO_LOGO_SCALE * letter.gapBefore}em`,
+            fill: letter.accent ? 'var(--color-accent)' : 'var(--color-action-primary-bg)',
+          }}
         >
-          {char}
-        </span>
+          {letter.paths.map((d) => (
+            <path key={d.slice(0, 16)} d={d} />
+          ))}
+        </svg>
       ))}
     </div>
   );

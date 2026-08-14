@@ -35,7 +35,9 @@ export const REGISTRATION_COPY = {
   cancel: 'Tühista',
   dialogTitle: 'Registreeri kool pilootkatsetusele',
   dialogHeading: 'Registreeri oma kool pilootkatsetusele',
-  dialogSubtitle: 'Targa Tuleviku Fondi toetusel. Tasuta. Kohustusteta.',
+  // Funder phrase is rendered as a link to TTF_URL in the dialog header.
+  dialogSubtitlePrefix: 'Targa Tuleviku Fondi toetusel' as const,
+  dialogSubtitleSuffix: '. Tasuta. Kohustusteta.' as const,
   submit: 'Esita registreering',
   submitting: 'Saadetakse…',
   contactNote: 'Võtame ühendust 48 tunni jooksul',
@@ -51,6 +53,15 @@ export const REGISTRATION_COPY = {
 
 // Shared URLs
 export const CALENDLY_URL = 'https://calendly.com/matx-ee/15min' as const;
+// Funder — TTF announced the MATx partnership 2026-08-13.
+export const TTF_URL = 'https://ttf.ee' as const;
+// Funder endorsement — quoted from TTF's public announcement (LinkedIn post).
+// A real statement with a source URL, not a testimonial.
+export const FUNDER_QUOTE = {
+  text: 'Targa Tuleviku Fondi toel saab MATx algaval õppeaastal oma metoodikat valideerida ning viia lahenduse esimeste õpilaste ja õpetajateni.',
+  source: 'Targa Tuleviku Fond',
+  href: 'https://www.linkedin.com/posts/targa-tuleviku-fond_targatulevikufond-tarktulevikalgabtaeuna-activity-7493681596756107264-rEUg',
+} as const;
 
 // Technical overview page — single source for its URL and navigation label
 export const TECH_OVERVIEW = { href: '/tehniline', label: 'Tehniline ülevaade' } as const;
@@ -91,6 +102,11 @@ export const CTA_COPY = {
   cardTitle: 'Koolide registreerimine',
   cardBody: 'Liitu 10 pilootkooliga. Sügisesed klassid 7.-9. klassini.',
   registerCta: 'Registreeri kool',
+  // Free-pilot claim — time-bounded exception authorized in PRODUCT.md
+  // (Brand Commitments): pilot participation is free while the TTF-funded
+  // pilot phase is open. Single source; the CTA section renders this text.
+  freePilotNote: 'Pilootkatsetus on 100% tasuta.',
+  cardChips: ['Tasuta', '48h vastus'],
   stats: [
     {
       id: 'tasks',
@@ -102,13 +118,6 @@ export const CTA_COPY = {
     { id: 'schools', value: '10', label: 'kooli (Piloodis)', chars: '0123456789' },
   ] as const,
   marqueeItems: ['Alusta tasuta', 'Õpi mõistvalt', 'Säästa aega'] as const,
-  // Grant pill — sentence fragments, fund and deadline rendered in CTA section.
-  grantInfo: {
-    submitPrefix: 'Taotlus esitatakse',
-    deadlineLabel: 'tähtaeg',
-  },
-  grantFund: 'Targa Tuleviku Fondile',
-  grantDeadline: '31. august 2026',
 } as const;
 
 // Awards — rendered in the hero badge row and the footer from one contract.
@@ -128,7 +137,9 @@ export const FOOTER_COPY = {
   contactHeading: 'Kontakt',
   contactEmail: 'andri@matx.ee',
   calendlyLabel: 'Broneeri vestlus',
-  copyright: '© 2026 MATx. Kõik õigused kaitstud. Targa Tuleviku Fondi toetatud.',
+  copyrightPrefix: '© 2026 MATx. Kõik õigused kaitstud. ',
+  // Funder note — the fund name is rendered as a link to TTF_URL in the footer.
+  copyrightFundNote: 'Targa Tuleviku Fondi toetatud',
   social: [
     { id: 'twitter', href: 'https://twitter.com/matx_ee', label: 'MATx Twitter' },
     { id: 'linkedin', href: 'https://linkedin.com/company/matx-ee', label: 'MATx LinkedIn' },
@@ -236,6 +247,9 @@ export const TOPICS_SECTION = {
   heading: 'Mida saab MATx-is harjutada?',
   description:
     'Praegune õppesisu katab valitud põhikooli matemaatika oskusi. Uued teemad lisatakse piloodi käigus.',
+  // Empty state for status filters with no topics (e.g. all topics are
+  // 'Piloodis' — 'Saadaval'/'Kavandatud' have nothing to show yet).
+  emptyFilter: 'Selles staatuses pole hetkel teemasid.',
 } as const;
 
 // National context cards
@@ -353,7 +367,7 @@ export const FAQ_ENTRIES: readonly FAQEntry[] = [
   {
     question: 'Milliseid oskusi saab praegu harjutada?',
     answer:
-      'Praegu katame valitud põhikooli matemaatika oskusi: liitmine, lahutamine, korrutamine, jagamine ja murdude põhitehted. Uued teemad lisatakse piloodi käigus.',
+      'Praegu katame valitud põhikooli matemaatika oskusi: korrutamise abivalemid, protsentarvutus ja ühe tundmatuga võrrandid. Uued teemad lisatakse piloodi käigus.',
   },
   {
     question: 'Mis on Saadaval, Piloodis ja Kavandatud?',

@@ -1,9 +1,16 @@
 import { ImageResponse } from 'next/og';
+import { matxLogoSvg } from '@/components/ui/matx-logo';
 import { SITE_META } from '@/lib/content/landing-copy';
 
 export const alt = 'MATx — adaptiivne matemaatikaõpikeskkond Eesti põhikoolidele';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
+
+// Real wordmark as an inline SVG data URI (two-tone on transparent, echoing
+// the light card background). Satori rasterizes it at build time.
+const LOGO_DATA_URI = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(
+  matxLogoSvg('#1e5a8a', '#0e6f68'),
+)}`;
 
 // Static OG card, generated at build time. Colors echo the light theme
 /**
@@ -26,10 +33,8 @@ export default function OpengraphImage() {
       }}
     >
       <div style={{ display: 'flex', alignItems: 'flex-start' }}>
-        <span style={{ fontSize: 88, fontWeight: 700, letterSpacing: '-0.02em' }}>
-          <span style={{ color: '#1e5a8a' }}>MAT</span>
-          <span style={{ color: '#0e6f68' }}>x</span>
-        </span>
+        {/* biome-ignore lint/performance/noImgElement: ImageResponse is static markup — next/image does not render inside it */}
+        <img src={LOGO_DATA_URI} alt='' width={420} height={145} style={{ marginTop: -20 }} />
         <div
           style={{
             display: 'flex',

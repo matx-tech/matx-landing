@@ -5,7 +5,7 @@ import { AlertCircle, Check, X } from 'lucide-react';
 import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { EVENTS, track } from '@/lib/analytics';
-import { REGISTRATION_COPY } from '@/lib/content/landing-copy';
+import { REGISTRATION_COPY, TTF_URL } from '@/lib/content/landing-copy';
 import { dialogExitMs } from '@/lib/dialog-timing';
 
 const roles = [
@@ -298,7 +298,18 @@ export function RegistrationForm({ isOpen, onClose }: RegistrationFormProps) {
                   <h2 className='text-2xl font-display font-bold text-text-primary mb-2'>
                     {REGISTRATION_COPY.dialogHeading}
                   </h2>
-                  <p className='text-text-secondary text-sm'>{REGISTRATION_COPY.dialogSubtitle}</p>
+                  <p className='text-text-secondary text-sm'>
+                    <a
+                      href={TTF_URL}
+                      target='_blank'
+                      rel='noopener noreferrer'
+                      className='underline hover:text-primary transition-colors focus-ring-target rounded-sm'
+                    >
+                      {REGISTRATION_COPY.dialogSubtitlePrefix}
+                      <span className='sr-only'> (avaneb uues aknas)</span>
+                    </a>
+                    {REGISTRATION_COPY.dialogSubtitleSuffix}
+                  </p>
                 </>
               ) : (
                 <div className='text-center py-6'>
