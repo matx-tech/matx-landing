@@ -264,7 +264,7 @@ export function TopicsSection() {
             type='button'
             onClick={() => scrollTo('prev')}
             className='absolute left-4 md:left-8 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full bg-elevated border border-border flex items-center justify-center hover:border-primary transition-colors disabled:opacity-30 focus-ring-target'
-            disabled={activeIndex === 0}
+            disabled={visibleAreas.length === 0 || activeIndex === 0}
             aria-label='Eelmine teema'
           >
             <ChevronLeft className='w-6 h-6 text-text-primary' />
@@ -274,7 +274,7 @@ export function TopicsSection() {
             type='button'
             onClick={() => scrollTo('next')}
             className='absolute right-4 md:right-8 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full bg-elevated border border-border flex items-center justify-center hover:border-primary transition-colors disabled:opacity-30 focus-ring-target'
-            disabled={activeIndex === visibleAreas.length - 1}
+            disabled={visibleAreas.length === 0 || activeIndex === visibleAreas.length - 1}
             aria-label='Järgmine teema'
           >
             <ChevronRight className='w-6 h-6 text-text-primary' />
@@ -282,56 +282,60 @@ export function TopicsSection() {
 
           {/* Carousel Track */}
           <div ref={viewportRef} className='overflow-hidden px-4 md:px-8 lg:px-16'>
-            <div
-              ref={trackRef}
-              className='flex gap-6 md:gap-8 cursor-grab active:cursor-grabbing'
-              style={{ width: 'max-content' }}
-            >
-              {visibleAreas.map((topic, index) => {
-                const Icon = TOPIC_ICONS[topic.id];
+            {visibleAreas.length === 0 ? (
+              <p className='py-16 text-center text-text-secondary'>{TOPICS_SECTION.emptyFilter}</p>
+            ) : (
+              <div
+                ref={trackRef}
+                className='flex gap-6 md:gap-8 cursor-grab active:cursor-grabbing'
+                style={{ width: 'max-content' }}
+              >
+                {visibleAreas.map((topic, index) => {
+                  const Icon = TOPIC_ICONS[topic.id];
 
-                return (
-                  <div
-                    key={topic.id}
-                    className={`flex-shrink-0 w-[320px] md:w-[400px] group ${
-                      index === activeIndex ? 'scale-100' : 'scale-95 opacity-70'
-                    } transition-all duration-500`}
-                  >
-                    <div className='card h-full p-8 relative overflow-hidden group-hover:border-primary/30 transition-colors'>
-                      {/* Status badge */}
-                      <div className='absolute top-4 right-4'>
-                        <CapabilityStatusBadge status={topic.status} />
-                      </div>
-
-                      {/* Icon */}
-                      <div className='w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center mb-6'>
-                        <Icon className='w-7 h-7 text-primary' />
-                      </div>
-
-                      {/* Title */}
-                      <h3 className='text-2xl font-display font-bold text-text-primary mb-3'>
-                        {topic.name}
-                      </h3>
-
-                      {/* Metadata */}
-                      <div className='bg-elevated rounded-lg p-4 mb-4 border border-border'>
-                        <div className='flex items-center justify-between text-sm'>
-                          <span className='text-text-secondary'>{topic.grade}</span>
-                          <span className='font-medium text-text-primary'>
-                            {topic.skillCount} oskust
-                          </span>
+                  return (
+                    <div
+                      key={topic.id}
+                      className={`flex-shrink-0 w-[320px] md:w-[400px] group ${
+                        index === activeIndex ? 'scale-100' : 'scale-95 opacity-70'
+                      } transition-all duration-500`}
+                    >
+                      <div className='card h-full p-8 relative overflow-hidden group-hover:border-primary/30 transition-colors'>
+                        {/* Status badge */}
+                        <div className='absolute top-4 right-4'>
+                          <CapabilityStatusBadge status={topic.status} />
                         </div>
-                      </div>
 
-                      {/* Description */}
-                      <p className='text-text-secondary text-sm leading-relaxed'>
-                        Harjutused katavad erinevaid raskusastmeid ja õppekava nõudeid.
-                      </p>
+                        {/* Icon */}
+                        <div className='w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center mb-6'>
+                          <Icon className='w-7 h-7 text-primary' />
+                        </div>
+
+                        {/* Title */}
+                        <h3 className='text-2xl font-display font-bold text-text-primary mb-3'>
+                          {topic.name}
+                        </h3>
+
+                        {/* Metadata */}
+                        <div className='bg-elevated rounded-lg p-4 mb-4 border border-border'>
+                          <div className='flex items-center justify-between text-sm'>
+                            <span className='text-text-secondary'>{topic.grade}</span>
+                            <span className='font-medium text-text-primary'>
+                              {topic.skillCount} oskust
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Description */}
+                        <p className='text-text-secondary text-sm leading-relaxed'>
+                          Harjutused katavad erinevaid raskusastmeid ja õppekava nõudeid.
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
-            </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
 
           {/* Pagination Dots */}

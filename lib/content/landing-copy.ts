@@ -102,6 +102,11 @@ export const CTA_COPY = {
   cardTitle: 'Koolide registreerimine',
   cardBody: 'Liitu 10 pilootkooliga. Sügisesed klassid 7.-9. klassini.',
   registerCta: 'Registreeri kool',
+  // Free-pilot claim — time-bounded exception authorized in PRODUCT.md
+  // (Brand Commitments): pilot participation is free while the TTF-funded
+  // pilot phase is open. Single source; the CTA section renders this text.
+  freePilotNote: 'Pilootkatsetus on 100% tasuta.',
+  cardChips: ['Tasuta', '48h vastus'],
   stats: [
     {
       id: 'tasks',
@@ -242,6 +247,9 @@ export const TOPICS_SECTION = {
   heading: 'Mida saab MATx-is harjutada?',
   description:
     'Praegune õppesisu katab valitud põhikooli matemaatika oskusi. Uued teemad lisatakse piloodi käigus.',
+  // Empty state for status filters with no topics (e.g. all topics are
+  // 'Piloodis' — 'Saadaval'/'Kavandatud' have nothing to show yet).
+  emptyFilter: 'Selles staatuses pole hetkel teemasid.',
 } as const;
 
 // National context cards

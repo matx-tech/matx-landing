@@ -240,7 +240,7 @@ export function CTASection() {
           </div>
           <div className='cta-line mt-4'>
             <p className='text-text-secondary'>
-              Pilootkatsetus on 100% tasuta.{' '}
+              {CTA_COPY.freePilotNote}{' '}
               <a
                 href={TTF_URL}
                 target='_blank'
@@ -294,9 +294,12 @@ export function CTASection() {
               {CTA_COPY.registerCta}
             </button>
             <div className='mt-4 flex justify-center gap-4 text-xs text-text-secondary'>
-              <span>Tasuta</span>
-              <span>·</span>
-              <span>48h vastus</span>
+              {CTA_COPY.cardChips.map((chip, index) => (
+                <span key={chip}>
+                  {chip}
+                  {index < CTA_COPY.cardChips.length - 1 && <span aria-hidden='true'> ·</span>}
+                </span>
+              ))}
             </div>
           </div>
 
