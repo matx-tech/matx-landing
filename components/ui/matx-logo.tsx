@@ -99,7 +99,8 @@ export function matxLogoSvg(mat: string, x: string): string {
 
 /**
  * Raw brand-tile SVG (rounded blue square + white stencil x) for generated
- * icons (apple-icon.tsx). Same transform as app/icon.svg — keep in sync.
+ * icons (app/icon.tsx favicon + app/apple-icon.tsx). Single source of truth
+ * for the tile glyph — both generated icons consume this builder.
  */
 export function matxIconSvg(): string {
   return [

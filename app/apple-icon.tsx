@@ -6,7 +6,7 @@ export const size = { width: 180, height: 180 };
 export const contentType = 'image/png';
 
 // Apple touch icon: brand tile + stencil x, rasterized at build time from the
-// shared SVG builder (same glyph source as app/icon.svg).
+// shared matxIconSvg() builder (same source as the favicon, app/icon.tsx).
 const ICON_DATA_URI = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(matxIconSvg())}`;
 
 /**
