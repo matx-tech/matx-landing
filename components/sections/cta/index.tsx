@@ -4,7 +4,7 @@ import gsap from 'gsap';
 import { ScrambleTextPlugin } from 'gsap/ScrambleTextPlugin';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { GraduationCap, Users } from 'lucide-react';
-import { useEffect, useRef } from 'react';
+import { Fragment, useEffect, useRef } from 'react';
 import { useRegistration } from '@/components/providers/registration-provider';
 import { CALENDLY_URL, CTA_COPY, FUNDER_QUOTE, TTF_URL } from '@/lib/content/landing-copy';
 import { usePrefersReducedMotion } from '@/lib/hooks/use-prefers-reduced-motion';
@@ -295,10 +295,14 @@ export function CTASection() {
             </button>
             <div className='mt-4 flex justify-center gap-4 text-xs text-text-secondary'>
               {CTA_COPY.cardChips.map((chip, index) => (
-                <span key={chip}>
-                  {chip}
-                  {index < CTA_COPY.cardChips.length - 1 && <span aria-hidden='true'> ·</span>}
-                </span>
+                <Fragment key={chip}>
+                  {index > 0 && (
+                    <span aria-hidden='true' className='select-none'>
+                      ·
+                    </span>
+                  )}
+                  <span>{chip}</span>
+                </Fragment>
               ))}
             </div>
           </div>
