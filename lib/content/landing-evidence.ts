@@ -11,41 +11,42 @@ export const PRODUCT_FIXTURE = {
 
   // Student answer
   task: {
-    question: '3/4 + 1/2 = ?',
-    skill: 'Murdude liitmine erineva nimetajaga',
+    question: '12% × 50 = ?',
+    skill: 'Protsentarvutus — protsendi leidmine arvust',
   },
 
   // Student response
   answer: {
-    submitted: '4/6',
+    submitted: '600',
     isCorrect: false,
   },
 
   // Feedback shown to the student
   feedback: {
-    text: 'Oled proovinud liita lugejaid ja nimetajaid eraldi. Murdude liitmisel tuleb esmalt leida ühine nimetaja.',
+    text: 'Oled proovinud korrutada protsendimäära arvuga, kuid unustanud sajaga jagamise. Protsendi leidmiseks arvust tuleb protsendimäär arvuga korrutada ja tulemus sajaga jagada.',
   },
 
   // Signal detection
   signal: {
-    pattern: 'Liidab lugejad ja nimetajad eraldi',
-    patternCode: 'FRAC_ADD_SEPARATE',
+    pattern: 'Korrutab protsendimäära arvuga ilma sajaga jagamata',
+    patternCode: 'PCT_NO_DIVIDE',
     label: 'Võimalik veamuster',
     confidence: 'Kontrollitav signaal',
   },
 
   // Targeted retry
   retry: {
-    question: '1/3 + 1/6 = ?',
+    question: '6% × 50 = ?',
     rationale: 'Lihtsam ülesanne sama mustri kontrollimiseks',
     hint: 'Proovi sama meetodit lihtsamal ülesandel',
-    expectedPattern: 'Kas õpilane liidab jälle lugejad ja nimetajad eraldi?',
+    expectedPattern: 'Kas õpilane korrutab jälle protsendimäära arvuga ilma sajaga jagamata?',
   },
 
   // Teacher action
   teacherAction: {
-    recommendation: 'Harjuta murdarvu liitmist sammu-sammult',
-    evidence: 'Õpilane on kahe viimase ülesande puhul liitnud lugejad ja nimetajad eraldi',
+    recommendation: 'Harjuta protsendi leidmist arvust sammu-sammult',
+    evidence:
+      'Õpilane on kahe viimase ülesande puhul korrutanud protsendimäära arvuga ilma sajaga jagamata',
     options: [
       { label: 'Võta vastu', action: 'accept' },
       { label: 'Muuda', action: 'modify' },
@@ -55,9 +56,9 @@ export const PRODUCT_FIXTURE = {
 
   // Recurring error-pattern examples for the problem-section pattern visual
   patternExamples: [
-    { expression: '3/4 + 1/2', wrongAnswer: '4/6' },
-    { expression: '1/3 + 1/6', wrongAnswer: '2/9' },
-    { expression: '2/5 + 1/10', wrongAnswer: '3/15' },
+    { expression: '12% × 50', wrongAnswer: '600' },
+    { expression: '6% × 50', wrongAnswer: '300' },
+    { expression: '25% × 80', wrongAnswer: '2000' },
   ],
 } as const;
 
@@ -122,9 +123,9 @@ export const CAPABILITIES: CapabilityRecord[] = [
   },
 ];
 
-// Topic/skill areas with maturity status. Mirrors the seeded product topics
-// (server/routes.ts): Korrutamise abivalemid, Protsentarvutus, Ühe tundmatuga
-// võrrandid — each with 3 competencies. Pilot classes are 7.-9. klass (CTA).
+// Topic/skill areas with maturity status. Mirrors the seeded pilot curriculum:
+// Korrutamise abivalemid, Protsentarvutus, Ühe tundmatuga võrrandid — each
+// with 3 competencies. Pilot classes are 7.-9. klass (CTA).
 export const TOPIC_AREAS = [
   {
     id: 'abivalemid',

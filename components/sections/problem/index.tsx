@@ -158,7 +158,7 @@ function BeatCard({ beat }: { beat: Beat }) {
           <div className='p-4 bg-elevated rounded-lg border border-border'>
             <div className='text-sm font-medium mb-2'>Mis järgmisena?</div>
             <div className='text-xs text-text-secondary space-y-1'>
-              <div>• Kas harjutada ühist nimetajat?</div>
+              <div>• Kas harjutada protsente lihtsamate arvudega?</div>
               <div>• Kas kinnistada lihtsamat näidet?</div>
               <div>• Kas võrrelda visuaalsete mudeliga?</div>
             </div>
