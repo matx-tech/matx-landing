@@ -4,7 +4,7 @@ import gsap from 'gsap';
 import { Draggable } from 'gsap/Draggable';
 import { Observer } from 'gsap/Observer';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { ChevronLeft, ChevronRight, Divide, Minus, Plus, X } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Percent, Sigma, Variable } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 if (typeof window !== 'undefined') {
@@ -25,12 +25,9 @@ import { gsapEase, motionTokens } from '@/lib/motion-tokens';
 // Icon per topic, keyed by the stable TopicRecord id — filtering or copy
 // changes can never shuffle which icon a topic gets.
 const TOPIC_ICONS = {
-  'addition-subtraction': Plus,
-  'multiplication-division': Minus,
-  fractions: X,
-  decimals: Divide,
-  percentages: Plus,
-  equations: Minus,
+  abivalemid: Sigma,
+  protsentarvutus: Percent,
+  vorrandid: Variable,
 } as const;
 
 /**

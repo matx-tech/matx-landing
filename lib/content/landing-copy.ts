@@ -352,7 +352,7 @@ export const FAQ_ENTRIES: readonly FAQEntry[] = [
   {
     question: 'Milliseid oskusi saab praegu harjutada?',
     answer:
-      'Praegu katame valitud põhikooli matemaatika oskusi: liitmine, lahutamine, korrutamine, jagamine ja murdude põhitehted. Uued teemad lisatakse piloodi käigus.',
+      'Praegu katame valitud põhikooli matemaatika oskusi: korrutamise abivalemid, protsentarvutus ja ühe tundmatuga võrrandid. Uued teemad lisatakse piloodi käigus.',
   },
   {
     question: 'Mis on Saadaval, Piloodis ja Kavandatud?',
