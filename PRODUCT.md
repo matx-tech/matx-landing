@@ -9,7 +9,7 @@ web
 ## Users
 
 - **Põhikooli matemaatikaõpetaja** — primary user and decision-maker. Situation: sees results, but doesn't know which exercise would most help a student next; recurring errors go unnoticed across tasks. Job: decide the next step for each student, with control over the outcome.
-- **Õpilane (põhikool, praegu 1.–6. klass; 7.–9. klass kavandatud)** — practices digitally or on paper; needs a clear, understandable next step, not just a right/wrong mark.
+- **Õpilane (põhikool, pilootkatsetuses 7.–9. klass)** — practices digitally or on paper; needs a clear, understandable next step, not just a right/wrong mark.
 - **Koolijuht** — evaluates fit for school curriculum and support systems; books demo calls.
 - **Hankija / riigihanke osapool** — needs transparent, evidence-backed technical and compliance information to purchase under Estonian procurement rules.
 - **Kooli IT** — needs architecture, security, and compliance status on one page.
@@ -32,7 +32,7 @@ The mechanism a neighboring product could not truthfully copy: a per-answer **ev
 ## Capabilities and Constraints
 
 - Capabilities (status in parentheses): digital exercises (Saadaval), paper-work scanning (Piloodis; handwriting recognition has limited accuracy), error-pattern detection (Saadaval; rule-based, verifiable signal — not final diagnosis), targeted exercise recommendation (Saadaval; skill-graph based, teacher reviews), teacher overview (Saadaval), real-time monitoring (Kavandatud), parent report generation (Kavandatud).
-- Topic areas: addition/subtraction (1.–6. klass, Saadaval), multiplication/division (2.–6. klass, Saadaval), fractions (4.–6. klass, Saadaval), decimal fractions (5.–6. klass, Piloodis), percentages (6.–9. klass, Kavandatud), equations (7.–9. klass, Kavandatud).
+- Topic areas (pilot curriculum, 7.–9. klass, Piloodis): korrutamise abivalemid, protsentarvutus, ühe tundmatuga võrrandid — each with 3 competencies.
 - Exact error-pattern count is under refinement during the pilot — public copy must not state a precise number.
 - GDPR applies from pilot phase; roles depend on each processing activity (school/municipality = controller; MATx = processor under documented instructions, otherwise independent/co-controller). Art. 8 minors' protection: Estonia's age-13 threshold and parental-consent rule apply only to consent-based information-society services offered directly to a child; below 13, legal-representative consent is required. For pilot/student processing, the lawful basis is recorded per activity — Article 8 is not a general student-data basis. Pseudonymisation via HMAC gateway is planned (Kavandatud); DSR de-pseudonymisation.
 - NIS2: education not in annexes I/II — no direct obligation; NIS2-based baseline adopted as good practice in pilot (Piloodis status reflects readiness, not formal compliance).
@@ -47,6 +47,7 @@ The mechanism a neighboring product could not truthfully copy: a per-answer **ev
 - Voice: honest, evidence-first, teacher-respectful Estonian. Core promise: "Soovitused toetavad õpetaja otsust. Õpetaja kontroll säilib."
 - National-context claims (PISA 2022, Haridus- ja Teadusministeerium 2023, EHIS 2024) are labeled as context only — MATx is neither cause nor effect.
 - No testimonials, fabricated customers, benchmarks, or pricing claims. Real funder endorsements with a public source URL are allowed (quoted, attributed, not testimonials).
+- **Time-bounded exception (pilot phase):** free-pilot claims ("Tasuta", "Kohustusteta", "100% tasuta", "Alusta tasuta") are permitted in registration/CTA copy while the TTF-funded pilot phase is open — participation is free for schools during the pilot. No price list, per-student fees, or post-pilot pricing claims until the price list is published.
 
 ## Evidence on Hand
 
