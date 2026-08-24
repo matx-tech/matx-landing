@@ -51,7 +51,7 @@
     "lefthook": "^2.1.10",
     "lighthouse": "^13.4.1",
     "npm-check-updates": "^23.0.2",
-    "oxlint": "^1.78.0",
+    "oxlint": "^1.79.0",
     "oxlint-tsgolint": "^7.0.2001",
     "postcss": "^8.5.26",
     "tailwindcss": "^4.3.3",
