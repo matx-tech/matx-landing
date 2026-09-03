@@ -153,7 +153,7 @@ This is the one runnable check the prototype leaves behind; it becomes the unit 
 
 Exit: Andri can click through end to end. Commit: `feat(naidistund): clickable prototype tab`.
 
-**Status 2026-09-03: done.** 44 nodes (not 35; extra convergence nodes `s4-jaga`, `s4-vihje`, `s5-miks`, `s6-pilt`, `s6-julge`, `s6-arvan`, `s6-mark`, `s7-aeg`). `metaphor` domain is `termomeeter | väravad` (the student picks between the thermometer and the football goal difference, so "kaal" was the wrong label). Self-check passes in the browser console; keyboard path and both branch families verified with Playwright. Screenshots in `docs/research/naidistund/screenshots/`. Open with any static server (`python3 -m http.server`), anchor `#matx`.
+**Status 2026-09-03: done, then reshaped.** The prototype is now a standalone page, `docs/research/naidistund/naidistund.html` (the four-tutor file stays untouched as reference). Light theme only. Story shape: cover card → chat with chapter markers per beat and a progress bar in the sticky top bar → typing indicator with length-based delay → animated error underline on solution cards → "Teine vaatus" title card and staggered class table. Drawing is incremental (only new turns animate); back/reset rebuild. 44 nodes (not 35; extra convergence nodes `s4-jaga`, `s4-vihje`, `s5-miks`, `s6-pilt`, `s6-julge`, `s6-arvan`, `s6-mark`, `s7-aeg`). `metaphor` domain is `termomeeter | väravad`. Self-check passes in the console; both branch families verified with Playwright. Screenshots in `docs/research/naidistund/screenshots/`. Open with any static server (`python3 -m http.server`).
 
 ---
 
