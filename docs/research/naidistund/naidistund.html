@@ -49,7 +49,7 @@ button{font:inherit; cursor:pointer;}
 .ctl-check{font-size:.82rem; color:var(--muted); display:inline-flex; gap:6px; align-items:center;}
 .controls{display:flex; gap:8px; align-items:center; flex-wrap:wrap;}
 .progress{height:2px; background:color-mix(in srgb,var(--ruut) 70%, transparent);}
-.progress span{display:block; height:100%; width:0; background:var(--sammal); transition:width 700ms var(--ease);}
+.progress span{display:block; height:100%; width:100%; background:var(--sammal); transform:scaleX(0); transform-origin:left; transition:transform 700ms var(--ease);}
 
 main{max-width:760px; margin:0 auto; padding:0 clamp(16px,4vw,32px) 120px; position:relative;}
 main::before{content:""; position:absolute; top:0; bottom:0; left:clamp(2px,1vw,8px); width:1.5px;
@@ -395,7 +395,7 @@ function cardHtml(c){
 }
 function setBeat(name){
   beatEl.textContent = name;
-  var i = BEAT_ORDER.indexOf(name); bar.style.width = ((i + 1) / BEAT_ORDER.length * 100) + '%';
+  var i = BEAT_ORDER.indexOf(name); bar.style.transform = 'scaleX(' + ((i + 1) / BEAT_ORDER.length) + ')';
 }
 function addTutor(id, node, f){
   var b = beatOf(id);
