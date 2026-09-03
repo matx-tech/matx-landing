@@ -1,0 +1,2154 @@
+<!doctype html>
+<html lang="et">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Matemaatika abitund — neli versiooni</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --suvapetrool:#123B38; --kriit:#F7F4ED; --merevaik:#E0A03C;
+  --ootahvel:#0B2422; --sammal:#3E7A6B; --terrakota:#B4452F; --ruut:#DDD7C9;
+  --paper:#F7F4ED; --ink:#123B38;
+  --muted: color-mix(in srgb, var(--ootahvel) 64%, var(--paper)); /* 4.5:1 AA on paper */
+  --grid: 28px;
+  color-scheme: light dark;
+  --sans:"Jost", ui-sans-serif, system-ui, sans-serif;
+  --serif:"Newsreader", ui-serif, Georgia, serif;
+  --lift: 0 8px 22px -12px rgba(11,36,34,.55);
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; color:var(--ink); font-family:var(--sans);
+  font-size:16px; line-height:1.5; letter-spacing:.005em;
+  background:
+    /* ruled lines */
+    repeating-linear-gradient(to bottom, transparent 0, transparent calc(var(--grid) - 1px),
+      color-mix(in srgb, var(--ruut) 60%, transparent) calc(var(--grid) - 1px), color-mix(in srgb, var(--ruut) 60%, transparent) var(--grid)),
+    var(--paper);
+  background-attachment: fixed;
+  -webkit-font-smoothing:antialiased;
+}
+.page{max-width:900px; margin:0 auto; padding:clamp(20px,5vw,56px) clamp(16px,4vw,40px) 96px;
+  position:relative;}
+/* terracotta margin hairline */
+.page::before{content:""; position:absolute; top:0; bottom:0; left:clamp(10px,2.4vw,26px);
+  width:1.5px; background:color-mix(in srgb, var(--terrakota) 62%, transparent);}
+
+/* ---- masthead ---- */
+.masthead{margin:0 0 clamp(28px,4vw,52px); padding-left:clamp(8px,2vw,18px);}
+.eyebrow{font-family:var(--sans); font-weight:500; font-size:.8125rem; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--sammal); margin:0 0 12px;}
+h1{font-family:var(--sans); font-weight:500; letter-spacing:-.025em; line-height:1.06;
+  font-size:clamp(2rem,6vw,3.1rem); margin:0 0 6px; color:var(--suvapetrool);}
+.sub{font-family:var(--serif); font-style:italic; font-size:clamp(1.05rem,2.4vw,1.35rem);
+  color:var(--muted); margin:0 0 28px;}
+.brief{background:var(--kriit); border:1px solid var(--ruut); border-radius:20px;
+  padding:20px 22px; font-size:.975rem; color:color-mix(in srgb,var(--ootahvel) 82%, var(--paper));
+  max-width:66ch;}
+.brief strong{color:var(--suvapetrool); font-weight:600;}
+
+/* ---- version tabs (sticky tablist — one session on screen at a time) ---- */
+.index{display:flex; flex-wrap:wrap; gap:8px; margin:26px 0 8px; padding:10px clamp(8px,2vw,18px);
+  position:sticky; top:0; z-index:10; background:color-mix(in srgb, var(--paper) 88%, transparent);
+  backdrop-filter:blur(10px) saturate(160%); -webkit-backdrop-filter:blur(10px) saturate(160%);
+  border-bottom:1px solid var(--ruut);}
+.tab-btn{display:inline-flex; align-items:center; gap:9px; text-decoration:none;
+  font-family:var(--sans); font-weight:500; font-size:.9rem; color:var(--suvapetrool);
+  background:var(--kriit); border:1px solid var(--ruut); border-radius:999px; cursor:pointer;
+  padding:7px 15px 7px 8px; transition:box-shadow .18s ease, transform .18s ease, border-color .18s, background .18s;}
+.tab-btn:hover{box-shadow:var(--lift); transform:translateY(-1px); border-color:color-mix(in srgb,var(--sammal) 45%, var(--ruut));}
+.tab-btn[aria-selected="true"]{background:var(--suvapetrool); border-color:var(--suvapetrool); color:var(--kriit);}
+.tab-btn[aria-selected="true"] .ni{background:var(--kriit); color:var(--suvapetrool);}
+.version{scroll-margin-top:64px;}
+[role="tabpanel"]:focus-visible{outline:none;}
+
+/* orphan control + keyboard focus (DESIGN: petrol focus ring, never browser blue) */
+.bubble,.vdesc,.brief,.note .prose,.dirnote .prose,.narration span,.verdict,.sub{text-wrap:pretty;}
+a,summary,.tab-btn{-webkit-tap-highlight-color:transparent;}
+.tab-btn:focus-visible,.dirnote summary:focus-visible{
+  outline:2px solid color-mix(in srgb,var(--suvapetrool) 65%, transparent); outline-offset:3px;}
+@media (prefers-reduced-motion: reduce){
+  *{transition-duration:.01ms !important; animation-duration:.01ms !important;}
+  .tab-btn:hover,.turn.student .bubble{transform:none;}
+}
+.ni{display:inline-flex; align-items:center; justify-content:center; width:22px; height:22px;
+  border-radius:50%; background:var(--suvapetrool); color:var(--kriit); font-size:.78rem; font-weight:600;}
+.ni-sota{font-size:.68rem; letter-spacing:.08em; text-transform:uppercase; color:var(--merevaik);
+  font-weight:600;}
+
+/* ---- version section (one tabpanel visible at a time) ---- */
+.version{margin:clamp(24px,4vw,40px) 0 0; padding-left:clamp(8px,2vw,18px);}
+.version[hidden],.notes[hidden]{display:none;}
+.vhead{display:grid; grid-template-columns:auto 1fr auto; gap:clamp(14px,3vw,26px); align-items:start;
+  padding-bottom:20px; border-bottom:1px solid var(--ruut);}
+.vnum{font-family:var(--sans); font-weight:500; letter-spacing:-.04em; line-height:.9;
+  font-size:clamp(2.6rem,7vw,4rem); color:color-mix(in srgb,var(--suvapetrool) 24%, var(--paper));}
+.vmeta{min-width:0;}
+.vtitle{font-family:var(--sans); font-weight:500; letter-spacing:-.015em;
+  font-size:clamp(1.3rem,3.2vw,1.7rem); color:var(--suvapetrool); line-height:1.15;
+  display:flex; flex-wrap:wrap; align-items:baseline; gap:8px;}
+.vage{font-size:.72em; color:var(--muted); font-weight:400;}
+.badge{font-size:.62rem; letter-spacing:.1em; text-transform:uppercase; font-weight:600;
+  color:var(--suvapetrool); background:color-mix(in srgb,var(--merevaik) 26%, var(--paper));
+  border:1px solid color-mix(in srgb,var(--merevaik) 55%, transparent);
+  border-radius:999px; padding:3px 9px; align-self:center;}
+.vrole{font-size:.85rem; color:var(--muted); font-weight:500; margin-top:4px; letter-spacing:.005em;}
+.vdesc{font-family:var(--serif); font-style:italic; font-size:1.02rem; line-height:1.5;
+  color:color-mix(in srgb,var(--ootahvel) 78%, var(--paper)); margin:12px 0 0; max-width:60ch;}
+.vgauge{display:flex; flex-direction:column; align-items:center; gap:6px;}
+.ring{display:block}
+.gauge-cap{font-size:.62rem; line-height:1.15; text-align:center; letter-spacing:.06em;
+  text-transform:uppercase; color:var(--muted); font-weight:500;}
+.verdict{font-family:var(--serif); font-style:italic; font-size:1.05rem; color:var(--sammal);
+  margin:16px 0 4px; max-width:60ch;}
+#v1 .verdict{color:var(--terrakota);}
+
+/* director note */
+.dirnote{margin:14px 0 4px; border:1px solid var(--ruut); border-radius:16px; background:var(--kriit);
+  overflow:hidden;}
+.dirnote summary{cursor:pointer; padding:12px 18px; font-weight:500; font-size:.9rem;
+  color:var(--suvapetrool); list-style:none;}
+.dirnote summary::-webkit-details-marker{display:none}
+.dirnote summary::before{content:"＋"; margin-right:10px; color:var(--sammal); font-weight:600;}
+.dirnote[open] summary::before{content:"－"}
+.dirnote .prose{padding:2px 22px 18px; font-size:.95rem; color:color-mix(in srgb,var(--ootahvel) 82%, var(--paper)); max-width:70ch;}
+.dirnote .prose p{margin:0 0 12px}
+
+/* ---- thread ---- */
+.thread{margin-top:26px; display:flex; flex-direction:column; gap:18px;}
+.turn{display:flex; gap:12px; align-items:flex-end; max-width:100%;}
+.turn.student{flex-direction:row-reverse;}
+.avatar{flex:0 0 auto; width:38px; height:38px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-family:var(--sans); font-weight:600; font-size:.95rem; margin-bottom:22px;}
+.turn.tutor .avatar{background:var(--kriit); color:var(--suvapetrool); border:1px solid var(--ruut);}
+.turn.student .avatar{background:var(--suvapetrool); color:var(--kriit);}
+.stack{display:flex; flex-direction:column; min-width:0; max-width:min(78%, 60ch);}
+.turn.student .stack{align-items:flex-end;}
+.who{font-family:var(--sans); font-size:.72rem; font-weight:500; letter-spacing:.05em;
+  text-transform:uppercase; color:var(--muted); margin:0 0 5px; padding:0 6px;}
+.bubble{padding:12px 17px; border-radius:20px; line-height:1.5; word-wrap:break-word;
+  font-variant-numeric:tabular-nums;}
+/* tutor speaks in serif italic — the two-voice rule */
+.turn.tutor .bubble{background:var(--kriit); border:1px solid var(--ruut); color:var(--ootahvel);
+  border-bottom-left-radius:6px; font-family:var(--serif); font-size:1.06rem; line-height:1.48;}
+.turn.tutor .bubble strong{font-weight:600; font-style:normal; font-family:var(--sans); font-size:.94em;}
+/* student speaks in Jost on petrol ink */
+.turn.student .bubble{background:var(--suvapetrool); color:var(--kriit);
+  border-bottom-right-radius:6px; font-family:var(--sans); box-shadow:var(--lift);}
+.stage{font-family:var(--serif); font-style:italic; font-size:.9em;
+  color:var(--muted);}
+.turn.student .stage{color:color-mix(in srgb,var(--kriit) 66%, var(--suvapetrool));}
+.turn.tutor .stage{color:color-mix(in srgb,var(--ootahvel) 52%, var(--paper));}
+
+/* narration between turns */
+.narration{display:flex; align-items:center; gap:14px; margin:6px 4px; color:var(--muted);}
+.narration::before,.narration::after{content:""; height:1px; flex:1;
+  background:color-mix(in srgb,var(--ruut) 80%, transparent);}
+.narration span{font-family:var(--serif); font-style:italic; font-size:.92rem; text-align:center;
+  max-width:48ch;}
+
+/* ---- closing notes (Kokkuvõte tabpanel) ---- */
+.notes{margin:clamp(24px,4vw,40px) 0 0; padding-left:clamp(8px,2vw,18px);
+  display:grid; gap:20px;}
+.notes-head{margin:0 0 4px;}
+.notes-head h2{font-family:var(--sans); font-weight:500; letter-spacing:-.015em;
+  font-size:clamp(1.3rem,3.2vw,1.7rem); color:var(--suvapetrool); margin:0 0 6px;}
+.notes-head p{font-family:var(--serif); font-style:italic; font-size:1.02rem;
+  color:color-mix(in srgb,var(--ootahvel) 78%, var(--paper)); max-width:60ch; margin:0;}
+.note{background:var(--kriit); border:1px solid var(--ruut); border-radius:24px;
+  padding:clamp(20px,3vw,30px);}
+.note h2{font-family:var(--sans); font-weight:500; letter-spacing:-.015em; font-size:1.2rem;
+  color:var(--suvapetrool); margin:0 0 4px;}
+.note .kicker{font-size:.75rem; letter-spacing:.12em; text-transform:uppercase; font-weight:500;
+  color:var(--sammal); margin:0 0 10px;}
+.note .prose{font-size:.97rem; color:color-mix(in srgb,var(--ootahvel) 84%, var(--paper)); max-width:74ch;}
+.note .prose p{margin:0 0 12px} .note .prose p:last-child{margin-bottom:0}
+.note strong{color:var(--suvapetrool); font-weight:600;}
+footer{margin:56px 0 0; padding-left:clamp(8px,2vw,18px); font-size:.8rem; color:var(--muted);
+  font-family:var(--serif); font-style:italic;}
+
+@media (max-width:620px){
+  .vhead{grid-template-columns:auto 1fr; grid-template-areas:"num meta" "gauge gauge";}
+  .vnum{grid-area:num} .vmeta{grid-area:meta}
+  .vgauge{grid-area:gauge; flex-direction:row; justify-content:flex-start; gap:12px; margin-top:6px;}
+  .gauge-cap{text-align:left}
+  .stack{max-width:84%;}
+}
+@media print{
+  body{background:var(--paper)} .index{display:none} .turn.student .bubble{box-shadow:none}
+  [hidden]{display:block !important}
+  .version{break-inside:avoid-page; margin-top:48px;}
+}
+
+/* ---- dark mode: the öötahvel night-board (DESIGN.md) ----
+   ponytail: additive selector overrides, not a token refactor — keeps the
+   validated light theme provably untouched. Upgrade to semantic tokens only
+   if a third theme ever appears. */
+@media (prefers-color-scheme: dark){
+  :root{
+    --muted-d: color-mix(in srgb, var(--kriit) 62%, var(--ootahvel)); /* AA on ground+card */
+    --teal-d:#6FB4A1;                                                 /* moss-derived text teal, 6.8:1 */
+    --border-d: color-mix(in srgb, var(--kriit) 16%, transparent);
+    --ink-d: color-mix(in srgb, var(--kriit) 88%, var(--ootahvel));
+  }
+  body{
+    color:var(--kriit);
+    background:
+      repeating-linear-gradient(to bottom, transparent 0, transparent calc(var(--grid) - 1px),
+        color-mix(in srgb, var(--kriit) 8%, transparent) calc(var(--grid) - 1px),
+        color-mix(in srgb, var(--kriit) 8%, transparent) var(--grid)),
+      var(--ootahvel);
+  }
+  .eyebrow,.note .kicker,.dirnote summary::before{color:var(--teal-d);}
+  h1,.vtitle,.note h2,.dirnote summary,.brief strong,.note strong,.notes-head h2{color:var(--kriit);}
+  .vnum{color:color-mix(in srgb,var(--kriit) 26%, transparent);}
+  .sub,.vage,.vrole,.gauge-cap,.who,.narration,footer{color:var(--muted-d);}
+  .index{background:color-mix(in srgb, var(--ootahvel) 88%, transparent); border-color:var(--border-d);}
+  .brief,.tab-btn,.dirnote,.note{background:var(--suvapetrool); border-color:var(--border-d);}
+  .brief{color:var(--ink-d);}
+  .tab-btn{color:var(--kriit);}
+  .tab-btn:hover{border-color:color-mix(in srgb,var(--teal-d) 50%, transparent);}
+  .tab-btn[aria-selected="true"]{background:var(--kriit); border-color:var(--kriit); color:var(--suvapetrool);}
+  .tab-btn[aria-selected="true"] .ni{background:var(--suvapetrool); color:var(--kriit);}
+  .ni{background:var(--kriit); color:var(--ootahvel);}
+  .vdesc,.dirnote .prose,.note .prose,.notes-head p{color:var(--ink-d);}
+  .verdict{color:var(--teal-d);}
+  #v1 .verdict{color:var(--terrakota);}
+  .vhead{border-bottom-color:var(--border-d);}
+  .ring circle + circle{stroke:var(--merevaik);} /* DESIGN: amber ring on dark */
+  .turn.tutor .bubble{background:var(--suvapetrool); border-color:var(--border-d); color:var(--kriit);}
+  .turn.tutor .avatar{background:var(--kriit); color:var(--suvapetrool); border-color:transparent;}
+  .turn.student .bubble{background:var(--kriit); color:var(--ootahvel);}
+  .turn.student .avatar{background:var(--kriit); color:var(--ootahvel);}
+  .turn.tutor .stage{color:color-mix(in srgb,var(--kriit) 60%, var(--suvapetrool));}
+  .turn.student .stage{color:color-mix(in srgb,var(--ootahvel) 55%, var(--kriit));}
+  .narration::before,.narration::after{background:color-mix(in srgb,var(--kriit) 14%, transparent);}
+  .badge{background:color-mix(in srgb,var(--merevaik) 20%, var(--ootahvel));
+    border-color:color-mix(in srgb,var(--merevaik) 55%, transparent); color:var(--kriit);}
+  .tab-btn:focus-visible,.dirnote summary:focus-visible{outline-color:var(--teal-d);}
+}
+</style>
+</head>
+<body>
+<main class="page">
+  <header class="masthead">
+    <p class="eyebrow">Matemaatika abitund · üks õpilane, neli juhendajat</p>
+    <h1>„Ma ei tea.”</h1>
+    <p class="sub">Sama tööleht. Sama poiss. Neli väga erinevat tundi.</p>
+    <div class="brief"><strong>Õpilane (kõigis versioonides sama):</strong> Sten, 7. klass. Hinded matemaatikas 2 ja 3. Vastab harjumuspäraselt "ma ei tea", väldib silmsidet, on veendunud, et ta "lihtsalt ei ole mata-inimene". Koduseks on jäänud tööleht ühe tundmatuga lineaarvõrranditest (nt 3x + 5 = 20; 7 − 2x = 15; 2(x − 4) = 10; x/3 + 2 = 7).</div>
+    <nav class="index" role="tablist" aria-label="Vali versioon">
+      <button type="button" class="tab-btn" role="tab" id="tab-v1" aria-controls="v1" aria-selected="true"><span class="ni">1</span>Karl-Erik</button>
+      <button type="button" class="tab-btn" role="tab" id="tab-v2" aria-controls="v2" aria-selected="false" tabindex="-1"><span class="ni">2</span>Liis</button>
+      <button type="button" class="tab-btn" role="tab" id="tab-v3" aria-controls="v3" aria-selected="false" tabindex="-1"><span class="ni">3</span>Aare Kask</button>
+      <button type="button" class="tab-btn" role="tab" id="tab-v4" aria-controls="v4" aria-selected="false" tabindex="-1"><span class="ni">4</span>Maarja Laan <span class="ni-sota">SoTA</span></button>
+      <button type="button" class="tab-btn" role="tab" id="tab-notes" aria-controls="notes" aria-selected="false" tabindex="-1">Kokkuvõte</button>
+    </nav>
+  </header>
+
+  <section class="version" id="v1" role="tabpanel" aria-labelledby="tab-v1" tabindex="0">
+    <header class="vhead">
+      <div class="vnum">1</div>
+      <div class="vmeta">
+        <div class="vtitle">Karl-Erik <span class="vage">19</span> </div>
+        <div class="vrole">eliitgümnaasiumi vilistlane · lai riigieksam 99/100</div>
+        <p class="vdesc">Särav, siiras, heatahtlik — aga õpetamiskogemuseta. Talle on matemaatika alati kerge olnud ja ta ei suuda ette kujutada pead, millele see kerge ei ole.</p>
+      </div>
+      <div class="vgauge">
+        <svg class="ring" viewBox="0 0 40 40" width="40" height="40" aria-hidden="true">
+    <circle cx="20" cy="20" r="15" fill="none" stroke="var(--ruut)" stroke-width="3"/>
+    <circle cx="20" cy="20" r="15" fill="none" stroke="var(--sammal)" stroke-width="3"
+      stroke-linecap="round" stroke-dasharray="15.1 94.2"
+      transform="rotate(-90 20 20)"/>
+  </svg>
+        <span class="gauge-cap">õpiteaduslik<br>sügavus</span>
+      </div>
+    </header>
+    <p class="verdict">Lahendab õpilase eest. Sten lahkub sama abituna.</p>
+    
+    <div class="thread">
+      <div class="turn tutor">
+    <div class="avatar" aria-hidden="true">K</div>
+    <div class="stack">
+      <div class="who">Karl-Erik</div>
+      <div class="bubble">Tšau! Sina oledki Sten, eks? Su ema rääkis, et võrrandid ei istu. Pole probleemi — ma tegin just riigieksami 99 punkti peale ja ausalt, võrrandid on seal kõige kergem osa üldse.</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble"><em class="stage">(vaatab lauda)</em> Tšau.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">K</div>
+    <div class="stack">
+      <div class="who">Karl-Erik</div>
+      <div class="bubble">Näita, mis teil koolis pooleli on.</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble"><em class="stage">(lükkab töölehe üle laua)</em> See. Ma ei saa mitte millestki aru.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">K</div>
+    <div class="stack">
+      <div class="who">Karl-Erik</div>
+      <div class="bubble">Vaatame... 3x + 5 = 20. Okei, see on täiesti elementaarne. Viid viie teisele poole, märk muutub, saad 3x = 15. Jagad kolmega — x on 5. Ongi kõik. Lihtne, eks?</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble">Mhm.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">K</div>
+    <div class="stack">
+      <div class="who">Karl-Erik</div>
+      <div class="bubble">Said aru?</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble">Ma ei tea. Vist.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">K</div>
+    <div class="stack">
+      <div class="who">Karl-Erik</div>
+      <div class="bubble">Mida siin mitte aru saada on? Kolm sammu kokku ju.</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble"><em class="stage">(vaikselt)</em> Miks see märk muutub?</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">K</div>
+    <div class="stack">
+      <div class="who">Karl-Erik</div>
+      <div class="bubble">Lihtsalt muutub. See on reegel — kui liige läheb üle võrdusmärgi, siis pluss muutub miinuseks ja vastupidi. Seda ei pea põhjendama, seda peab teadma. Nagu liiklusmärki.</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble">Ahah.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">K</div>
+    <div class="stack">
+      <div class="who">Karl-Erik</div>
+      <div class="bubble">Järgmine: 7 − 2x = 15. Siin viid seitsme paremale... ei, tead, teeme hoopis kiiremini. Lahutad mõlemalt poolt seitsme, jääb −2x = 8, jagad miinus kahega, x = −4. Näed?</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble">Sa enne ütlesid, et tuleb teisele poole viia ja märki muuta. Nüüd sa hoopis lahutasid ja jagasid?</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">K</div>
+    <div class="stack">
+      <div class="who">Karl-Erik</div>
+      <div class="bubble">See on sisuliselt sama asi, lihtsalt teistpidi. Mõlemad annavad sama vastuse.</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble">Ma ei tea... ma ei saa aru, kumba ma siis tegema pean.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">K</div>
+    <div class="stack">
+      <div class="who">Karl-Erik</div>
+      <div class="bubble">Kumba tahad. Tee seda, mis kiirem on.</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble">Ma ei tea, kumb kiirem on.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">K</div>
+    <div class="stack">
+      <div class="who">Karl-Erik</div>
+      <div class="bubble"><em class="stage">(kergelt ohates)</em> Okei. Vaata lihtsalt, kuidas mina teen, ja tee täpselt järgi. 2(x − 4) = 10. Avad sulud: 2x − 8 = 10. Kaheksa teisele poole: 2x = 18. x = 9. Selge? Nüüd sina — 3(x + 2) = 21. Täpselt sama asi.</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble"><em class="stage">(kirjutab: 3x + 2 = 21)</em> Nii?</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">K</div>
+    <div class="stack">
+      <div class="who">Karl-Erik</div>
+      <div class="bubble">Ei-ei, sa pead ju kahe ka kolmega läbi korrutama. Sulgude avamine, see on ju kuuenda klassi asi.</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble"><em class="stage">(kustutab, kõrvad punased)</em> Ma ajan alati sassi.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">K</div>
+    <div class="stack">
+      <div class="who">Karl-Erik</div>
+      <div class="bubble">3 korda x on 3x, 3 korda 2 on 6. Saad 3x + 6 = 21. Edasi?</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble">Ma ei tea.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">K</div>
+    <div class="stack">
+      <div class="who">Karl-Erik</div>
+      <div class="bubble">No mida me just kolm korda järjest tegime? Vii kuus teisele poole.</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble">3x on... 15?</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">K</div>
+    <div class="stack">
+      <div class="who">Karl-Erik</div>
+      <div class="bubble">Näed! Edasi?</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble">Jagan... kolmega? x on 5?</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">K</div>
+    <div class="stack">
+      <div class="who">Karl-Erik</div>
+      <div class="bubble">Täpselt! Näed, sa ju oskad. Sa lihtsalt ei viitsi mõelda.</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble"><em class="stage">(vaikib)</em></div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">K</div>
+    <div class="stack">
+      <div class="who">Karl-Erik</div>
+      <div class="bubble">Teeme nüüd midagi ägedamat ka. Põhikooli lõpueksamil on selliseid, kus murd sees on. x/3 + 2 = 7. Siin on hea trikk: korrutad kohe alguses kõik liikmed kolmega läbi, siis murd kaob ära. x + 6 = 21, x = 15. Kui selle triki selgeks saad, teed sellised sekunditega.</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble">Miks just kolmega?</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">K</div>
+    <div class="stack">
+      <div class="who">Karl-Erik</div>
+      <div class="bubble">Sest nimetaja on kolm.</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble">Ma ei saa vist murdudest ka aru.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">K</div>
+    <div class="stack">
+      <div class="who">Karl-Erik</div>
+      <div class="bubble"><em class="stage">(paus)</em> Murrud on viienda klassi teema... Okei, sellega me täna küll ei jõua tegeleda. Harjutame võrrandeid, murrud tulevad küll harjutades iseenesest.</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble">Mhm.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">K</div>
+    <div class="stack">
+      <div class="who">Karl-Erik</div>
+      <div class="bubble"><em class="stage">(vaatab kella)</em> Teeme veel viis tükki, siis on käsi sees. Ma teen igaühe ette, sina teed järgi.</div>
+    </div>
+  </div>
+<div class="narration"><span>Nad lahendavad. Karl-Erik ütleb suurema osa sammudest ette; Sten kirjutab järele. Töölehel on nüüd viis õiget vastust, mis on sisuliselt Karl-Eriku käekirjaga.</span></div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">K</div>
+    <div class="stack">
+      <div class="who">Karl-Erik</div>
+      <div class="bubble">Vaata — viis tükki, kõik õiged! Sa oskad tegelikult täitsa hästi.</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble">Sa ju ise tegid need.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">K</div>
+    <div class="stack">
+      <div class="who">Karl-Erik</div>
+      <div class="bubble">Ma ainult aitasin natuke. Kuule, ausalt — matemaatika ongi puhtalt harjutamise küsimus. Mina tegin enne eksamit iga päev kakskümmend ülesannet. Tee sina kasvõi viis päevas, ja kuu pärast on kontrolltöö viis.</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble">Ma ei jaksa kodus üksi. Ma ei tea kunagi, kas mul on õige või vale.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">K</div>
+    <div class="stack">
+      <div class="who">Karl-Erik</div>
+      <div class="bubble">Vastused on ju õpiku tagakaanel.</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble">Aga kui vale on, siis ma ei tea, MIS valesti läks.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">K</div>
+    <div class="stack">
+      <div class="who">Karl-Erik</div>
+      <div class="bubble">Siis vaatame need järgmine kord koos üle. Nii, aeg saab läbi. Kodus tee tööleht lõpuni — need on kõik täpselt samasugused nagu need, mis me tegime. Saad hakkama!</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble"><em class="stage">(paneb vihiku kotti)</em> Mhm. Aitäh.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">K</div>
+    <div class="stack">
+      <div class="who">Karl-Erik</div>
+      <div class="bubble">Pole tänu väärt! Ja ära üldse muretse, võrrandid on tõesti kõige lihtsam osa. Oota, kuni logaritmid tulevad. <em class="stage">(naerab)</em></div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble"><em class="stage">(nõrgalt)</em> Mhm.</div>
+    </div>
+  </div>
+<div class="narration"><span>Sten lahkub sama töölehega, millega tuli — ainult et nüüd on seal võõra käekirjaga vastused, mida ta kodus korrata ei oska.</span></div>
+    </div>
+  </section>
+<section class="version" id="v2" role="tabpanel" aria-labelledby="tab-v2" tabindex="0" hidden>
+    <header class="vhead">
+      <div class="vnum">2</div>
+      <div class="vmeta">
+        <div class="vtitle">Liis <span class="vage">27</span> </div>
+        <div class="vrole">matemaatikaõpetaja · MA, Tallinna Ülikool</div>
+        <p class="vdesc">Soe, kannatlik, teadlikult tehnikaid kasutav: usaldusliku õhkkonna loomine, vigade normaliseerimine, mudeli abil selgitamine, valikvastustega küsimused lahtise "miks?" asemel, ooteaja andmine, protsessi kiitmine.</p>
+      </div>
+      <div class="vgauge">
+        <svg class="ring" viewBox="0 0 40 40" width="40" height="40" aria-hidden="true">
+    <circle cx="20" cy="20" r="15" fill="none" stroke="var(--ruut)" stroke-width="3"/>
+    <circle cx="20" cy="20" r="15" fill="none" stroke="var(--sammal)" stroke-width="3"
+      stroke-linecap="round" stroke-dasharray="51.8 94.2"
+      transform="rotate(-90 20 20)"/>
+  </svg>
+        <span class="gauge-cap">õpiteaduslik<br>sügavus</span>
+      </div>
+    </header>
+    <p class="verdict">Turvatunne, mudel reegli asemel, päris eduelamus.</p>
+    
+    <div class="thread">
+      <div class="turn tutor">
+    <div class="avatar" aria-hidden="true">L</div>
+    <div class="stack">
+      <div class="who">Liis</div>
+      <div class="bubble">Hei, Sten! Mina olen Liis. Enne kui me üldse vihiku lahti teeme — istu, hinga. Kuidas koolis muidu läheb?</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble"><em class="stage">(kehitab õlgu)</em> Normaalselt. Peale mata.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">L</div>
+    <div class="stack">
+      <div class="who">Liis</div>
+      <div class="bubble">Mis mata tunnis kõige jubedam on?</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble">Ma ei tea. Kõik. Ma ei saa millestki aru, ja siis õps küsib, ja ma ei oska, ja kõik vaatavad.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">L</div>
+    <div class="stack">
+      <div class="who">Liis</div>
+      <div class="bubble">See on päris kohutav tunne — kui kõik vaatavad ja peas on täielik tühjus. Mul oli ülikoolis ühes aines täpselt sama.</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble"><em class="stage">(vaatab esimest korda üles)</em> Sul? Sa oled ju mataõps.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">L</div>
+    <div class="stack">
+      <div class="who">Liis</div>
+      <div class="bubble">Mataõpetajad ei sünni matemaatikat osates. Ma luban sulle täna kaks asja. Esiteks: siin toas ei ole olemas lolli küsimust. Teiseks: vead on siin lausa kohustuslikud, sest viga on ainus koht, kust ma näen, kuidas su pea mõtleb. Diil?</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble"><em class="stage">(pool-muigab)</em> Diil.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">L</div>
+    <div class="stack">
+      <div class="who">Liis</div>
+      <div class="bubble">Mis teil praegu teemaks on?</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble">Võrrandid. Ma ei saa üldse pihta.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">L</div>
+    <div class="stack">
+      <div class="who">Liis</div>
+      <div class="bubble">Siis unustame korraks võrrandid sootuks ära. Ma joonistan hoopis kaalu. <em class="stage">(joonistab kahe kausiga kaalu)</em> Vasakus kausis on kolm ühesugust salapärast pakki ja lisaks üks 5-grammine raskus. Paremas kausis on 20 grammi. Kaal on tasakaalus. Kui palju üks pakk kaalub?</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble"><em class="stage">(vaatab pilti pikalt)</em> ...Ma ei tea.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">L</div>
+    <div class="stack">
+      <div class="who">Liis</div>
+      <div class="bubble">Täiesti okei, teeme sammukese väiksemaks. Kui ma võtan vasakult kausilt selle 5-grammise raskuse ära — mis kaaluga juhtub?</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble">Läheb... kaldu?</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">L</div>
+    <div class="stack">
+      <div class="who">Liis</div>
+      <div class="bubble">Täpselt, vasak pool läheb kergemaks. Mida ma pean paremal pool tegema, et tasakaal tagasi tuleks?</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble">Võtma ka midagi ära?</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">L</div>
+    <div class="stack">
+      <div class="who">Liis</div>
+      <div class="bubble">Kui palju?</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble">...viis?</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">L</div>
+    <div class="stack">
+      <div class="who">Liis</div>
+      <div class="bubble">Miks just viis?</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble">Sest sa võtsid vasakult viis ära?</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">L</div>
+    <div class="stack">
+      <div class="who">Liis</div>
+      <div class="bubble">Sten. See lause, mille sa just ütlesid, ONGI võrrandite lahendamise kõige tähtsam reegel. Mida teen ühel pool, teen ka teisel pool. Kirjuta see suurte tähtedega vihiku äärde.</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble"><em class="stage">(kirjutab)</em> See ongi kõik või?</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">L</div>
+    <div class="stack">
+      <div class="who">Liis</div>
+      <div class="bubble">See on süda. Nii — mis paremasse kaussi alles jäi?</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble">20 miinus 5... 15.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">L</div>
+    <div class="stack">
+      <div class="who">Liis</div>
+      <div class="bubble">Ja vasakule?</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble">Kolm pakki.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">L</div>
+    <div class="stack">
+      <div class="who">Liis</div>
+      <div class="bubble">Kolm ühesugust pakki kaaluvad kokku 15 grammi. Palju üks kaalub?</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble">Viis?</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">L</div>
+    <div class="stack">
+      <div class="who">Liis</div>
+      <div class="bubble">Kas sa arvad või tead?</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble"><em class="stage">(paus)</em> Tean. Kolm korda viis on viisteist.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">L</div>
+    <div class="stack">
+      <div class="who">Liis</div>
+      <div class="bubble">Ja see viimane lause — "kolm korda viis on viisteist" — see oli kontrollimine. Sa kontrollisid oma vastuse ise ära, ilma minuta. Nüüd kirjutame täpselt sama loo matemaatika keeles. Pakk on x. <em class="stage">(kirjutab: 3x + 5 = 20)</em></div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble">Oot. See ONGI see ülesanne, mis meil koju jäi.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">L</div>
+    <div class="stack">
+      <div class="who">Liis</div>
+      <div class="bubble"><em class="stage">(naeratab)</em> Ongi. Ja sa lahendasid selle just ära, ilma et ma oleksin sulle ühtegi sammu ette öelnud.</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble"><em class="stage">(vaatab töölehte)</em> Aga tunnis ma ei saanud üldse aru, kui õps ütles, et "vii teisele poole ja muuda märki".</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">L</div>
+    <div class="stack">
+      <div class="who">Liis</div>
+      <div class="bubble">Sest see lause peidab kaalu ära. "Vii teisele poole" tähendab päriselt "võta mõlemast kausist sama palju ära". Sama asi, aga pilt on kadunud. Proovime järgmist, ja kirjutame iga sammu kõrvale, mida me kaaluga teeme. 2x + 3 = 11. Mis su esimene käik on?</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble">Võtan... mõlemalt poolt kolm ära?</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">L</div>
+    <div class="stack">
+      <div class="who">Liis</div>
+      <div class="bubble">Miks kolm, mitte kaks?</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble">Ma ei tea... <em class="stage">(Liis ootab rahulikult, ei täida vaikust)</em> ...sest ma tahan, et pakid jääksid üksi?</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">L</div>
+    <div class="stack">
+      <div class="who">Liis</div>
+      <div class="bubble">Väga hästi sõnastatud. Tahame pakid üksi jätta, ja kolm on lisaraskus, mis segab. Tee ära.</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble"><em class="stage">(kirjutab: 2x = 8)</em> Ja siis jagan kahega? x = 4?</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">L</div>
+    <div class="stack">
+      <div class="who">Liis</div>
+      <div class="bubble">Ja kuidas sa ise teada saad, kas see on õige — ilma minult küsimata?</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble">Panen... tagasi? Kaks korda neli on kaheksa, pluss kolm on üksteist. <em class="stage">(üllatunult)</em> On õige.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">L</div>
+    <div class="stack">
+      <div class="who">Liis</div>
+      <div class="bubble">Kontrollisid jälle ise. Ja märkame üht asja: viimase kümne minuti jooksul oled sa öelnud "ma ei tea" täpselt ühe korra.</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble"><em class="stage">(muigab)</em> Ja pärast mõtlesin ikka välja.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">L</div>
+    <div class="stack">
+      <div class="who">Liis</div>
+      <div class="bubble">Just. Teeme nüüd ühe kavalama. 7 − 2x = 15.</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble"><em class="stage">(jääb jänni)</em> Siin on x-i ees miinus... ma ei tea, mida siin teha.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">L</div>
+    <div class="stack">
+      <div class="who">Liis</div>
+      <div class="bubble">Proovime "ma ei tea" asemel nii: ütle mulle üks asi, mida sa selle ülesande kohta TEAD.</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble"><em class="stage">(paus)</em> Et... ma pean mõlemal pool sama asja tegema?</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">L</div>
+    <div class="stack">
+      <div class="who">Liis</div>
+      <div class="bubble">Juba olemas. Ja keda sa tahaksid üksi jätta?</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble">Seda 2x-i? Aga tal on miinus ees.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">L</div>
+    <div class="stack">
+      <div class="who">Liis</div>
+      <div class="bubble">Proovi julgelt, mis juhtub, kui võtad mõlemalt poolt seitsme ära. Kui untsu läheb — see ongi see kohustuslik viga, milles me kokku leppisime.</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble"><em class="stage">(kirjutab: −2x = 8)</em> Nii on kuidagi imelik.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">L</div>
+    <div class="stack">
+      <div class="who">Liis</div>
+      <div class="bubble">Imelik, aga õige. Nüüd jaga mõlemad pooled miinus kahega.</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble">Kas miinusega üldse saab jagada?</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">L</div>
+    <div class="stack">
+      <div class="who">Liis</div>
+      <div class="bubble">Saab, täpselt samamoodi nagu tavalisega. Kaheksa jagatud miinus kahega on...?</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble">...miinus neli?</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">L</div>
+    <div class="stack">
+      <div class="who">Liis</div>
+      <div class="bubble">Kontrolli.</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble">Seitse miinus... kaks korda miinus neli... <em class="stage">(kortsutab kulmu)</em> miinus korda miinus on pluss? Seitse pluss kaheksa on viisteist! <em class="stage">(istub sirgemalt)</em> Päriselt tuli õige.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">L</div>
+    <div class="stack">
+      <div class="who">Liis</div>
+      <div class="bubble">Sa lahendasid just võrrandi, kus vastus on negatiivne arv — see on kogu selle töölehe kõige raskem tüüp. Kuidas enesetunne?</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble">Parem. Aga ma kardan, et kodus üksi ma jälle ei oska.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">L</div>
+    <div class="stack">
+      <div class="who">Liis</div>
+      <div class="bubble">Sellepärast teeme nii. Vali töölehelt ise kolm ülesannet: üks kerge, üks keskmine ja üks selline, mis natuke hirmutab. Kodus teed AINULT need kolm — aga iga sammu juurde kirjutad, mida sa kaaluga teed, ja lõppu teed kontrolli. Kolm tükki, mitte kakskümmend. Sobib?</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble">Kolm ma vist jaksan küll.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">L</div>
+    <div class="stack">
+      <div class="who">Liis</div>
+      <div class="bubble">Ja kui mõni läheb untsu, siis too see viga mulle — sellest algab meie järgmine tund. Enne kui lähed: seleta mulle oma sõnadega, mis on võrrandi lahendamise kõige tähtsam reegel.</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble">Et... mis ma ühel pool teen, teen teisel pool ka. Ja lõpus panen vastuse tagasi sisse ja vaatan, kas klapib.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">L</div>
+    <div class="stack">
+      <div class="who">Liis</div>
+      <div class="bubble">Sa just õpetasid mulle võrrandite lahendamist. Järgmise nädalani, Sten.</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble"><em class="stage">(kotti pakkides, peaaegu naeratades)</em> Nägemist. See polnud üldse nii hull, kui ma arvasin. ---</div>
+    </div>
+  </div>
+    </div>
+  </section>
+<section class="version" id="v3" role="tabpanel" aria-labelledby="tab-v3" tabindex="0" hidden>
+    <header class="vhead">
+      <div class="vnum">3</div>
+      <div class="vmeta">
+        <div class="vtitle">Aare Kask <span class="vage">64</span> </div>
+        <div class="vrole">TÜ matemaatikadidaktika professor</div>
+        <p class="vdesc">Rahulik, aeglane, diagnostiline. Ei alusta üldse tänase teemaga — otsib enne üles tegelikud augud (väärarusaamad), töötab õpilase enesepildiga ja õpetab metakognitiivseid küsimusi. Lahendab ühe tunniga vähem ülesandeid kui keegi teine, aga muudab rohkem.</p>
+      </div>
+      <div class="vgauge">
+        <svg class="ring" viewBox="0 0 40 40" width="40" height="40" aria-hidden="true">
+    <circle cx="20" cy="20" r="15" fill="none" stroke="var(--ruut)" stroke-width="3"/>
+    <circle cx="20" cy="20" r="15" fill="none" stroke="var(--sammal)" stroke-width="3"
+      stroke-linecap="round" stroke-dasharray="77.3 94.2"
+      transform="rotate(-90 20 20)"/>
+  </svg>
+        <span class="gauge-cap">õpiteaduslik<br>sügavus</span>
+      </div>
+    </header>
+    <p class="verdict">Diagnoosib augud, muudab enesepilti, õpetab mõtlema.</p>
+    
+    <div class="thread">
+      <div class="turn tutor">
+    <div class="avatar" aria-hidden="true">A</div>
+    <div class="stack">
+      <div class="who">Aare Kask</div>
+      <div class="bubble">Tere, Sten. Istu. Ma ütlen kohe alguses ühe asja, mis sind võib-olla üllatab: ma ei kavatse sind täna võrrandeid lahendama õpetada.</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble"><em class="stage">(segaduses)</em> Aga... ema ütles, et selleks ma siia tulingi.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">A</div>
+    <div class="stack">
+      <div class="who">Aare Kask</div>
+      <div class="bubble">Jõuame nendeni ka. Aga kõigepealt tahan ma aru saada, kuidas sinu pea matemaatikat teeb. Arst, kes paneb kipsi enne röntgenit, on halb arst. Kas ma tohin esitada sulle mõned küsimused, millel ei ole hindeid?</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble"><em class="stage">(ettevaatlikult)</em> Okei.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">A</div>
+    <div class="stack">
+      <div class="who">Aare Kask</div>
+      <div class="bubble">Esimene. Ma kirjutan siia: 8 = 5 + 3. Kas niimoodi tohib kirjutada?</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble"><em class="stage">(vaatab kaua)</em> ...See on kuidagi tagurpidi. Vastus peaks lõpus olema.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">A</div>
+    <div class="stack">
+      <div class="who">Aare Kask</div>
+      <div class="bubble">Huvitav. Miks vastus peaks lõpus olema?</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble">Sest võrdusmärk tähendab, et nüüd tuleb vastus?</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">A</div>
+    <div class="stack">
+      <div class="who">Aare Kask</div>
+      <div class="bubble">Aitäh, see on väga aus vastus. Teine küsimus: kui palju on kolm miinus seitse?</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble"><em class="stage">(kiiresti)</em> Seda ei saa. Väiksemast ei saa suuremat lahutada. Või... oot, saab vist ikka. Neli? Miinus neli? Ma ei tea.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">A</div>
+    <div class="stack">
+      <div class="who">Aare Kask</div>
+      <div class="bubble">Kolmas küsimus: võrrandis 3x + 5 = 20 — mis asi see x üldse on?</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble">Mingi täht, mille... vastuse ma pean leidma? Ma ei tea, mis ta on.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">A</div>
+    <div class="stack">
+      <div class="who">Aare Kask</div>
+      <div class="bubble">Suurepärane. Ma tean nüüd sinu kohta rohkem kui sinu viimased kolm kontrolltööd kokku. Kas tahad kuulda, mida ma nägin?</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble"><em class="stage">(kehitab õlgu)</em> Nagunii seda, et ma olen loll.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">A</div>
+    <div class="stack">
+      <div class="who">Aare Kask</div>
+      <div class="bubble">Täpselt vastupidist. Ma nägin poissi, kelle mõtlemisel ei ole mitte midagi viga, aga kelle vundamendis on kaks auku. Ja pane tähele vahet: "loll" oleks omadus, aga auk on koht. Kohta saab täita. Kas sa tead, mis su esimene auk on?</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble">Ei tea.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">A</div>
+    <div class="stack">
+      <div class="who">Aare Kask</div>
+      <div class="bubble">Sa arvad, et võrdusmärk on käsklus: "arvuta nüüd ära". Tegelikult on ta väide: "vasakul ja paremal on täpselt ühepalju". Nagu kaalu kaks kaussi. Sellepärast tunduski 8 = 5 + 3 sulle tagurpidi — aga kaalule on täiesti ükskõik, kummal pool mis seisab. Ja kui see arusaam paigas ei ole, siis võrranditest EI SAAGI aru saada. Ükskõik kui palju sa harjutad. See ei ole sinu süü — keegi ei ole sulle seda lihtsalt kunagi niipidi öelnud.</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble"><em class="stage">(vaikselt)</em> Ma mõtlesin alati, et ma olen lihtsalt matas nõrk.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">A</div>
+    <div class="stack">
+      <div class="who">Aare Kask</div>
+      <div class="bubble">"Ma olen matas nõrk" on lause, mille me täna prügikasti viskame. Ma olen nelikümmend aastat vaadanud, kuidas lapsed matemaatikat õpivad. Peaaegu iga "nõrk" õpilane on tegelikult õpilane, kes jäi kunagi ühest-kahest klotsist ilma ja on sestpeale ehitanud maja ilma nurgakivita. Sinu puuduvad klotsid on võrdusmärgi tähendus ja negatiivsed arvud. Hakkame esimest auku täitma. Ütle mulle: väljas on kolm kraadi sooja. Öösel läheb seitse kraadi külmemaks. Mitu kraadi termomeeter hommikul näitab?</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble">Miinus neli.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">A</div>
+    <div class="stack">
+      <div class="who">Aare Kask</div>
+      <div class="bubble">Sa vastasid alla sekundiga. Sten — sa arvutasid praegu kolm miinus seitse.</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble"><em class="stage">(jahmunult)</em> Oot... see on sama tehe?</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">A</div>
+    <div class="stack">
+      <div class="who">Aare Kask</div>
+      <div class="bubble">Seesama, mille kohta sa viis minutit tagasi ütlesid, et "seda ei saa". Numbrid ei muutunud. Muutus pilt sinu peas. Termomeeter ei lõpe nulli peal ära — ja arvurida ka mitte. <em class="stage">(joonistab arvurea, märgib −10 kuni 10)</em> Kus on kolm? Näita näpuga.</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble"><em class="stage">(näitab)</em></div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">A</div>
+    <div class="stack">
+      <div class="who">Aare Kask</div>
+      <div class="bubble">Miinus seitse tähendab: seitse sammu vasakule. Kõnni.</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble"><em class="stage">(loeb samme)</em> ...Miinus neli.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">A</div>
+    <div class="stack">
+      <div class="who">Aare Kask</div>
+      <div class="bubble">Veel kolm tükki, ainult näpu ja reaga. Viis miinus üheksa?</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble"><em class="stage">(kõnnib real)</em> Miinus neli.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">A</div>
+    <div class="stack">
+      <div class="who">Aare Kask</div>
+      <div class="bubble">Miinus kaks pluss kuus?</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble">...Neli.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">A</div>
+    <div class="stack">
+      <div class="who">Aare Kask</div>
+      <div class="bubble">Miinus kolm miinus kaks?</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble"><em class="stage">(kõhkleb, kõnnib)</em> Miinus viis?</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">A</div>
+    <div class="stack">
+      <div class="who">Aare Kask</div>
+      <div class="bubble">Kas sa arvad või tead?</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble"><em class="stage">(vaatab rida uuesti)</em> Tean. Ma alustasin miinus kolmest ja läksin veel kaks vasakule.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">A</div>
+    <div class="stack">
+      <div class="who">Aare Kask</div>
+      <div class="bubble">Pane tähele, mida sa just tegid. Sa ei öelnud "ma ei tea" — sa võtsid tööriista ja kontrollisid. See ongi kogu vahe nõrga ja tugeva õpilase vahel. Mitte pea, vaid harjumus. Nüüd teine auk: võrdusmärk. <em class="stage">(kirjutab: 3x + 5 = 20)</em> Kui võrdusmärk on kaal, siis mis on vasakus kausis?</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble">Kolm x-i ja... viis.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">A</div>
+    <div class="stack">
+      <div class="who">Aare Kask</div>
+      <div class="bubble">Ja x on lihtsalt arv, mille suurus on hetkel varjus. Mitte "mingi täht" — arv, kes kannab maski. Sinu töö on mask maha võtta. Millest sa alustaksid?</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble">Võtan... mõlemalt poolt viis ära? Et x-id üksi jääks?</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">A</div>
+    <div class="stack">
+      <div class="who">Aare Kask</div>
+      <div class="bubble">Tee. Ma ei ütle täna enam ühtegi sammu ette — ma ainult küsin.</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble"><em class="stage">(kirjutab: 3x = 15)</em> Ja nüüd... jagan kolmega. Mõlemad pooled. x = 5.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">A</div>
+    <div class="stack">
+      <div class="who">Aare Kask</div>
+      <div class="bubble">Kust sina tead, et see õige on? Ära minult küsi — minult küsimine on kõige halvem viis.</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble"><em class="stage">(paus)</em> Panen viie tagasi? Kolm korda viis on viisteist, pluss viis on kakskümmend. Klapib.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">A</div>
+    <div class="stack">
+      <div class="who">Aare Kask</div>
+      <div class="bubble">Sa lahendasid võrrandi ja tõestasid ise, et vastus on õige. Sina, mitte mina. Nüüd kirjutame vihiku esimesele lehele kolm küsimust, mida sa igas ülesandes ENDALT küsid. Esimene: keda ma tahan üksi jätta? Teine: mida ma teen mõlemal pool, et sinnani jõuda? Kolmas: kas vastus tagasi pannes klapib? Loe ette.</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble"><em class="stage">(loeb)</em> Keda tahan üksi jätta. Mida teen mõlemal pool. Kas tagasi pannes klapib.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">A</div>
+    <div class="stack">
+      <div class="who">Aare Kask</div>
+      <div class="bubble">Ja veel üks kokkulepe. Lause "ma ei tea" on siitpeale keelatud — mitte sellepärast, et see oleks häbiasi, vaid sellepärast, et see paneb mõtlemise kinni. Selle asemel alustad alati lausega "ma tean, et...". Isegi kui sa tead ainult üht pisikest asja. Proovime kohe: 7 − 2x = 15. Alusta.</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble"><em class="stage">(hingab sisse)</em> Ma tean, et... ma tahan 2x-i üksi jätta. Ja ma tean, et pean mõlemal pool sama asja tegema. <em class="stage">(kirjutab: −2x = 8)</em> Siin ma... ma tean, et jagan mõlemad pooled miinus kahega. <em class="stage">(vaatab arvurida)</em> x on miinus neli.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">A</div>
+    <div class="stack">
+      <div class="who">Aare Kask</div>
+      <div class="bubble">Ja?</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble">Kontrollin. Seitse miinus kaks korda miinus neli... kaks korda miinus neli on miinus kaheksa... seitse miinus miinus kaheksa... <em class="stage">(vaatab üles)</em> seitse pluss kaheksa. Viisteist. Klapib.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">A</div>
+    <div class="stack">
+      <div class="who">Aare Kask</div>
+      <div class="bubble">Kui sa täna hommikul oleksid seda ülesannet kontrolltöös näinud, mis sa teinud oleksid?</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble">Jätnud vahele. Nagu alati.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">A</div>
+    <div class="stack">
+      <div class="who">Aare Kask</div>
+      <div class="bubble">Ja mis nüüd teisiti on? Öelda ausalt — mitte selleks, et mulle meeldida.</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble"><em class="stage">(mõtleb päriselt)</em> Ma tean nüüd, MIDA ma ei osanud. Enne ma arvasin, et ma ei oska... kõike. Aga tegelikult ma ei osanud kahte asja.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">A</div>
+    <div class="stack">
+      <div class="who">Aare Kask</div>
+      <div class="bubble">See on kõige täpsem lause, mis siin toas täna öeldud on. Nüüd räägin ma sinuga nagu täiskasvanuga, sest sa oled selle ära teeninud. Sinu hinne ei parane järgmiseks nädalaks. Meie plaan on kolm nädalat vundamenti: negatiivsed arvud, murrud ja võrdusmärk. Alles siis kiirus ja tööleht. See tähendab, et vahepeal võib tulla veel mõni kehv hinne — ja see on plaani osa, mitte ebaõnnestumine. Kas sa pead sellele vastu?</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble">Kui see päriselt aitab, siis pean.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">A</div>
+    <div class="stack">
+      <div class="who">Aare Kask</div>
+      <div class="bubble">Aitab. Mitte sellepärast, et mina olen professor, vaid sellepärast, et sa täna ise nägid, mis juhtub, kui auk täis saab. Koju annan ma sulle kümme tehet negatiivsete arvudega — mitte ühtegi võrrandit. Ja iga tehte juurde joonistad arvurea. Kohtume nädala pärast.</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble"><em class="stage">(ukse juures, pöördub)</em> Kas järgmine kord võib ka nii... et teie küsite ja mina mõtlen ise? See oli parem kui see, kui mulle ette tehakse.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">A</div>
+    <div class="stack">
+      <div class="who">Aare Kask</div>
+      <div class="bubble">Sten, nii see siin edaspidi ainult käibki. ---</div>
+    </div>
+  </div>
+    </div>
+  </section>
+<section class="version" id="v4" role="tabpanel" aria-labelledby="tab-v4" tabindex="0" hidden>
+    <header class="vhead">
+      <div class="vnum">4</div>
+      <div class="vmeta">
+        <div class="vtitle">Maarja Laan <span class="vage">45</span> <span class="badge">SoTA · õpiteadused</span></div>
+        <div class="vrole">matemaatikadidaktika PhD · õpiteadused · 20 a praktikat</div>
+        <p class="vdesc">„Minu eesmärk on muutuda õpilasele võimalikult kiiresti tarbetuks.”</p>
+      </div>
+      <div class="vgauge">
+        <svg class="ring" viewBox="0 0 40 40" width="40" height="40" aria-hidden="true">
+    <circle cx="20" cy="20" r="15" fill="none" stroke="var(--ruut)" stroke-width="3"/>
+    <circle cx="20" cy="20" r="15" fill="none" stroke="var(--merevaik)" stroke-width="3"
+      stroke-linecap="round" stroke-dasharray="91.4 94.2"
+      transform="rotate(-90 20 20)"/>
+  </svg>
+        <span class="gauge-cap">õpiteaduslik<br>sügavus</span>
+      </div>
+    </header>
+    <p class="verdict">Õpilane räägib rohkem kui tutor. Toestus taandub nähtavalt.</p>
+    <details class="dirnote">
+         <summary>Toimetaja märkus — miks versioon 4 sündis</summary>
+         <div class="prose"><p>Aare sessioon on kolmest parim, sest ta teeb kolm asja, mida uurimused järjekindlalt toetavad: ta diagnoosib enne õpetamist ja leiab tegelikud väärarusaamad (võrdusmärk kui käsklus; "väiksemast ei saa lahutada"), ta töötab õpilase enesepildiga ("auk on koht, mitte omadus") ja ta õpetab metakognitiivse tööriista (kolm eneseküsimust, kontroll asendamise teel). Need jäävad neljandasse versiooni alles.</p>
+<p>Aga range õpiteaduste pilguga on tal kuus nõrkust. Esiteks rääkimissuhe: Aare peab pikki monolooge ("nelikümmend aastat...", vundamendi-metafoor), samas kui juhendamisuuringud (Chi self-explanation effect; Bloomi-järgse tutoring-kirjanduse metaanalüüsid) näitavad, et õppimine toimub siis, kui õpilane ise verbaliseerib — tark tutor räägib vähem, mitte paremini. Teiseks on "ma ei tea" KEELAMINE väline reegel; püsivam on kujundada asendusharjumus kogemuse kaudu, nii et "ma ei tea veel, aga ma tean, et..." tuleb õpilase enda suust. Kolmandaks on kõik metafoorid (mask, kaal, termomeeter) tutori omad; personaliseerimine õpilase enda huvialast tõstab nii motivatsiooni kui ka ülekannet — parim pilt on see, mille õpilane ise valib. Neljandaks ei tegele Aare enesekindluse kalibreerimisega: Metcalfe'i hüperkorrektsiooniuuringud näitavad, et kõige ohtlikumad ja ühtlasi kõige väärtuslikumad on vead, milles õpilane on VÄGA kindel — need tuleb spetsiaalselt üles otsida (kindlushinnangud iga vastuse juurde) ja nende parandus jääb kõige paremini meelde. Viiendaks on kodutöö drill ilma tagasisidesilmuseta: kümme tehet arvureaga on parem kui kakskümmend võrrandit, aga SoTA-praktika on lühike hajutatud harjutamine (spacing), väljakaevamisharjutus (retrieval practice — tühi leht, mitte ülelugemine) ja iseseisev kontrollisilmus koos nähtava progressiga. Kuuendaks jätab Aare süsteemi kõrvale: ta ei tegele ärevuse füsioloogiaga (Beilocki ja Ramireze "worry-dump" ja erutuse ümbertõlgendamine on odavad ja testitud võtted) ega ehita silda aineõpetajani (järelevastamine kui lähedale toodud eduelamus — high-dosage-tutoring programmide standardpraktika). Lisaks: Aare otsustab kolme nädala plaani üksi; agentsus — õpilase enda sõnastatud eesmärk ja tema tehtud valikud — on üks tugevamaid motivatsioonihoobasid, mis üldse olemas on.</p>
+<p>Versioon 4 hoiab seega Aare selgroo (diagnostika → väärarusaamad → identiteet → metakognitsioon) ja lisab: õpilase sõnastatud eesmärgi mõõdupuuna, kindlushinnangutega diagnostika, õpilase enda valitud metafoori, tahtliku veaga näidislahenduse (õpilane kohtunikuna), eksplitsiitselt taandatava toestuse ("mina küsin → sina küsid valjusti → sina küsid peas"), raskusastme valiku andmise õpilasele, tühja lehe väljakaevamisharjutuse, kuueminutilise päevaprotokolli koos progressitabeliga, ärevustehnikad ja silla aineõpetajani. Ja üks nähtav vormiline erinevus: tutori repliigid on lühemad kui õpilase omad — sessiooni lõpupoole peaaegu ainult küsimused.</p></div>
+       </details>
+    <div class="thread">
+      <div class="turn tutor">
+    <div class="avatar" aria-hidden="true">M</div>
+    <div class="stack">
+      <div class="who">Maarja Laan</div>
+      <div class="bubble">Tere, Sten. Enne kui me midagi muud teeme — sul on täna kuuskümmend minutit minu aega ja see aeg kuulub sinule, mitte su emale. Mille peale sina tahad, et me selle kulutame?</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble"><em class="stage">(kohmetult)</em> Ma ei tea. Ema tahab, et hinded paremaks läheks.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">M</div>
+    <div class="stack">
+      <div class="who">Maarja Laan</div>
+      <div class="bubble">See on ema soov. Mina küsisin sinu oma.</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble"><em class="stage">(pikk paus)</em> ...Et ma ei tunneks ennast tunnis lollina. Et kui õps küsib, ei tuleks kohe paanika.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">M</div>
+    <div class="stack">
+      <div class="who">Maarja Laan</div>
+      <div class="bubble">"Et ei tuleks paanikat, kui õps küsib." Ma kirjutan selle siia üles — see on meie mõõdupuu. Mitte hinne; hinne tuleb sabas järele. Mis su kehas juhtub sel hetkel, kui õpetaja su nime ütleb?</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble">Süda hakkab taguma. Ja pea läheb täitsa tühjaks.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">M</div>
+    <div class="stack">
+      <div class="who">Maarja Laan</div>
+      <div class="bubble">Kas sa tead, mis see südame tagumine tegelikult on? Keha pumpab ajule verd ja hapnikku juurde. See ei ole märk, et sa kohe läbi kukud — see on keha viis öelda "olen valmis". Sportlastel on enne starti täpselt sama. Probleem pole südames, vaid lauses, mida sa endale sel hetkel ütled. Mis lause sul peas käib?</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble">Et "nüüd on kõik, ma ei oska nagunii".</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">M</div>
+    <div class="stack">
+      <div class="who">Maarja Laan</div>
+      <div class="bubble">Selle lause juurde tuleme tunni lõpus tagasi, mul on sulle üks kahe minuti trikk, mida on päris eksperimentides testitud. Aga kõigepealt teeme midagi, millel ei ole ühtegi hinnet. Viis kiiret küsimust. Ja iga vastuse järel ütled mulle veel ühe numbri ühest kümneni: kui kindel sa oma vastuses oled.</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble">Milleks see number?</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">M</div>
+    <div class="stack">
+      <div class="who">Maarja Laan</div>
+      <div class="bubble">Sest ma ei taha teada ainult, mida sa oskad. Ma tahan teada, kus su oskus ja su enesekindlus lahku lähevad — need on kaks eri kaarti, ja kõige huvitavam on seal, kus nad ei kattu. Esimene: kolm miinus seitse.</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble">Miinus neli? Kindlus... kolm.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">M</div>
+    <div class="stack">
+      <div class="who">Maarja Laan</div>
+      <div class="bubble">Teine: kas "8 = 5 + 3" on korrektne kirjapilt?</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble">Ei ole? Vastus peaks lõpus olema. Kindlus seitse.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">M</div>
+    <div class="stack">
+      <div class="who">Maarja Laan</div>
+      <div class="bubble">Kolmas: ava sulud — 2(x − 4).</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble">2x − 4. Kindlus kaheksa.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">M</div>
+    <div class="stack">
+      <div class="who">Maarja Laan</div>
+      <div class="bubble">Neljas: 5x = 20. Mis on x?</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble">Neli. Kindlus üheksa.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">M</div>
+    <div class="stack">
+      <div class="who">Maarja Laan</div>
+      <div class="bubble">Viies: mis asi see x üldse on?</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble"><em class="stage">(ohkab)</em> Täht, mille vastust otsitakse. Kindlus kaks.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">M</div>
+    <div class="stack">
+      <div class="who">Maarja Laan</div>
+      <div class="bubble"><em class="stage">(joonistab tahvlile ruudustiku: õige/vale ühel teljel, kindel/ebakindel teisel)</em> Vaata nüüd oma kaarti. "5x = 20" — õige ja kindel: sinu kindel maa. "Kolm miinus seitse" — õige, aga sa ise ei usu seda. See tähendab, et oskus on olemas ja puudu on ainult usaldus; seda on kõige kergem parandada. Aga siin — "2(x − 4) = 2x − 4" — vale, ja kindlus kaheksa. See ruut on kõige ohtlikum, sest sealt tulevad kontrolltöö vead, mida sa ise kunagi ei märka.</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble"><em class="stage">(vaatab ruudustikku)</em> Ma ei teadnudki, et see vale on.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">M</div>
+    <div class="stack">
+      <div class="who">Maarja Laan</div>
+      <div class="bubble">Ja nüüd üks hea uudis, mida vähesed teavad. Uuringud näitavad, et vead, milles inimene oli väga kindel, jäävad pärast parandamist kõige PAREMINI meelde. Sinu kaheksa-punkti-viga on kõige väärtuslikum asi, mis sa täna kaasa tõid. Võtame ta varsti lahti. Aga enne ütle mulle: milles sa väljaspool kooli hea oled? Päriselt hea.</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble"><em class="stage">(kehitab õlgu)</em> Jalkas vist. Ja FIFA-s.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">M</div>
+    <div class="stack">
+      <div class="who">Maarja Laan</div>
+      <div class="bubble">Jalgpall sobib ideaalselt. Kui su tiim kaotab 1:3, mis on väravate vahe?</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble">Miinus kaks.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">M</div>
+    <div class="stack">
+      <div class="who">Maarja Laan</div>
+      <div class="bubble">Ja kui te lööte kaks väravat juurde?</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble">Siis on viik. Null.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">M</div>
+    <div class="stack">
+      <div class="who">Maarja Laan</div>
+      <div class="bubble">Sa liikusid just arvureal miinus kahest nulli, ilma et keegi oleks sind õpetanud. Sten — sa arvutad negatiivsete arvudega igal nädalavahetusel: tabeliseis, väravate vahe, FIFA reiting. Sul pole vaja seda õppida. Sul on vaja endale luba anda kasutada matemaatikatunnis sama pead, mida sa staadionil kasutad. Vali ise: kas sinu pilt negatiivsete arvude jaoks on väravate vahe või midagi muud?</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble">Väravate vahe. Seda ma jagan.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">M</div>
+    <div class="stack">
+      <div class="who">Maarja Laan</div>
+      <div class="bubble">Siis on see nüüd sinu tööriist, mitte minu oma. Kiire proov: viis miinus üheksa?</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble">Nagu 0:4 seisust neli... ei, oota. <em class="stage">(mõtleb)</em> Miinus neli. Lõin viis, lasin üheksa sisse.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">M</div>
+    <div class="stack">
+      <div class="who">Maarja Laan</div>
+      <div class="bubble">Kindlus?</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble"><em class="stage">(üllatunult)</em> Kaheksa.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">M</div>
+    <div class="stack">
+      <div class="who">Maarja Laan</div>
+      <div class="bubble">Pane tähele — kolm minutit tagasi oli sama tehte kindlus kolm. Numbrid ei muutunud, pilt muutus. Nüüd vahetame rollid. Mina lahendan tahvlil ühe ülesande ja sina oled kohtunik. Kohtunik vilistab, kui näeb viga.</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble"><em class="stage">(muigab)</em> Kas te teete siis meelega vea või?</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">M</div>
+    <div class="stack">
+      <div class="who">Maarja Laan</div>
+      <div class="bubble">Seda ma ei ütle. Kohtunik peab kogu aeg valvas olema. <em class="stage">(lahendab valjusti)</em> 2(x − 4) = 10. Avan sulud: kaks korda x on 2x... miinus neli... saan 2x − 4 = 10.</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble"><em class="stage">(kõhkleb)</em> ...Oot. Kas te ei pidanud nelja ka kahega korrutama?</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">M</div>
+    <div class="stack">
+      <div class="who">Maarja Laan</div>
+      <div class="bubble">Kohtunik, ära usu oma kõhutunnet — tõesta. Pane x-i asemele suvaline arv ja vaata, kas 2(x − 4) ja 2x − 4 annavad sama.</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble"><em class="stage">(võtab x = 5)</em> Viis miinus neli on üks, kaks korda üks on kaks. Ja teine: kümme miinus neli on kuus. <em class="stage">(vaatab üles)</em> Ei anna sama. Vile käib!</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">M</div>
+    <div class="stack">
+      <div class="who">Maarja Laan</div>
+      <div class="bubble">Vile käis põhjusega, ja sa ei vaielnud arvamusega — sa katsetasid. See ongi see, mida matemaatikud päriselt teevad. Ja pane tähele: see oli täpselt sinu kaheksa-punkti-kindlusega viga.</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble"><em class="stage">(vaikselt)</em> Ma olen seda vist igas kontrolltöös teinud.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">M</div>
+    <div class="stack">
+      <div class="who">Maarja Laan</div>
+      <div class="bubble">Väga võimalik. Ja tõenäoliselt enam ei tee — sest sa püüdsid ta ise kinni, mitte ei kuulnud minult. Paranda mu lahendus lõpuni ära.</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble">2x − 8 = 10. Liidan mõlemale poole kaheksa... 2x = 18. Jagan kahega, x = 9. Ja kontrollin: üheksa miinus neli on viis, korda kaks on kümme. Klapib.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">M</div>
+    <div class="stack">
+      <div class="who">Maarja Laan</div>
+      <div class="bubble">Kui palju mina selle ülesande juures rääkisin?</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble"><em class="stage">(muigab)</em> Peaaegu üldse mitte.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">M</div>
+    <div class="stack">
+      <div class="who">Maarja Laan</div>
+      <div class="bubble">Nii see edasi lähebki, kolme astmega. Esimeses ülesandes küsin küsimusi mina. Teises küsid sina neid iseendalt — valjusti, täpselt nagu mina küsiksin. Kolmandas oled vait ja küsid peas. Iga astmega jään mina vaiksemaks, sest minu töö on muutuda sulle tarbetuks. Esimene: 3x + 5 = 20. Keda sa tahad üksi jätta?</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble">X-e. Võtan mõlemalt poolt viis ära — 3x = 15. Jagan kolmega, x = 5. Kontroll: kolm korda viis pluss viis, kakskümmend.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">M</div>
+    <div class="stack">
+      <div class="who">Maarja Laan</div>
+      <div class="bubble">Teine aste. 7 − 2x = 15. Nüüd räägi ise endaga, mina kuulan.</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble"><em class="stage">(aeglaselt, valjusti)</em> Keda ma üksi jätan... seda 2x-i. Mida ma teen mõlemal pool... võtan seitsme ära. Jääb miinus 2x võrdub kaheksa. Jagan... miinus kahega. Kaheksa jagatud miinus kahega... väravate vahe... miinus neli. Kas klapib: seitse miinus kaks korda miinus neli... miinus korda miinus on pluss... seitse pluss kaheksa, viisteist. Klapib.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">M</div>
+    <div class="stack">
+      <div class="who">Maarja Laan</div>
+      <div class="bubble"><em class="stage">(vaikselt)</em> Kolmas aste. x/3 + 2 = 7. Peas.</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble"><em class="stage">(kirjutab, jääb seisma)</em> Siin on murd... ma ei tea... <em class="stage">(paus, ise)</em> ...ma ei tea VEEL. Aga ma tean, et tahan x-i üksi jätta. Võtan kahed ära: x/3 = 5. <em class="stage">(vaatab pikalt)</em> X on jagatud kolmega. Mis jagamise tagasi keerab...</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">M</div>
+    <div class="stack">
+      <div class="who">Maarja Laan</div>
+      <div class="bubble"><em class="stage">(ootab, ei ütle midagi)</em></div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble">Korrutamine? Korrutan mõlemad pooled kolmega. x = 15. Kontroll: viisteist jagatud kolmega on viis, pluss kaks on seitse. <em class="stage">(paneb pastaka käest)</em> Klapib.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">M</div>
+    <div class="stack">
+      <div class="who">Maarja Laan</div>
+      <div class="bubble">Sa märkasid, mida sa vahepeal ütlesid?</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble">Et "ma ei tea"?</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">M</div>
+    <div class="stack">
+      <div class="who">Maarja Laan</div>
+      <div class="bubble">Et "ma ei tea VEEL" — ja siis sa ei jäänud seisma, vaid küsisid endalt, mida sa tead. Seda ei õpetanud sulle mina. Nüüd vali ise: kas järgmine ülesanne on samasugune, kergem või kurjem?</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble"><em class="stage">(paus)</em> ...Kurjem.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">M</div>
+    <div class="stack">
+      <div class="who">Maarja Laan</div>
+      <div class="bubble"><em class="stage">(naeratab)</em> See vastus ütleb mulle rohkem kui kõik tänased õiged lahendused kokku. Palun: 3(x + 2) − 4 = 17.</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble"><em class="stage">(vaikselt, omaette)</em> Sulud enne... KÕIK liikmed korda kolm, mitte ainult x... 3x + 6 − 4 = 17. Siis 3x + 2 = 17. Võtan kahed ära, 3x = 15, x = 5. Kontroll: viis pluss kaks on seitse, korda kolm on kakskümmend üks, miinus neli... seitseteist. <em class="stage">(nõjatub tooli seljatoele)</em> Klapib.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">M</div>
+    <div class="stack">
+      <div class="who">Maarja Laan</div>
+      <div class="bubble">Viimased kümme minutit. Pane vihik kinni ja võta tühi leht.</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble">Milleks kinni? Ma võiks ju sealt vaadata.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">M</div>
+    <div class="stack">
+      <div class="who">Maarja Laan</div>
+      <div class="bubble">Sellepärast, et meeldejäämine ei toimu siis, kui info pähe läheb, vaid siis, kui sa ta ise VÄLJA tood. Iga kord, kui sa midagi mälust välja kaevad, muutub see rada laiemaks. Ülelugemine tundub õppimisena, aga ei ole. Kirjuta või joonista kõik, mis sul tänasest meeles on.</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble"><em class="stage">(kirjutab: mõlemal pool sama asi — väravate vahe — sulgudes korruta KÕIKI liikmeid — pane vastus tagasi ja kontrolli — kindel-aga-vale on kõige ohtlikum ruut — "ma ei tea veel" + mida ma tean)</em></div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">M</div>
+    <div class="stack">
+      <div class="who">Maarja Laan</div>
+      <div class="bubble">See leht on väärtuslikum kui terve konspekt, sest iga rida sellel tuli sinu peast. Nüüd plaan — ja selle üle otsustad sina. Uuringud ütlevad ühemõtteliselt: kuus minutit iga päev võidab kahte tundi pühapäeval. Sinu kuus minutit näeks välja nii: kaks minutit eilse tühja lehe harjutust, kolm minutit kaks ülesannet koos kontrolliga, üks minut märgid siia tabelisse, mitu kontrolli klappis. <em class="stage">(annab lihtsa tabeli: kuupäev, klappis / ei klappinud)</em> Pane tähele — sa ei vaja vastuste lehte ega mind. Tagasipanek ütleb sulle ise, kas sul on õige. Millal sinu kuus minutit on?</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble">Pärast trenni? Seitsme ajal.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">M</div>
+    <div class="stack">
+      <div class="who">Maarja Laan</div>
+      <div class="bubble">Kirjuta see ise tabeli peale. Sinu käega, mitte minu omaga. <em class="stage">(Sten kirjutab)</em> Ja veel kaks asja. Esiteks see paanikalause. Järgmise kontrolltöö alguses — enne kui üldse ülesandeid vaatad — kirjuta kaks minutit mustandilehele kõike, mida sa kardad. Sõna-sõnalt: "ma kardan, et...". Kõlab veidralt, aga seda on päris eksamiolukordades testitud — mure, mis on paberile pandud, ei keeruta enam töömälus. Ja kui süda tagub, siis mäleta, mida see tähendab.</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble">Et keha on valmis.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">M</div>
+    <div class="stack">
+      <div class="who">Maarja Laan</div>
+      <div class="bubble">Just. Teiseks: kas sa lubad mul saata su matemaatikaõpetajale lühikese kirja? Mitte kaebamiseks — ma tahan küsida, kas sa saaksid kahe nädala pärast ühe kontrolltöö järele vastata, kui vundament all on. Sina otsustad, kas ma saadan.</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble"><em class="stage">(üllatunult)</em> Ma ei teadnudki, et niimoodi saab. ...Jah, saatke.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">M</div>
+    <div class="stack">
+      <div class="who">Maarja Laan</div>
+      <div class="bubble">Ja päris viimane asi. Tunni alguses vastasid sa viiele küsimusele. Ma küsin kaks neist uuesti. Kolm miinus seitse — ja kindlus.</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble">Miinus neli. Kindlus kümme. See on lihtsalt väravate vahe.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">M</div>
+    <div class="stack">
+      <div class="who">Maarja Laan</div>
+      <div class="bubble">Ja 2(x − 4)?</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble">2x miinus KAHEKSA. Kindlus kümme. Ma ju ise kontrollisin seda.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">M</div>
+    <div class="stack">
+      <div class="who">Maarja Laan</div>
+      <div class="bubble">Tunni alguses ütlesid sa, et sinu eesmärk on "et ei tuleks paanikat, kui õps küsib". Mina just küsisin. Kus paanika oli?</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble"><em class="stage">(paus, päriselt üllatunud)</em> ...Ei olnudki.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">M</div>
+    <div class="stack">
+      <div class="who">Maarja Laan</div>
+      <div class="bubble">Nädala pärast samal ajal. Võta oma tühi leht kaasa — alustame sellest, mida sina mäletad, mitte sellest, mida mina räägin.</div>
+    </div>
+  </div>
+<div class="turn student">
+    <div class="avatar" aria-hidden="true">S</div>
+    <div class="stack">
+      <div class="who">Sten</div>
+      <div class="bubble"><em class="stage">(ukse juures, pöördub)</em> Kas ma tohin seda ruudustikku pildistada? Seda kindel-ja-vale asja. Ma tahan vaadata, kas mul on... teisi selliseid kohti ka.</div>
+    </div>
+  </div>
+<div class="turn tutor">
+    <div class="avatar" aria-hidden="true">M</div>
+    <div class="stack">
+      <div class="who">Maarja Laan</div>
+      <div class="bubble">Sten, sa esitasid just päris matemaatiku küsimuse. ---</div>
+    </div>
+  </div>
+    </div>
+  </section>
+
+  <section class="notes" id="notes" role="tabpanel" aria-labelledby="tab-notes" tabindex="0" hidden>
+    <div class="notes-head">
+      <h2>Kokkuvõte</h2>
+      <p>Sama õpilane, sama tööleht, neli juhendajat. Mida iga versioon selgitab järgmise kohta.</p>
+    </div>
+    <article class="note">
+      <p class="kicker">Võrdlus · versioonid 1–3</p>
+      <h2>Kolm suunda samast lähtepunktist</h2>
+      <div class="prose"><p>Kõik kolm versiooni algavad samast töölehest ja samast "ma ei tea" mustrist, aga liiguvad eri suundades. Karl-Erik lahendab ülesandeid õpilase eest ja pakub reegleid ilma tähenduseta, mistõttu Sten lahkub sama abituna, ainult viisakalt noogutades. Liis loob kõigepealt turvatunde, asendab reegli mudeliga (kaal), tükeldab küsimused nii väikeseks, et "ma ei tea" ei mahu enam vahele, ja lõpetab väikese, aga päris eduelamusega. Aare ei tegele üldse tänase teemaga, vaid diagnoosib kaks tegelikku väärarusaama (võrdusmärk kui käsklus; "väiksemast ei saa suuremat lahutada"), töötab ümber õpilase enesepildi ("auk, mitte omadus") ja annab kaasa metakognitiivse tööriista — kolm eneseküsimust ja "ma tean, et..." alguse —, aktsepteerides, et hinne paraneb aeglasemalt, aga püsivalt.</p></div>
+    </article>
+    <article class="note">
+      <p class="kicker">Võrdlus · miks versioon 4</p>
+      <h2>Kokkuvõte ühe lõiguna</h2>
+      <div class="prose"><p>Maarja hoiab kõik Aare tugevused (diagnostika enne õpetamist, sama kahe väärarusaama tabamine, identiteeditöö, kontroll asendamise teel), aga pöörab rollid ümber: sessiooni teises pooles räägib Sten rohkem kui tema. Eesmärgi sõnastab õpilane ise ja sessioon lõpeb selle mõõtmisega; kindlushinnangud teevad nähtavaks kõige ohtlikuma vea (kindel-aga-vale) ja kasutavad ära hüperkorrektsiooniefekti; metafoor (väravate vahe) on õpilase enda valitud, mitte tutori pakutud; tahtliku veaga näidislahendus teeb õpilasest kohtuniku ja annab talle esimest korda võimu; toestuse taandamine on eksplitsiitne kolmeastmeline redel; "ma ei tea veel" sünnib õpilase suus, mitte keelureeglina; kodutöö on kuueminutiline hajutatud protokoll iseseisva tagasisidesilmuse ja nähtava progressitabeliga, mitte drill; ärevus saab kaks konkreetset testitud tööriista (worry-dump ja erutuse ümbertõlgendus); ning sild aineõpetajani (järelevastamine) toob eduelamuse hindelisse maailma piisavalt lähedale, et motivatsioon vastu peaks — kusjuures ka selle otsuse teeb õpilane.</p></div>
+    </article>
+  </section>
+
+  <footer>MATx — hästi peetud harjutusvihiku moodi. Süvapetrool tint, kriidivalge paber, 28&nbsp;px joonestik.</footer>
+</main>
+<script>
+(function(){
+  var tabs = Array.prototype.slice.call(document.querySelectorAll('.index [role="tab"]'));
+  var panels = tabs.map(function(t){ return document.getElementById(t.getAttribute('aria-controls')); });
+
+  function activate(index, opts){
+    opts = opts || {};
+    tabs.forEach(function(t, i){
+      var selected = i === index;
+      t.setAttribute('aria-selected', String(selected));
+      t.tabIndex = selected ? 0 : -1;
+      panels[i].hidden = !selected;
+    });
+    if (opts.focus) tabs[index].focus();
+    if (opts.pushHash) history.replaceState(null, '', '#' + tabs[index].getAttribute('aria-controls'));
+    if (opts.scroll) panels[index].scrollIntoView({block: 'start'});
+  }
+
+  tabs.forEach(function(tab, i){
+    tab.addEventListener('click', function(){
+      activate(i, {pushHash: true, scroll: true});
+    });
+    tab.addEventListener('keydown', function(e){
+      var next;
+      if (e.key === 'ArrowRight') next = (i + 1) % tabs.length;
+      else if (e.key === 'ArrowLeft') next = (i - 1 + tabs.length) % tabs.length;
+      else if (e.key === 'Home') next = 0;
+      else if (e.key === 'End') next = tabs.length - 1;
+      else return;
+      e.preventDefault();
+      activate(next, {focus: true, pushHash: true});
+    });
+  });
+
+  var startIndex = tabs.findIndex(function(t){ return t.getAttribute('aria-controls') === location.hash.slice(1); });
+  activate(startIndex >= 0 ? startIndex : 0);
+})();
+</script>
+</body>
+</html>
