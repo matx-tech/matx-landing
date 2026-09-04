@@ -9,7 +9,9 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,500&display=swap" rel="stylesheet">
 <style>
-/* Prototype of the matx.ee näidistund. Light theme only. Source of truth for the script until lib/content/demo-script.ts exists. */
+/* FROZEN 2026-09-04. Prototype of the matx.ee näidistund, light theme only.
+   The script is no longer maintained here: lib/content/demo-script.ts is the source of truth.
+   This file is kept as a visual reference; do not edit its inline SCRIPT — change the TS module instead. */
 :root{
   --suvapetrool:#123B38; --kriit:#F7F4ED; --merevaik:#E0A03C;
   --ootahvel:#0B2422; --sammal:#3E7A6B; --terrakota:#B4452F; --ruut:#DDD7C9;
@@ -501,47 +503,6 @@ $('back').addEventListener('click', back);
 $('reset').addEventListener('click', reset);
 showLog.addEventListener('change', function(){ draw(true, false); });
 
-/* ---- self-check (becomes tests/unit/demo-script.test.ts in Phase 2) ---- */
-(function selfCheck(){
-  var DOM = { goal: ['paanika','tööleht'], eq: ['käsklus','ok'], neg: ['ei-saa','ok'], sulud: ['vale','ok'], hintAsked: ['jah','ei'], metaphor: ['termomeeter','väravad'] };
-  var PROHIBITED = ['täielik kooskõla','A+ usaldusskoor','99.9% uptime','garanteeritud','2.3× kiirem','säästa 10 tundi','NIS2 vastavus','AI vestlus','Vale!'];
-  var combos = [{}];
-  Object.keys(DOM).forEach(function(k){ var out = []; combos.forEach(function(c){ DOM[k].forEach(function(v){ var n = Object.assign({}, c); n[k] = v; out.push(n); }); }); combos = out; });
-  console.assert(combos.length === 64, 'flag combos');
-  var strings = [];
-  function walk(v){ if (typeof v === 'string') strings.push(v); else if (v && typeof v === 'object') Object.keys(v).forEach(function(k){ walk(v[k]); }); }
-  Object.keys(SCRIPT).forEach(function(id){
-    var n = SCRIPT[id]; walk(n.card); console.assert(beatOf(id), 'no beat for ' + id);
-    combos.forEach(function(f){
-      var t = res(n.tutor, f), chs = res(n.choices, f), nx = res(n.next, f), lg = res(n.log, f);
-      strings.push(t); if (lg) strings.push(lg);
-      if (chs){ chs.forEach(function(c){ strings.push(c.label); if (c.set) Object.keys(c.set).forEach(function(k){ console.assert(DOM[k] && DOM[k].indexOf(c.set[k]) >= 0, 'flag domain ' + id + ' ' + k + '=' + c.set[k]); }); console.assert(c.teacher || SCRIPT[c.next], 'dangling ' + id + ' → ' + c.next); }); }
-      else console.assert(SCRIPT[nx], 'dangling next ' + id + ' → ' + nx);
-      console.assert(id === 'end' ? chs.length === 1 : !chs || (chs.length >= 2 && chs.length <= 4), 'choice count ' + id);
-    });
-  });
-  combos.forEach(function(f){
-    var color = {}; var ok = true;
-    (function dfs(id){
-      if (color[id] === 1){ ok = false; console.assert(false, 'cycle at ' + id); return; }
-      if (color[id] === 2) return; color[id] = 1;
-      var n = SCRIPT[id], chs = res(n.choices, f);
-      if (id !== 'end'){ var outs = chs ? chs.map(function(c){ return c.next; }) : [res(n.next, f)]; outs.forEach(dfs); }
-      color[id] = 2;
-    })('s0');
-    console.assert(ok && color.end === 2, 'end unreachable under ' + JSON.stringify(f));
-  });
-  var declined = /\bx-[a-zõäöü]+/i, emoji = /[\u{1F300}-\u{1FAFF}✅❌✔]/u;
-  strings.forEach(function(s){
-    console.assert(!declined.test(s), 'declined x: ' + s);
-    console.assert(!emoji.test(s), 'emoji: ' + s);
-    PROHIBITED.forEach(function(p){ console.assert(s.indexOf(p) < 0, 'prohibited "' + p + '": ' + s); });
-  });
-  ['s4-done','s5-done','s6-done','s7-kokkuvote'].forEach(function(id){ combos.forEach(function(f){
-    var t = res(SCRIPT[id].tutor, f), lg = res(SCRIPT[id].log, f);
-    console.assert(!/\d/.test(t) && !(lg && /\d/.test(lg)), 'digits in ' + id); }); });
-  console.log('MATx näidis: ' + Object.keys(SCRIPT).length + ' sõlme, self-check done');
-})();
 })();
 </script>
 </body>
