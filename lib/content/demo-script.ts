@@ -496,7 +496,7 @@ export const DEMO_COPY = {
     eyebrow: 'Näidistund · ette kirjutatud, mitte päris AI',
     title: '„Ma ei tea.”',
     sub: 'Sten, 7. klass. Kakskümmend minutit. Sina valid, mida ta vastab.',
-    // `briefEmphasis` renders bold, immediately followed by `brief`.
+    // `briefEmphasis` renders bold, then a space, then `brief`.
     briefEmphasis: 'Sten',
     brief:
       'on väljamõeldud õpilane. Hinded matemaatikas 2 ja 3, harjumus öelda „ma ei tea“, veendumus, et ta „lihtsalt ei ole mata-inimene“. Koduseks on jäänud tööleht võrranditest. Iga sinu valik näitab, mida MATx sellises kohas teeb.',
@@ -507,6 +507,11 @@ export const DEMO_COPY = {
   lesson: {
     label: 'Näidistund',
     choicesLabel: 'Steni vastus',
+    // Speaker labels and avatar initials — never hardcoded in the renderer.
+    tutorName: 'MATx',
+    tutorInitial: 'M',
+    studentName: 'Sten',
+    studentInitial: 'S',
   },
   teacher: {
     label: 'Õpetaja vaade',
@@ -560,10 +565,13 @@ export const DEMO_COPY = {
 /** One skill state letter per skill column; see `DEMO_COPY.teacher.stateLabels`. */
 export type DemoSkillState = 'k' | 's' | 'l' | 'p';
 
+/** Five state letters, one per `DEMO_SKILLS` column, in column order. */
+export type DemoSkillStates =
+  `${DemoSkillState}${DemoSkillState}${DemoSkillState}${DemoSkillState}${DemoSkillState}`;
+
 export type DemoClassRow = {
   initials: string;
-  /** Five state letters, one per `DEMO_SKILLS` column, in column order. */
-  states: string;
+  states: DemoSkillStates;
 };
 
 /** 21 fixture classmates. Sten's row is derived at runtime (story 1.2). */
