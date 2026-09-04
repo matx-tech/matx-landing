@@ -1,0 +1,3 @@
+{"ts": 1788551936450886912, "event": "spec-status-transition-observed", "spec": "/home/notroot/Documents/MATx/landing-page/matx-landing/_bmad-output/implementation-artifacts/spec-1-1-type-the-demo-script.md", "status": "in-review"}
+{"ts": 1788554322251056172, "event": "straggler-reap", "pids": [713781, 715617, 715634, 715549, 715571, 714552, 714450, 715369, 714031, 714029, 714107, 714021, 715351]}
+{"ts": 1788554322753486411, "event": "kill-outcome", "reaped": true, "forced": [], "unreaped": []}
