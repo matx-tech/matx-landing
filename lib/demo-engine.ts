@@ -76,6 +76,21 @@ export function replay(history: DemoHistoryEntry[]): DemoReplayState {
   return { flags, steps, currentId, awaitingAdvance };
 }
 
+/**
+ * Ports the prototype's `back()` (naidistund.html:452): pop trailing entries
+ * until one with a non-null `choice` is also popped, so the offering choice
+ * (plain or beneath an auto-advance run) is re-presented. No-op on an empty
+ * history or one with only `choice: null` entries. Never mutates `history`.
+ */
+export function popLastChoice(history: DemoHistoryEntry[]): DemoHistoryEntry[] {
+  const next = [...history];
+  let entry = next.pop();
+  while (entry && entry.choice == null) {
+    entry = next.pop();
+  }
+  return next;
+}
+
 // ---- walkAllPaths ----------------------------------------------------------
 
 export type DemoEdge = { from: string; to: string };
