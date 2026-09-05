@@ -438,6 +438,7 @@ Igal võimekusel on avalik staatus — Saadaval, Piloodis või Kavandatud — ja
 
 - [Esileht](${SITE_META.url}/): Toote tutvustus — tõendusloogi etapid, probleem ja lahendus ning piloodiga liitumise vorm.
 - [Tehniline ülevaade](${SITE_META.url}/tehniline): Arhitektuur, turvalisus, andmekaitse, vastavus, hanked ja võimekuste staatused hankijatele ning kooli IT-le.
+- [Näidistund](${SITE_META.url}/demo): Skriptitud näidistund, mis illustreerib tõendusloogi ilma registreerimiseta.
 
 ## Optional
 

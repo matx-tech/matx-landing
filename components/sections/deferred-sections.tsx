@@ -155,6 +155,14 @@ function createLazySection(
 // demand when the user scrolls near them, not in the initial bundle. This
 // whole tree lives in one client island so the page itself stays a Server
 // Component with only the hero rendered statically.
+const DemoSection = createLazySection(
+  () =>
+    import('@/components/sections/demo').then((mod) => ({
+      default: mod.DemoSection,
+    })),
+  { id: SECTION_IDS.demo },
+);
+
 const EvidenceLoopSection = createLazySection(
   () =>
     import('@/components/sections/evidence-loop').then((mod) => ({
@@ -251,7 +259,13 @@ const FooterSection = createLazySection(
 export function DeferredSections() {
   return (
     <>
-      {/* Narrative order: hero → evidence loop → student → problem → teacher → context → topics → adoption → trust → faq → cta */}
+      {/* Narrative order: hero → demo → evidence loop → student → problem → teacher → context → topics → adoption → trust → faq → cta */}
+      <SectionGate
+        id={SECTION_IDS.demo}
+        placeholderClassName='min-h-[36rem] md:min-h-[40rem] lg:min-h-[44rem]'
+      >
+        <DemoSection />
+      </SectionGate>
       <SectionGate
         id={SECTION_IDS.workflow}
         placeholderClassName='min-h-[36rem] md:min-h-[40rem] lg:min-h-[44rem]'
