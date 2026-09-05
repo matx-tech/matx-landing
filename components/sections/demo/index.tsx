@@ -88,8 +88,14 @@ export function DemoSection() {
   const isTyping = started && revealedCount < displayTurns.length;
   const revealed = displayTurns.slice(0, revealedCount);
 
+  // Keep each choice's index into the raw (unfiltered) array `replay`
+  // resolves against — filtering here must never shift the index a click
+  // sends to `handleChoice`, or a future node mixing a `teacher` choice
+  // alongside real choices would silently misroute history playback.
   const resolvedChoices = currentNode.choices
-    ? resolve(currentNode.choices, flags).filter((choice) => !choice.teacher)
+    ? resolve(currentNode.choices, flags)
+        .map((choice, rawIndex) => ({ choice, rawIndex }))
+        .filter(({ choice }) => !choice.teacher)
     : [];
   const showChoices = started && !isTyping && resolvedChoices.length > 0;
 
@@ -280,12 +286,11 @@ export function DemoSection() {
               aria-label={DEMO_COPY.lesson.choicesLabel}
               className={styles.choices}
             >
-              {resolvedChoices.map((choice, index) => (
+              {resolvedChoices.map(({ choice, rawIndex }) => (
                 <button
-                  // biome-ignore lint/suspicious/noArrayIndexKey: node.choices is a fixed array per render, order never changes mid-list
-                  key={`${index}-${choice.label}`}
+                  key={`${rawIndex}-${choice.label}`}
                   type='button'
-                  onClick={() => handleChoice(index)}
+                  onClick={() => handleChoice(rawIndex)}
                 >
                   {choice.label}
                 </button>
