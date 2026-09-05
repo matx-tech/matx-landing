@@ -198,12 +198,13 @@ export type DemoTeacherView = {
   stenRow: DemoSkillStates;
   /** Strengths, blocker, hint — in that order. */
   studentCard: [string, string, string];
+  /** Whether the "sulgude avamine" (parentheses) blocker groups this student for cluster teaching. */
   inCluster: boolean;
 };
 
 /**
  * The derivation is the prototype's `deriveTeacher` unchanged; only the returned fields
- * were renamed (`sten`/`card` → `stenRow`/`studentCard`) for the story 3.3/3.4 contract.
+ * were renamed (`sten`/`card` → `stenRow`/`studentCard`) to match the teacher-panel contract.
  * Reads copy from `DEMO_COPY.teacher`, never inlines new Estonian text.
  */
 export function deriveTeacherView(flags: DemoFlags): DemoTeacherView {
@@ -212,7 +213,7 @@ export function deriveTeacherView(flags: DemoFlags): DemoTeacherView {
     'l',
     flags.sulud === 'vale' ? 'k' : 'l',
     flags.neg === 'ei-saa' ? 's' : 'l',
-    'p',
+    'p', // murrud (fractions) is never assessed in this demo — always 'proovimata'.
   ].join('') as DemoSkillStates;
   const studentCard: [string, string, string] = [
     DEMO_COPY.teacher.cardStrengths,
