@@ -83,7 +83,7 @@ export const HERO_COPY = {
   support:
     'matx.ee seob õpilase harjutamise, arusaadava tagasiside ja õpetaja tegevussoovituse üheks jälgitavaks töövooks.',
   primaryCTA: 'Liitu kooli piloodiga',
-  secondaryCTA: 'Vaata töövoogu',
+  secondaryCTA: 'Proovi näidistundi',
   trustLine: 'Soovitused toetavad õpetaja otsust. Õpetaja kontroll säilib.',
   // Persona picker — labels mirror the ADOPTION_ROUTES vocabulary.
   personaPrompt: 'Ma olen:',
@@ -420,6 +420,7 @@ export const SECTION_IDS = {
   pilot: 'piloot',
   trust: 'usaldus',
   faq: 'kkk',
+  demo: 'näidistund',
 } as const;
 
 // llms.txt — LLM-friendly site index, served at /llms.txt via
@@ -431,7 +432,7 @@ export const LLMS_TXT = `# MATx
 
 MATx on pilootfaasis valitud koolidega. Töövoog põhineb tõendusloogil: õpilase vastus → kontrollitav veamustri signaal (hüpotees, mitte lõplik diagnoos) → sihitud järgmine harjutus → õpetaja otsus (soovituse vastuvõtmine, muutmine või eiramine). Õpetaja kontroll säilib alati.
 
-Igal võimekusel on avalik staatus — Saadaval, Piloodis või Kavandatud — ja allikas. Avalikult on keelatud väljamõeldud statistika, garantiid ja ülepaisutatud vastavusväited. Piloodiga liitumine toimub registreerimisvormi kaudu; 15-minutiline tutvustuskõne on broneeritav Calendlys.
+Igal võimekusel on avalik staatus — Saadaval, Piloodis või Kavandatud — ja allikas. Avalikult on keelatud väljamõeldud statistika, garantiid ja ülepaisutatud vastavusväited. Piloodiga liitumine toimub registreerimisvormi kaudu; 15-minutiline tutvustuskõne on broneeritav Calendlys. Esilehel saab proovida skriptitud näidistundi, mis illustreerib tõendusloogi ilma registreerimiseta.
 
 ## Lehed
 
@@ -448,6 +449,7 @@ Igal võimekusel on avalik staatus — Saadaval, Piloodis või Kavandatud — ja
 
 export const LANDING_NAV_ITEMS = [
   { label: 'Kuidas töötab', href: `#${SECTION_IDS.workflow}` },
+  { label: 'Näidistund', href: `#${SECTION_IDS.demo}` },
   { label: 'Õpilasele', href: `#${SECTION_IDS.student}` },
   { label: 'Õpetajale', href: `#${SECTION_IDS.teacher}` },
   { label: 'Teemad', href: `#${SECTION_IDS.capabilities}` },

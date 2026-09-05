@@ -194,7 +194,7 @@ export function HeroSection() {
                 )}
 
                 <a
-                  href={`#${SECTION_IDS.workflow}`}
+                  href={`#${SECTION_IDS.demo}`}
                   className='btn-secondary min-w-[240px] sm:min-w-[280px] px-8 py-4 text-lg rounded-xl font-semibold group focus-ring-target min-h-[44px]'
                 >
                   {HERO_COPY.secondaryCTA}
