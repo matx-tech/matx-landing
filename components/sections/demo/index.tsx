@@ -232,73 +232,77 @@ export function DemoSection() {
   }
 
   return (
-    <section id={SECTION_IDS.demo} className={`${styles.demo} ${newsreaderTutor.variable}`}>
-      {started && (
-        <div className={styles.top}>
-          <div className={styles.in}>
-            <button type='button' className={styles.ctl} onClick={handleBack}>
-              {DEMO_COPY.controls.back}
-            </button>
-            <button type='button' className={styles.ctl} onClick={handleReset}>
-              {DEMO_COPY.controls.reset}
-            </button>
-            <label className={styles.ctl}>
-              <input
-                type='checkbox'
-                checked={showLog}
-                onChange={(e) => setShowLog(e.target.checked)}
-              />{' '}
-              {DEMO_COPY.controls.showLog}
-            </label>
-            <span className={styles.beat} aria-live='polite'>
-              {currentBeatName}
-            </span>
-          </div>
-          <div className={styles.progress} aria-hidden='true'>
-            <span style={{ transform: `scaleX(${progressRatio})` }} />
-          </div>
-        </div>
-      )}
-
-      {!started ? (
-        <div>
-          <p>{DEMO_COPY.cover.eyebrow}</p>
-          <h2>{DEMO_COPY.cover.title}</h2>
-          <p>{DEMO_COPY.cover.sub}</p>
-          <p>
-            <strong>{DEMO_COPY.cover.briefEmphasis}</strong> {DEMO_COPY.cover.brief}
-          </p>
-          <p>{DEMO_COPY.cover.honest}</p>
-          <button type='button' onClick={() => setStarted(true)}>
-            {DEMO_COPY.cover.start}
-          </button>
-        </div>
-      ) : (
-        <div>
-          <ol ref={chatRef} role='log' aria-live='polite' className={styles.chat}>
-            {items}
-          </ol>
-          {showChoices && (
-            // biome-ignore lint/a11y/useSemanticElements: intent-contract requires <div role="group"> for this choice list — not a native form's <fieldset>
-            <div
-              ref={choicesGroupRef}
-              role='group'
-              aria-label={DEMO_COPY.lesson.choicesLabel}
-              className={styles.choices}
-            >
-              {resolvedChoices.map(({ choice, rawIndex }) => (
-                <button
-                  key={`${rawIndex}-${choice.label}`}
-                  type='button'
-                  onClick={() => handleChoice(rawIndex)}
-                >
-                  {choice.label}
-                </button>
-              ))}
+    <section id={SECTION_IDS.demo} className='container mx-auto px-4 md:px-8 lg:px-16'>
+      <p className='text-text-secondary text-sm max-w-2xl mx-auto my-4'>{DEMO_COPY.foot}</p>
+      <div className={`${styles.demo} ${newsreaderTutor.variable}`}>
+        {started && (
+          <div className={styles.top}>
+            <div className={styles.in}>
+              <button type='button' className={styles.ctl} onClick={handleBack}>
+                {DEMO_COPY.controls.back}
+              </button>
+              <button type='button' className={styles.ctl} onClick={handleReset}>
+                {DEMO_COPY.controls.reset}
+              </button>
+              <label className={styles.ctl}>
+                <input
+                  type='checkbox'
+                  checked={showLog}
+                  onChange={(e) => setShowLog(e.target.checked)}
+                />{' '}
+                {DEMO_COPY.controls.showLog}
+              </label>
+              <span className={styles.beat} aria-live='polite'>
+                {currentBeatName}
+              </span>
             </div>
-          )}
-        </div>
-      )}
+            <div className={styles.progress} aria-hidden='true'>
+              <span style={{ transform: `scaleX(${progressRatio})` }} />
+            </div>
+          </div>
+        )}
+
+        {!started ? (
+          <div>
+            <p>{DEMO_COPY.cover.eyebrow}</p>
+            <h2>{DEMO_COPY.cover.title}</h2>
+            <p>{DEMO_COPY.cover.sub}</p>
+            <p>
+              <strong>{DEMO_COPY.cover.briefEmphasis}</strong> {DEMO_COPY.cover.brief}
+            </p>
+            <p>{DEMO_COPY.cover.honest}</p>
+            <button type='button' onClick={() => setStarted(true)}>
+              {DEMO_COPY.cover.start}
+            </button>
+          </div>
+        ) : (
+          <div>
+            <ol ref={chatRef} role='log' aria-live='polite' className={styles.chat}>
+              {items}
+            </ol>
+            {showChoices && (
+              // biome-ignore lint/a11y/useSemanticElements: intent-contract requires <div role="group"> for this choice list — not a native form's <fieldset>
+              <div
+                ref={choicesGroupRef}
+                role='group'
+                aria-label={DEMO_COPY.lesson.choicesLabel}
+                className={styles.choices}
+              >
+                {resolvedChoices.map(({ choice, rawIndex }) => (
+                  <button
+                    key={`${rawIndex}-${choice.label}`}
+                    type='button'
+                    onClick={() => handleChoice(rawIndex)}
+                  >
+                    {choice.label}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+      <p className='text-text-secondary text-sm max-w-2xl mx-auto my-4'>{DEMO_COPY.foot}</p>
     </section>
   );
 }
