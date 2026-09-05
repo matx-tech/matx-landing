@@ -4,6 +4,7 @@ import {
   DEMO_COPY,
   DEMO_FLAG_DOMAINS,
   DEMO_SCRIPT,
+  DEMO_SKILLS,
   type DemoChoice,
   type DemoFlags,
 } from '../../lib/content/demo-script.ts';
@@ -200,5 +201,31 @@ void describe('demo-script — content contract (AC2)', () => {
     for (const s of allStrings) {
       assert.equal(allowed.test(s), true, `out-of-subset character in: ${s.slice(0, 80)}`);
     }
+  });
+});
+
+void describe('DEMO_SKILLS — taxonomy anchoring (AC: 3.2)', () => {
+  const TAXONOMY_ID_RE = /^[a-z]+(\.[a-z0-9_]+){2}$/;
+
+  void test('every taxonomyId is a non-null, non-empty string', () => {
+    for (const skill of DEMO_SKILLS) {
+      assert.equal(typeof skill.taxonomyId, 'string', `${skill.label}: taxonomyId is not a string`);
+      assert.notEqual(skill.taxonomyId, '', `${skill.label}: taxonomyId is empty`);
+    }
+  });
+
+  void test('every taxonomyId matches ^[a-z]+(\\.[a-z0-9_]+){2}$', () => {
+    for (const skill of DEMO_SKILLS) {
+      assert.equal(
+        TAXONOMY_ID_RE.test(skill.taxonomyId ?? ''),
+        true,
+        `${skill.label}: taxonomyId "${skill.taxonomyId}" does not match the expected pattern`,
+      );
+    }
+  });
+
+  void test('all five taxonomyId values are pairwise unique', () => {
+    const ids = DEMO_SKILLS.map((skill) => skill.taxonomyId);
+    assert.equal(new Set(ids).size, ids.length, `duplicate taxonomyId found in: ${ids.join(', ')}`);
   });
 });

@@ -601,15 +601,21 @@ export const DEMO_CLASS_ROWS: DemoClassRow[] = [
 
 export type DemoSkill = {
   label: string;
-  /** Story 3.2 replaces null with an ID from the frozen taxonomy. */
+  /**
+   * Story 3.2 anchors this to a node ID from the frozen taxonomy exhibit:
+   * `matxteacher/LISA_3_Kulmutatud_taksonoomia.xlsx`, sheet "Teemad → Mikrooskused",
+   * SHA-256 25230b569bb47ce9f927327647c7acdc969906b03c511bf8c59516f29fb2144b,
+   * checked 2026-09-05. On disagreement between the xlsx and the SQL migrations
+   * that are generated from it, the xlsx wins — it is the signed contract exhibit.
+   */
   taxonomyId: string | null;
 };
 
 /** The five skill columns, in table order. */
 export const DEMO_SKILLS: DemoSkill[] = [
-  { label: 'Võrduse omadused', taxonomyId: null },
-  { label: 'Kontroll asendamisega', taxonomyId: null },
-  { label: 'Sulgude avamine', taxonomyId: null },
-  { label: 'Negatiivsed arvud', taxonomyId: null },
-  { label: 'Murrud', taxonomyId: null },
+  { label: 'Võrduse omadused', taxonomyId: 'algebra.vorrand.omadus_liitmine_lahutamine' },
+  { label: 'Kontroll asendamisega', taxonomyId: 'algebra.vorrand.lahendi_moiste' },
+  { label: 'Sulgude avamine', taxonomyId: 'algebra.avaldis.sulgude_avamine' },
+  { label: 'Negatiivsed arvud', taxonomyId: 'arv.negatiivne.moiste' },
+  { label: 'Murrud', taxonomyId: 'arv.murd.liitmine_lahutamine' },
 ];
