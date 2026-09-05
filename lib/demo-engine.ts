@@ -194,22 +194,23 @@ export function walkAllPaths(script: Record<string, DemoNode>): DemoPathWalk {
 // ---- deriveTeacherView ------------------------------------------------------
 
 export type DemoTeacherView = {
-  sten: DemoSkillStates;
+  /** Sten's five state letters, one per `DEMO_SKILLS` column, in column order. */
+  stenRow: DemoSkillStates;
   /** Strengths, blocker, hint — in that order. */
-  card: [string, string, string];
+  studentCard: [string, string, string];
   inCluster: boolean;
 };
 
 /** Ports `deriveTeacher` verbatim — reads copy from `DEMO_COPY.teacher`, never inlines new Estonian text. */
 export function deriveTeacherView(flags: DemoFlags): DemoTeacherView {
-  const sten = [
+  const stenRow = [
     flags.eq === 'käsklus' ? 's' : 'l',
     'l',
     flags.sulud === 'vale' ? 'k' : 'l',
     flags.neg === 'ei-saa' ? 's' : 'l',
     'p',
   ].join('') as DemoSkillStates;
-  const card: [string, string, string] = [
+  const studentCard: [string, string, string] = [
     DEMO_COPY.teacher.cardStrengths,
     flags.sulud === 'vale'
       ? DEMO_COPY.teacher.cardBlockerSulud
@@ -218,5 +219,5 @@ export function deriveTeacherView(flags: DemoFlags): DemoTeacherView {
         : DEMO_COPY.teacher.cardBlockerNoneNegOk,
     flags.hintAsked === 'jah' ? DEMO_COPY.teacher.cardHintAsked : DEMO_COPY.teacher.cardHintNone,
   ];
-  return { sten, card, inCluster: flags.sulud === 'vale' };
+  return { stenRow, studentCard, inCluster: flags.sulud === 'vale' };
 }
