@@ -201,7 +201,11 @@ export type DemoTeacherView = {
   inCluster: boolean;
 };
 
-/** Ports `deriveTeacher` verbatim — reads copy from `DEMO_COPY.teacher`, never inlines new Estonian text. */
+/**
+ * The derivation is the prototype's `deriveTeacher` unchanged; only the returned fields
+ * were renamed (`sten`/`card` → `stenRow`/`studentCard`) for the story 3.3/3.4 contract.
+ * Reads copy from `DEMO_COPY.teacher`, never inlines new Estonian text.
+ */
 export function deriveTeacherView(flags: DemoFlags): DemoTeacherView {
   const stenRow = [
     flags.eq === 'käsklus' ? 's' : 'l',

@@ -65,22 +65,56 @@ function flagCombinations(): DemoFlags[] {
   return combos;
 }
 
+// Murrud (column 5) is always 'p', so a "perfect" row is 'llllp', never 'lllll'.
 void describe('deriveTeacherView', () => {
   const COMBOS = flagCombinations();
-  // Widened to unknown[] first: DEMO_COPY is `as const`, so Object.values yields a
-  // literal union that a `value is string` predicate cannot narrow.
-  const TEACHER_STRINGS = new Set(
-    (Object.values(DEMO_COPY.teacher) as unknown[]).filter(
-      (value): value is string => typeof value === 'string',
-    ),
-  );
+  /** The six sentences the derivation may select from — not every string in DEMO_COPY.teacher. */
+  const CARD_SENTENCES: ReadonlySet<string> = new Set([
+    DEMO_COPY.teacher.cardStrengths,
+    DEMO_COPY.teacher.cardBlockerSulud,
+    DEMO_COPY.teacher.cardBlockerNoneNegOk,
+    DEMO_COPY.teacher.cardBlockerNoneNegWeak,
+    DEMO_COPY.teacher.cardHintAsked,
+    DEMO_COPY.teacher.cardHintNone,
+  ]);
+  /** The alphabet is whatever the copy table can render — not a hardcoded copy of it. */
+  const STATE_LETTERS = Object.keys(DEMO_COPY.teacher.stateLabels);
+
+  /**
+   * Every stenRow the derivation can emit, written out as a literal so the assertions
+   * cannot mirror the implementation's own ternaries. Keyed by `eq|sulud|neg`; the
+   * remaining flags (goal, metaphor, hintAsked) are absent because they must not matter.
+   */
+  const GOLDEN_ROWS: Record<string, string> = {
+    'käsklus|vale|ei-saa': 'slksp',
+    'käsklus|vale|ok': 'slklp',
+    'käsklus|ok|ei-saa': 'sllsp',
+    'käsklus|ok|ok': 'slllp',
+    'ok|vale|ei-saa': 'llksp',
+    'ok|vale|ok': 'llklp',
+    'ok|ok|ei-saa': 'lllsp',
+    'ok|ok|ok': 'llllp',
+  };
 
   void test('enumerates all 64 flag combinations', () => {
     assert.equal(COMBOS.length, 64);
   });
 
+  void test('DEMO_SKILLS column order is frozen — stenRow positions are bound to it', () => {
+    assert.deepEqual(
+      DEMO_SKILLS.map((skill) => skill.label),
+      [
+        'Võrduse omadused',
+        'Kontroll asendamisega',
+        'Sulgude avamine',
+        'Negatiivsed arvud',
+        'Murrud',
+      ],
+    );
+  });
+
   void test('returns exactly stenRow, studentCard, inCluster', () => {
-    for (const flags of [{} as DemoFlags, ...COMBOS]) {
+    for (const flags of [{}, ...COMBOS]) {
       assert.deepEqual(Object.keys(deriveTeacherView(flags)).sort(), [
         'inCluster',
         'stenRow',
@@ -89,7 +123,7 @@ void describe('deriveTeacherView', () => {
     }
   });
 
-  void test('full happy path: everything läbitud, not in the cluster', () => {
+  void test('full happy path: everything läbitud except murrud, not in the cluster', () => {
     const view = deriveTeacherView({
       goal: 'tööleht',
       eq: 'ok',
@@ -98,8 +132,6 @@ void describe('deriveTeacherView', () => {
       hintAsked: 'ei',
       metaphor: 'väravad',
     });
-    // Murrud (column 5) is always 'p' — the spec matrix's 'lllll' contradicts its own
-    // AC ("column 5 is always p"); the AC and the frozen derivation win.
     assert.equal(view.stenRow, 'llllp');
     assert.equal(view.inCluster, false);
   });
@@ -117,28 +149,33 @@ void describe('deriveTeacherView', () => {
 
   void test('empty flags (mid-lesson) derive llllp without throwing', () => {
     const view = deriveTeacherView({});
-    // Murrud (column 5) is always 'p' — the spec matrix's 'lllll' contradicts its own
-    // AC ("column 5 is always p"); the AC and the frozen derivation win.
     assert.equal(view.stenRow, 'llllp');
     assert.equal(view.inCluster, false);
   });
 
-  void test('maps every column per DEMO_SKILLS order across all 64 combinations', () => {
+  void test('matches the golden stenRow for its (eq, sulud, neg) triple, all 64 combinations', () => {
     for (const flags of COMBOS) {
       const { stenRow } = deriveTeacherView(flags);
       const where = JSON.stringify(flags);
       assert.equal(stenRow.length, DEMO_SKILLS.length, `stenRow width for ${where}`);
       for (const [index, letter] of [...stenRow].entries()) {
         assert.ok(
-          ['k', 's', 'l', 'p'].includes(letter),
-          `${DEMO_SKILLS[index].label}: invalid state '${letter}' for ${where}`,
+          STATE_LETTERS.includes(letter),
+          `${DEMO_SKILLS[index].label}: state '${letter}' has no stateLabels entry, for ${where}`,
         );
       }
-      assert.equal(stenRow[0], flags.eq === 'käsklus' ? 's' : 'l', `Võrduse omadused ${where}`);
-      assert.equal(stenRow[1], 'l', `Kontroll asendamisega ${where}`);
-      assert.equal(stenRow[2], flags.sulud === 'vale' ? 'k' : 'l', `Sulgude avamine ${where}`);
-      assert.equal(stenRow[3], flags.neg === 'ei-saa' ? 's' : 'l', `Negatiivsed arvud ${where}`);
-      assert.equal(stenRow[4], 'p', `Murrud ${where}`);
+      assert.equal(stenRow, GOLDEN_ROWS[`${flags.eq}|${flags.sulud}|${flags.neg}`], where);
+    }
+  });
+
+  void test('goal, metaphor and hintAsked never affect stenRow', () => {
+    for (const flags of COMBOS) {
+      const skillFlagsOnly = { eq: flags.eq, sulud: flags.sulud, neg: flags.neg };
+      assert.equal(
+        deriveTeacherView(flags).stenRow,
+        deriveTeacherView(skillFlagsOnly).stenRow,
+        JSON.stringify(flags),
+      );
     }
   });
 
@@ -152,7 +189,19 @@ void describe('deriveTeacherView', () => {
     }
   });
 
-  void test('studentCard is 3 non-empty DEMO_COPY.teacher sentences across all 64 combinations', () => {
+  void test('card sentences carry the text that distinguishes their branch', () => {
+    assert.match(deriveTeacherView({ neg: 'ei-saa' }).studentCard[1], /vajavad kordamist/);
+    assert.match(deriveTeacherView({ neg: 'ok' }).studentCard[1], /on paigas/);
+    // sulud wins over neg: the blocker names the parentheses, not the negatives.
+    assert.match(
+      deriveTeacherView({ sulud: 'vale', neg: 'ei-saa' }).studentCard[1],
+      /sulgude avamine/i,
+    );
+    assert.match(deriveTeacherView({ hintAsked: 'jah' }).studentCard[2], /küsis ise/);
+    assert.match(deriveTeacherView({ hintAsked: 'ei' }).studentCard[2], /ei küsinud/);
+  });
+
+  void test('studentCard is 3 non-empty selectable card sentences across all 64 combinations', () => {
     for (const flags of COMBOS) {
       const { studentCard } = deriveTeacherView(flags);
       const where = JSON.stringify(flags);
@@ -160,8 +209,8 @@ void describe('deriveTeacherView', () => {
       for (const sentence of studentCard) {
         assert.ok(sentence.length > 0, `empty card sentence for ${where}`);
         assert.ok(
-          TEACHER_STRINGS.has(sentence),
-          `card sentence not in DEMO_COPY.teacher: ${where}`,
+          CARD_SENTENCES.has(sentence),
+          `card sentence is not one of the six selectable ones: ${where}`,
         );
       }
       assert.equal(studentCard[0], DEMO_COPY.teacher.cardStrengths, `strengths for ${where}`);
